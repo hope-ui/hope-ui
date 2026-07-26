@@ -1,8 +1,13 @@
 # `createDismissable`
 
 Calls an `onDismiss` callback on Escape keydown, outside pointerdown and/or outside focus
-while active. Built fresh for hope-ui, modeled on Base UI's/React Aria's dismiss-layer
-behavior.
+while active, for the **topmost** open layer.
+
+The single-layer half was built fresh for hope-ui, modeled on Base UI's/React Aria's dismiss-layer
+behavior. The layer stack that came later is a port: the flat activation-order array and its
+topmost check are React Aria `useOverlay`'s `visibleOverlays` (Adobe, Apache-2.0), so the file
+carries an `@license` header and a row in both `NOTICE.md` tables. `bubbles` takes its name and
+shape — but no source — from Base UI's `useDismiss` (MIT).
 
 ## API
 
@@ -15,6 +20,7 @@ function createDismissable(options: {
   dismissOnOutsidePointerDown?: boolean; // default true
   exclude?: Accessor<Element[]>;
   dismissOnFocusOutside?: boolean; // default false
+  bubbles?: boolean | { escapeKey?: boolean; outsidePress?: boolean }; // default: neither
 }): void;
 ```
 
@@ -26,6 +32,8 @@ function createDismissable(options: {
 - `exclude` — elements that don't count as "outside", subtrees included. See below.
 - `dismissOnFocusOutside` — dismiss when focus lands outside the container. **Default `false`**;
   a modal layer traps focus, so the listener would be dead weight there.
+- `bubbles` — whether a dismissal handled by the layer **above** this one also reaches it.
+  **Neither channel by default.** See below.
 
 ## `exclude` — the trigger is not "outside"
 
@@ -84,25 +92,93 @@ This primitive tracks `ref()` in its `compute` function for exactly that reason,
 works if `ref` is a real `createSignal` accessor. Same rule as `createFocusTrap` — see
 `create-focus-trap.md`.
 
-## Scope
+## Nested layers
 
-This is intentionally a single-layer primitive — it does not manage a stacked dismiss-order
-across multiple simultaneously open overlays. `exclude` does not change that: it settles **what
-counts as outside for one layer**, not **which of several open layers wins**.
+Every active layer pushes onto a stack held on `document` under
+`Symbol.for("hope-ui.dismiss-stack")`, topmost last. On `document` rather than at module scope for
+the reason CLAUDE.md gives generally: nothing forces a consumer to have one installed copy of
+`@hope-ui/primitives`, and two module-scope stacks each believing they own the topmost layer is an
+unreproducible field bug — one Escape closing a Dialog straight through the Popover above it, on
+some installs and not others. Pinned by a `?instance=2` import in
+`create-dismissable.browser.test.tsx`.
 
-The symptom, once a Popover opens from inside a Dialog: the listeners are attached to `document`
-per instance with no ordering guard, so an Escape or an outside pointerdown reaches *every* open
-layer and dismisses both. The port that fixes it is recorded — react-aria `useOverlay`'s
-`visibleOverlays` flat mount-order stack plus its two-phase pointer guard (capture the topmost at
-pointerdown *start*, dismiss only if the same layer is still topmost when the interaction
-completes), with Base UI `useDismiss`'s `bubbles` for the API vocabulary. See
-`__internal__/reference-implementations.md:306` and its § *Nested overlay ordering*, which also
-records why Astryx, Angular Aria and `@floating-ui/vue` are not candidates: none implements layer
-coordination at all.
+Two rules follow from the stack:
 
-Its sibling half lives in [`createHideOutside`](./create-hide-outside.md) § *Nesting*, and the two
-registries stay **separate** — a Dialog with `dismissOnEscape: false` still participates in
-hide-outside ordering but must never win Escape.
+- **Escape and outside pointerdown dismiss the topmost layer only.** Without the gate, a Popover
+  opened inside a Dialog closes both on one Escape and both on one outside click.
+- **Nothing inside a layer opened _above_ this one counts as "outside".** A pointerdown on the
+  Popover's card is not an outside press for the Dialog underneath, and focus landing there is not
+  focus leaving it. It is one clause inside the shared `isOutside`, so it covers pointerdown and
+  focus-out together — and it is why `exclude` never needs to name a layer, only a trigger.
+
+**Focus-out deliberately gets no topmost gate.** The layers-above clause already covers the
+nesting, and focus that genuinely leaves the whole chain should close all of it, not just the top.
+
+### Stack position is activation order, not mount order
+
+The push happens inside the effect body, *after* the `active`/`ref` guard, so a mounted-but-closed
+layer is simply absent from the stack and reopening it puts it back on top. One consequence worth
+knowing, which React Aria's `visibleOverlays` shares: the effect is keyed on `[active(), ref()]`,
+so swapping the container element *while active* re-runs it and moves that layer to the top.
+
+Cleanup splices by `indexOf` rather than popping — layers can close in either order, and
+`splice(-1, 1)` on a miss would drop whichever layer happens to be topmost.
+
+### `bubbles` — opting a lower layer back in
+
+```ts
+bubbles?: boolean | { escapeKey?: boolean; outsidePress?: boolean };
+```
+
+Both members default to `false`: one Escape closes one layer. The name and shape are Base UI's
+(`useDismiss`); **its asymmetric default (`escapeKey: false`, `outsidePress: true`) is deliberately
+not followed** — an outside press that bubbled would make a single click on a modal's backdrop
+close the modal *and* the layer above it, which is the exact breakage this stack exists to end. A
+bare boolean sets both channels.
+
+`Popover.Root` and `Dialog.Root` thread it straight through, so a consumer sets it once on the
+root.
+
+### Two deliberate divergences from React Aria's `useOverlay`
+
+Both are recorded as divergences rather than gaps — see
+[`reference-implementations.md`](../../reference-implementations.md) § *Nested overlay ordering*.
+
+**1. Escape stays document-level.** React Aria scopes it to the overlay element through
+`useKeyboard`, so it only fires with focus inside the overlay; here it is a `document` listener
+gated on being topmost. Element-scoping it would mean returning keyboard props from every part hook
+in every family — a change to the whole public surface, for behavior the stack already provides. The
+practical difference is that hope-ui's stack carries more weight than upstream's: with focus
+elsewhere, upstream's overlay hears nothing, while here the gate is the only thing deciding who
+answers.
+
+**2. One phase, not two.** React Aria snapshots the topmost layer at `pointerdown` and *decides* at
+`click`, because it dismisses at `click` and the two events can have different targets. hope-ui
+dismisses at the start of the interaction, in the capture-phase `pointerdown` handler, so "topmost
+at the snapshot" and "topmost now" are the same instant and the second phase buys nothing.
+
+That equivalence rests on a dispatch not being reorderable underneath itself. Every layer's
+listener is attached by its own sibling effect, and the topmost layer's handler *writes the very
+signal those effects track* — dismissing unmounts a layer. If that write re-ran the effects
+mid-dispatch, a lower layer's listener would be detached before the event reached it, and the
+single-phase guard would be reading a stack that changed under it. Solid defers the re-run to the
+next flush, so it cannot. Pinned by `solid-contract.browser.test.tsx` § *a signal write from one
+document listener cannot unhook the next one mid-dispatch*; if that ever goes red, the two-phase
+snapshot becomes necessary.
+
+### Three registries, not one
+
+This stack answers "who wins a dismissal". [`createHideOutside`](./create-hide-outside.md)'s
+answers "who observes, and who is spared"; [`createFocusScope`](./create-focus-scope.md)'s answers
+"did focus land in me or above me". They stay **separate**, and merging them would be a bug: a
+Dialog with `dismissOnEscape: false` still participates in hide-outside and focus-scope ordering
+but must never win Escape. React Aria keeps `visibleOverlays`, `observerStack` and `focusScopeTree`
+apart for the same reason and centralizes nothing — which is also why `roadmap.md`'s speculative
+`createOverlayStack` (#14) was retired rather than built.
+
+The layer *tree* (Base UI's `FloatingTree`, real ancestry rather than flat order) is **deferred to
+Menu**, where submenu chains make it load-bearing; it composes with the flat stack rather than
+replacing it.
 
 ## SSR
 

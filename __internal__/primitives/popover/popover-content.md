@@ -34,6 +34,10 @@ On open, focus moves into the popup: `initialFocus` if given, else the first foc
 else the container itself under a temporary `tabindex="-1"`. On close it returns to whatever was
 focused before.
 
+Opened **inside another layer** — a modal Dialog — this popup is the topmost one, so Escape closes
+it alone and the layer below keeps its own Escape for the next press. Focus behaves the same way,
+one layer at a time: the popover restores to the popover's trigger, the dialog to the dialog's.
+
 ## ARIA pattern
 
 `role="dialog"` (or `"alertdialog"`), from `createPopover`'s `role` option — a non-modal
@@ -74,12 +78,13 @@ Positioner consumes the same one. See [`popover-root.md`](popover-root.md) and
 
 ```ts
 createFocusRestore({ active: state.open });
+createFocusScope({ active: state.open, ref });
 createAutoFocus({ active: () => state.open() && state.floating.isPositioned(), ref, initialFocus });
-createDismissable({ active: state.open, ref, exclude: state.dismissExclusions, … });
+createDismissable({ active: state.open, ref, exclude: state.dismissExclusions, bubbles, … });
 createRegisteredId({ id: () => props.id, register: state.setPopupId });
 ```
 
-All four are created in **this hook's** scope (the content's), so each tears down when the content
+All five are created in **this hook's** scope (the content's), so each tears down when the content
 unmounts. `ref` is `state.contentElement` — the signal, never a local: the content is conditionally
 rendered by the very signal these effects key on, which is the recorded ref hazard
 ([`create-auto-focus.ts`](../internal/create-auto-focus.md)).
@@ -90,10 +95,27 @@ rendered by the very signal these effects key on, which is the recorded ref haza
    below moves focus. Sibling effects run in creation order; this is the constraint
    [`create-focus-restore.md`](../internal/create-focus-restore.md) states, and the one
    `dialog-content.ts` follows for the same reason.
-2. **`createAutoFocus` before `createDismissable`.** `.focus()` dispatches `focusin` **synchronously**,
+2. **`createFocusScope` before `createAutoFocus`**, so this layer is on the focus-scope stack —
+   above whatever it was opened inside — *before* anything moves focus into it. Registered after,
+   the `focusin` that autofocus dispatches reaches an enclosing modal's focus trap while the trap
+   still knows nothing about this layer; it yanks focus straight back out, and the dismissal below
+   reads that as focus leaving and closes the popover in ~3ms. See
+   [`create-focus-scope.md`](../internal/create-focus-scope.md).
+3. **`createAutoFocus` before `createDismissable`.** `.focus()` dispatches `focusin` **synchronously**,
    and focus-out now dismisses — so on a reopen that finds the layer still positioned, the focus lands
    before the dismissable effect attaches its document listener, and the layer cannot dismiss itself
    on the way in.
+
+### The scope is a registration, not a trap
+
+It is keyed on `open`, not on `isPositioned` like the autofocus below it: the scope costs nothing
+while the layer is still measuring, and being registered *early* is the entire point. The predicate
+it returns (`containsSelfOrAbove`) is for a **trap** to consult — this layer has none, so it is
+deliberately unused here. What the registration buys is what the *dialog's* trap does: focus in this
+popup is no longer focus escaping the dialog.
+
+Tab is unaffected. It still leaves the popup freely and still closes it
+(`closeOnFocusOutside`) — the non-modal contract, not a gap.
 
 ### Autofocus is gated on `isPositioned`, not on `open` alone
 
@@ -122,13 +144,19 @@ both are needed:
 | Cold open (not yet measured) | Autofocus runs *after* the dismissable listener attaches, so the listener's own `container.contains(target)` early return is what holds. |
 | Reopen while still positioned | Both fire in the same flush, and creation order puts the `.focus()` before the attach. |
 
-## The three dismissal toggles come from the root
+## The dismissal options come from the root
 
-`dismissOnEscape` / `dismissOnOutsidePointerDown` / `dismissOnFocusOutside` are forwarded from
-`state.closeOnEscape()` / `state.closeOnInteractOutside()` / `state.closeOnFocusOutside()`, so a
-consumer sets them **once** on `createPopover` / `Popover.Root`. They are forwarded as **getters**,
-not one-time reads: `createDismissable` reads them live inside its keydown/pointerdown/focusin
-handlers, so a getter keeps them reactive (and avoids a `STRICT_READ_UNTRACKED` read in this body).
+`dismissOnEscape` / `dismissOnOutsidePointerDown` / `dismissOnFocusOutside` / `bubbles` are
+forwarded from `state.closeOnEscape()` / `state.closeOnInteractOutside()` /
+`state.closeOnFocusOutside()` / `state.bubbles()`, so a consumer sets them **once** on
+`createPopover` / `Popover.Root`. They are forwarded as **getters**, not one-time reads:
+`createDismissable` reads them live inside its keydown/pointerdown/focusin handlers, so a getter
+keeps them reactive (and avoids a `STRICT_READ_UNTRACKED` read in this body).
+
+`bubbles` decides whether an Escape or outside pointerdown this layer consumed *also* reaches the
+layer below it. Default: neither channel — the topmost layer alone dismisses, so a popover inside a
+dialog takes the first Escape and the dialog takes the second. See
+[`create-dismissable.md`](../internal/create-dismissable.md) § *Nested layers*.
 
 `closeOnFocusOutside` defaults `true` **on Popover**, while the kernel option defaults `false` — see
 [`popover-root.md`](popover-root.md).
@@ -158,8 +186,9 @@ running it here scopes its cleanup to the content's unmount.
 
 ## SSR
 
-Every effect is client-only by construction — `createFocusRestore`, `createAutoFocus` and
-`createDismissable` reach the DOM from effect bodies alone, and `createRegisteredId` uses `onSettled`,
+Every effect is client-only by construction — `createFocusRestore`, `createFocusScope`,
+`createAutoFocus` and `createDismissable` reach the DOM from effect bodies alone (and there is no
+focus-scope stack on a server), while `createRegisteredId` uses `onSettled`,
 which never runs on the server. So nothing here needs an `isServer` branch. Because
 `createRegisteredId` does not run server-side, a consumer `id` is not registered during SSR; the
 server-visible value is `createPopover`'s generated `popupId` fallback.

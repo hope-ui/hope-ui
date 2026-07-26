@@ -9,32 +9,40 @@ import { Dialog } from "../../dialog";
 import { Popover } from "../index";
 
 /**
- * **A Popover opened inside a modal Dialog — every assertion here is written against the FIXED
- * behavior, so this whole file is red until the nested-overlay ports land.** It is the executable
- * form of `popover.stories.tsx`'s `InsideADialog`, which pinned the breakage in a doc comment; a
- * doc comment fails nothing.
+ * **A Popover opened inside a modal Dialog — the regression net for the three layer registries.**
+ * The executable form of `popover.stories.tsx`'s `InsideADialog`, which pinned the same nesting in
+ * a doc comment; a doc comment fails nothing.
  *
- * The breakage is **four** independent mechanisms, each needing a different registry, and each test
- * below names the one it measures:
+ * It was written red, one assertion per symptom, before any of the three ports existed. What it
+ * caught was **four** independent mechanisms, each needing a different registry, and each test
+ * below still names the one it guards:
  *
- * 1. **Escape / outside-pointerdown reach every open layer.** `create-dismissable.ts` attaches to
- *    `document` per instance with no ordering guard, so both layers dismiss at once.
- * 2. **Focus is then lost with it** — two focus restores fire for triggers that are both
- *    unmounting. Measured against this harness the survivor is the *dialog's* trigger, not
- *    `<body>`: the popover restores first, onto a trigger that the dialog's own unmount is about to
- *    take with it, and the dialog's restore lands last and wins. Either way the popover trigger —
- *    the control the reader actually pressed — does not get focus back.
- * 3. **The Dialog's `MutationObserver` marks the Popover `inert` + `aria-hidden`.**
- *    `create-hide-outside.ts` hides every added `<body>` child not in that layer's *static* `spare`
- *    array, and the Popover's portal is one. The card still paints **on top**, undimmed and
- *    legible — it is `inert` making it transparent to hit testing that breaks it, so
- *    `elementFromPoint` at its own centre returns whatever is underneath. It looks like a working
- *    popover and cannot be touched.
- * 4. **The Dialog's focus trap yanks focus back out of the Popover.** `create-focus-trap.ts`
- *    refocuses its container whenever focus lands outside it, portaled popup included, and the
- *    Popover reads that as focus leaving and dismisses itself. This is what the story's
- *    `closeOnFocusOutside={false}` hides — **so the harness here carries default props**, and the
- *    prop is deliberately absent.
+ * 1. **Escape / outside-pointerdown reached every open layer.** `create-dismissable.ts` attached to
+ *    `document` per instance with no ordering guard, so both layers dismissed at once. Closed by
+ *    the dismiss stack's topmost-only gate.
+ * 2. **Focus went down with it** — two focus restores fired for triggers that were both
+ *    unmounting. Measured against this harness the survivor was the *dialog's* trigger, not
+ *    `<body>`: the popover restored first, onto a trigger the dialog's own unmount was about to
+ *    take with it, and the dialog's restore landed last and won. Either way the popover trigger —
+ *    the control the reader actually pressed — did not get focus back. Closed by the same gate:
+ *    one Escape now closes one layer, so each restore has a live trigger to return to.
+ * 3. **The Dialog's `MutationObserver` marked the Popover `inert` + `aria-hidden`.**
+ *    `create-hide-outside.ts` hid every added `<body>` child not in that layer's *static* `spare`
+ *    array, and the Popover's portal was one. The card still painted **on top**, undimmed and
+ *    legible — it was `inert` making it transparent to hit testing that broke it, so
+ *    `elementFromPoint` at its own centre returned whatever was underneath. It looked like a
+ *    working popover and could not be touched. Closed by the hide-outside layer stack plus
+ *    `createKeepVisible`, which `Popover.Positioner` calls.
+ * 4. **The Dialog's focus trap yanked focus back out of the Popover.** `create-focus-trap.ts`
+ *    refocused its container whenever focus landed outside it, portaled popup included, and the
+ *    Popover read that as focus leaving and dismissed itself — the popup flashed and was gone in
+ *    ~3ms. Closed by the focus-scope stack: the trap asks `containsSelfOrAbove`, not
+ *    `container.contains`. **The harness carries default props on both roots**, which is what keeps
+ *    this symptom reachable at all — the story used to set `closeOnFocusOutside={false}` to hide it.
+ *
+ * Symptom 3 *masked* symptom 4 while both were live: an element inside an `inert` subtree is not
+ * focusable, so autofocus was a silent no-op and the trap never ran. That is why the tests below
+ * assert on **focus** rather than on survival, and why the two ports could not ship separately.
  *
  * Everything the assertions rest on was measured in this project, not assumed: the `browser`
  * project loads **no compiled Tailwind** and its viewport is **414×896**, so every recipe class is
@@ -173,12 +181,13 @@ const describeElement = (element: Element | null) =>
 /**
  * `mount()` plus a safety net. Every test still calls `dispose()` itself — that call is the
  * `STRICT_READ_UNTRACKED` / `REACTIVE_WRITE_IN_OWNED_SCOPE` gate (`mount.md`), and it is how this
- * phase *confirms* rather than assumes that the layer registries the ports add are safe for a
- * descendant to register into.
+ * file *confirms* rather than assumes that the three layer registries are safe for a descendant to
+ * register into.
  *
- * The net exists because this file is red by design: a test failing before its own `dispose()`
- * would leave a modal dialog mounted, and `createHideOutside` would then mark the *next* test's
- * container `inert` + `aria-hidden` — turning one honest failure into eight unreadable ones.
+ * The net matters on the day one of these goes red again: a test failing before its own
+ * `dispose()` would leave a modal dialog mounted, and `createHideOutside` would then mark the
+ * *next* test's container `inert` + `aria-hidden` — turning one honest failure into eight
+ * unreadable ones.
  */
 function mountLayers(ui: () => JSX.Element): { dispose: () => void } {
   const mounted = mount(ui);
@@ -310,17 +319,17 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     const { popoverContent } = await openBothLayers();
 
-    // The sequence symptom 4 names: autofocus moves focus into the portaled popup, the dialog's
+    // The sequence symptom 4 named: autofocus moves focus into the portaled popup, the dialog's
     // focus trap sees focus land outside *its* container and pulls it straight back to the dialog's
     // own first focusable, and the popover's focus-out dismissal reads that as focus leaving. The
-    // card flashes and is gone — the thing a consumer hits first, and why the story carries
-    // `closeOnFocusOutside={false}`.
+    // card flashed and was gone — the thing a consumer hit first. `createFocusScope` is what stops
+    // it: the trap asks `containsSelfOrAbove`, and focus in a layer above it is not focus escaping.
     //
-    // **Focus is the assertion that measures it, not survival.** Measured here, symptom 3 currently
-    // *masks* symptom 4: an element inside an `inert` subtree is not focusable, so autofocus's
-    // `.focus()` is a silent no-op, no `focusin` fires, the trap never runs and the layer never
-    // dismisses itself. Asserting only "still open" would therefore pass today and regress the
-    // moment the hide-outside port makes the popup focusable again.
+    // **Focus is the assertion that measures it, not survival.** While symptom 3 was live it
+    // *masked* symptom 4: an element inside an `inert` subtree is not focusable, so autofocus's
+    // `.focus()` was a silent no-op, no `focusin` fired, the trap never ran and the layer never
+    // dismissed itself. Asserting only "still open" would have passed with symptom 4 fully
+    // present — and would go quiet again the day a hide-outside regression re-hides the popup.
     await settle();
 
     const inner = page.getByTestId("popover-inner").element() as HTMLElement;
@@ -399,16 +408,15 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     await openBothLayers();
 
-    // **The subject of this test is not measurable today — the interaction it describes is
-    // unreachable, so it fails on the precondition below rather than on the assertion.** While the
-    // dialog's hide-outside marks the popover `inert`, a real pointer never reaches the card at
-    // all: the hit test falls through to the `ModalBackdrop`, which is *outside* the dialog and
-    // dismisses it. So the hide-outside port (removing `inert`) is what makes this test
-    // *reachable*, and the dismissable port (a target inside a layer **above** this one is not
-    // "outside") is what makes it pass — which is exactly why those two cannot ship separately: the
-    // first one alone turns a click inside the popover into a click that closes the dialog.
-    // The precondition is spelled out rather than left to `userEvent`, which would otherwise fail
-    // this on a pointer-actionability timeout that names no cause.
+    // **This test takes two registries to pass, and it is the reason they could not ship
+    // separately.** While the dialog's hide-outside marked the popover `inert`, a real pointer
+    // never reached the card at all: the hit test fell through to the `ModalBackdrop`, which is
+    // *outside* the dialog and dismisses it. The hide-outside port (no more `inert`) is what makes
+    // this interaction **reachable**; the dismissable port (a target inside a layer **above** this
+    // one is not "outside") is what makes it **pass**. Ship the first alone and a click inside the
+    // popover becomes a click that closes the dialog.
+    // The precondition is asserted rather than left to `userEvent`, which would otherwise fail this
+    // on a pointer-actionability timeout that names no cause.
     const inner = page.getByTestId("popover-inner").element() as HTMLElement;
     const topmost = topmostElementOver(inner);
     expect(

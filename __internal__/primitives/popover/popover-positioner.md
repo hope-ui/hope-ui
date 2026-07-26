@@ -42,6 +42,33 @@ it and no attribute is needed. A Popover is **measured** — where it landed is 
 `mounted` is `state.contentPresence.mounted` — the shared presence, never a new one. Gate the
 element's render on it, so the layer stays mounted through the content's exit transition.
 
+## It is the element that stays visible inside a modal
+
+```ts
+createKeepVisible({ active: state.contentPresence.mounted, ref: state.positionerElement });
+```
+
+The positioner is the direct `<body>` child that a modal ancestor's `createHideOutside` observer
+sees appear — a `Popover` opened from inside a `Dialog`. Left to itself the modal marks it
+`aria-hidden` + `inert`, which leaves a card that paints on top of the scrim, undimmed and fully
+legible, yet is out of the accessibility tree and **transparent to hit testing**: the click lands on
+whatever is underneath. `createKeepVisible` registers the element with whichever hide-outside layer
+is innermost right now, and sparing it spares its **whole subtree** — `isSpared` tests containment
+both ways — so the Content, the Arrow and everything in the card ride along on this one call. See
+[`create-hide-outside.md`](../internal/create-hide-outside.md) § *Nesting*.
+
+Two details are deliberate:
+
+- **Keyed on `mounted()`, not `open()`** — the same reason `createFloating` is. A layer animating
+  out is still in the page, and going `inert` mid-exit would make the card stop responding to the
+  pointer before it has finished leaving.
+- **It is unconditional.** A popover with no modal above it registers into an empty layer stack and
+  `keepVisible` no-ops, so there is nothing to gate on and no ancestor to detect.
+
+The focus half of the same nesting lives one part up, in
+[`popover-content.md`](popover-content.md) — this part covers hit testing and the accessibility
+tree only.
+
 ## The `style` merge order is the documented escape valve
 
 ```ts
@@ -103,7 +130,8 @@ wrong side.
 
 ## SSR
 
-No DOM access and no effects other than the dev-only string-`style` warning, which never runs on the
-server. `floatingStyles()` serves its pre-positioned branch — a constant with no client-only input —
+No DOM access. Both effects here — `createKeepVisible` and the dev-only string-`style` warning —
+reach the DOM from their effect bodies alone, and effect bodies never run on the server (there is no
+layer stack there anyway). `floatingStyles()` serves its pre-positioned branch — a constant with no client-only input —
 and `side()`/`align()` seed from the config, so `data-side`/`data-align` are identical on both sides
 of the hydration round-trip. The tree never branches on them, only CSS does.

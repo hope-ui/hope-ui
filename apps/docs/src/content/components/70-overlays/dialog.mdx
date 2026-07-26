@@ -562,6 +562,13 @@ props — `open`, `defaultOpen`, `modal`, the `closeOn*` flags, and event handle
       description: "Whether a pointer-down outside the card closes the dialog.",
     },
     {
+      prop: "bubbles",
+      type: "boolean | { escapeKey?: boolean; outsidePress?: boolean }",
+      default: "false",
+      description:
+        "Whether an Escape or outside pointer-down consumed by a layer opened above the dialog (a Popover, a Menu) also closes the dialog. Off for both channels: the topmost layer alone dismisses, so the first Escape closes the popover and the second closes the dialog.",
+    },
+    {
       prop: "slotClasses",
       type: 'SlotClasses<"dialog">',
       default: "",

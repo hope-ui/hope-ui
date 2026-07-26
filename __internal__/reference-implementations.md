@@ -206,26 +206,35 @@ composes `createFloating` alone; a hover-triggered Menu/HoverCard composes both.
   math, not `hooks/useHover.ts`'s React lifecycle. floating-ui generalizes the classic triangle to a
   polygon (accounts for placement, gap, buffer) — same concept.
 
-### Nested overlay ordering (planned) — `createDismissable` + `createHideOutside`
+### Nested overlay ordering — `createDismissable` + `createHideOutside` + `createFocusScope`
 
-Both primitives currently handle exactly one layer. Popover is the first consumer that stacks a
-second one on Dialog, and it breaks them in two distinct ways:
+**Shipped.** Popover was the first consumer to stack a second layer on Dialog, and it broke the
+kernel in **four** distinct ways — each needing a different mechanism, which is why they could not
+ship separately:
 
-- **Escape and outside-pointerdown reach every open layer.** `create-dismissable.ts` attaches its
-  listeners to `document` per instance with no ordering guard, so dismissing a Popover inside a
-  Dialog closes both.
-- **The Dialog's `MutationObserver` hides the Popover.** A portaled popup lands on `document.body`
-  after the Dialog's `createHideOutside` is already observing; it isn't in that layer's static
-  `spare` array, so it gets `aria-hidden` + `inert`.
+| Symptom | Closed by |
+|---|---|
+| Escape and outside-pointerdown reached every open layer at once | the dismiss stack's topmost-only gate |
+| Focus went down with them — two restores firing for triggers both unmounting | the same gate, once one Escape closes one layer |
+| The Dialog's `MutationObserver` marked the portaled Popover `aria-hidden` + `inert` | the hide-outside layer stack + `keepVisible` |
+| The Dialog's focus trap yanked focus out, and `closeOnFocusOutside` closed the Popover in ~3ms | the focus-scope stack |
 
-**Two registries, not one.** They answer different questions and merging them is a bug: a Dialog with
-`dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape.
-react-aria keeps them fully separate (`visibleOverlays` in `useOverlay`, `observerStack` in
-`ariaHideOutside`, `focusScopeTree` in `FocusScope`) and never centralizes them into one overlay
-manager — which is also the argument against `roadmap.md`'s speculative `createOverlayStack` row.
-Each registry lives on `document` under a `Symbol.for(…)` key, per CLAUDE.md's no-module-scope rule.
+The third one is the nastiest: `inert` changes nothing about how the card paints, so the popover
+looked perfectly normal and no click reached a word of it. It also *masked* the fourth — an element
+inside an `inert` subtree is not focusable, so autofocus was a silent no-op and the trap never ran.
+Pinned end-to-end by `packages/components/src/popover/__tests__/popover-in-dialog.browser.test.tsx`,
+which carries **default props on both roots**.
 
-**The policy shortcut does not apply here.** Prefer-the-fine-grained-reactive-port has no candidate:
+**Three registries, not one.** They answer different questions and merging them is a bug: a Dialog
+with `dismissOnEscape: false` still participates in hide-outside *and* focus-scope ordering but must
+never win Escape. react-aria keeps them fully separate (`visibleOverlays` in `useOverlay`,
+`observerStack` in `ariaHideOutside`, `focusScopeTree` in `FocusScope`) and never centralizes them
+into one overlay manager — which is the argument that retired `roadmap.md`'s speculative
+`createOverlayStack` row (#14) in place rather than building it. Each registry lives on `document`
+under a `Symbol.for(…)` key, per CLAUDE.md's no-module-scope rule, and each is pinned
+cross-instance by a `?instance=2` import rather than argued.
+
+**The policy shortcut did not apply here.** Prefer-the-fine-grained-reactive-port had no candidate:
 
 | Source | Nested-overlay handling |
 |---|---|
@@ -233,34 +242,67 @@ Each registry lives on `document` under a `Symbol.for(…)` key, per CLAUDE.md's
 | **Angular Aria** `private/behaviors/popup` | **None.** `open`/`close`/`toggle` over one `expanded` signal + ARIA wiring; single popup only |
 | **floating-ui `@floating-ui/vue`** | **None.** Positioning only (`useFloating.ts`, `arrow.ts`, `types.ts`, `index.ts`) — the interaction layer exists solely in the React port |
 
-react-aria and Base UI are therefore not a fallback, they are the only implementations.
+react-aria and Base UI were therefore not a fallback, they were the only implementations.
 
 **`createHideOutside` → react-aria `ariaHideOutside`.** Already its source (the TreeWalker
-accept/skip/reject strategy and the `MutationObserver` rationale are credited in the file's own
-comments), so this is finishing a port rather than choosing one. The per-element ref count is
-already here; three pieces are not:
+accept/skip/reject strategy and the `MutationObserver` rationale), so this finished a port rather
+than choosing one. The per-element ref count was already here; three pieces were added:
 - `react-aria/src/overlays/ariaHideOutside.ts:39` `observerStack` — a new call disconnects the
   previous observer (`:166`) and cleanup restarts it (`:288`), so only the innermost layer observes.
+  Shipped **including the out-of-order splice branch** (`:288`–`:295`): two overlays really can close
+  in either order.
 - `:299` `keepVisible(element)` — dynamic registration into the *current topmost* layer's
-  `visibleNodes`, returning an undo. hope-ui's `spare` is static and per-layer, so it cannot express
-  "spare this in whichever layer is on top right now".
+  `visibleNodes`, returning an undo. hope-ui's `spare` is static and per-layer, so it could not
+  express "spare this in whichever layer is on top right now". Shipped with a reactive wrapper,
+  `createKeepVisible`, which is what `Popover.Positioner` calls.
 - `:21` `isAlwaysVisibleNode` — a declarative `data-*` opt-out (`data-react-aria-top-layer`,
   `data-live-announcer`) checked inside the observer, so content appearing later is spared with no
-  registration at all.
+  registration at all. Shipped as `TOP_LAYER_ATTRIBUTE` (`data-hope-ui-top-layer`), covering the
+  ordering `keepVisible` cannot reach — a modal opening *after* the layer it must spare — and code
+  that never sees this kernel. Wired to nothing, exactly as upstream's is.
 
 **`createDismissable` → react-aria `useOverlay` for the mechanism, Base UI `useDismiss` for the API
 vocabulary.**
-- `react-aria/src/overlays/useOverlay.ts:61` — a flat mount-order array, topmost wins (`:95`). The
-  pointer path is two-phase (`:100`–`:126`): capture the topmost at pointerdown *start*, dismiss only
-  if the same layer is still topmost when the interaction completes.
-- One asymmetry worth knowing before porting: react-aria's Escape is **element-scoped** (`useKeyboard`
-  → `keyboardProps` spread on the overlay, `:129`), so it only fires with focus inside; only
-  outside-press is document-level (`react-aria/src/interactions/useInteractOutside.ts:80`). hope-ui's
-  Escape *is* document-level, so the stack carries more weight here than it does upstream.
+- `react-aria/src/overlays/useOverlay.ts:61` — a flat activation-order array, topmost wins (`:95`).
+  Shipped, with the same guarded `indexOf`/`splice` cleanup.
+- **Divergence 1, deliberate: Escape stays document-level.** react-aria's is **element-scoped**
+  (`useKeyboard` → `keyboardProps` spread on the overlay, `:129`), so it only fires with focus
+  inside; only outside-press is document-level
+  (`react-aria/src/interactions/useInteractOutside.ts:80`). Element-scoping hope-ui's would mean
+  returning keyboard props from every part hook in every family — the whole public surface, for
+  behavior the stack already provides. The stack therefore carries more weight here than upstream.
+- **Divergence 2, deliberate: the pointer guard is single-phase.** Upstream is two-phase
+  (`:100`–`:126`): capture the topmost at pointerdown *start*, dismiss only if the same layer is
+  still topmost when the interaction completes at `click`. hope-ui dismisses at the *start* of the
+  interaction, so "topmost at the snapshot" and "topmost now" are the same instant and the second
+  phase buys nothing. That equivalence rests on a Solid guarantee — a signal write from one document
+  listener cannot unhook the next one mid-dispatch — which is pinned by name in
+  `solid-contract.browser.test.tsx`, not assumed. If it goes red, two phases become necessary.
 - **Base UI** `floating-ui-react/hooks/useDismiss.ts` — the `bubbles` option, normalized per event
   type (`escapeKey` / `outsidePress`). "Should Escape on the nested Popover also close the Dialog?"
   is a genuine consumer choice and react-aria has no name for it. API surface only, same borrowing
-  as `useAnchorPositioning` above.
+  as `useAnchorPositioning` above — and **its asymmetric default is not followed**: hope-ui defaults
+  both channels to `false`, where Base UI defaults `outsidePress: true`, because an outside press
+  that bubbled would make one backdrop click close the modal and the layer above it.
+
+**`createFocusScope` → react-aria's `FocusScope`, idea only.** Upstream's `focusScopeTree` is a
+genuine `Tree` of `TreeNode`s with parent links, a per-node `nodeToRestore`, a pre-order traversal
+generator and a `clone()` — a structure built to carry the focus *restore* algorithm living in the
+same file. hope-ui already has that half (`createFocusRestore`), so what remained was a flat array,
+an `indexOf` and a `slice`. What was taken is the question `useOverlay` asks through
+`isElementInChildOfActiveScope`: **is that blur focus leaving, or focus landing in a layer above
+me?** `createFocusTrap` asks the same thing via `containsSelfOrAbove` instead of
+`container.contains`.
+
+**Attribution: two files crossed the line, one did not.** The split this document draws — designing
+against a reference owes nothing, reproducing its expression makes a derivative — resolved as:
+
+| File | Before | After |
+|---|---|---|
+| `create-hide-outside.ts` | credited in prose ("written fresh for Solid") | **attributed derivative** — `@license` header + both `NOTICE.md` tables. `observerStack`'s disconnect/restart sequence, `keepVisible` and `isAlwaysVisibleNode` are ported function-for-function |
+| `create-dismissable.ts` | credited in prose | **attributed derivative** — the flat activation-order array plus topmost check is `useOverlay`'s structure, even though the event model around it diverges twice |
+| `create-focus-scope.ts` | — (new) | **prose credit only** — different data structure, different predicate, no shared expression. No `@license` header and no `NOTICE.md` row, by decision rather than by omission |
+| `bubbles` (Base UI, MIT) | — (new) | **no obligation** — the option's name and shape only, no source reproduced; the root `NOTICE.md` already credits Base UI generally |
 
 **Rejected for now: the layer *tree*.** Base UI vendors floating-ui-react's
 `FloatingTree`/`FloatingTreeStore`, and `useDismiss` asks `getNodeChildren` whether a descendant is
@@ -303,10 +345,11 @@ Consolidated verdicts from the evaluation.
 | `announce` (live-region) | **Future port** — Astryx `useAnnounce` |
 | overlay positioning (placement/flip/shift/arrow/autoUpdate) | **Wrapped** — `internal/create-floating.ts`, over `@floating-ui/dom` (optional peer); ported from `@floating-ui/vue` `useFloating`/`arrow` with Base UI `useAnchorPositioning`'s API vocab — see §1 `createFloating` |
 | menu-hover intent / safe triangle | **Future port** — Astryx `useMenuHover` (wiring) + floating-ui `safePolygon.ts` (geometry) — see §1 `createHoverIntent` |
-| nested dismissal ordering (Escape / outside-press across layers) | **Future port** into the existing `internal/create-dismissable.ts` — react-aria `useOverlay`'s `visibleOverlays` + two-phase pointer guard (mechanism) with Base UI `useDismiss`'s `bubbles` (API vocab). **Not** Astryx / Angular Aria / `@floating-ui/vue` — none implement it — see §1 |
-| nested `aria-hidden` + `inert` (portaled child of a modal) | **Finish the port** into the existing `internal/create-hide-outside.ts` — react-aria `ariaHideOutside`'s `observerStack`, `keepVisible`, and `data-*` top-layer opt-out — see §1 |
+| nested dismissal ordering (Escape / outside-press across layers) | **Ported** into `internal/create-dismissable.ts` — react-aria `useOverlay`'s `visibleOverlays` (mechanism) with Base UI `useDismiss`'s `bubbles` (API vocab, not its defaults). Two deliberate divergences: document-level Escape, and a **single-phase** pointer guard in place of upstream's two-phase snapshot. Now an attributed Apache-2.0 derivative — see §1 |
+| nested `aria-hidden` + `inert` (portaled child of a modal) | **Ported** into `internal/create-hide-outside.ts` — react-aria `ariaHideOutside`'s `observerStack` (out-of-order splice branch included), `keepVisible` (plus a reactive `createKeepVisible`), and the `data-*` top-layer opt-out as `TOP_LAYER_ATTRIBUTE`. Now an attributed Apache-2.0 derivative — see §1 |
+| nested focus containment (a trap must yield to the layer above it) | **Ported as a new primitive**, `internal/create-focus-scope.ts` — the *idea* of react-aria's `focusScopeTree` + `isElementInChildOfActiveScope`, as a flat container stack. **Not derivative**: prose credit only, no `@license` header — see §1 |
 | overlay layer *tree* (submenu chains) | **Deferred to Menu** — Base UI `FloatingTree`/`FloatingTreeStore` + `getNodeChildren`. Composes with the flat stack, doesn't replace it; rejected for Popover on consumer-wiring cost — see §1 |
-| unified overlay manager / `createOverlayStack` | **Skip as specified.** `roadmap.md` #14 is a placeholder name with no reference behind it; react-aria keeps three independent registries and centralizes nothing — see §1 |
+| unified overlay manager / `createOverlayStack` | **Skip as specified.** `roadmap.md` #14 is a placeholder name with no reference behind it; react-aria keeps three independent registries and centralizes nothing, and hope-ui now ships three of its own — #14 is **retired in place**, a pointer to the three rows above it — see §1 |
 | input-container (combobox text sync) | **Future port** — Astryx `useInputContainer` |
 | media-query / hotkeys / overflow observers | **Adopt** `@solid-primitives/*` (see `solid-primitives-eval.md`) |
 | focus-trap / scroll-lock / presence | **Already have** in the kernel |

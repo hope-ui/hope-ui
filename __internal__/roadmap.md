@@ -44,7 +44,8 @@ infrastructure, deliberately *not* a growing component tracker):
 - Kernel primitives: `createCollection`, `createVirtualCollection`, `createListFocus`,
   `createListNavigation`, `createListTypeahead`, `createListSelection`, `createListExpansion`,
   `createGridNavigation`, `createComponentContext`, `createControllableState`, `createDismissable`,
-  `createAutoFocus`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createScrollLock`,
+  `createAutoFocus`, `createFocusTrap`, `createFocusScope`, `createFocusRestore`,
+  `createHideOutside`, `createScrollLock`,
   `createPresence`, `createFloating`, `createPress`, `createButton`, `createRegisteredId`,
   `createRegisteredElement`; utils `renderElement`, `withDefaults`, `composeEventHandlers`,
   `createKeyboardHandler`, `compareByIdOrReference`. Plus `ModalBackdrop`, the kernel's only
@@ -111,7 +112,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Tabs | Navigation | 5/5 | `createListNavigation` | roving + follow-focus |
 | Accordion | Disclosure | 5/5 | `createListExpansion` | kernel ready |
 | Tooltip | Overlays | 5/5 | `createFloating`*, `createTimer`* | open/close delay |
-| Popover ✅ | Overlays | 5/5 | `createFloating`, `createDismissable`, `createAutoFocus`, `createFocusRestore`, `createPresence` | the "compose, don't inherit from Dialog" proof, landed — styled API (10 compound parts + `popover` recipe). **Non-modal v1:** no focus trap, scroll lock, hide-outside or backdrop; a `modal` mode is later work |
+| Popover ✅ | Overlays | 5/5 | `createFloating`, `createDismissable`, `createAutoFocus`, `createFocusRestore`, `createFocusScope`, `createKeepVisible`, `createPresence` | the "compose, don't inherit from Dialog" proof, landed — styled API (10 compound parts + `popover` recipe). **Non-modal v1:** no focus trap, scroll lock, hide-outside or backdrop; a `modal` mode is later work. Opened **inside** a modal it is a first-class layer above it (#18/#19/#20) — spared, focusable, and it takes the first Escape alone |
 | HoverCard | Overlays | 2/5 | `createFloating`*, `createHoverIntent`* | |
 | Dialog ✅ | Overlays | 5/5 | (kernel complete) | styled API landed (compound parts + `dialog` recipe) |
 | Drawer / Sheet | Overlays | 5/5 | Dialog kernel | Dialog variant + slide presence |
@@ -138,7 +139,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | CommandPalette | Navigation | 2/5 | Combobox-based | ⌘K launcher |
 | Toast ★ | Feedback | 5/5 | `createTimer`*, `createDragState`*, `createLiveRegion`* | Sonner port (stacking, swipe, pause-on-hover) |
 | FileUpload | Forms | 4/5 | `createFileUploadState`* | drag-drop + validation |
-| OverlayManager | Overlays | infra | `createOverlayStack`* | z-index / nesting / dismiss order |
+| OverlayManager | Overlays | infra | the three shipped layer registries (#18/#19/#20) | z-index only — nesting and dismiss order are already in the kernel |
 | TreeView | Collections | 4/5 | `createTreeCollection`* (+ nav + expansion) | hierarchical |
 
 ### T4 — Specialist (heavy domain logic)
@@ -187,15 +188,16 @@ stable reference and the ordering claim holds within the original survey.
 | 11 | `createPinInputState` · `createTagsState` | field-specific interaction state | PinInput, TagsInput | T2 |
 | 12 | `createDragState` | pointer drag / resize / swipe | Slider thumb, Splitter, Toast swipe, ScrollArea | T3 |
 | 13 | `createFileUploadState` | file selection, drag-drop, accept/size validation | FileUpload | T3 |
-| 14 | `createOverlayStack` | z-index / nesting / dismissal-order coordination. **Speculative, and #18/#19 are the answer instead** — [`reference-implementations.md`](reference-implementations.md) §1 argues the two registries must stay separate, since a Dialog with `dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape | OverlayManager, nested Dialog/Popover/Menu | T3 |
+| 14 | ~~`createOverlayStack`~~ | **Retired in place — never build this.** Nesting is shipped as **three separate registries**: #18 (dismissal order), #19 (`aria-hidden`/`inert`), #20 (focus containment). Merging them would be a bug, not a simplification: a Dialog with `dismissOnEscape: false` still participates in hide-outside *and* focus-scope ordering but must never win Escape. react-aria keeps its three apart for the same reason and centralizes nothing — [`reference-implementations.md`](reference-implementations.md) §1. The number is kept so cross-references stay valid | — see #18/#19/#20 | — |
 | 15 | `createTreeCollection` | hierarchical collection: levels, expand-aware flat nav | TreeView *(builds on `createCollection` + nav + expansion)* | T3 |
 | 16 | `createDateState` | calendar model: month grid, min/max, ranges, disabled dates, i18n | Calendar, DatePicker *(pairs with `createGridNavigation`)* | T4 |
 | 17 | `createAutoFocus` ✅ | Move focus into a container on activation **without** trapping it — including the `tabindex="-1"` fallback for a container with no focusable descendant, and its cleanup. Extracted from `createFocusTrap`, whose own doc comment had named the gap and named Popover as the caller, and which now composes it rather than welding the two together | Popover (a non-modal layer must not trap), and `createFocusTrap` itself | T1 |
-| 18 | `createDismissable` — **nested layer ordering** ✳︎ | A mount-order stack so only the **topmost** open layer consumes Escape or an outside pointerdown. Today `create-dismissable.ts` attaches per instance to `document` with no ordering guard, so — measured — Escape on a Popover inside a Dialog closes **both**, and focus is left on `<body>`. Port react-aria `useOverlay`'s `visibleOverlays` + its two-phase pointer guard for the mechanism, Base UI `useDismiss`'s `bubbles` for the vocabulary — [`reference-implementations.md`](reference-implementations.md) §1 | nested Popover-in-Dialog (pinned by Popover's `InsideADialog` story), Menu, Select, ContextMenu | T2 |
-| 19 | `createHideOutside` — **nested `aria-hidden`/`inert`** ✳︎ | `observerStack` (only the innermost layer observes) + a dynamic `keepVisible` + a declarative `data-*` always-visible opt-out, so a layer portaled **after** an outer modal started observing is spared. Measured today: the Popover's positioner lands as a direct `<body>` child and is marked `inert` + `aria-hidden="true"`. It does **not** render beneath the scrim — both layers are `z-50` and the popover portal is the later body child, so the card paints on top, undimmed and fully legible, while `elementFromPoint` at its own centre returns the Dialog's `fixed inset-0` positioner. It looks like a working popover and cannot be touched | same as #18 | T2 |
+| 18 | `createDismissable` — **nested layer ordering** ✅ ✳︎ | An activation-order stack on `document`, so only the **topmost** open layer consumes Escape or an outside pointerdown, plus a layers-above clause that stops a press inside an upper layer counting as "outside" for the one below. Ported from react-aria `useOverlay`'s `visibleOverlays`, with Base UI `useDismiss`'s `bubbles` for the opt-back-in vocabulary (defaults deviate: neither channel bubbles). Two deliberate divergences from upstream — document-level Escape, and a single-phase pointer guard — are recorded in [`reference-implementations.md`](reference-implementations.md) §1. Now an attributed Apache-2.0 derivative | nested Popover-in-Dialog (pinned by `popover-in-dialog.browser.test.tsx` and Popover's `InsideADialog` story), Menu, Select, ContextMenu | T2 |
+| 19 | `createHideOutside` — **nested `aria-hidden`/`inert`** ✅ ✳︎ | `observerStack` (only the innermost layer observes, out-of-order closes included) + a dynamic `keepVisible`/`createKeepVisible` + `TOP_LAYER_ATTRIBUTE`, the declarative always-visible marker. The two cover opposite orderings: registration reaches a layer opening *after* the modal, the marker reaches a modal opening *after* the layer — which no registration can. `Popover.Positioner` calls `createKeepVisible`; the marker ships wired to nothing, as the third-party/toast escape hatch. Now an attributed Apache-2.0 derivative | same as #18 | T2 |
+| 20 | `createFocusScope` ✅ | The third registry: a container stack answering **"did focus land in me, or in a layer opened above me?"** (`containsSelfOrAbove`). `createFocusTrap` composes it and consults it instead of `container.contains`, so a Dialog stops yanking focus out of a Popover portaled above it — which, with `closeOnFocusOutside`, used to close that Popover ~3ms after it opened. Moves no focus and cages nothing; Tab still leaves a non-modal layer freely. The *idea* is react-aria's `focusScopeTree`/`isElementInChildOfActiveScope`, but the implementation shares no expression with it: **not derivative, prose credit only** | same as #18 | T2 |
 
-✳︎ Extensions to a **shipped** primitive, not new ones — and deliberately two registries rather than
-one (see #14).
+✳︎ Extensions to a **shipped** primitive, not new ones — and deliberately three registries rather
+than one (see #14).
 
 **Covered by existing primitives (no new work):** open/close state → `createControllableState`
 (+ `createPresence`); roving focus / typeahead / arrow nav / 2D grid → the list-\* + grid kernel;

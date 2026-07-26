@@ -69,6 +69,22 @@ trigger is focusable again. Same rule as before: create `createFocusRestore` fir
 its snapshot (before `inert` blurs the trigger) and its restore (after `inert` is removed) land
 where they should.
 
+### Both constraints still hold with a focus scope in the chain
+
+A layered composition now creates [`createFocusScope`](create-focus-scope.md) between the restore
+and whatever moves focus — `createFocusRestore` → `createFocusScope` → `createAutoFocus` →
+`createDismissable` in `popover-content.ts`, with `createFocusTrap` composing its own scope first of
+its three. Neither constraint above changes, and neither needed re-deriving: **a scope moves no
+focus and attaches no listener.** It pushes a container onto a `document`-keyed stack in its effect
+body and splices it out in its cleanup, so it can neither disturb the `document.activeElement`
+snapshot (constraint 1) nor be the listener the microtask deferral is waiting to outlive
+(constraint 2).
+
+What it does change is who the *trap* considers outside — focus landing in a layer above it is no
+longer yanked back — which makes restoring the chain one layer at a time observable rather than
+theoretical: the popover's restore hands focus to the popover's trigger, the dialog's to the
+dialog's.
+
 ## When restore is skipped
 
 - The remembered element has left the document (`isConnected === false`) — its subtree was

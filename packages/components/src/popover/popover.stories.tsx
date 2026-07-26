@@ -307,32 +307,32 @@ export const StaysOpenOnFocusOut: Story = {
 };
 
 /**
- * **Inside a Dialog — the popup is inert and Escape closes both (known, see roadmap).**
+ * **Inside a Dialog — a layer above the modal.**
  *
- * A pinning story, not a demo. A `Popover.Portal` mounts its layer as a *sibling* of the dialog's,
- * so it is outside the dialog's content — and a modal Dialog runs `createHideOutside`, which marks
- * everything outside that content `inert` + `aria-hidden`. Measured in the DOM: the popover
- * positioner lands as a direct child of `<body>` carrying **`inert` and `aria-hidden="true"`**, so the
- * whole popup is out of the accessibility tree and out of the focus order.
+ * Default props on both roots, which is the whole point. A `Popover.Portal` mounts its layer as a
+ * *sibling* of the dialog's, so by every DOM measure the popup sits outside the modal's content —
+ * and a modal Dialog marks everything outside that content `inert` + `aria-hidden`, cages focus
+ * inside it, and listens for Escape on the document. Three `document`-keyed registries are what make
+ * the popup a layer *above* the modal rather than a casualty of it:
  *
- * The pointer half is the nastier one, because the popup looks perfectly fine. Both layers sit at
- * `z-50` and the popover's portal is the *later* body child, so the card paints **on top of** the
- * dialog and its scrim — undimmed, fully legible. But `inert` makes an element transparent to hit
- * testing, so clicks fall straight through it: `elementFromPoint` at the card's own centre returns
- * the dialog's `fixed inset-0` positioner underneath, never the card. A reader sees a normal popover
- * and cannot touch a single word of it.
+ * - **The card stays reachable.** `Popover.Positioner` registers with the innermost open
+ *   hide-outside layer (`createKeepVisible`), so the dialog's `MutationObserver` spares it and its
+ *   whole subtree. Not merely legible — *hit-testable*. `inert` is transparent to hit testing while
+ *   changing nothing about how the card paints, so without this the popover looks perfectly normal
+ *   and no click reaches a word of it.
+ * - **Focus lands inside it and stays.** `Popover.Content` registers a focus scope above the
+ *   dialog's, and the dialog's trap consults the scope stack instead of its own `contains` — focus
+ *   in a layer opened above it is not focus escaping. Without that, the trap yanks focus back and
+ *   the popover's `closeOnFocusOutside` reads the yank as focus leaving: the card flashes and is
+ *   gone in ~3ms.
+ * - **Escape walks down one layer at a time.** Only the topmost dismissable layer consumes an
+ *   Escape or an outside pointerdown, so the first Escape closes the popover, the second closes the
+ *   dialog, and a click on the backdrop closes the dialog alone. `bubbles` opts back in per event
+ *   channel for a consumer who wants one keystroke to take the whole chain.
  *
- * Escape then hits both layers at once and leaves focus on `<body>`: two focus restores fire for
- * triggers that are both unmounting, so neither wins. Neither layer knows the other exists.
- *
- * **With the default `closeOnFocusOutside` it is worse, and this is what a consumer hits first:** the
- * popover opens, the Dialog's focus trap pulls focus straight back into the dialog (measured: ~3ms),
- * the Popover reads that as focus leaving, and it dismisses itself. The popup flashes and is gone. It
- * is set `false` below only so the *rest* of the breakage is visible at all.
- *
- * Every part of this needs the same missing piece — the overlay stack (`createOverlayStack` /
- * react-aria's `visibleOverlays` port) recorded in `roadmap.md`. **Don't "fix" this story by deleting
- * it**; fix the layering and rename it.
+ * Focus follows that chain back down: the popover hands it to the button that opened the popover,
+ * the dialog to the button that opened the dialog. Executable form:
+ * `__tests__/popover-in-dialog.browser.test.tsx`.
  */
 export const InsideADialog: Story = {
   render: () => (
@@ -345,12 +345,12 @@ export const InsideADialog: Story = {
             <Dialog.Header>
               <Dialog.Title>Project settings</Dialog.Title>
               <Dialog.Description>
-                The popover below opens, but the dialog has marked it inert — and Escape closes
-                both.
+                The popover below opens above the modal, stays clickable, and takes the first Escape
+                on its own.
               </Dialog.Description>
             </Dialog.Header>
             <Dialog.Body>
-              <PopoverDemo triggerLabel="Open popover" closeOnFocusOutside={false} />
+              <PopoverDemo triggerLabel="Open popover" />
             </Dialog.Body>
           </Dialog.Content>
         </Dialog.Positioner>

@@ -7,9 +7,12 @@ state on deactivation. Each element outside gets **both**:
 - `inert` — removes it from the focus order, and from hit testing.
 
 Behavior adapted from React Aria's `ariaHideOutside` (Adobe, Apache-2.0) — its TreeWalker
-accept/skip/reject strategy, its per-element ref count, and its `MutationObserver`. The
-`inert` half follows floating-ui's `markOthers`, which exposes it as a flag layered on
-`aria-hidden`. The code is written fresh for Solid.
+accept/skip/reject strategy, its per-element ref count, its `MutationObserver`, its layer stack,
+`keepVisible` and the always-visible marker. The stack's disconnect/restart sequence (including the
+out-of-order splice branch), `keepVisible` and `isAlwaysVisibleNode` are ported function-for-
+function, so this file is an **attributed derivative**: it carries an `@license` header and a row in
+both `NOTICE.md` tables. The `inert` half follows floating-ui's `markOthers`, which exposes it as a
+flag layered on `aria-hidden`.
 
 ## API
 
@@ -19,6 +22,19 @@ function createHideOutside(options: {
   target: Accessor<Element | null | undefined>;
   spare?: Accessor<ReadonlyArray<Element | null | undefined>>;
 }): void;
+
+/** Spare an element from the innermost open layer, for as long as `active`. */
+function createKeepVisible(options: {
+  active: Accessor<boolean>;
+  ref: Accessor<Element | null | undefined>;
+}): void;
+
+/** The imperative form: spares `element`, returns the undo — or `undefined` if there is no open
+ *  layer, or it already spares it. */
+function keepVisible(element: Element): (() => void) | undefined;
+
+/** `"data-hope-ui-top-layer"` — an element carrying it is spared by every layer. */
+const TOP_LAYER_ATTRIBUTE: string;
 ```
 
 - `active` — whether outside content should currently be hidden.
@@ -100,32 +116,81 @@ two independent counts and un-hide each other's elements. `Symbol.for` resolves 
 cross-realm global symbol registry, so every copy reads the same slot. `createScrollLock`
 stores its lock state the same way, for the same reason.
 
-### What ref-counting does *not* cover: a portaled child layer
+### Only the innermost layer observes
 
-Ref-counting composes two layers that were both known when each ran. It does not help when a
-**new** layer mounts into a page an existing one is already observing. Once a Popover opens from
-inside a Dialog, the popup portals onto `document.body` *after* the Dialog's `createHideOutside`
-started observing, and it isn't in that layer's static `spare` array — so the Dialog's own
-`MutationObserver` marks the popup `aria-hidden` + `inert`. The popup is unreadable to assistive
-technology and transparent to hit testing, while every test stays green.
+Every activation also pushes onto a layer stack held on `document` under
+`Symbol.for("hope-ui.hide-outside-stack")`, and disconnects the layer it covers — so exactly one
+`MutationObserver` is live at a time. Cleanup un-hides this layer's own set, then either pops and
+restarts the layer underneath (the normal, innermost-closes-first case) or splices itself out of
+the middle without restarting anything, because whoever is on top never stopped observing. Two
+overlays really can close in either order, so that second branch is not hypothetical.
 
-`spare` cannot express the fix, because it is static and per-layer: there is no way to say "spare
-this in whichever layer is currently on top". The port that can is recorded — react-aria
-`ariaHideOutside`'s `observerStack` (a new call disconnects the previous observer, cleanup restarts
-it, so only the innermost layer observes), `keepVisible(element)` (dynamic registration into the
-current topmost layer, returning an undo) and `isAlwaysVisibleNode`'s declarative `data-*`
-top-layer opt-out. See `__internal__/reference-implementations.md:307` and its § *Nested overlay
-ordering*.
+**That is load-bearing, not an optimization.** `keepVisible` registers into the *topmost* layer
+only, so a still-observing outer layer would hide the very element the inner one just agreed to
+spare, and no registration could ever survive a nesting. (A Dialog inside a Dialog also stops
+marking every newly added element twice.)
 
-This is the sibling half of [`createDismissable`](./create-dismissable.md) § *Scope*, and the two
-registries stay **separate**: they answer different questions, and a Dialog with
-`dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape.
+**Stack position is activation order, not mount order.** The push happens inside the effect body,
+after the `active`/`target` guard, so a mounted-but-closed layer is simply absent and reopening it
+puts it on top. The effect is keyed on `[active(), target(), spare()]`, so swapping the target
+element *while active* re-runs it and moves that layer to the top.
+
+Like the per-element count, the stack lives under a `Symbol.for(…)` key rather than at module
+scope, and for the same reason. Pinned by the same `?instance=2` import.
+
+### Sparing a layer that opens later: `keepVisible` and the top-layer marker
+
+Ref-counting composes two layers that were both known when each ran. It does not cover a **new**
+layer mounting into a page an existing one is already observing — a Popover opened inside a Dialog
+portals onto `document.body` *after* the Dialog's `createHideOutside` started observing, and it
+isn't in that layer's static `spare` array. Marked `aria-hidden` + `inert`, the popup is out of the
+accessibility tree and transparent to hit testing while still painting perfectly, and every test
+stays green.
+
+`spare` cannot express the fix: it is static and per-layer, with no way to say "spare this in
+whichever layer is currently on top". Two mechanisms do, and **they cover opposite orderings** —
+which is why both exist:
+
+| Ordering | Mechanism |
+| --- | --- |
+| A layer opens **after** the modal — Popover inside Dialog | `createKeepVisible` / `keepVisible` — the layer registers itself into whichever layer is topmost *now*, and unregisters on close |
+| A modal opens **after** the element — a toast root, a live region, a third-party portal already in the page | `TOP_LAYER_ATTRIBUTE` (`data-hope-ui-top-layer`) — read on every walk and inside the observer, so no registration is needed at all |
+
+No registration can reach the second row: a modal that opens later walks the page fresh and knows
+nothing about a call that happened before it existed. And no attribute is a good fit for the first
+row, because it is always on — `Popover.Positioner` wants sparing scoped to one layer and undone on
+close, which is what `createKeepVisible` gives it. React Aria ships the same pair
+(`data-react-aria-top-layer`, and no first-party overlay of theirs sets it either); hope-ui's marker
+likewise ships **wired to nothing**, as the escape hatch for code that never sees this kernel.
+
+`createKeepVisible` is the reactive form, shaped like `createRegisteredElement`: it registers from
+an effect body (not a cleanup or a deferred callback, which would run after the observer had already
+seen the element) and undoes on deactivation, on an element swap, or on disposal. Sparing an element
+spares its **whole subtree**, since `isSpared` tests containment in both directions — so
+`Popover.Positioner` registering covers the card and everything in it. Keyed on what keeps the layer
+*mounted* rather than on `open`, because a layer animating out is still in the page and still must
+not be `inert`. Registering into an empty stack is a no-op, so a popover with no modal above it pays
+nothing.
+
+### Three registries, not one
+
+This stack answers "who observes, and who is spared".
+[`createDismissable`](./create-dismissable.md)'s answers "who wins a dismissal";
+[`createFocusScope`](./create-focus-scope.md)'s answers "did focus land in me or above me". They
+stay **separate**: a Dialog with `dismissOnEscape: false` still participates in hide-outside and
+focus-scope ordering but must never win Escape. React Aria keeps `observerStack`, `visibleOverlays`
+and `focusScopeTree` apart for the same reason.
 
 ## Late-arriving content
 
 A `MutationObserver` on `document.body` hides elements added while the layer is active — a
 second portal, a toast, a lazily rendered route, or the `ModalBackdrop` a modal layer renders,
 which is inserted after the effect runs.
+
+Three things escape it: a node carrying `TOP_LAYER_ATTRIBUTE`, which is added to the layer's spared
+set instead of hidden; a node already spared, or inside something spared (`keepVisible`'s
+registrations included); and a node under an ancestor this layer already hid, since both attributes
+inherit. Only the innermost layer's observer is live — see § *Nesting*.
 
 ## SSR
 
@@ -147,5 +212,19 @@ function Popup(props: { open: boolean; modal: boolean }) {
   });
 
   return <div ref={setRef} role="dialog" aria-modal={props.modal ? "true" : undefined} />;
+}
+```
+
+A non-modal layer that may open *inside* one — this is all `Popover.Positioner` does:
+
+```tsx
+function Positioner(props: { mounted: boolean }) {
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+
+  // Keyed on `mounted`, not `open`: a layer animating out is still in the page, and an `inert`
+  // element mid-exit stops responding to the pointer. A no-op when nothing modal is open.
+  createKeepVisible({ active: () => props.mounted, ref });
+
+  return <div ref={setRef}>...</div>;
 }
 ```

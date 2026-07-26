@@ -28,9 +28,30 @@ function createFocusTrap(options: {
 - While active: `Tab` on the last focusable descendant moves to the first;
   `Shift+Tab` on the first moves to the last. If focus is moved outside the container by
   other means (e.g. another script calling `.focus()`), a `focusin` listener on
-  `document` redirects it back inside.
+  `document` redirects it back inside — **unless it landed in a layer opened above this one**,
+  see § *A trap is not the outermost thing in the page*.
 - On deactivation: listeners are removed, and any `tabindex` this primitive added itself is
   removed.
+
+## A trap is not the outermost thing in the page
+
+The `focusin` listener does **not** ask `container.contains(target)`. It asks
+[`createFocusScope`](create-focus-scope.md)'s `containsSelfOrAbove`, which is true for this
+container *and* for the container of any scope registered above it.
+
+Without that, a `Popover` opened from inside a modal `Dialog` is unreachable: the popup is portaled
+out of the dialog's container, so `contains` is `false` for everything in it, this listener reads
+autofocus landing there as focus escaping and pulls it straight back — and the popover's
+`closeOnFocusOutside` reads *that* as focus leaving and closes the layer. Measured at ~3ms, with no
+error anywhere.
+
+The trap composes the scope itself (same `options`, so registration and the listeners activate on
+exactly the same edge) and creates it **first of the three**, so this container is on the stack
+before the listeners can consult it and before `createAutoFocus` moves focus anywhere.
+
+Registering a scope does **not** extend the cage: a non-modal layer above the trap is not trapped,
+Tab still leaves it, and the trap below then pulls focus back — the documented non-modal contract.
+See [`create-focus-scope.md`](create-focus-scope.md) § *Tab is deliberately not covered*.
 
 ## Moving focus in is `createAutoFocus`
 
@@ -43,7 +64,8 @@ forwarded straight through.
 ### The listener effect is created *first*, and that is load-bearing
 
 ```ts
-createEffect(…listeners…);   // ← first
+createFocusScope(options);   // ← before both, see above
+createEffect(…listeners…);   // ← first of the two below
 createAutoFocus(options);    // ← second
 ```
 
