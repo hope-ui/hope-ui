@@ -5,6 +5,7 @@ import {
   createControllableState,
   createFloating,
   createPresence,
+  type DismissBubbles,
   type FloatingAlign,
   type Padding,
   type PresenceState,
@@ -96,6 +97,12 @@ export interface CreatePopoverOptions {
    */
   closeOnFocusOutside?: boolean;
   /**
+   * Whether an Escape / outside pointerdown that closes a layer opened **above** this popover also
+   * closes the popover. Default: neither — the topmost layer alone dismisses. Forwarded by
+   * `createPopoverContent` to `createDismissable`'s `bubbles`.
+   */
+  bubbles?: DismissBubbles;
+  /**
    * ARIA role for the popup — `"dialog"` (default) or `"alertdialog"`. An accessibility concern, so
    * it lives on the state hook (not the styling layer): `createPopoverContent` reads it for the
    * surface's `role` attribute. The trigger's `aria-haspopup` stays `"dialog"` either way — ARIA
@@ -146,6 +153,9 @@ export interface CreatePopoverReturn {
   closeOnInteractOutside: Accessor<boolean>;
   /** Whether focus landing outside closes the popover. Read by `createPopoverContent`'s `createDismissable`. */
   closeOnFocusOutside: Accessor<boolean>;
+  /** Whether a dismissal handled by a layer above also closes this one. Read by
+   * `createPopoverContent`'s `createDismissable`. */
+  bubbles: Accessor<DismissBubbles | undefined>;
 
   /** The popup's id: a registered consumer id if any, else a generated (SSR-stable) fallback. */
   popupId: Accessor<string>;
@@ -222,6 +232,9 @@ export function createPopover(options: CreatePopoverOptions = {}): CreatePopover
   const closeOnEscape = () => merged.closeOnEscape;
   const closeOnInteractOutside = () => merged.closeOnInteractOutside;
   const closeOnFocusOutside = () => merged.closeOnFocusOutside;
+  // No `withDefaults` entry: "neither channel bubbles" is what an absent `bubbles` already means to
+  // `createDismissable`, so a default here would only restate it.
+  const bubbles = () => merged.bubbles;
   const role = () => merged.role;
 
   // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
@@ -317,6 +330,7 @@ export function createPopover(options: CreatePopoverOptions = {}): CreatePopover
     closeOnEscape,
     closeOnInteractOutside,
     closeOnFocusOutside,
+    bubbles,
     popupId,
     setPopupId: setCustomPopupId,
     titleId,

@@ -1,5 +1,10 @@
 import { type Accessor, createSignal, createUniqueId } from "solid-js";
-import { createControllableState, createPresence, type PresenceState } from "../internal";
+import {
+  createControllableState,
+  createPresence,
+  type DismissBubbles,
+  type PresenceState,
+} from "../internal";
 import { withDefaults } from "../utils";
 
 /**
@@ -59,6 +64,12 @@ export interface CreateDialogOptions {
    */
   closeOnInteractOutside?: boolean;
   /**
+   * Whether an Escape / outside pointerdown that closes a layer opened **above** this dialog also
+   * closes the dialog. Default: neither — the topmost layer alone dismisses. Forwarded by
+   * `createDialogContent` to `createDismissable`'s `bubbles`.
+   */
+  bubbles?: DismissBubbles;
+  /**
    * ARIA role — `"dialog"` (default) or `"alertdialog"` (the APG destructive-confirmation pattern).
    * An accessibility concern, so it lives on the state hook (not the styling layer): `createDialogContent`
    * reads it for the surface's `role` attribute.
@@ -81,6 +92,9 @@ export interface CreateDialogReturn {
   closeOnEscape: Accessor<boolean>;
   /** Whether an outside pointerdown closes the dialog. Read by `createDialogContent`'s `createDismissable`. */
   closeOnInteractOutside: Accessor<boolean>;
+  /** Whether a dismissal handled by a layer above also closes this one. Read by
+   * `createDialogContent`'s `createDismissable`. */
+  bubbles: Accessor<DismissBubbles | undefined>;
 
   /** The popup's id: a registered consumer id if any, else a generated (SSR-stable) fallback. */
   popupId: Accessor<string>;
@@ -136,6 +150,9 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   const isModal = () => open() && modal();
   const closeOnEscape = () => merged.closeOnEscape;
   const closeOnInteractOutside = () => merged.closeOnInteractOutside;
+  // No `withDefaults` entry: "neither channel bubbles" is what an absent `bubbles` already means to
+  // `createDismissable`, so a default here would only restate it.
+  const bubbles = () => merged.bubbles;
   const role = () => merged.role;
 
   // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
@@ -168,6 +185,7 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
     isModal,
     closeOnEscape,
     closeOnInteractOutside,
+    bubbles,
     role,
     popupId,
     setPopupId: setCustomPopupId,

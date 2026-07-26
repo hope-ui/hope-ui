@@ -25,6 +25,7 @@ carries an attribution header naming its upstream source:
 | `packages/i18n/src/i18n-provider.tsx` | `@react-aria/i18n` — `src/i18n/context.tsx` |
 | `packages/primitives/src/internal/create-press.ts` | `@react-aria/interactions` — `src/usePress.ts` |
 | `packages/primitives/src/internal/create-hide-outside.ts` | `@react-aria/overlays` — `src/ariaHideOutside.ts` (the layer stack, `keepVisible`, the always-visible marker) |
+| `packages/primitives/src/internal/create-dismissable.ts` | `@react-aria/overlays` — `src/useOverlay.ts` (the visible-layer stack and its topmost check) |
 
 `@internationalized/date` is also an Adobe Apache-2.0 work. hope-ui consumes it as an ordinary npm
 dependency and never bundles it — it is resolved as a bare specifier in the published output and

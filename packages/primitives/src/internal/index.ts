@@ -28,6 +28,7 @@ export {
 export {
   type CreateDismissableOptions,
   createDismissable,
+  type DismissBubbles,
 } from "./create-dismissable";
 export {
   type Boundary,

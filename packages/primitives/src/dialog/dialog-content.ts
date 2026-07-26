@@ -74,10 +74,11 @@ export function createDialogContent(
     target: ref,
     spare: state.sparedElements,
   });
-  // The two dismissal toggles come from the root state, so a consumer sets them once on
-  // `createDialog` / `Dialog.Root` and this part forwards them (both default `true` on the root).
-  // Getters, not a one-time read: `createDismissable` reads these live inside its keydown/pointerdown
-  // handlers, so a getter keeps them reactive (and avoids a `STRICT_READ_UNTRACKED` read here).
+  // The dismissal options come from the root state, so a consumer sets them once on
+  // `createDialog` / `Dialog.Root` and this part forwards them (both toggles default `true` on the
+  // root; `bubbles` defaults to neither channel). Getters, not a one-time read: `createDismissable`
+  // reads these live inside its keydown/pointerdown handlers, so a getter keeps them reactive (and
+  // avoids a `STRICT_READ_UNTRACKED` read here).
   createDismissable({
     active: state.open,
     ref,
@@ -87,6 +88,9 @@ export function createDialogContent(
     },
     get dismissOnOutsidePointerDown() {
       return state.closeOnInteractOutside();
+    },
+    get bubbles() {
+      return state.bubbles();
     },
   });
   createScrollLock({ active: state.isModal });

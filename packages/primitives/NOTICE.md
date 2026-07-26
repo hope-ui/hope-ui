@@ -17,13 +17,18 @@ an attribution header naming its upstream source:
 | ---- | ------------ |
 | `src/internal/create-press.ts` | `@react-aria/interactions` — `src/usePress.ts` — the unified pointer/touch/mouse/keyboard/virtual press model |
 | `src/internal/create-hide-outside.ts` | `@react-aria/overlays` — `src/ariaHideOutside.ts` — the layer stack (including its out-of-order teardown), `keepVisible`, and the always-visible marker |
+| `src/internal/create-dismissable.ts` | `@react-aria/overlays` — `src/useOverlay.ts` — the flat activation-ordered stack of visible layers, and the topmost check that gates a dismissal on it |
 
 The principal modifications to `create-press.ts` are re-expression for SolidJS 2.0's reactive model,
 firing `onPress` from the `click` event, and a single plain-value signal surface for hydration
 safety. `create-hide-outside.ts` applies `aria-hidden` and `inert` together rather than choosing
 between them, spells its always-visible marker as a single `data-hope-ui-top-layer` attribute, and
 keeps its ref count and layer stack on the DOM under `Symbol.for` keys so two installed copies of
-this package share them. Both sets are documented inline in the files.
+this package share them. `create-dismissable.ts` keeps only the stack: its Escape is a
+document-level listener rather than element-scoped keyboard props, its outside-press guard is
+single-phase at `pointerdown` rather than a two-phase `pointerdown`/`click` snapshot, and its
+"a target inside a layer above is not outside" clause has no upstream counterpart. All three sets
+are documented inline in the files.
 
 `@internationalized/date` is also an Adobe Apache-2.0 work. It is an ordinary npm dependency,
 resolved as a bare specifier in the published output and never bundled — it ships with its own

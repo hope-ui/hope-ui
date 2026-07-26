@@ -86,8 +86,8 @@ export function createPopoverContent(
     ref,
     initialFocus: () => props.initialFocus?.(),
   });
-  // The three dismissal toggles come from the root state, so a consumer sets them once on
-  // `createPopover` / `Popover.Root` and this part forwards them. Getters, not one-time reads:
+  // The three dismissal toggles and `bubbles` come from the root state, so a consumer sets them
+  // once on `createPopover` / `Popover.Root` and this part forwards them. Getters, not one-time reads:
   // `createDismissable` reads them live inside its keydown/pointerdown/focusin handlers, so a getter
   // keeps them reactive (and avoids a `STRICT_READ_UNTRACKED` read here).
   //
@@ -108,6 +108,9 @@ export function createPopoverContent(
     },
     get dismissOnFocusOutside() {
       return state.closeOnFocusOutside();
+    },
+    get bubbles() {
+      return state.bubbles();
     },
   });
 
