@@ -167,21 +167,27 @@ the label and the reserved gutter sat on the empty side.)
 (`rounded-t-*`, `border-b`, `py-*`, `mt-*`) and flex/grid alignment (`justify-end`, `items-start`,
 `order-first`) are direction-invariant or already flow-relative.
 
-**Two sanctioned exemptions.**
+**Three sanctioned exemptions.** The first two are *enforced* — both gate halves share the predicate
+— and the third is the comment escape hatch.
 1. **An `rtl:`/`ltr:`-scoped utility** is a deliberate manual flip and is correct — it is the escape
    hatch for a rule no logical property can express. hope's calendar mirrors its chevrons with
-   `rtl:[&_svg]:rotate-180`.
-2. **An `rtl-ok: <reason>` comment** on the offending line (or the one above it), for a case neither
-   a logical property nor an `rtl:` variant covers. Same philosophy as `expectNoA11yViolations`'
-   `allowIncomplete` — name the specific case with a reason, never silence the category. A bare
-   `rtl-ok:` with no reason does not count.
+   `rtl:[&_svg]:rotate-180`. (`DIRECTION_SCOPED`.)
+2. **A utility scoped by a `data-side-*` variant** — `data-side-bottom:border-t`. `data-side` reports
+   measured geometry, so a physical response under it is the matching answer; see *the governing
+   rule* below. (`MEASURED_SIDE_SCOPED`.) Scoped to `_base/_variants.css`'s four **registered**
+   variant names; the arbitrary form `data-[side=bottom]:` is deliberately **not** exempt, since it
+   can select values the registered set never produces. hope's popover arrow is the worked example:
+   which two edges of a 45°-rotated square face outward is a fact of the rotation, so the bordered
+   pair is *identical* under `dir="rtl"`.
+3. **An `rtl-ok: <reason>` comment** on the offending line (or the one above it), for a case none of
+   the above covers. Same philosophy as `expectNoA11yViolations`' `allowIncomplete` — name the
+   specific case with a reason, never silence the category. A bare `rtl-ok:` with no reason does not
+   count.
 
 **Correctly physical, and deliberately out of scope.** `origin-left`/`origin-right` —
-`transform-origin` has no portable logical keyword, so there is no replacement to point at.
-`_base/_variants.css`'s `data-side-left`/`data-side-right` — `data-side` reports the side a floating
-layer *landed on* after `flip`, which is a physical fact, so the variant name matches the attribute
-value it selects. And `createFloating` writes its computed coordinates to `left`/`top`:
-`inset-inline-start` there would double-flip under RTL.
+`transform-origin` has no portable logical keyword, so there is no replacement to point at. And
+`createFloating` writes its computed coordinates to `left`/`top`: `inset-inline-start` there would
+double-flip under RTL.
 
 **The governing rule.** A `data-*` attribute reporting a **measured runtime outcome** carries
 **physical** values; an **authored variant name** carries **logical** ones. So `data-side` is
@@ -205,8 +211,19 @@ nearest where the text starts" — a Select listbox's corner radius, a submenu's
   they reach a **third-party preset** and a class only a `compoundVariant` assembles at call time.
   Each preset recipe test calls it beside `assertSlotRecipeConformance`.
 
-The rule table is canonical in `PHYSICAL_UTILITIES` (`packages/theming/src/conformance.ts`); a drift
-guard in that package's `conformance.test.ts` fails if the script's copy diverges.
+Both halves apply the **same** exemption predicate, `DIRECTION_SCOPED || MEASURED_SIDE_SCOPED` — so a
+`data-side-bottom:border-t` passes the script and the kit for the same reason, and neither takes a
+per-call-site opt-out for it. `assertLogicalPropertyConformance` has no `directionInvariant` option
+by design: an exemption that is a property of the *scope* belongs in the predicate once, not repeated
+as ceremony at every call site that happens to use the scope.
+
+The rule table is canonical in `PHYSICAL_UTILITIES` (`packages/theming/src/conformance.ts`), and so
+are the two exemption predicates (`DIRECTION_SCOPED`, `MEASURED_SIDE_SCOPED`). A drift guard in
+`packages/presets/src/hope/__tests__/hope.test.ts` reads the script off disk and fails if either
+copy diverges — **what is exempt is compared as well as what is forbidden**, because a half that
+exempts a scope the other doesn't turns one gate green and the other red on identical source. (The
+guard lives in presets rather than in theming's own tests: reading the script by relative path is a
+repo-layout dependency, and the contract layer stays agnostic of where it is checked out.)
 
 **What the scan reads.** `.ts`/`.tsx` under `packages/{presets,components,primitives}/src` — the
 three packages that author classes or write style properties — plus `.ts`/`.tsx`/`.mdx`/`.css` under

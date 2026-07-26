@@ -121,9 +121,12 @@ export function assertSlotRecipeConformance<Variants>(
  * `border-l-4` but not `border-blue-500`.
  *
  * The repo-side static scan (`scripts/check-rtl-safety.mjs`, `pnpm check:rtl-safety`) applies the
- * same table to source files; a drift guard in `__tests__/conformance.test.ts` fails if the two
- * diverge. This runtime half is what reaches a *third-party* preset and the classes a recipe only
- * assembles at call time through `compoundVariants`.
+ * same table to source files; a drift guard in
+ * `packages/presets/src/hope/__tests__/hope.test.ts` fails if the two diverge. It lives there rather
+ * than in this package's own tests because reading the script off disk is a repo-layout dependency,
+ * and `@hope-ui/theming` is the contract layer — it must stay agnostic of where it is checked out.
+ * This runtime half is what reaches a *third-party* preset and the classes a recipe only assembles
+ * at call time through `compoundVariants`.
  */
 export const PHYSICAL_UTILITIES: ReadonlyArray<{
   test: RegExp;
@@ -183,9 +186,32 @@ function splitVariants(candidate: string): { variants: string; base: string } {
  * An `rtl:`/`ltr:`-scoped utility is a deliberate manual flip (`ltr:pr-8 rtl:pl-8`) — the one shape
  * where a physical class is the correct answer, and the escape hatch for a rule a logical property
  * cannot express (hope's calendar mirrors its chevrons with `rtl:[&_svg]:rotate-180`).
+ *
+ * Exported for the same reason as {@link PHYSICAL_UTILITIES}: the script half keeps its own copy,
+ * and the drift guard compares the two by `.source`. An exemption that diverges between the halves
+ * is the same silent split as a rule-table entry that does.
  */
-function isDirectionScoped(variants: string): boolean {
-  return /(^|:)(rtl|ltr):/.test(variants);
+export const DIRECTION_SCOPED = /(^|:)(rtl|ltr):/;
+
+/**
+ * `data-side` reports where a floating layer LANDED after `flip` — measured geometry, a physical
+ * fact — so a physical response under that scope is the matching answer, not a defect
+ * (`__internal__/theming.md` § The governing rule). A recipe that genuinely needs "the side nearest
+ * where the text starts" still layers `ltr:`/`rtl:` on top, which {@link DIRECTION_SCOPED} covers.
+ *
+ * Scoped to `_base/_variants.css`'s registered variant names, the vocabulary `createFloating`
+ * emits. The arbitrary form (`data-[side=bottom]:`) is deliberately NOT matched.
+ *
+ * Exported alongside {@link DIRECTION_SCOPED}, for the drift guard.
+ */
+export const MEASURED_SIDE_SCOPED = /(^|:)data-side-(top|right|bottom|left):/;
+
+/**
+ * Whether a candidate's variant chain makes its base utility direction-invariant — either a manual
+ * flip the author already spelled both ways, or a scope whose own values are physical geometry.
+ */
+function isDirectionInvariant(variants: string): boolean {
+  return DIRECTION_SCOPED.test(variants) || MEASURED_SIDE_SCOPED.test(variants);
 }
 
 /**
@@ -210,7 +236,7 @@ export function checkLogicalPropertyConformance<Variants>(
       }
       for (const candidate of classes.split(/\s+/).filter(Boolean)) {
         const { variants, base } = splitVariants(candidate);
-        if (isDirectionScoped(variants)) {
+        if (isDirectionInvariant(variants)) {
           continue;
         }
         const rule = PHYSICAL_UTILITIES.find(({ test }) => test.test(base));

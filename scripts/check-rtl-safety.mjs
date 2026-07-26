@@ -54,14 +54,16 @@
 // more noise than signal and push people to suppress the whole category, so pass 2 stays on
 // padding/margin/border property *writes*, where it has no false positives at all.
 //
-// Also correctly physical, and out of scope by construction: `_base/_variants.css`'s
-// `data-side-left` / `data-side-right` custom variants (`data-side` reports the side a floating layer
-// LANDED on after `flip`, which is a physical fact — there is deliberately no inline-relative
-// `data-side-*` pair beside them, because a recipe wanting that hook writes `ltr:`/`rtl:`-scoped
-// rules over these two, which is the sanctioned escape hatch and passes both this check and
-// `assertLogicalPropertyConformance`), and `origin-left`/`origin-right` — `transform-origin` has no
-// portable logical keyword, so there is no replacement to point at and flagging it would only be
-// noise.
+// Also correctly physical: a utility scoped by one of `_base/_variants.css`'s `data-side-*` custom
+// variants. `data-side` reports the side a floating layer LANDED on after `flip`, which is measured
+// geometry, so a physical response under that scope is the matching answer rather than a defect —
+// `MEASURED_SIDE_SCOPED` exempts it in pass 1, and the conformance kit's identical predicate does the
+// same at runtime. A recipe that wants the reading-relative hook instead layers `ltr:`/`rtl:` on top,
+// which `DIRECTION_SCOPED` covers. There is deliberately no inline-relative `data-side-*` pair beside
+// the four physical ones, for that reason.
+//
+// Out of scope by construction: `origin-left`/`origin-right` — `transform-origin` has no portable
+// logical keyword, so there is no replacement to point at and flagging it would only be noise.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import { blankNonCode, lineAt, stringInteriors } from "./lib/source-projection.mjs";
@@ -108,7 +110,8 @@ function isScannedFile(path) {
 // This table is the canonical one shared with `PHYSICAL_UTILITIES` in
 // `packages/theming/src/conformance.ts`, which applies the same rule to a *resolved* recipe at
 // runtime (and so reaches third-party presets and compound variants). A drift guard in
-// `packages/theming/src/__tests__/conformance.test.ts` reads this file and fails if the two diverge.
+// `packages/presets/src/hope/__tests__/hope.test.ts` reads this file and fails if the two diverge —
+// on the rule table AND on the exemption predicates below.
 const PHYSICAL_UTILITIES = [
   { re: /^-?pl-/, physical: "pl-*", logical: "ps-*" },
   { re: /^-?pr-/, physical: "pr-*", logical: "pe-*" },
@@ -224,11 +227,28 @@ function splitVariants(candidate) {
  * A `rtl:`/`ltr:`-scoped utility is a deliberate manual flip (`ltr:pr-8 rtl:pl-8`), the one shape
  * where a physical class is the correct answer. `calendar.ts`'s `rtl:[&_svg]:rotate-180` is the
  * in-repo precedent.
+ */
+const DIRECTION_SCOPED = /(^|:)(rtl|ltr):/;
+
+/**
+ * `data-side` reports where a floating layer LANDED after `flip` — measured geometry, a physical
+ * fact — so a physical response under that scope is the matching answer, not a defect
+ * (`__internal__/theming.md` § The governing rule). A recipe that genuinely needs "the side nearest
+ * where the text starts" still layers `ltr:`/`rtl:` on top, which `DIRECTION_SCOPED` covers.
+ *
+ * Scoped to `_base/_variants.css`'s registered variant names, the vocabulary `createFloating`
+ * emits. The arbitrary form (`data-[side=bottom]:`) is deliberately NOT matched.
+ */
+const MEASURED_SIDE_SCOPED = /(^|:)data-side-(top|right|bottom|left):/;
+
+/**
+ * Whether a candidate's variant chain makes its base utility direction-invariant — either a manual
+ * flip the author already spelled both ways, or a scope whose own values are physical geometry.
  *
  * @param {string} variants
  */
-function isDirectionScoped(variants) {
-  return /(^|:)(rtl|ltr):/.test(variants);
+function isDirectionInvariant(variants) {
+  return DIRECTION_SCOPED.test(variants) || MEASURED_SIDE_SCOPED.test(variants);
 }
 
 /**
@@ -264,7 +284,7 @@ function checkFile(file) {
   const checkClassTokens = (projection) => {
     for (const token of projection.matchAll(/\S+/g)) {
       const { variants, base } = splitVariants(token[0]);
-      if (isDirectionScoped(variants)) {
+      if (isDirectionInvariant(variants)) {
         continue;
       }
       const rule = PHYSICAL_UTILITIES.find(({ re }) => re.test(base));

@@ -162,6 +162,54 @@ describe("logical-property (RTL) conformance", () => {
     expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
   });
 
+  it("allows a physical utility scoped by a measured `data-side-*`", () => {
+    // `data-side` reports where a floating layer LANDED after `flip`. Which two edges of a
+    // 45°-rotated arrow face outward is a fact of that measured geometry, not of reading direction,
+    // so the pair is IDENTICAL under `dir="rtl"` — hope's popover arrow is the worked example.
+    const recipe = recipeEmitting(
+      "data-side-bottom:border-t data-side-bottom:border-l data-side-left:border-r",
+    );
+    expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
+    expect(() => assertLogicalPropertyConformance(recipe, rootOnly)).not.toThrow();
+  });
+
+  it("exempts on the variant chain, never on the base utility", () => {
+    // The exemption is the SCOPE. The same `border-l` bare, or under an unrelated variant, is the
+    // ordinary defect this rule exists for — a `data-side-*` class elsewhere in the recipe must not
+    // launder it.
+    for (const classes of [
+      "flex border-l",
+      "hover:border-l",
+      "data-side-bottom:border-t border-l",
+    ]) {
+      const result = checkLogicalPropertyConformance(recipeEmitting(classes), rootOnly);
+      expect(result.ok, `"${classes}" should fail`).toBe(false);
+      expect(result.errors[0]).toContain("border-s*");
+    }
+  });
+
+  it("does not exempt the arbitrary `data-[side=…]` form", () => {
+    // Only `_base/_variants.css`'s four registered variant names are exempt — the vocabulary
+    // `createFloating` actually emits. The arbitrary form is out of scope by design: it can select
+    // values the registered set never produces, so it gets no free pass.
+    const result = checkLogicalPropertyConformance(
+      recipeEmitting("data-[side=bottom]:border-l"),
+      rootOnly,
+    );
+    expect(result.ok).toBe(false);
+    expect(result.errors[0]).toContain("border-s*");
+  });
+
+  it("keys the `data-side-*` exemption on the attribute, not on a utility allowlist", () => {
+    // The deliberate boundary, pinned rather than narrowed. `pl-4` under a side scope passes too:
+    // the doctrine is "a measured-geometry scope carries physical values", not "these particular
+    // utilities are safe". A recipe that genuinely wants "the side nearest where the text starts"
+    // under a side scope layers `ltr:`/`rtl:` on top, which is the other exemption.
+    expect(
+      checkLogicalPropertyConformance(recipeEmitting("data-side-bottom:pl-4"), rootOnly).ok,
+    ).toBe(true);
+  });
+
   it("strips a variant chain before matching, including arbitrary variants", () => {
     const result = checkLogicalPropertyConformance(
       recipeEmitting("hover:md:data-[slot=x]:[&_svg]:pl-2"),
