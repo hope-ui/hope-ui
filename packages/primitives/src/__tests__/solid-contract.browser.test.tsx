@@ -1,7 +1,7 @@
 import { applyRef, hydrate } from "@solidjs/web";
 // `sharedConfig` is re-exported by `@solidjs/web`'s *types* but not by its runtime bundle — importing
 // it from there fails at load. It lives in `solid-js`.
-import { sharedConfig } from "solid-js";
+import { createEffect, createRoot, createSignal, flush, sharedConfig } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 /**
@@ -95,6 +95,100 @@ describe("@solidjs/web client-build contract", () => {
       dispose();
       container.remove();
       globals._$HY = undefined;
+    });
+  });
+
+  describe("a signal write from one document listener cannot unhook the next one mid-dispatch", () => {
+    // Depended on by: `createDismissable` (packages/primitives/src/internal/create-dismissable.ts),
+    // whose outside-pointerdown guard is deliberately **single-phase** — it answers "am I the
+    // topmost layer?" once, in the capture-phase `pointerdown` handler, at the instant the
+    // interaction starts. React Aria's `useOverlay` instead snapshots the visible-overlay stack at
+    // pointerdown and *decides* at `click`, because that is where it dismisses and the two events
+    // can have different targets. hope-ui dismisses at the start of the interaction, so "topmost at
+    // the snapshot" and "topmost now" are the same instant and the second phase buys nothing.
+    //
+    // That equivalence is only true if a dispatch cannot be reordered underneath itself: every
+    // layer's listener was attached by its own sibling effect, and the topmost layer's handler
+    // *writes the very signal those effects track* (dismissing unmounts a layer). If that write
+    // could re-run the effects mid-dispatch, a lower layer's listener would be detached before the
+    // event reached it — or a re-attached one would see the event twice — and the single-phase
+    // guard would be reading a stack that changed under it. Solid defers the re-run to the next
+    // flush, so it cannot. If that ever stops holding, the two-phase snapshot becomes necessary.
+
+    const PROBE_EVENT = "hope-ui-solid-contract-probe";
+
+    /** Two sibling effects, each attaching a `document` listener while `openLayers` is high
+     * enough to keep its layer "open" — the shape `createDismissable` produces per layer. The
+     * upper one's handler dismisses itself by writing that same signal. */
+    function createProbeLayers(): { log: string[]; dispose: () => void } {
+      const log: string[] = [];
+      const [openLayers, setOpenLayers] = createSignal(2);
+      let dispose!: () => void;
+
+      createRoot((disposeRoot) => {
+        dispose = disposeRoot;
+
+        createEffect(
+          () => openLayers(),
+          (count) => {
+            if (count < 2) {
+              return;
+            }
+            const handler = () => {
+              log.push("upper:handled");
+              setOpenLayers(1);
+            };
+            document.addEventListener(PROBE_EVENT, handler, true);
+            return () => {
+              document.removeEventListener(PROBE_EVENT, handler, true);
+              log.push("upper:detached");
+            };
+          },
+        );
+
+        createEffect(
+          () => openLayers(),
+          (count) => {
+            if (count < 1) {
+              return;
+            }
+            const handler = () => log.push("lower:handled");
+            document.addEventListener(PROBE_EVENT, handler, true);
+            log.push("lower:attached");
+            return () => {
+              document.removeEventListener(PROBE_EVENT, handler, true);
+              log.push("lower:detached");
+            };
+          },
+        );
+      });
+
+      flush();
+      return { log, dispose };
+    }
+
+    it("delivers one dispatch to every listener attached when it started, then re-runs the effects", () => {
+      const { log, dispose } = createProbeLayers();
+      log.length = 0;
+
+      document.body.dispatchEvent(new CustomEvent(PROBE_EVENT, { bubbles: true }));
+
+      // Both handlers ran, in attach order, and nothing detached in between: the write inside the
+      // upper handler is not visible to a plain read until the next flush (client build).
+      expect(log).toEqual(["upper:handled", "lower:handled"]);
+
+      // And the re-run lands afterwards, in sibling creation order — the contract
+      // `solid-contract.test.ts` pins for effects generally, observed here through the listeners.
+      flush();
+      expect(log).toEqual([
+        "upper:handled",
+        "lower:handled",
+        "upper:detached",
+        "lower:detached",
+        "lower:attached",
+      ]);
+
+      dispose();
     });
   });
 });
