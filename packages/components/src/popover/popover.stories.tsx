@@ -189,6 +189,14 @@ const SIDES = ["top", "right", "bottom", "left"] as const;
  * The four physical sides. `data-side` reports where the layer **landed** — so the card slides in
  * from the trigger's direction and scales out of the edge nearest it, and the arrow re-pins itself,
  * all from one attribute.
+ *
+ * The arrow's **border** keys on `data-side` too: it carries the card's hairline around its two
+ * *outward* edges, so the border no longer stops dead where the arrow covers it. **This story is the
+ * only place a swapped pair is catchable** — the browser test project compiles no Tailwind, so every
+ * automated check passes on a chevron pointing the wrong way. What to look for: all four arrows point
+ * *away* from their card, and the hairline runs continuously through both elbows of each. A wrong
+ * adjacent pair points back *into* the card; an opposite pair paints two parallel bars instead of a
+ * point. Under `dir="rtl"` (the `RTL` story) the pair must be **identical**, never mirrored.
  */
 export const Sides: Story = {
   // Fullscreen + generous gaps: at the default centered layout the four demos sit shoulder to

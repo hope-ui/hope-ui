@@ -17,8 +17,9 @@ function createPopoverArrow(
 };
 ```
 
-The hook carries **measurements only**. The 45° rotation, the size and the background are the `arrow`
-slot's, and how a clamped arrow disappears is the recipe's call — see `data-uncentered` below.
+The hook carries **measurements only**. The 45° rotation, the size, the background and the border are
+the `arrow` slot's, and how a clamped arrow disappears is the recipe's call — see `data-uncentered`
+below.
 
 ## Render the element unconditionally
 
@@ -68,6 +69,24 @@ resize observer and a re-render, to arrive at a number CSS already has.
 The alternative — a `size` option on the hook — moves a value the recipe already owns into JS and
 makes it a second source of truth.
 
+**It is border-width-agnostic, and stays that way — but a bordered preset must compensate.** Pinning
+by *half* the arrow puts the square's centre on the popup's **padding-box edge**, the inner edge of
+whatever border a preset draws. For a borderless consumer that is exactly right, and `box-sizing:
+border-box` keeps the outer box at `--popover-arrow-size` either way, so the rotated silhouette is
+bit-identical.
+
+For a preset that *does* draw a border it is one hairline short, and the shortfall is visible. A
+rotated square is widest at its **side vertices**; with those on the border's *inner* edge, the card's
+band still protrudes past the arrow's outward edges at the base — a burr one border-width wide on each
+side, which antialiases to a ~0.5px sliver at 1:1. It reads as the hairline overshooting the diagonal
+and ending in a small stub.
+
+The fix belongs to the **preset**, not here: hope's recipe nudges the arrow outward by exactly
+`--popover-card-border`, putting the widest point on the hairline's *outer* edge, where the composite
+outline hands off from straight to diagonal with no step. Baking a `- 1px` term into `PIN_OFFSET`
+would hard-code one preset's border width for every headless consumer, including those drawing none —
+so the kernel keeps the border-agnostic pin and the layer that authors the border cancels it.
+
 **The name is unprefixed on purpose.** `--hope-*` is `@hope-ui/theming`'s *semantic token* vocabulary,
 authored by a preset in its `theme.css`; this property is a component-local geometry channel between a
 recipe and this hook — the role calendar's `--cell-size` plays. The distinction is enforced rather than
@@ -85,18 +104,52 @@ is dropped in favour of the pin. Unlike the Positioner, this part does not warn 
 the Positioner's style paints the whole layer at 0,0, while dropping the arrow's leaves a correctly
 pinned arrow missing a decoration.
 
-## Borderless in v1
+## The bordered arrow — which two edges, and why they are physical
 
-A bordered arrow is a 45°-rotated square whose *outward* two edges carry the border — a fact of the
-rotation, not of reading direction. `assertLogicalPropertyConformance` exempts only `rtl:`/`ltr:`
--scoped utilities and takes **no allowlist parameter**, so a direction-invariant physical border
-would have to be spelled twice (`ltr:border-t ltr:border-s rtl:border-t rtl:border-e`, per side) to
-pass a check whose premise does not apply to it.
+The arrow is opaque and absolutely positioned, so it paints **above** the card's own border (a
+positioned descendant paints over its parent's background and border). Unbordered, it stops the card's
+hairline dead for ~11px and reads as a detached tab. So the recipe borders its two **outward** edges
+and the hairline continues around it.
 
-The path to a bordered one, if it is ever wanted: give the conformance kit an explicit
-`directionInvariant` escape hatch — a named opt-out with a reason string, the shape `rtl-ok:` already
-uses in `check-rtl-safety.mjs` — rather than doubling the class list at every call site. Until then
-the arrow is a solid `bg-surface-overlay` square and the card's border stops at it.
+**Which two.** A clockwise 45° turn maps the box's corners **TL→top, TR→right, BR→bottom, BL→left** —
+so the box's `top` edge becomes the upper-*right* one, `left` the upper-left, and so on. `data-side` is
+the **popup's** side, so the arrow points the *other* way:
+
+| `data-side` | arrow points | box edges | classes |
+|---|---|---|---|
+| `bottom` | up | top + left | `border-t border-l` |
+| `top` | down | bottom + right | `border-b border-r` |
+| `right` | left | left + bottom | `border-l border-b` |
+| `left` | right | top + right | `border-t border-r` |
+
+**The invariant that catches a mistake:** in every row the pair is **adjacent**, meeting at the vertex
+that is the tip — CSS miters that into a clean point. An *opposite* pair gives two parallel bars; the
+wrong *adjacent* pair gives a chevron pointing back **into** the card. Neither fails any automated
+check (the browser test project compiles no Tailwind), so the mapping is pinned as a table in
+`packages/presets/src/hope/recipes/__tests__/popover.test.ts` and judged by eye in Storybook's `Sides`
+story.
+
+**No opt-out is needed.** Both halves of the RTL gate exempt a `data-side-*`-scoped utility
+(`MEASURED_SIDE_SCOPED`, in `packages/theming/src/conformance.ts` and `scripts/check-rtl-safety.mjs`):
+`data-side` reports where the layer *landed* after `flip` — measured geometry — and which edges of a
+rotated square face outward follows from that, identically in `ltr` and `rtl`. The pair is **not**
+mirrored under `dir="rtl"`; if it ever appears to be, something else in the chain is direction-sensitive
+and the exemption's premise is wrong. See `__internal__/theming.md` § The governing rule.
+
+Two details the recipe owns, both silent if dropped:
+
+- **`border-subtle` is required, not cosmetic.** Tailwind's preflight is `border: 0 solid`, so a bare
+  `border-t` paints in `currentColor` — the card's inherited `text-foreground`. The colour therefore sits
+  on the base unconditionally, with only the *widths* keyed per side.
+- **The card's elevation must be a `filter`.** `shadow-md` is a `box-shadow` painted in the card's own
+  background layer, beneath its positioned descendants, so the arrow covers it and casts none of its
+  own. `drop-shadow-md` derives from the rendered subtree's alpha and traces the **card ∪ arrow**
+  silhouette. An arrow hidden by `data-uncentered:invisible` contributes no alpha, so an unmeasured
+  arrow correctly casts nothing.
+- **The arrow must sit on the border's OUTER edge**, which costs one outward translate of exactly the
+  border width — otherwise the card's band protrudes past the arrow's base. See § *The pin offset*.
+  The width is single-sourced as `--popover-card-border` on the card and inherited by the arrow, so
+  the border and the compensation cannot drift apart.
 
 ## SSR
 

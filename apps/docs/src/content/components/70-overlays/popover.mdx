@@ -453,10 +453,12 @@ anchor that moves under a CSS transform or an animation, opt into per-frame re-m
 ## The arrow
 
 `Popover.Arrow` is opt-in and goes **inside** `Popover.Content`. It is measured, not guessed: it
-re-pins itself whenever the card flips or shifts. When the anchor is too narrow — or the card has been
-pushed so far by `shift` that the arrow can no longer honestly point at the anchor's centre — the part
-says so with `data-uncentered`, and hope's preset answers by hiding it rather than leaving a square
-pointing at nothing.
+re-pins itself whenever the card flips or shifts, and it carries the card's hairline and elevation
+around its two outward edges, so the border reads as one continuous outline rather than stopping where
+the arrow meets it. When the anchor is too narrow — or the card has been pushed so far by `shift` that
+the arrow can no longer honestly point at the anchor's centre — the part says so with
+`data-uncentered`, and hope's preset answers by hiding it rather than leaving a square pointing at
+nothing.
 
 <Preview>
   <PopoverArrowDemo />

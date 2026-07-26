@@ -45,6 +45,15 @@ const ARROW_SIZE_PROPERTY = "--popover-arrow-size";
  */
 const ANCHOR_WIDTH_PROPERTY = "--anchor-width";
 
+/**
+ * The card's hairline width, declared on `content` and inherited by the arrow (a descendant). Unlike
+ * the two above this one is wholly internal to this recipe — but it is the same class of hazard: the
+ * arrow cancels the card's border by translating outward by exactly its width, so a hard-coded `1px`
+ * on either side would have to *happen* to match the other, and a preset changing one would silently
+ * reintroduce the ~0.5px burr at the arrow's base.
+ */
+const CARD_BORDER_PROPERTY = "--popover-card-border";
+
 describe("hope popover recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
     assertSlotRecipeConformance(popoverRecipe, { cases: CASES, slots: SLOTS });
@@ -88,7 +97,20 @@ describe("hope popover recipe", () => {
     expect(content).toContain("bg-surface-overlay");
     expect(content).toContain("border-subtle");
     expect(content).toContain("rounded-lg");
-    expect(content).toContain("shadow-md");
+
+    // The hairline's WIDTH is a property, not the bare `border` keyword: the arrow reads it back to
+    // nudge itself onto the border's outer edge (see the arrow test). A bare `border` would still
+    // render 1px and still look right on the card — while leaving the arrow's compensation reading an
+    // undefined property, which resolves to no translate and silently restores the burr.
+    expect(content).toContain(`[${CARD_BORDER_PROPERTY}:1px]`);
+    expect(content).toContain(`border-(length:${CARD_BORDER_PROPERTY})`);
+    expect(content).not.toMatch(/(?:^|\s)border(?:\s|$)/);
+    // A FILTER, not a box-shadow: the elevation has to trace the card ∪ arrow silhouette, and a
+    // `box-shadow` paints in the card's own background layer — beneath the absolutely-positioned
+    // arrow, which then covers it and casts none of its own. `drop-shadow` derives from the rendered
+    // subtree's alpha, so the arrow is included automatically.
+    expect(content).toContain("drop-shadow-md");
+    expect(content).not.toMatch(/(?<![\w-])shadow-md/);
     expect(content).toContain("outline-none");
     expect(content).toContain("text-foreground");
 
@@ -153,13 +175,52 @@ describe("hope popover recipe", () => {
     expect(arrow).not.toMatch(/(?:^|\s)hidden(?:\s|$)/);
   });
 
-  it("leaves the arrow borderless and unpositioned — both are owned elsewhere", () => {
+  it("borders the arrow's two OUTWARD edges per resolved side, continuing the card's hairline", () => {
     const arrow = popoverRecipe({}).arrow();
     expect(arrow).toContain("rotate-45");
     expect(arrow).toContain("bg-surface-overlay");
-    // Borderless in v1: a rotated square's outward edges are a fact of the rotation, not of reading
-    // direction, and `assertLogicalPropertyConformance` takes no allowlist (`popover-arrow.md`).
-    expect(arrow).not.toContain("border");
+
+    // A clockwise 45° turn maps TL→top, TR→right, BR→bottom, BL→left, so the box's `top` edge is the
+    // upper-RIGHT one. `data-side` is the POPUP's side, so the arrow points the other way. A swapped
+    // pair paints a chevron pointing back INTO the card — visible in Storybook's `Sides` story, and
+    // invisible to every automated check here (the browser project compiles no Tailwind), which is
+    // why the mapping is pinned as a table rather than spot-checked.
+    const OUTWARD_EDGES = {
+      bottom: ["border-t", "border-l"], // points UP
+      top: ["border-b", "border-r"], // points DOWN
+      right: ["border-l", "border-b"], // points LEFT
+      left: ["border-t", "border-r"], // points RIGHT
+    } as const;
+
+    for (const [side, edges] of Object.entries(OUTWARD_EDGES)) {
+      for (const edge of edges) {
+        expect(arrow).toContain(`data-side-${side}:${edge}`);
+      }
+      // Exactly two — a third would border an edge facing into the card.
+      expect(arrow.match(new RegExp(`data-side-${side}:border-[tblr]\\b`, "g"))).toHaveLength(2);
+    }
+
+    // Unconditional colour: without it the width utilities fall back to `currentColor`.
+    expect(arrow).toContain("border-subtle");
+    // No all-round `border` — it would paint the two edges facing into the card.
+    expect(arrow).not.toMatch(/(?:^|\s)border(?:\s|$)/);
+
+    // Nudged OUTWARD by exactly the card's border width, per side. Without this the diamond's widest
+    // point sits on the hairline's INNER edge and the card's 1px band protrudes past the arrow's
+    // outward edges at the base — a ~1px burr on each side that antialiases to a ~0.5px sliver.
+    // Direction per side is the same "arrow points away from the popup" mapping as the borders.
+    const OUTWARD_NUDGE = {
+      bottom: "-translate-y",
+      top: "translate-y",
+      right: "-translate-x",
+      left: "translate-x",
+    } as const;
+    for (const [side, axis] of Object.entries(OUTWARD_NUDGE)) {
+      expect(arrow).toContain(`data-side-${side}:${axis}-(${CARD_BORDER_PROPERTY})`);
+    }
+    // Read from the property the card declares, never a second literal `1px` that must happen to
+    // match the border beside it — the same single-source rule as `--popover-arrow-size` above.
+    expect(arrow).not.toMatch(/translate-[xy]-px/);
     // `position: absolute` is written inline by `createPopoverArrow` beside the measured offsets, where
     // it always wins. A class here would be dead weight that reads as load-bearing.
     expect(arrow).not.toContain("absolute");
