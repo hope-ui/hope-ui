@@ -40,6 +40,18 @@ const ANCHOR_STYLE: JSX.CSSProperties = {
 };
 
 /**
+ * Wider than the `md` card's `max-w-72` (288px) and than the 200px {@link POSITIONER_STYLE}, so a
+ * layer that really tracks the anchor's width is unmistakably distinguishable from one that does not.
+ * Still inside the 414px viewport, so nothing `shift`s.
+ */
+const WIDE_TRIGGER_STYLE: JSX.CSSProperties = {
+  position: "fixed",
+  top: "200px",
+  left: "40px",
+  width: "320px",
+};
+
+/**
  * Hard against the inline-start edge and only 4px wide: `shift` pushes the card back inside the
  * `collisionPadding` gutter while the arrow can only travel to `arrowPadding`, so the arrow cannot
  * point at the anchor's centre and stays `data-uncentered`.
@@ -79,7 +91,10 @@ interface PopoverDemoProps {
   closeOnFocusOutside?: boolean;
   side?: PopoverRootProps["side"];
   align?: PopoverRootProps["align"];
+  matchAnchorWidth?: PopoverRootProps["matchAnchorWidth"];
   triggerStyle?: JSX.CSSProperties;
+  /** Overrides {@link POSITIONER_STYLE} — the seam a test spends `--anchor-width` through. */
+  positionerStyle?: JSX.CSSProperties;
   /** Give the card a real exit duration — see {@link TRANSITIONED_CONTENT_STYLE}. */
   contentStyle?: JSX.CSSProperties;
   /** Mount a `Popover.Anchor`, which outranks the trigger as the positioning reference. */
@@ -103,6 +118,7 @@ const PopoverDemo: Component<PopoverDemoProps> = (props) => (
       closeOnFocusOutside={props.closeOnFocusOutside}
       side={props.side}
       align={props.align}
+      matchAnchorWidth={props.matchAnchorWidth}
     >
       <Show when={props.withAnchor}>
         <Popover.Anchor data-testid="anchor" style={ANCHOR_STYLE}>
@@ -111,7 +127,7 @@ const PopoverDemo: Component<PopoverDemoProps> = (props) => (
       </Show>
       <Popover.Trigger style={props.triggerStyle ?? TRIGGER_STYLE}>Open popover</Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner style={POSITIONER_STYLE}>
+        <Popover.Positioner style={props.positionerStyle ?? POSITIONER_STYLE}>
           <Popover.Content style={props.contentStyle}>
             <Popover.Arrow style={ARROW_STYLE} />
             <Popover.Header>
@@ -366,6 +382,40 @@ describe("Popover — positioning", () => {
     await waitForPositioned();
     await vi.waitFor(() => expect(partOf("arrow")?.style.left).not.toBe(""));
     expect(partOf("arrow")?.hasAttribute("data-uncentered")).toBe(true);
+
+    dispose();
+  });
+
+  it("publishes --anchor-width as real, spendable CSS — a layer sized from it matches the trigger", async () => {
+    // The end-to-end claim, asserted through the consumer `style` seam rather than the recipe:
+    // **this project compiles no Tailwind**, so `w-(--anchor-width)` is an inert string here (see
+    // POSITIONER_STYLE). Spending the property directly is what proves it resolves to a usable
+    // length — a malformed or missing value leaves the declaration invalid and the width unchanged.
+    const { dispose } = mount(() => (
+      <PopoverDemo
+        defaultOpen
+        triggerStyle={WIDE_TRIGGER_STYLE}
+        positionerStyle={{ width: "var(--anchor-width)" }}
+      />
+    ));
+
+    const positioner = await waitForPositioned();
+    const triggerRect = (triggerLocator().query() as HTMLElement).getBoundingClientRect();
+    expect(positioner.getBoundingClientRect().width).toBeCloseTo(triggerRect.width, 1);
+
+    dispose();
+  });
+
+  it("puts the width-matching class on the positioner and drops the card's size cap", async () => {
+    const { dispose } = mount(() => <PopoverDemo defaultOpen matchAnchorWidth />);
+
+    await waitForPositioned();
+    // The recipe wiring reaching the DOM. The absence of `max-w-*` is the load-bearing half: a card
+    // capped at its size would stay narrower than a wide anchor, and the compound variants exist so
+    // that cap is never emitted rather than emitted-then-overridden.
+    expect(partOf("positioner")?.className).toContain("w-(--anchor-width)");
+    expect(partOf("positioner")?.className).not.toContain("w-max");
+    expect(partOf("content")?.className).not.toMatch(/\bmax-w-/);
 
     dispose();
   });

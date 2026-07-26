@@ -19,7 +19,13 @@ const SLOTS = [
 
 const CASES: PopoverRecipeVariants[] = [
   undefined as unknown as PopoverRecipeVariants,
-  ...SIZES.map((size) => ({ size })),
+  // The full cross product, so the conformance asserts cover the `(size × matchAnchorWidth)` compound
+  // variants and not just the plain axes.
+  ...SIZES.flatMap((size) => [
+    { size },
+    { size, matchAnchorWidth: false },
+    { size, matchAnchorWidth: true },
+  ]),
 ];
 
 /**
@@ -29,6 +35,15 @@ const CASES: PopoverRecipeVariants[] = [
  * primitives, so nothing but this constant and the pointer comment on `PIN_OFFSET` ties them).
  */
 const ARROW_SIZE_PROPERTY = "--popover-arrow-size";
+
+/**
+ * The custom property `createPopoverPositioner` publishes on the positioner's inline style, in
+ * `packages/primitives/src/popover/popover-positioner.ts`. Same standing as
+ * {@link ARROW_SIZE_PROPERTY}: presets does not depend on primitives, so the spelling is the only
+ * thing tying the two packages together, and a rename on either side is silent — the recipe's
+ * `width` would resolve to nothing and the card would quietly shrink-wrap.
+ */
+const ANCHOR_WIDTH_PROPERTY = "--anchor-width";
 
 describe("hope popover recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
@@ -42,7 +57,8 @@ describe("hope popover recipe", () => {
   it("keeps the positioner free of anything positional — the kernel writes that inline", () => {
     const positioner = popoverRecipe({}).positioner();
     expect(positioner).toContain("z-50");
-    // Shrink-wrap the card so floating-ui measures its real width.
+    // Shrink-wrap the card so floating-ui measures its real width — from the `matchAnchorWidth`
+    // variant's `false` branch (the default), not the base.
     expect(positioner).toContain("w-max");
 
     // `createFloating` owns position/left/top/transform (and the pre-measurement `visibility`) as an
@@ -189,13 +205,41 @@ describe("hope popover recipe", () => {
     expect(popoverRecipe({ size: "lg" }).content()).toContain("gap-3");
   });
 
-  it("keeps every density value in the size variants, none in the base", () => {
-    // The base carries no width/padding/gap, so a size applies additively and nothing depends on
-    // tailwind-merge stripping a competing base class (the `dialog.ts` cautionary tale).
+  it("emits each density value exactly once, never a base class an override has to beat", () => {
+    // Nothing depends on tailwind-merge stripping a competing class (the `dialog.ts` cautionary
+    // tale): padding and gap come only from the `size` variant, the max width only from the
+    // `(size × matchAnchorWidth: false)` compound.
     for (const size of SIZES) {
       const content = popoverRecipe({ size }).content();
       expect(content).toMatch(/\bmax-w-\d/);
       expect(content.match(/\bmax-w-[\w.]+/g)).toHaveLength(1);
+      expect(content.match(/(?<![\w-])p-[\w.]+/g)).toHaveLength(1);
+      expect(content.match(/(?<![\w-])gap-[\w.]+/g)).toHaveLength(1);
+    }
+  });
+
+  it("swaps the positioner's width between shrink-wrap and the anchor's measured width", () => {
+    const shrinkWrapped = popoverRecipe({ matchAnchorWidth: false }).positioner();
+    expect(shrinkWrapped).toContain("w-max");
+    expect(shrinkWrapped).not.toContain(ANCHOR_WIDTH_PROPERTY);
+
+    const matched = popoverRecipe({ matchAnchorWidth: true }).positioner();
+    expect(matched).toContain(`w-(${ANCHOR_WIDTH_PROPERTY})`);
+    // Not "the variant out-orders the base" — the base carries no width at all, so there is no
+    // second `w-*` for tailwind-merge to resolve and no declaration order to depend on.
+    expect(matched).not.toContain("w-max");
+    expect(matched.match(/(?<![\w-])w-[\w(.-]+/g)).toHaveLength(1);
+  });
+
+  it("gives a width-matched card NO max width, rather than one cancelled by max-w-none", () => {
+    // The point of routing the cap through `(size × matchAnchorWidth: false)` compounds. An
+    // override-based recipe (`matchAnchorWidth: { true: { content: "max-w-none" } }`) renders
+    // identically in a browser and fails here — which is the regression this test exists to catch,
+    // because it silently depends on `matchAnchorWidth` being declared after `size` inside `tv`.
+    for (const size of SIZES) {
+      const content = popoverRecipe({ size, matchAnchorWidth: true }).content();
+      expect(content).not.toMatch(/\bmax-w-/);
+      // The density values are untouched by the axis — only the cap is conditional.
       expect(content.match(/(?<![\w-])p-[\w.]+/g)).toHaveLength(1);
       expect(content.match(/(?<![\w-])gap-[\w.]+/g)).toHaveLength(1);
     }
@@ -209,8 +253,7 @@ describe("hope popover recipe", () => {
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {
-    const cases: PopoverRecipeVariants[] = [{}, ...SIZES.map((size) => ({ size }))];
-    for (const variants of cases) {
+    for (const variants of CASES) {
       const parts = popoverRecipe(variants);
       for (const slot of SLOTS) {
         const cls = parts[slot]();

@@ -9,10 +9,27 @@
  * ── The positioner carries NOTHING positional ───────────────────────────────────────────────────
  * `createFloating` writes the layer's `position`/`left`/`top`/`transform` — and its pre-measurement
  * `visibility: hidden` — as an **inline style** on the positioner. A `position`/`inset`/`translate`
- * class here would fight a value only the kernel can know, so the `positioner` slot is stacking and
- * sizing only (`z-50 w-max`: shrink-wrap the card so floating-ui measures its real width). The
- * enter/exit `translate` lives on `content`, one level down, for the same reason — a transition on the
- * positioner would animate against the `translate()` that positions it.
+ * class here would fight a value only the kernel can know, so the `positioner` slot is stacking
+ * (`z-50`) plus a width, and nothing else. The enter/exit `translate` lives on `content`, one level
+ * down, for the same reason — a transition on the positioner would animate against the `translate()`
+ * that positions it.
+ *
+ * ── Every width class is additive; none of them is an override ──────────────────────────────────
+ * The card is sized one of two ways, and they are mutually exclusive: shrink-wrapped to its content
+ * and capped by the size (`w-max` + `max-w-72`), or pinned to the anchor (`w-(--anchor-width)`, no
+ * cap at all). Spelling the second as an override of the first — a base `w-max` beaten by a variant
+ * `w-*`, a size's `max-w-72` beaten by a `max-w-none` — would make the rendered result depend on
+ * variant declaration order inside `tv` and on tailwind-merge resolving the pair, which is a silent
+ * failure the moment either changes. So neither competing class is ever emitted:
+ *
+ *   - `w-max` / `w-(--anchor-width)` are the two values of the `matchAnchorWidth` variant. The
+ *     positioner base carries no width.
+ *   - `max-w-*` lives in `(size × matchAnchorWidth: false)` compound variants, so a width-matched
+ *     card simply never receives one. The `size` variant carries no width.
+ *
+ * This is `button.ts`'s rule (`px-*` in `(size × iconOnly)` compounds, never on the size base),
+ * applied to the same problem. Pinned by `__tests__/popover.test.ts` — the width-matched cases assert
+ * the ABSENCE of a `max-w-*`, which an override-based recipe would fail while looking identical.
  *
  * ── Recipe purity ───────────────────────────────────────────────────────────────────────────────
  * Every color is a finished `--hope-*` token: `bg-surface-overlay` (the card and the arrow),
@@ -38,7 +55,24 @@
  * `__internal__/theming.md`.
  */
 
-import { tv } from "@hope-ui/theming";
+import { type PopoverSize, tv } from "@hope-ui/theming";
+
+const MAX_WIDTH: Record<PopoverSize, string> = {
+  sm: "max-w-56",
+  md: "max-w-72",
+  lg: "max-w-96",
+};
+
+/**
+ * The card's max width, per size, **only when it is not matching its anchor**. A width-matched card
+ * therefore carries no `max-w-*` at all rather than one cancelled by a `max-w-none` — see the header
+ * note. Same shape as `button.ts`'s `paddingCompoundVariants`.
+ */
+const MAX_WIDTH_COMPOUND_VARIANTS = (Object.keys(MAX_WIDTH) as PopoverSize[]).map((size) => ({
+  size,
+  matchAnchorWidth: false as const,
+  class: { content: MAX_WIDTH[size] },
+}));
 
 /**
  * hope's Popover slot recipe — used as-is by the component (`recipe(props).content()`), no adapter.
@@ -46,8 +80,10 @@ import { tv } from "@hope-ui/theming";
  */
 export const popoverRecipe = tv({
   slots: {
-    // The measured layer. Stacking + sizing ONLY — the kernel owns everything positional (header note).
-    positioner: "z-50 w-max",
+    // The measured layer. Stacking ONLY — the kernel owns everything positional (header note), and the
+    // width belongs to `matchAnchorWidth`, never here: a base `w-max` under a variant `w-*` is exactly
+    // the tailwind-merge race the compound structure exists to avoid.
+    positioner: "z-50",
     // The card. `relative` so the arrow's absolute pin resolves against it; `flex flex-col` + a per-size
     // `gap` gives the title/description the same rhythm Dialog's content gives its own regions. Width
     // and padding are density values and live per `size`, not here.
@@ -101,18 +137,30 @@ export const popoverRecipe = tv({
     closeTrigger: "absolute end-2 top-2",
   },
   variants: {
-    // The single axis. `size` owns the full density set — the card's max width, its padding, the gap
-    // between its regions and the tighter one inside the header — and each value is self-contained, so
-    // a size applies additively and nothing depends on tailwind-merge stripping a competing base class
-    // (neither base `content` nor base `header` carries width, padding or gap). Anchored to a trigger,
-    // so the scale stays narrow: a viewport-filling popover would be a Dialog.
+    // The density axis: the card's padding, the gap between its regions and the tighter one inside the
+    // header. Each value is self-contained, so a size applies additively and nothing depends on
+    // tailwind-merge stripping a competing base class (neither base `content` nor base `header` carries
+    // padding or gap). Anchored to a trigger, so the scale stays narrow: a viewport-filling popover
+    // would be a Dialog.
+    //
+    // The card's MAX WIDTH is not here — it lives in `MAX_WIDTH_COMPOUND_VARIANTS`, keyed by
+    // (size × matchAnchorWidth), for the header's reason.
     size: {
-      sm: { content: "max-w-56 gap-2 p-2", header: "gap-0.5" },
-      md: { content: "max-w-72 gap-2.5 p-2.5", header: "gap-0.5" },
-      lg: { content: "max-w-96 gap-3 p-3", header: "gap-1" },
+      sm: { content: "gap-2 p-2", header: "gap-0.5" },
+      md: { content: "gap-2.5 p-2.5", header: "gap-0.5" },
+      lg: { content: "gap-3 p-3", header: "gap-1" },
+    },
+    // Whether the card is pinned to the anchor's measured width. `--anchor-width` is published on the
+    // positioner by `createPopoverPositioner` for every popover, measured and device-pixel snapped by
+    // `createFloating`'s `size` middleware — this variant only decides whether to spend it.
+    matchAnchorWidth: {
+      true: { positioner: "w-(--anchor-width)" },
+      false: { positioner: "w-max" },
     },
   },
+  compoundVariants: MAX_WIDTH_COMPOUND_VARIANTS,
   defaultVariants: {
     size: "md",
+    matchAnchorWidth: false,
   },
 });

@@ -71,9 +71,15 @@ export interface FloatingArrowState {
 }
 
 export interface FloatingSizeState {
-  /** The anchor's measured width — the `--anchor-width` a Select listbox matches. */
+  /**
+   * The anchor's measured width — the `--anchor-width` a Popover or a Select listbox matches.
+   * **Device-pixel snapped** (see `snapSpanByDevicePixelRatio`), so a layer sized from it rasterizes
+   * on the anchor's own pixels rather than a pixel beside them.
+   */
   anchorWidth: number;
+  /** The anchor's measured height, snapped the same way. */
   anchorHeight: number;
+  /** Space left before the collision boundary, raw — a sub-pixel never shows in a `max-width`. */
   availableWidth: number;
   /** Space left before the collision boundary — the `--available-height` a long listbox caps itself with. */
   availableHeight: number;
@@ -239,6 +245,17 @@ function roundByDevicePixelRatio(element: HTMLElement, value: number): number {
 }
 
 /**
+ * Snap a measured span by rounding its two **edges** in device pixels, not its length.
+ * `Math.round(width)` drifts by a pixel depending on where the span starts, so a layer sized from it
+ * rasterizes one pixel off the anchor it is supposed to match — the whole point of `anchorWidth`.
+ * Same reasoning as Base UI's `useAnchorPositioning`.
+ */
+function snapSpanByDevicePixelRatio(element: HTMLElement, start: number, length: number): number {
+  const ratio = getDevicePixelRatio(element);
+  return (Math.round((start + length) * ratio) - Math.round(start * ratio)) / ratio;
+}
+
+/**
  * Ordering is floating-ui's own guidance: `offset` shifts the starting point, `flip` picks the side
  * from the offset geometry, `shift` slides within the side `flip` chose, and `arrow` measures against
  * the final coordinates. Radix deliberately runs `shift` *before* `flip` — preferring to slide rather
@@ -277,10 +294,15 @@ function buildMiddleware(config: FloatingConfig, sink: SizeSink): Middleware[] {
         // Measurement only — deliberately no width/height write. Sizing the floating element here
         // is what creates `size`'s classic ResizeObserver feedback loop; the consumer decides what
         // to do with the numbers (usually a CSS custom property).
-        apply({ rects, availableWidth, availableHeight }) {
+        //
+        // The anchor's dimensions are device-pixel snapped and the available space is not: the
+        // former is spent on a `width` that has to land on the anchor's own pixels, the latter on a
+        // `max-height` where a sub-pixel is invisible.
+        apply({ rects, elements, availableWidth, availableHeight }) {
+          const { x, y, width, height } = rects.reference;
           sink.value = {
-            anchorWidth: rects.reference.width,
-            anchorHeight: rects.reference.height,
+            anchorWidth: snapSpanByDevicePixelRatio(elements.floating, x, width),
+            anchorHeight: snapSpanByDevicePixelRatio(elements.floating, y, height),
             availableWidth,
             availableHeight,
           };

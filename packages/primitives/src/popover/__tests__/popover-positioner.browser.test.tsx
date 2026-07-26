@@ -129,6 +129,48 @@ describe("createPopoverPositioner", () => {
     dispose();
   });
 
+  it("publishes the measured geometry as custom properties once positioned", async () => {
+    const { container, state, dispose } = mountHarness({ options: OPEN_OPTIONS });
+    const positioner = elementOf(container, "positioner");
+
+    // Nothing before the first measurement — deliberately absent rather than `0px`, which would
+    // collapse whatever reads it. An unresolved `var()` invalidates only its own declaration.
+    expect(positioner.style.getPropertyValue("--anchor-width")).toBe("");
+
+    await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
+
+    const trigger = elementOf(container, "trigger").getBoundingClientRect();
+    expectWithinOnePixel(
+      Number.parseFloat(positioner.style.getPropertyValue("--anchor-width")),
+      trigger.width,
+    );
+    expectWithinOnePixel(
+      Number.parseFloat(positioner.style.getPropertyValue("--anchor-height")),
+      trigger.height,
+    );
+    // Space before the collision boundary — a viewport-sized number, so only its sign is stable.
+    expect(
+      Number.parseFloat(positioner.style.getPropertyValue("--available-width")),
+    ).toBeGreaterThan(0);
+    expect(
+      Number.parseFloat(positioner.style.getPropertyValue("--available-height")),
+    ).toBeGreaterThan(0);
+    dispose();
+  });
+
+  it("publishes them without sizing the layer itself — the ResizeObserver loop stays open", async () => {
+    const { container, state, dispose } = mountHarness({ options: OPEN_OPTIONS });
+    await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
+
+    // `trackSize` is measurement-only by contract: the kernel hands CSS the numbers and writes no
+    // `width`/`max-height` of its own. Writing them here is what would close `size`'s feedback loop.
+    const positioner = elementOf(container, "positioner");
+    expect(positioner.style.width).toBe("");
+    expect(positioner.style.maxHeight).toBe("");
+    expect(elementOf(container, "content").style.maxHeight).toBe("");
+    dispose();
+  });
+
   it("merges a consumer style object over the kernel's, so a conflicting key wins", async () => {
     const { container, state, dispose } = mountHarness({
       options: OPEN_OPTIONS,
@@ -141,8 +183,10 @@ describe("createPopoverPositioner", () => {
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     expect(positioner.style.zIndex).toBe("60");
     expect(positioner.style.position).toBe("fixed");
-    // …and the rest of the kernel's object survived the merge rather than being replaced by it.
+    // …and the rest of the kernel's object survived the merge rather than being replaced by it —
+    // including the measured custom properties, which a recipe's `w-(--anchor-width)` depends on.
     expect(positioner.style.transform).toContain("translate(");
+    expect(positioner.style.getPropertyValue("--anchor-width")).not.toBe("");
     dispose();
   });
 

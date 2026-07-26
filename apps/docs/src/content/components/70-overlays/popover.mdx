@@ -8,6 +8,7 @@ import { PopoverFormDemo } from "~/components/demos/popover/PopoverFormDemo";
 import { PopoverHeaderDemo } from "~/components/demos/popover/PopoverHeaderDemo";
 import { PopoverInDialogDemo } from "~/components/demos/popover/PopoverInDialogDemo";
 import { PopoverLogicalSideDemo } from "~/components/demos/popover/PopoverLogicalSideDemo";
+import { PopoverMatchAnchorWidthDemo } from "~/components/demos/popover/PopoverMatchAnchorWidthDemo";
 import { PopoverNestedDemo } from "~/components/demos/popover/PopoverNestedDemo";
 import { PopoverPositionMatrixDemo } from "~/components/demos/popover/PopoverPositionMatrixDemo";
 import { PopoverScrollContainerDemo } from "~/components/demos/popover/PopoverScrollContainerDemo";
@@ -368,6 +369,76 @@ where a box landed is geometry.
   }
 />
 
+### Matching the anchor's width
+
+`matchAnchorWidth` pins the card to the measured width of whatever it is anchored to — the trigger, or
+a `Popover.Anchor` when one is mounted. The `size` cap does not apply to a matched card: a card
+narrower than the control it points at would defeat the purpose, so `size` keeps only its padding and
+its gaps.
+
+<Preview>
+  <PopoverMatchAnchorWidthDemo />
+</Preview>
+
+```tsx
+<Popover.Root matchAnchorWidth>…</Popover.Root>
+```
+
+The width tracks the anchor for as long as the popover is open, not just at the moment it opens —
+resize the window above and the matched card follows.
+
+#### The measurements, as CSS custom properties
+
+`matchAnchorWidth` is one way to spend a measurement every popover already publishes.
+`Popover.Positioner` carries four custom properties, on every popover, whether or not you use this
+prop:
+
+<DataTable
+  columns={[
+    { key: "property", label: "Property" },
+    { key: "description", label: "What it holds" },
+  ]}
+  rows={[
+    {
+      property: "--anchor-width",
+      description: "The anchor's width, snapped to whole device pixels.",
+    },
+    { property: "--anchor-height", description: "The anchor's height, snapped the same way." },
+    {
+      property: "--available-width",
+      description: "Space left before the collision boundary, along the inline axis.",
+    },
+    {
+      property: "--available-height",
+      description: "Space left before the collision boundary — what a scrolling card caps itself with.",
+    },
+  ]}
+/>
+
+Reach for them when the prop is not the shape you want — a floor rather than an exact match, or a card
+that scrolls instead of growing past the viewport:
+
+```tsx title="At least as wide as the trigger, never taller than the space available"
+<Popover.Positioner class="min-w-(--anchor-width)">
+  <Popover.Content class="max-h-(--available-height) overflow-y-auto">…</Popover.Content>
+</Popover.Positioner>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Sizing a popover from <code>--available-height</code> can make Chromium log{" "}
+      <code>ResizeObserver loop completed with undelivered notifications</code> in development.
+      The loop settles — the space available depends on the anchor and the viewport, not on the
+      card's own height — so this is noise, not a bug to fix by turning <code>autoUpdate</code>{" "}
+      off.
+    </div>
+  }
+/>
+
 ### Staying glued
 
 The position is kept current as the page scrolls or resizes (`autoUpdate`, on by default). For an
@@ -656,7 +727,8 @@ through `slotClasses`. There is no `root` slot (`Popover.Root` renders no elemen
     {
       slot: "positioner",
       attr: "popover-positioner",
-      description: "The measured layer. Stacking and sizing only — never anything positional.",
+      description:
+        "The measured layer, and where the --anchor-width family is published. Stacking and width only — never anything positional.",
     },
     { slot: "content", attr: "popover-content", description: "The card surface." },
     { slot: "arrow", attr: "popover-arrow", description: "The pointing square." },
@@ -717,9 +789,9 @@ export const myPreset = definePreset(hope, {
 });
 ```
 
-`size` is the recipe's only variant, so it is the only prop defaultable app-wide. Positioning
-(`side`, `align`, the offsets), `role`, and the open/dismissal props are per-usage decisions and stay
-on the instance.
+`size` and `matchAnchorWidth` are the recipe's variants, so they are the props defaultable app-wide.
+Positioning (`side`, `align`, the offsets), `role`, and the open/dismissal props are per-usage
+decisions and stay on the instance.
 
 ## API
 
@@ -734,6 +806,13 @@ on the instance.
       type: "PopoverSize",
       default: '"md"',
       description: "Card width + padding scale: sm, md, lg.",
+    },
+    {
+      prop: "matchAnchorWidth",
+      type: "boolean",
+      default: "false",
+      description:
+        "Pin the card to the anchor's measured width. The size cap does not apply to a matched card.",
     },
     {
       prop: "role",

@@ -65,6 +65,7 @@ export const Root: Component<PopoverRootProps> = (props) => {
     defaults: {
       size: "md" as const,
       role: "dialog" as const,
+      matchAnchorWidth: false,
       sideOffset: 8,
       collisionPadding: 8,
       arrowPadding: 8,
@@ -73,12 +74,15 @@ export const Root: Component<PopoverRootProps> = (props) => {
 
   const slots = useSlots({
     recipe: "popover",
-    variantsProps: () => ({ size: merged.size }),
+    variantsProps: () => ({ size: merged.size, matchAnchorWidth: merged.matchAnchorWidth }),
     slotClasses: () => merged.slotClasses,
   });
 
   // `createPopover` reads only its own option keys off `merged` (open/role/closeOn*/side/align/…) —
-  // the defaulted `size` and `slotClasses` ride along harmlessly. Pass `merged`, not raw `props`:
+  // the defaulted `size`, `matchAnchorWidth` and `slotClasses` ride along harmlessly. `matchAnchorWidth`
+  // needs no primitive counterpart precisely because it is styling: the kernel measures the anchor and
+  // publishes `--anchor-width` on the positioner unconditionally, and the recipe decides whether to
+  // spend it. Pass `merged`, not raw `props`:
   // `useDefaults` exposes its defaults as getters over `props`, so `merged` stays just as lazy and
   // reactive (the controllable-state getters, and every positioning getter `createFloating` tracks,
   // stay live) while remaining the single source of truth.

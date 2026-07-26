@@ -69,10 +69,56 @@ The focus half of the same nesting lives one part up, in
 [`popover-content.md`](popover-content.md) — this part covers hit testing and the accessibility
 tree only.
 
+## The measured geometry is published as custom properties
+
+Four, on the positioner's inline style, on **every** popover:
+
+| Property | Value |
+| --- | --- |
+| `--anchor-width` | the anchor's width, device-pixel snapped |
+| `--anchor-height` | the anchor's height, device-pixel snapped |
+| `--available-width` | space before the collision boundary, raw |
+| `--available-height` | space before the collision boundary, raw |
+
+They come from `createFloating`'s `size` middleware, which `createPopover` enables unconditionally
+(`trackSize: true`). The kernel measures and **writes nothing onto the element** — that is what keeps
+`size` out of its classic ResizeObserver feedback loop — so handing the numbers to CSS is the
+consumer's job, and this part is where Popover does it. hope's recipe spends `--anchor-width` behind
+the `matchAnchorWidth` variant; a consumer spends `--available-height` on a `max-height` when the card
+scrolls.
+
+**Unconditional, not behind an option.** Behind a flag, a `width: var(--anchor-width)` that nobody
+enabled is an invalid declaration the browser drops in silence — no error, no warning, a card that is
+merely the wrong size. Ark/Zag (`--reference-width`), Base UI (`--anchor-width`) and React Aria
+Components (`--trigger-width`) all publish theirs unconditionally for the same reason. The cost is one
+extra middleware reading rects per measurement pass.
+
+**Unprefixed on purpose.** These name the *anchor*, not the popover: `--anchor-width` is kernel
+vocabulary a future Select or Menu positioner publishes identically. Contrast `--popover-arrow-size`,
+which is component-local and therefore component-named. Neither is `--hope-*` — that namespace belongs
+to `@hope-ui/theming`'s *semantic tokens*, and `check:recipe-purity` rejects a recipe naming it in a
+bracketed value.
+
+**Nothing is emitted before the first measurement**, rather than a `0px` placeholder. A real `0px`
+would collapse whatever reads it, where an absent property invalidates only the one declaration
+referencing it — and the layer is `visibility: hidden` until `isPositioned()` anyway, so no
+intermediate is visible. It also keeps the server render and the first client render identical, which
+is what hydration needs: `size()` is `undefined` in both.
+
+Two consequences worth knowing:
+
+- **Expect `ResizeObserver loop completed with undelivered notifications` in Chromium** once a
+  consumer actually spends `--anchor-width` on a `width`. The write re-fires `autoUpdate`'s
+  `elementResize`, and the loop **converges** — the anchor's width does not depend on the layer's own
+  size — so this is a log, not a bug. Do not "fix" it by turning `autoUpdate` off.
+- `size()` returns a fresh object every measurement pass, so the `style` memo recomputes on every
+  `autoUpdate` tick even when the numbers are unchanged. Solid diffs `style` per property, so no DOM
+  write results.
+
 ## The `style` merge order is the documented escape valve
 
 ```ts
-style = { ...state.floating.floatingStyles(), ...consumerStyleObject }
+style = { ...state.floating.floatingStyles(), ...anchorSizeProperties(), ...consumerStyleObject }
 ```
 
 **Kernel first, consumer last** — so a conflicting key resolves the consumer's way. This is the

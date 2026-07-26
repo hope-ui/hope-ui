@@ -4,8 +4,9 @@ import { createKeepVisible, type FloatingAlign, type PresenceStatus, type Side }
 import type { CreatePopoverReturn } from "./popover-root";
 
 export interface CreatePopoverPositionerReturn {
-  /** Spread onto the positioner element. `style` carries the kernel's positioning, with the
-   * consumer's own object merged over it; `data-side`/`data-align`/`data-presence` are owned here. */
+  /** Spread onto the positioner element. `style` carries the kernel's positioning and the measured
+   * `--anchor-width`/`--anchor-height`/`--available-width`/`--available-height`, with the consumer's
+   * own object merged over it; `data-side`/`data-align`/`data-presence` are owned here. */
   props: JSX.HTMLAttributes<HTMLDivElement> & {
     "data-side": Side;
     "data-align": FloatingAlign;
@@ -53,7 +54,7 @@ export function createPopoverPositioner(
     // pre-positioned behavior (their own `visibility`, a `z-index`, a `pointer-events`) spreads it
     // *after* and wins, without the positioner slot growing a `position`/`left`/`top` of its own.
     get style(): JSX.CSSProperties {
-      const kernel = state.floating.floatingStyles();
+      const kernel = { ...state.floating.floatingStyles(), ...anchorSizeProperties(state) };
       const consumer = props.style;
       return typeof consumer === "string" ? kernel : { ...kernel, ...consumer };
     },
@@ -72,6 +73,37 @@ export function createPopoverPositioner(
     props: elementProps,
     mounted: state.contentPresence.mounted,
     setRef: (element) => state.setPositionerElement(element),
+  };
+}
+
+/**
+ * The measured geometry, published as custom properties so CSS can spend it — a recipe's
+ * `w-(--anchor-width)`, or a consumer's `max-h-(--available-height)` on a card that scrolls. The
+ * kernel deliberately writes none of this onto the element itself (that is what keeps `size` out of
+ * its ResizeObserver feedback loop), so handing the numbers to CSS is the consumer's job, and this
+ * is where Popover does it.
+ *
+ * **Unprefixed on purpose.** These name the anchor, not the popover: `--anchor-width` is kernel
+ * vocabulary a future Select or Menu positioner publishes identically. `--hope-*` is the theming
+ * package's *semantic token* namespace and is not what this is — the same distinction
+ * `--popover-arrow-size` draws, which is component-local and therefore component-named.
+ *
+ * **Nothing is emitted before the first measurement**, rather than a `0px` placeholder. A real `0px`
+ * would collapse whatever reads it; an absent property leaves `width: var(--anchor-width)` invalid,
+ * so the browser drops that one declaration and the element keeps its natural size. It also keeps
+ * the server render and the first client render identical, which is what hydration needs — `size()`
+ * is `undefined` in both.
+ */
+function anchorSizeProperties(state: CreatePopoverReturn): JSX.CSSProperties {
+  const size = state.floating.size();
+  if (size === undefined) {
+    return {};
+  }
+  return {
+    "--anchor-width": `${size.anchorWidth}px`,
+    "--anchor-height": `${size.anchorHeight}px`,
+    "--available-width": `${size.availableWidth}px`,
+    "--available-height": `${size.availableHeight}px`,
   };
 }
 

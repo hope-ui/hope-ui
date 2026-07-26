@@ -283,6 +283,13 @@ export function createPopover(options: CreatePopoverOptions = {}): CreatePopover
     // tracked in `createFloating`'s config memo. So a popover with no arrow, and one whose arrow ref
     // arrives late, both work with no branch here.
     arrowElement,
+    // Unconditional, and a literal rather than an option: `createPopoverPositioner` publishes the
+    // measurements as `--anchor-width`/`--available-height`/… on every popover, so a consumer's
+    // `w-(--anchor-width)` always resolves. Behind a flag those variables would be absent by
+    // default, and a `width: var(--anchor-width)` that nobody enabled is an invalid declaration the
+    // browser drops in silence — the failure mode Ark, Base UI and React Aria all avoid by exposing
+    // theirs unconditionally too. The middleware itself only reads rects; it writes nothing.
+    trackSize: true,
     // Getters throughout — the documented `createFloating` idiom, and the only shape in which
     // changing an option re-measures instead of needing a remount.
     get side() {

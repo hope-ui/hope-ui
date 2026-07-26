@@ -131,6 +131,58 @@ export const Sizes: Story = {
   ),
 };
 
+/**
+ * `matchAnchorWidth` pins the card to the trigger's measured width instead of letting it shrink-wrap.
+ * The card's `size` cap does not apply here — a matched card is never narrower than what it points at,
+ * which is the whole promise — so `size` keeps only its padding and gaps. Widen the browser and the
+ * wide trigger below stretches its card with it, live: `createFloating` re-measures on every
+ * `autoUpdate` tick and republishes `--anchor-width` on the positioner.
+ *
+ * The same measurement is available to CSS on any popover, matched or not — `--anchor-width`,
+ * `--anchor-height`, `--available-width`, `--available-height` — so a card that wants a floor rather
+ * than an exact match writes `min-w-(--anchor-width)` on the Positioner itself.
+ */
+export const MatchAnchorWidth: Story = {
+  // A matched card is as tall as it is wide is unusual — it covers whatever sits right below it — so
+  // the two demos are spaced far enough apart that both triggers stay clickable while one is open.
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        "flex-direction": "column",
+        gap: "9rem",
+        width: "24rem",
+        padding: "3rem 2rem",
+      }}
+    >
+      <Popover.Root matchAnchorWidth>
+        <Popover.Trigger
+          render={(p) => (
+            <Button {...(p as ButtonProps)} fullWidth>
+              A wide trigger — the card matches it
+            </Button>
+          )}
+        />
+        <Popover.Portal>
+          <Popover.Positioner>
+            <Popover.Content>
+              <Popover.Arrow />
+              <Popover.Title>Share this page</Popover.Title>
+              <Popover.Description>
+                Anyone with the link can view it. This card is as wide as the button above, past the
+                `md` size's own cap.
+              </Popover.Description>
+            </Popover.Content>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+      {/* The contrast: same content, same size, shrink-wrapped and capped instead. */}
+      <PopoverDemo triggerLabel="Shrink-wrapped (the default)" />
+    </div>
+  ),
+};
+
 const SIDES = ["top", "right", "bottom", "left"] as const;
 
 /**

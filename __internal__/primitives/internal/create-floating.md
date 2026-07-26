@@ -101,6 +101,19 @@ keeps `size` out of its classic ResizeObserver feedback loop. Once a consumer *d
 `ResizeObserver loop completed with undelivered notifications` even though the loop converges
 (`availableHeight` depends on the anchor and boundary, not on the layer's own height).
 
+**`anchorWidth`/`anchorHeight` are device-pixel snapped; `availableWidth`/`availableHeight` are not.**
+The anchor's dimensions get spent on a `width` that has to rasterize on the anchor's own pixels, so
+each is computed by rounding the rect's two **edges** in device pixels and subtracting — rounding the
+*length* instead drifts by a pixel depending on where the span starts, and a "same width" layer then
+visibly overhangs its anchor. The available space gets spent on a `max-height`, where a sub-pixel
+never shows. Same reasoning as Base UI's `useAnchorPositioning`.
+
+**Popover is the first consumer, and it turns `trackSize` on unconditionally.**
+`createPopoverPositioner` publishes all four numbers as custom properties on every popover, so a
+`w-(--anchor-width)` in a recipe always resolves — see
+[`popover-positioner.md`](../popover/popover-positioner.md) for the full argument, which applies
+verbatim to a future Select or Menu.
+
 ### Base UI vocabulary → floating-ui middleware
 
 | Option | What it becomes |

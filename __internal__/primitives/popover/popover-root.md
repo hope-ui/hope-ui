@@ -199,6 +199,13 @@ the Positioner part. Base UI spells them on its `Popover.Positioner`; hope-ui ta
 It follows from `createFloating` being root-owned, and it matches Dialog's precedent — `closeOnEscape`
 and `role` are `Dialog.Root` options even though `Dialog.Content` is what consumes them.
 
+**`trackSize` is not among them: it is passed as a literal `true`, not exposed.** Every popover
+measures its anchor, and `createPopoverPositioner` publishes the result as `--anchor-width` and its
+three siblings — see [`popover-positioner.md`](popover-positioner.md) for why that is unconditional
+and what it costs. The middleware only reads rects; nothing is written onto the layer, so the
+measurement-only contract `create-floating.md` describes is intact. `createFloating`'s own `trackSize`
+default stays `false` for every other consumer.
+
 They are forwarded as **getters**, never read once:
 
 ```ts

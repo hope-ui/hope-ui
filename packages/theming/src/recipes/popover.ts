@@ -11,8 +11,13 @@
  * Popover is a **measured floating surface** — a card `createFloating` positions against a trigger or
  * an anchor — so, unlike Dialog, *where it sits* is runtime geometry the kernel writes as an inline
  * `style`, never a recipe axis. What is left for the recipe is the card's chrome and its density, so
- * the single axis is `size`. It carries **no** color axis: v1 is a neutral overlay, and role accents
- * belong on whatever the consumer puts inside it.
+ * the axes are `size` and `matchAnchorWidth`. It carries **no** color axis: v1 is a neutral overlay,
+ * and role accents belong on whatever the consumer puts inside it.
+ *
+ * `matchAnchorWidth` is the one axis that reads *from* the geometry rather than ignoring it, and it
+ * still isn't positioning: the kernel measures the anchor and publishes `--anchor-width` on the
+ * positioner, and the recipe decides whether to spend it. That split is what keeps "where it sits"
+ * out of the recipe while letting "how wide it is" stay a themeable decision.
  *
  * `role` (`dialog` vs. `alertdialog`) is **not** a recipe variant — it changes ARIA, not styling, so
  * it is a component-layer prop on `Popover.Root` threaded to the content hook through context. The
@@ -33,10 +38,23 @@ import type { SlotRecipeFn } from "../slot-recipe";
  */
 export type PopoverSize = "sm" | "md" | "lg";
 
-/** The Popover recipe's variant props — also the density axis a preset may default app-wide. */
+/** The Popover recipe's variant props — also the axes a preset may default app-wide. */
 export interface PopoverRecipeVariants {
   /** Card width + padding scale. Default `md`. */
   size?: PopoverSize;
+  /**
+   * Pin the card to the anchor's measured width instead of letting it shrink-wrap its content.
+   * Default `false`.
+   *
+   * A styling axis over a *measurement*: `createPopoverPositioner` publishes `--anchor-width` on
+   * every popover regardless, and this variant is what spends it. So a preset is free to express it
+   * as a floor (`min-width`) rather than an exact match, and a consumer who wants the other one
+   * reaches for the custom property directly.
+   *
+   * The card's `size` cap and this are mutually exclusive by construction — see the hope preset's
+   * compound variants — so a matched card is never silently narrower than its anchor.
+   */
+  matchAnchorWidth?: boolean;
 }
 
 /**
@@ -50,8 +68,10 @@ export interface PopoverThemeableProps extends PopoverRecipeVariants {}
 
 /**
  * The Popover recipe's slots. `positioner` is the layer `createFloating` measures and moves (chrome
- * only — stacking and sizing; **never** `position`/`left`/`top`/`transform`, which would fight the
- * inline style the kernel writes); `content` is the card itself; `arrow` the little square that points
+ * only — stacking and width; **never** `position`/`left`/`top`/`transform`, which would fight the
+ * inline style the kernel writes — where "width" means shrink-wrapping the card or matching the
+ * anchor, both of which the kernel measures *around* rather than dictating); `content` is the card
+ * itself; `arrow` the little square that points
  * at the anchor; `header` the optional column grouping the labelled text; `title`/`description` that
  * text; `closeTrigger` the corner dismiss button's placement (its chrome comes from `CloseButton`'s
  * own recipe, merged under this).

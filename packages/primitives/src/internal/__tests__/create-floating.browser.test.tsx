@@ -215,6 +215,15 @@ function arrowOf(api: CreateFloatingReturn): FloatingArrowState {
   return arrow;
 }
 
+/** A CSS px value that lands on a whole device pixel — `1e-9` absorbs the float division only. */
+function expectWholeDevicePixels(value: number): void {
+  const inDevicePixels = value * (window.devicePixelRatio || 1);
+  expect(
+    Math.abs(inDevicePixels - Math.round(inDevicePixels)),
+    `expected ${value}px to be a whole number of device pixels, got ${inDevicePixels}`,
+  ).toBeLessThan(1e-9);
+}
+
 function sizeOf(api: CreateFloatingReturn): FloatingSizeState {
   const size = api.size();
   if (size === undefined) {
@@ -713,6 +722,29 @@ describe("createFloating", () => {
     // Measurement only: nothing was written onto the element, which is what keeps `size` out of its
     // classic ResizeObserver feedback loop.
     expect(elementOf(trackedMount.container, "floating").style.maxHeight).toBe("");
+    trackedMount.dispose();
+  });
+
+  it("snaps the anchor's dimensions to whole device pixels, leaving the available space raw", async () => {
+    // A sub-pixel anchor at a sub-pixel offset: the case where rounding the LENGTH and rounding the
+    // two EDGES disagree. A consumer spends `anchorWidth` on a `width`, so it has to rasterize on the
+    // anchor's own pixels — off by one, and a "same width" popup visibly overhangs its trigger.
+    let tracked!: CreateFloatingReturn;
+    const trackedMount = mount(() => (
+      <FloatingHarness
+        onReady={(ready) => (tracked = ready)}
+        trackSize
+        anchorStyle={{ ...CLEAR_OF_EDGES, left: "100.3px", width: "80.4px", height: "24.7px" }}
+      />
+    ));
+    await vi.waitFor(() => expect(tracked.size()).toBeDefined());
+
+    const size = sizeOf(tracked);
+    expectWholeDevicePixels(size.anchorWidth);
+    expectWholeDevicePixels(size.anchorHeight);
+    // Still the anchor, not some other box — snapping moves it by less than a device pixel.
+    expectWithinOnePixel(size.anchorWidth, anchorRectOf(trackedMount.container).width);
+
     trackedMount.dispose();
   });
 
