@@ -44,10 +44,11 @@ infrastructure, deliberately *not* a growing component tracker):
 - Kernel primitives: `createCollection`, `createVirtualCollection`, `createListFocus`,
   `createListNavigation`, `createListTypeahead`, `createListSelection`, `createListExpansion`,
   `createGridNavigation`, `createComponentContext`, `createControllableState`, `createDismissable`,
-  `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createScrollLock`, `createPresence`,
-  `createPress`, `createButton`, `createRegisteredId`, `createRegisteredElement`; utils `renderElement`, `withDefaults`,
-  `composeEventHandlers`, `createKeyboardHandler`, `compareByIdOrReference`. Plus `ModalBackdrop`, the
-  kernel's only DOM-rendering component.
+  `createAutoFocus`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createScrollLock`,
+  `createPresence`, `createFloating`, `createPress`, `createButton`, `createRegisteredId`,
+  `createRegisteredElement`; utils `renderElement`, `withDefaults`, `composeEventHandlers`,
+  `createKeyboardHandler`, `compareByIdOrReference`. Plus `ModalBackdrop`, the kernel's only
+  DOM-rendering component.
 - Styling / theming: **Tailwind v4 + `tailwind-variants`** via `@hope-ui/theming` (`tv`/`cn`/`cx` +
   `useRecipe` + the semantic-token contract); the default visual identity is **`@hope-ui/presets/hope`**.
   Dark mode via a `.dark` class. The recipe pattern is proven end-to-end — Button, Badge, Alert,
@@ -110,7 +111,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Tabs | Navigation | 5/5 | `createListNavigation` | roving + follow-focus |
 | Accordion | Disclosure | 5/5 | `createListExpansion` | kernel ready |
 | Tooltip | Overlays | 5/5 | `createFloating`*, `createTimer`* | open/close delay |
-| Popover | Overlays | 5/5 | `createFloating`*, `createDismissable`, `createFocusTrap` | the "compose, don't inherit from Dialog" proof |
+| Popover ✅ | Overlays | 5/5 | `createFloating`, `createDismissable`, `createAutoFocus`, `createFocusRestore`, `createPresence` | the "compose, don't inherit from Dialog" proof, landed — styled API (10 compound parts + `popover` recipe). **Non-modal v1:** no focus trap, scroll lock, hide-outside or backdrop; a `modal` mode is later work |
 | HoverCard | Overlays | 2/5 | `createFloating`*, `createHoverIntent`* | |
 | Dialog ✅ | Overlays | 5/5 | (kernel complete) | styled API landed (compound parts + `dialog` recipe) |
 | Drawer / Sheet | Overlays | 5/5 | Dialog kernel | Dialog variant + slide presence |
@@ -168,7 +169,8 @@ keyboard auto-advance have shipped; these have not):
 
 Everything the overlay/collection kernel already provides is listed under *Already in place* above.
 These are the gaps, ordered by build complexity. `*` marks the ones referenced in the component
-tables.
+tables. A gap identified later is **appended rather than renumbered**, so a row number stays a
+stable reference and the ordering claim holds within the original survey.
 
 | # | Primitive (proposed) | Purpose | Consumers | Tier |
 |---|---|---|---|---|
@@ -185,9 +187,15 @@ tables.
 | 11 | `createPinInputState` · `createTagsState` | field-specific interaction state | PinInput, TagsInput | T2 |
 | 12 | `createDragState` | pointer drag / resize / swipe | Slider thumb, Splitter, Toast swipe, ScrollArea | T3 |
 | 13 | `createFileUploadState` | file selection, drag-drop, accept/size validation | FileUpload | T3 |
-| 14 | `createOverlayStack` | z-index / nesting / dismissal-order coordination | OverlayManager, nested Dialog/Popover/Menu | T3 |
+| 14 | `createOverlayStack` | z-index / nesting / dismissal-order coordination. **Speculative, and #18/#19 are the answer instead** — [`reference-implementations.md`](reference-implementations.md) §1 argues the two registries must stay separate, since a Dialog with `dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape | OverlayManager, nested Dialog/Popover/Menu | T3 |
 | 15 | `createTreeCollection` | hierarchical collection: levels, expand-aware flat nav | TreeView *(builds on `createCollection` + nav + expansion)* | T3 |
 | 16 | `createDateState` | calendar model: month grid, min/max, ranges, disabled dates, i18n | Calendar, DatePicker *(pairs with `createGridNavigation`)* | T4 |
+| 17 | `createAutoFocus` ✅ | Move focus into a container on activation **without** trapping it — including the `tabindex="-1"` fallback for a container with no focusable descendant, and its cleanup. Extracted from `createFocusTrap`, whose own doc comment had named the gap and named Popover as the caller, and which now composes it rather than welding the two together | Popover (a non-modal layer must not trap), and `createFocusTrap` itself | T1 |
+| 18 | `createDismissable` — **nested layer ordering** ✳︎ | A mount-order stack so only the **topmost** open layer consumes Escape or an outside pointerdown. Today `create-dismissable.ts` attaches per instance to `document` with no ordering guard, so — measured — Escape on a Popover inside a Dialog closes **both**, and focus is left on `<body>`. Port react-aria `useOverlay`'s `visibleOverlays` + its two-phase pointer guard for the mechanism, Base UI `useDismiss`'s `bubbles` for the vocabulary — [`reference-implementations.md`](reference-implementations.md) §1 | nested Popover-in-Dialog (pinned by Popover's `InsideADialog` story), Menu, Select, ContextMenu | T2 |
+| 19 | `createHideOutside` — **nested `aria-hidden`/`inert`** ✳︎ | `observerStack` (only the innermost layer observes) + a dynamic `keepVisible` + a declarative `data-*` always-visible opt-out, so a layer portaled **after** an outer modal started observing is spared. Measured today: the Popover's positioner lands as a direct `<body>` child and is marked `inert` + `aria-hidden="true"`. It does **not** render beneath the scrim — both layers are `z-50` and the popover portal is the later body child, so the card paints on top, undimmed and fully legible, while `elementFromPoint` at its own centre returns the Dialog's `fixed inset-0` positioner. It looks like a working popover and cannot be touched | same as #18 | T2 |
+
+✳︎ Extensions to a **shipped** primitive, not new ones — and deliberately two registries rather than
+one (see #14).
 
 **Covered by existing primitives (no new work):** open/close state → `createControllableState`
 (+ `createPresence`); roving focus / typeahead / arrow nav / 2D grid → the list-\* + grid kernel;
@@ -205,8 +213,14 @@ Not components and not primitives — repo-wide seams that get more expensive pe
 Every styled Root that forwards native attributes onto its element has to separate "an option the
 primitive consumes" from "an attribute the consumer wants on the DOM node". Today that separation is
 a literal key list passed to `omit(merged, …)`, hand-copied from the primitive's `CreateXOptions`
-interface — `Calendar.Root` (28 keys) and `Listbox.Root` (26) carry one each, and every future
-compound root (Select, Combobox, Menu, Popover, Tabs, Accordion, …) will need its own.
+interface — `Calendar.Root` (29 keys) and `Listbox.Root` (27) carry one each, and every future
+compound root that **renders an element** (Select, Combobox, Menu, Tabs, Accordion, …) will need its
+own. `Popover.Root` is the counter-example and the cheapest fix available: it renders no element at
+all, exactly as `Dialog.Root` doesn't, so it has nothing to subtract from and keeps no list. Stated
+in `popover-root.md` so the absence isn't read as an oversight and "fixed".
+
+*(Those two counts are as measured. They are also the section's own point in miniature — they were
+written as 28 and 26, and each drifted by one the next time an option was added.)*
 
 **It drifts in both directions, silently.**
 - A key **missing** from the list leaks into the DOM as a junk attribute (`commitbehavior="reset"`).

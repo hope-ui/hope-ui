@@ -37,6 +37,14 @@ and `@solid-primitives/a11y` (the live-region announcer).
 > branch, which Vite/Rollup will, given `sideEffects: false`. If you import from
 > `@hope-ui/primitives/internal` under a bundler that doesn't, install both peers.
 
+> **`@floating-ui/dom` is optional here, but not for anyone using `@hope-ui/components`'s Popover.**
+> The optionality claim belongs to *this* package — it is `createFloating` that needs the peer, and a
+> consumer who only opens a Dialog still pays nothing. But `@hope-ui/components/popover` positions
+> every layer through `createFloating`, so installing that component means resolving the peer,
+> unconditionally. `@hope-ui/components` deliberately declares no dependency on it: moving the
+> declaration there would make the peer mandatory for consumers of every *other* component in the
+> package, which is the larger group.
+
 ## Subpath exports
 
 Only top-level `src/` folders carry a barrel and a subpath — nothing deeper.
@@ -45,8 +53,9 @@ Only top-level `src/` folders carry a barrel and a subpath — nothing deeper.
 | ------ | -------- |
 | `@hope-ui/primitives/render` | `renderElement` — the `render`/`as` polymorphism primitive (+ ref merging) every public component routes its parts through. |
 | `@hope-ui/primitives/utils` | The remaining non-`createX` composition helpers: `withDefaults` (the correct way to apply defaults under 2.0), `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`. |
-| `@hope-ui/primitives/internal` | The `createX` behavior primitives: `createComponentContext`, `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`, `createFloating` (overlay positioning, over `@floating-ui/dom`), `createRegisteredId`, `createRegisteredElement`, plus the list/grid/collection navigation family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListSelection`, `createListTypeahead`, `createListExpansion`, `createGridNavigation`). |
+| `@hope-ui/primitives/internal` | The `createX` behavior primitives: `createComponentContext`, `createControllableState`, `createPresence`, `createAutoFocus` (initial focus **without** a trap — what a non-modal layer needs, and what `createFocusTrap` composes), `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`, `createFloating` (overlay positioning, over `@floating-ui/dom`), `createRegisteredId`, `createRegisteredElement`, plus the list/grid/collection navigation family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListSelection`, `createListTypeahead`, `createListExpansion`, `createGridNavigation`). |
 | `@hope-ui/primitives/dialog` | The `createDialog` hook family (root state + one hook per part). |
+| `@hope-ui/primitives/popover` | The `createPopover` hook family (root state + trigger/anchor/positioner/content/arrow/title/description/close-trigger hooks) — a **non-modal** floating layer composed from `createFloating` + `createDismissable` + `createAutoFocus` + `createFocusRestore` + `createPresence`, never Dialog's modal machinery. |
 | `@hope-ui/primitives/listbox` | The `createListbox` hook family (root state + item/group/group-label/separator hooks) — composes the `internal/` list kernel; collection + virtual source modes, roving + activedescendant focus. |
 | `@hope-ui/primitives/calendar` | The `createCalendar` hook family (headless month/year/decade calendar, built on `@internationalized/date`). |
 | `@hope-ui/primitives/modal-backdrop` | `ModalBackdrop` — the kernel's only DOM-rendering component, the pointer-blocking third of modality. |

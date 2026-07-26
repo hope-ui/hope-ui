@@ -12,6 +12,14 @@ floating-ui draws between its own packages. A Popover composes them; none of the
 others. In particular, a non-modal layer must **not** reach for Dialog's modal machinery to get
 positioned.
 
+**The worked consumer is `packages/components/src/popover/`**, over the
+[`createPopover`](../popover/popover-root.md) hook family — the first, and the reference to read
+before wiring the second. It settles, in code that runs, every question this doc answers in prose:
+where the call goes (once, on the root, so `side()` reaches both the Positioner and the Arrow), how
+the positioner/content split keeps the enter transition off the kernel's `translate()`, how
+`floatingStyles()` merges with a consumer's `style`, and — the one that is not obvious — what
+`active` is keyed on. Its browser suite samples the frames rather than reasoning about them.
+
 ## Why `@floating-ui/dom` (and why optional)
 
 `@floating-ui/dom` is the framework-agnostic core with no Solid coupling, so we **adopt** it and
@@ -370,7 +378,7 @@ identical on both sides of the round-trip.
 `visibility: hidden` and not `display: none` — an element with no box can never be measured, so
 `display: none` would deadlock. And not `opacity: 0`, which stays hit-testable.
 
-Four consumer anti-patterns, each of which looks reasonable:
+Five consumer anti-patterns, each of which looks reasonable:
 
 1. **`<Show when={isPositioned()}>` around the floating element is a deadlock,** not merely a
    hydration bug: no element → no `floating()` → no `computePosition` → `isPositioned()` never
@@ -381,3 +389,14 @@ Four consumer anti-patterns, each of which looks reasonable:
 3. **Keep `floatingStyles()` an object** Solid can diff — never concatenate it into a style string.
 4. **The positioner's recipe must not set `position`/`left`/`top`/`transform`,** or it will fight
    the kernel's styles and win.
+5. **A layer with an exit transition passes `active: () => presence.mounted()`, never
+   `active: open`.** This one has no symptom until an animation is authored, which is why it reads
+   as the obvious wiring. `update()` ends in `setIsPositioned(untrack(options.active))` and effect
+   (2) does `!active → setIsPositioned(false)`, so keyed on `open` the layer reverts to
+   `{ left: 0, top: 0, visibility: "hidden" }` **the instant it closes** — while `createPresence` is
+   still holding it mounted for its exit. It vanishes instead of animating out, and `autoUpdate`
+   stops tracking a layer that is still on screen, so it can drift too. Keyed on `mounted()` both
+   hold until the element actually leaves. `createPopover` is the worked case
+   (`popover-root.ts`), and the pin is *"keeps a closing layer positioned for every frame of its
+   exit"* in `popover.browser.test.tsx` — which samples the positioner's computed style per frame
+   and, reverted to `active: open`, reports every exit frame `hidden` with `transform: none`.

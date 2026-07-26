@@ -289,11 +289,12 @@ pnpm workspace, Turborepo pipeline.
   - `utils/` — `withDefaults` (**the only correct way to apply prop defaults under 2.0**),
     `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`.
   - `internal/` — the `createX` behavior primitives: `createComponentContext`,
-    `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`,
-    `createHideOutside`, `createDismissable`, `createScrollLock`, `createFloating`, `createPress`,
-    `createButton`, `createRegisteredId`, `createRegisteredElement`, plus the collection/navigation
-    family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`,
-    `createListTypeahead`, `createListSelection`, `createListExpansion`, `createGridNavigation`).
+    `createControllableState`, `createPresence`, `createAutoFocus`, `createFocusTrap`,
+    `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
+    `createFloating`, `createPress`, `createButton`, `createRegisteredId`,
+    `createRegisteredElement`, plus the collection/navigation family (`createCollection`,
+    `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListTypeahead`,
+    `createListSelection`, `createListExpansion`, `createGridNavigation`).
     Docs under `__internal__/primitives/internal/`; read the ref/`createEffect` timing gotcha in
     `__internal__/solid-2.0-notes.md` before writing another one.
 
