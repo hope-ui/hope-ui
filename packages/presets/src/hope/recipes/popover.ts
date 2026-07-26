@@ -84,10 +84,10 @@ export const popoverRecipe = tv({
       "[--popover-arrow-size:0.5rem] size-(--popover-arrow-size)",
       "rotate-45 bg-surface-overlay data-uncentered:invisible",
     ],
-    title: "text-base font-medium leading-none text-foreground",
+    title: "font-medium leading-none text-foreground",
     // Prose, muted; a link inside gets the shadcn underline treatment and brightens on hover.
     description: [
-      "text-sm text-foreground-muted",
+      "text-foreground-muted",
       "[&_a]:underline [&_a]:underline-offset-4 [&_a:hover]:text-foreground",
     ],
     // Placement only — pinned to the trailing-top corner (logical, so it mirrors in `rtl`). The button
@@ -101,9 +101,9 @@ export const popoverRecipe = tv({
     // width, padding or gap). Anchored to a trigger, so the scale stays narrow: a viewport-filling
     // popover would be a Dialog.
     size: {
-      sm: { content: "max-w-56 gap-1 p-2.5" },
-      md: { content: "max-w-72 gap-1.5 p-3" },
-      lg: { content: "max-w-96 gap-2 p-4" },
+      sm: { content: "max-w-56 gap-2 p-2" },
+      md: { content: "max-w-72 gap-2.5 p-2.5" },
+      lg: { content: "max-w-96 gap-3 p-3" },
     },
   },
   defaultVariants: {
