@@ -88,6 +88,7 @@ export {
   type CreateListFocusReturn,
   createListFocus,
   type FocusMode,
+  type FocusMoveOptions,
 } from "./create-list-focus";
 export {
   type CreateListNavigationOptions,
@@ -148,3 +149,7 @@ export {
   createVirtualCollection,
   type VirtualItemData,
 } from "./create-virtual-collection";
+export {
+  type ScrollIntoViewAlignment,
+  scrollIntoView,
+} from "./scroll-into-view";

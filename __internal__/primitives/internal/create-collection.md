@@ -26,7 +26,7 @@ mounts ahead of its siblings still sorts to the front). Angular Aria's `SortedCo
 ```ts
 interface ItemSource<V = unknown> {
   items: Accessor<ReadonlyArray<CollectionItem<V>>>;
-  scrollIndexIntoView?: (index: number) => void; // omitted here — every item is mounted
+  scrollIndexIntoView?: (index: number) => void; // omitted here — see below
 }
 
 interface CollectionItem<V = unknown> {
@@ -41,6 +41,11 @@ interface CollectionItem<V = unknown> {
 The other implementation, `createVirtualCollection`, satisfies the same interface but resolves
 `element` only for the windowed slice and provides `scrollIndexIntoView`. A behavior written against
 `ItemSource` works over either — that is the whole point of the seam. See `create-list-focus.md`.
+
+`createCollection` deliberately implements **no** `scrollIndexIntoView`, even though its items can be
+clipped: its one remaining consumer is Calendar's roving grid, where the native `.focus()` scrolls on
+its own. A data-driven source that has to reveal a clipped row does it with
+[`scrollIntoView`](scroll-into-view.md) against its scroll element.
 
 ## API
 

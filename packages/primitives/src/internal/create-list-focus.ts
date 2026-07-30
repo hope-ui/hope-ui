@@ -5,6 +5,16 @@ import { createControllableState } from "./create-controllable-state";
 /** How the list surfaces the active item to assistive technology and the tab order. */
 export type FocusMode = "roving" | "activedescendant";
 
+/** Per-call overrides for a focus move. */
+export interface FocusMoveOptions {
+  /**
+   * Whether to bring the target row into view via `source.scrollIndexIntoView`. Default `true`.
+   * A pointer-driven move passes `false`: the row is already under the cursor, so scrolling would
+   * slide the list and hand the highlight to whatever ends up beneath the pointer.
+   */
+  scroll?: boolean;
+}
+
 export interface CreateListFocusOptions<V = unknown> {
   /**
    * The abstract item source — `createCollection` (default) or `createVirtualCollection`. This is
@@ -67,15 +77,17 @@ export interface CreateListFocusReturn<V = unknown> {
   setFocused(value: boolean): void;
 
   /**
-   * Make the item at `index` active. In roving mode this moves real DOM focus to the item —
-   * **deferred until the item's element exists**, which is exactly what a virtualized row (mounted
-   * only after `scrollIndexIntoView`) and the activedescendant path both need. In activedescendant
-   * mode it updates `aria-activedescendant` and, if the target row is unmounted, scrolls it into
-   * view so the IDREF resolves, but never moves DOM focus.
+   * Make the item at `index` active and bring it into view (`options.scroll`, default `true`).
+   * In roving mode this also moves real DOM focus to the item — **deferred until the item's element
+   * exists**, which is exactly what a virtualized row (mounted only after `scrollIndexIntoView`)
+   * and the activedescendant path both need; that native `.focus()` is also what scrolls a mounted
+   * row in, so roving asks the source only for rows that do not exist yet. In activedescendant mode
+   * nothing moves DOM focus, so **every** row is scrolled in — otherwise a mounted-but-clipped
+   * option sits offscreen while `aria-activedescendant` names it.
    */
-  focusIndex(index: number): void;
+  focusIndex(index: number, options?: FocusMoveOptions): void;
   /** Make `item` active. See {@link focusIndex}. */
-  focus(item: CollectionItem<V>): void;
+  focus(item: CollectionItem<V>, options?: FocusMoveOptions): void;
   /** Re-apply focus to the currently active item (roving) or the container (activedescendant). */
   focusActive(): void;
   /**
@@ -225,7 +237,7 @@ export function createListFocus<V = unknown>(
       }),
   );
 
-  const setActive = (index: number) => {
+  const setActive = (index: number, { scroll = true }: FocusMoveOptions = {}) => {
     const length = items().length;
     const clamped = length === 0 ? -1 : index < 0 ? -1 : Math.min(index, length - 1);
     setActiveIndexState(clamped);
@@ -233,10 +245,20 @@ export function createListFocus<V = unknown>(
       return;
     }
 
-    const item = items()[clamped];
-    // Bring an unmounted row into view (virtualization): required both so a roving `.focus()` has
-    // an element to land on, and so an activedescendant IDREF names an element that exists.
-    if (item && item.element() == null) {
+    // Bring the row into view. Which rows need it is exactly the difference between the two modes:
+    //
+    // - **activedescendant** — every row. Nothing moves DOM focus, so a *mounted but clipped* option
+    //   would sit offscreen while `aria-activedescendant` names it, with every test green. That is
+    //   the failure Select would ship, and roving mode has been hiding it all along.
+    // - **roving** — only a row that does not exist yet (virtualized, outside the window), so the
+    //   deferred `.focus()` below has an element to land on. Once it is mounted, that native
+    //   `.focus()` scrolls it in *and computes the offset from the real scrollport*, which is
+    //   strictly better than a source can: asking the source too would land a second, coarser scroll
+    //   on top of the browser's exact one, clipping the active row (measured: 6px, the virtualizer
+    //   aligning against the border box while the port excludes the border and the padding).
+    //
+    // Sources align `"nearest"`, so even the activedescendant path is a no-op for a visible row.
+    if (scroll && (focusMode() === "activedescendant" || items()[clamped]?.element() == null)) {
       options.source.scrollIndexIntoView?.(clamped);
     }
     if (focusMode() === "roving") {
@@ -244,8 +266,9 @@ export function createListFocus<V = unknown>(
     }
   };
 
-  const focusIndex = (index: number) => setActive(index);
-  const focus = (item: CollectionItem<V>) => setActive(items().indexOf(item));
+  const focusIndex = (index: number, move?: FocusMoveOptions) => setActive(index, move);
+  const focus = (item: CollectionItem<V>, move?: FocusMoveOptions) =>
+    setActive(items().indexOf(item), move);
 
   const focusActive = () => {
     if (focusMode() === "roving") {

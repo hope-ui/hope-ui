@@ -48,7 +48,10 @@ function createListboxItem<V = unknown>(
 - **Pointer move** — `onPointerMove` re-targets the active item to this one, but **only on real
   movement**, guarded by `state.pointerMoved(clientX, clientY)`. A spurious `pointermove` at
   unchanged coords (the list scrolling under a still cursor after a keyboard arrow) is ignored, so a
-  keyboard arrow is never overridden. Disabled items ignore pointer moves.
+  keyboard arrow is never overridden. Disabled items ignore pointer moves. It is also the one path
+  that passes `{ scroll: false }`: the row is already under the cursor, so scrolling to it would
+  slide the list and hand the highlight to whatever ends up beneath the pointer. Click and focus
+  keep the default (`"nearest"` is a no-op for an already-visible row). See `create-list-focus.md`.
 - **Focus** — `onFocus` syncs the active index to real DOM focus (`untrack`ed, since focus is moved
   from inside `createListFocus`'s own effect). This paints the row that takes focus when the list is
   entered — tabbing in, clicking, or a programmatic `.focus()`. No `getEventTarget` guard is needed:

@@ -8,9 +8,12 @@ import {
   FRUITS,
   type Fruit,
   fruitOptions,
+  listbox,
+  mountedIndices,
   nth,
   options,
   selectedValues,
+  VirtualListbox,
 } from "./listbox-harness";
 
 const label = (fruit: Fruit) => fruit.name;
@@ -18,6 +21,10 @@ const label = (fruit: Fruit) => fruit.name;
 /** Dispatch a real `pointermove` at explicit client coords — the fight-guard reads clientX/clientY. */
 function pointerMoveAt(element: HTMLElement, x: number, y: number): void {
   element.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true }));
+}
+
+function rowAt(container: HTMLElement, index: number): HTMLElement {
+  return container.querySelector(`[data-index="${index}"]`) as HTMLElement;
 }
 
 describe("createListboxItem — attributes", () => {
@@ -137,6 +144,41 @@ describe("createListboxItem — pointer / click", () => {
     pointerMoveAt(nth(options(container), 1), 10, 25); // Banana is disabled
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(activeValues(container)).toEqual([]);
+    dispose();
+  });
+});
+
+describe("createListboxItem — hover moves the highlight but never the scroll", () => {
+  it("leaves the scroll alone on pointer move, while a click still reveals the row", async () => {
+    let state!: CreateListboxReturn<number>;
+    const { container, dispose } = mount(() => (
+      <VirtualListbox
+        count={50}
+        rowHeight={30}
+        viewport={100}
+        // Activedescendant so DOM focus never moves: a real `.focus()` scrolls on its own, which
+        // would hide whichever path is under test.
+        options={{ focusMode: "activedescendant" }}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(mountedIndices(container)).toContain(3));
+
+    const list = listbox(container);
+    expect(list.scrollTop).toBe(0);
+
+    // Row 3 spans [90, 120) in a 100px port: mounted and hoverable, but only 10px of it is visible.
+    const clipped = rowAt(container, 3);
+    pointerMoveAt(clipped, 10, 95);
+    await vi.waitFor(() => expect(state.focus.activeIndex()).toBe(3));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(list.scrollTop).toBe(0);
+
+    // Clicking the same row does scroll — only the pointer-move path opts out. `.click()` rather
+    // than `userEvent.click`, which scrolls the target into view before pressing.
+    clipped.click();
+    await vi.waitFor(() => expect(list.scrollTop).toBe(120 - 100));
+    await expectNoA11yViolations(container);
     dispose();
   });
 });

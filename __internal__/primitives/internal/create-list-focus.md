@@ -31,11 +31,42 @@ list usually focuses a mounted element synchronously, but a virtualized list nav
 are not in the DOM yet. `focusIndex` therefore:
 
 1. sets the active index (updating tab stops / `aria-activedescendant` reactively);
-2. if the target row is unmounted, calls `source.scrollIndexIntoView(index)` to bring it in;
+2. calls `source.scrollIndexIntoView(index)` to bring the row into view;
 3. in roving mode, records the index and lets an effect call `.focus()` once the element mounts.
 
 Activedescendant mode never moves DOM focus, so it uses the same "the element may be absent"
 plumbing for free — which is why focus lives here, in one primitive, rather than in each component.
+
+## Scrolling the active row into view
+
+Which rows get step 2 is exactly the difference between the two modes:
+
+| Mode | `source.scrollIndexIntoView(index)` runs for |
+|---|---|
+| `activedescendant` | **every** active row |
+| `roving` | only a row whose `element()` has not resolved (virtualized, outside the window) |
+
+In **activedescendant** mode nothing moves DOM focus, so a *mounted but clipped* option would sit
+offscreen while `aria-activedescendant` names it — with every test green. That is precisely the
+failure a Select would ship, and roving mode has been hiding it all along.
+
+In **roving** mode the deferred `.focus()` is itself the scroll: the browser computes the offset from
+the real scrollport, which is strictly better than a source can. Asking the source *as well* lands a
+second, coarser scroll on top of the browser's exact one and clips the active row — measured at 6px
+in the virtualized listbox, where `scrollToIndex` aligns against the border box while the port
+excludes the border and the padding. So roving asks the source only for the one thing `.focus()`
+cannot do: make an unmounted row exist.
+
+Sources align `"nearest"` ([`scroll-into-view.md`](scroll-into-view.md)), so even the
+activedescendant path is a no-op whenever the row is already fully visible — no visibility test is
+needed here.
+
+`focusIndex(index, { scroll: false })` and `focus(item, { scroll: false })` opt out. The one caller
+that does is the **pointer** path (`createListboxItem`'s `onPointerMove`): the row is already under
+the cursor, so scrolling to it would slide the list and hand the highlight to whatever ends up
+beneath the pointer. Click and focus keep the default.
+
+A source with no `scrollIndexIntoView` — `createCollection` — simply ignores all of this.
 
 ## Roving + virtualization: focus recovery
 
@@ -71,9 +102,11 @@ function createListFocus<V = unknown>(options: {
 ```
 
 Returned surface: `items`, `activeIndex`, `activeItem`, `disabled`, `skipDisabled`, `focusMode`,
-`isFocused`; `setFocused(value)`, `focusIndex(index)`, `focus(item)`, `focusActive()`, `focusEntry()`;
-`isActive(item)`, `isFocusable(item)`; `getListTabIndex()`, `getItemTabIndex(item)`,
-`activeDescendant()`.
+`isFocused`; `setFocused(value)`, `focusIndex(index, options?)`, `focus(item, options?)`,
+`focusActive()`, `focusEntry()`; `isActive(item)`, `isFocusable(item)`; `getListTabIndex()`,
+`getItemTabIndex(item)`, `activeDescendant()`.
+
+`options` is `{ scroll?: boolean }` (default `true`) — see "Scrolling the active row into view".
 
 - **Roving tab stop before navigation.** APG requires exactly one tabbable element. Before any
   arrow press (`activeIndex === -1`), the *entry item* gets `tabindex=0`, so Tab reaches the widget.

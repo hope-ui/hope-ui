@@ -44,8 +44,8 @@ The buffer resets after `delay` ms of inactivity.
 
 `search` reads `item.textValue()`, which a `createVirtualCollection` supplies from its per-index data
 even for rows that were never mounted. Focusing the match calls `focus.focusIndex`, which scrolls the
-row into view and focuses it once it mounts. So typeahead over a 10k-row list finds and reveals an
-offscreen match — verified in the browser test.
+row into view (mounted or not — see `create-list-focus.md`) and focuses it once it mounts. So
+typeahead over a 10k-row list finds and reveals an offscreen match — verified in the browser test.
 
 ## SSR
 

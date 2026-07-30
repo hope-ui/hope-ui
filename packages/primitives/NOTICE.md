@@ -6,7 +6,7 @@ Nothing here relicenses those portions.
 
 ## Adobe React Spectrum
 
-- **Project:** https://github.com/adobe/react-spectrum (`@react-aria/interactions`, `@react-aria/overlays`)
+- **Project:** https://github.com/adobe/react-spectrum (`@react-aria/interactions`, `@react-aria/overlays`, `@react-aria/utils`)
 - **License:** Apache License, Version 2.0 — full text in [`LICENSE-APACHE-2.0.txt`](./LICENSE-APACHE-2.0.txt)
 - **Copyright:** Copyright 2020 Adobe. All rights reserved.
 
@@ -18,6 +18,7 @@ an attribution header naming its upstream source:
 | `src/internal/create-press.ts` | `@react-aria/interactions` — `src/usePress.ts` — the unified pointer/touch/mouse/keyboard/virtual press model |
 | `src/internal/create-hide-outside.ts` | `@react-aria/overlays` — `src/ariaHideOutside.ts` — the layer stack (including its out-of-order teardown), `keepVisible`, and the always-visible marker |
 | `src/internal/create-dismissable.ts` | `@react-aria/overlays` — `src/useOverlay.ts` — the flat activation-ordered stack of visible layers, and the topmost check that gates a dismissal on it |
+| `src/internal/scroll-into-view.ts` | `@react-aria/utils` — `src/scrollIntoView.ts` — the scroll-port arithmetic (border widths, `scroll-padding-*`, `scroll-margin-*`, scrollbar thickness, the RTL scrollbar side) and the `"nearest"` minimum-distance delta |
 
 The principal modifications to `create-press.ts` are re-expression for SolidJS 2.0's reactive model,
 firing `onPress` from the `click` event, and a single plain-value signal surface for hydration
@@ -27,8 +28,11 @@ keeps its ref count and layer stack on the DOM under `Symbol.for` keys so two in
 this package share them. `create-dismissable.ts` keeps only the stack: its Escape is a
 document-level listener rather than element-scoped keyboard props, its outside-press guard is
 single-phase at `pointerdown` rather than a two-phase `pointerdown`/`click` snapshot, and its
-"a target inside a layer above is not outside" clause has no upstream counterpart. All three sets
-are documented inline in the files.
+"a target inside a layer above is not outside" clause has no upstream counterpart.
+`scroll-into-view.ts` keeps only the containing-block variant (`scrollIntoViewport`, which walks
+scroll parents up to the page, is deliberately absent), restructures the arithmetic into per-axis
+spans, and drops the iOS/WebKit scrollbar-side branch — overlay scrollbars measure zero there, so it
+was already inert. All four sets are documented inline in the files.
 
 `@internationalized/date` is also an Adobe Apache-2.0 work. It is an ordinary npm dependency,
 resolved as a bare specifier in the published output and never bundled — it ships with its own

@@ -1,12 +1,14 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
-import { type Accessor, createSignal, For } from "solid-js";
+import { type Accessor, createSignal, For, untrack } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import {
   type CollectionItem,
   type CreateCollectionReturn,
   createCollection,
+  type ItemSource,
 } from "../create-collection";
 import { type CreateListFocusReturn, createListFocus, type FocusMode } from "../create-list-focus";
+import { scrollIntoView } from "../scroll-into-view";
 
 /** Array access that asserts presence — under `noUncheckedIndexedAccess`, `list[i]` is `T | undefined`. */
 function nth<T>(list: ArrayLike<T>, index: number): T {
@@ -269,6 +271,165 @@ describe("createListFocus — activedescendant mode", () => {
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
     await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+// ─── Scrolling the active row into view ──────────────────────────────────────────────────────────
+
+const ROW = 30;
+const VIEWPORT = 90; // exactly three rows
+
+interface ScrollHarnessApi extends HarnessApi {
+  /** Every index `scrollIndexIntoView` was asked for, in order. */
+  scrolledIndices: number[];
+}
+
+/**
+ * A **fully mounted** list that is nevertheless clipped, over a source that implements
+ * `scrollIndexIntoView` — the shape `createDataCollection` will have, and the one a Select needs:
+ * activedescendant mode moves no DOM focus, so nothing but this reveals the highlighted row.
+ */
+function ScrollableFocusHarness(props: {
+  values: string[];
+  focusMode?: Accessor<FocusMode>;
+  onReady: (api: ScrollHarnessApi) => void;
+}) {
+  const collection = createCollection<string>();
+  const [containerRef, setContainerRef] = createSignal<HTMLUListElement>();
+  const scrolledIndices: number[] = [];
+
+  const source: ItemSource<string> = {
+    items: collection.items,
+    // Untracked on purpose: this is an imperative DOM sync called from a focus move, never a
+    // dependency — and roving mode would otherwise run it inside `createListFocus`'s own effect.
+    scrollIndexIntoView: (index) =>
+      untrack(() => {
+        scrolledIndices.push(index);
+        const list = containerRef();
+        const element = collection.items()[index]?.element();
+        if (list && element) {
+          scrollIntoView(list, element);
+        }
+      }),
+  };
+
+  const focus = createListFocus<string>({
+    source,
+    focusMode: props.focusMode ?? (() => "activedescendant"),
+    element: containerRef,
+  });
+  props.onReady({ collection, focus, scrolledIndices });
+
+  return (
+    <ul
+      ref={setContainerRef}
+      role="listbox"
+      aria-label="fruits"
+      tabindex={focus.getListTabIndex()}
+      aria-activedescendant={focus.activeDescendant()}
+      style={{ height: `${VIEWPORT}px`, "overflow-y": "auto" }}
+    >
+      <For each={props.values}>
+        {(value) => {
+          const [ref, setRef] = createSignal<HTMLLIElement>();
+          const item = collection.register({ ref, value: () => value });
+          return (
+            <li
+              ref={setRef}
+              id={item.id}
+              role="option"
+              aria-selected={focus.isActive(item) ? "true" : "false"}
+              tabindex={focus.getItemTabIndex(item)}
+              data-value={value}
+              style={{ height: `${ROW}px` }}
+            >
+              {value}
+            </li>
+          );
+        }}
+      </For>
+    </ul>
+  );
+}
+
+const TEN_ROWS = Array.from({ length: 10 }, (_, index) => `row-${index}`);
+
+describe("createListFocus — scrolling the active item into view", () => {
+  it("scrolls a mounted but clipped row into view in activedescendant mode", async () => {
+    let api!: ScrollHarnessApi;
+    const { container, dispose } = mount(() => (
+      <ScrollableFocusHarness values={TEN_ROWS} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(10));
+
+    const list = listbox(container);
+    expect(list.scrollTop).toBe(0);
+
+    api.focus.focusIndex(6);
+
+    // Row 6 spans [180, 210) in a 90px port: `"nearest"` brings it flush with the bottom edge.
+    await vi.waitFor(() => expect(list.scrollTop).toBe(210 - VIEWPORT));
+    expect(list.getAttribute("aria-activedescendant")).toBe(nth(api.collection.items(), 6).id);
+    // Nothing took DOM focus — the row is visible because it was scrolled to, not focused.
+    for (const option of options(container)) {
+      expect(option).not.toHaveFocus();
+    }
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("leaves the scroll alone when the row is already visible", async () => {
+    let api!: ScrollHarnessApi;
+    const { container, dispose } = mount(() => (
+      <ScrollableFocusHarness values={TEN_ROWS} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(10));
+
+    api.focus.focusIndex(1);
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(1));
+    expect(api.scrolledIndices).toEqual([1]);
+    expect(listbox(container).scrollTop).toBe(0);
+    dispose();
+  });
+
+  it("leaves a mounted row to the native focus scroll in roving mode", async () => {
+    let api!: ScrollHarnessApi;
+    const roving = () => "roving" as const;
+    const { container, dispose } = mount(() => (
+      <ScrollableFocusHarness values={TEN_ROWS} focusMode={roving} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(10));
+
+    const list = listbox(container);
+    api.focus.focusIndex(6);
+
+    // The row still ends up visible — but the browser did it, as part of moving real DOM focus, and
+    // it computes the offset from the true scrollport. Asking the source too would land a second,
+    // coarser scroll on top of that exact one.
+    await expect.element(nth(options(container), 6)).toHaveFocus();
+    expect(api.scrolledIndices).toEqual([]);
+    expect(list.scrollTop).toBeGreaterThan(0);
+    dispose();
+  });
+
+  it("skips the scroll entirely when asked to", async () => {
+    let api!: ScrollHarnessApi;
+    const { container, dispose } = mount(() => (
+      <ScrollableFocusHarness values={TEN_ROWS} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(10));
+
+    api.focus.focusIndex(6, { scroll: false });
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(6));
+    expect(api.scrolledIndices).toEqual([]);
+    expect(listbox(container).scrollTop).toBe(0);
+
+    // …and `focus(item)` takes the same override.
+    api.focus.focus(nth(api.collection.items(), 8), { scroll: false });
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(8));
+    expect(api.scrolledIndices).toEqual([]);
+    expect(listbox(container).scrollTop).toBe(0);
     dispose();
   });
 });

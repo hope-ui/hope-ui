@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { type Accessor, merge, omit, untrack } from "solid-js";
-import { type CollectionItem, createRegisteredElement } from "../internal";
+import { type CollectionItem, createRegisteredElement, type FocusMoveOptions } from "../internal";
 import { composeEventHandlers, withDefaults } from "../utils";
 import type { CreateListboxReturn } from "./listbox-root";
 
@@ -105,14 +105,14 @@ export function createListboxItem<V = unknown>(
   };
   const isDisabled = () => getItem()?.disabled() ?? false;
 
-  const activate = () => {
+  const activate = (move?: FocusMoveOptions) => {
     if (virtualIndex) {
-      state.focus.focusIndex(virtualIndex());
+      state.focus.focusIndex(virtualIndex(), move);
       return;
     }
     const item = getItem();
     if (item) {
-      state.focus.focus(item);
+      state.focus.focus(item, move);
     }
   };
 
@@ -190,7 +190,9 @@ export function createListboxItem<V = unknown>(
         if (!state.pointerMoved(event.clientX, event.clientY)) {
           return;
         }
-        activate();
+        // `scroll: false`: the row is already under the cursor, and scrolling to it would slide the
+        // list and hand the highlight to whatever ends up beneath the pointer.
+        activate({ scroll: false });
       });
     },
     get onFocus() {
