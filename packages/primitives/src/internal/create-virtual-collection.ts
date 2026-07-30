@@ -15,15 +15,13 @@ import {
   onCleanup,
   untrack,
 } from "solid-js";
-import type { CollectionItem, ItemSource } from "./create-collection";
+import { type CollectionItem, createItemIds, type IndexedItemSource } from "./create-collection";
 
 /** `@tanstack/virtual-core`'s scroll alignment — declared locally; the core doesn't export it. */
 type ScrollAlignment = "start" | "center" | "end" | "auto";
 
 /** The per-index metadata a virtualized collection needs, since offscreen rows have no element. */
 export interface VirtualItemData<V = unknown> {
-  /** Stable DOM id for the row at this index — the `aria-activedescendant` target. */
-  id: string;
   /** The selection value at this index. */
   value?: V;
   /** Typeahead text at this index. **Required for offscreen typeahead** — an unmounted row has no
@@ -48,7 +46,7 @@ export interface CreateVirtualCollectionOptions<V = unknown> {
   horizontal?: boolean;
 }
 
-export interface CreateVirtualCollectionReturn<V = unknown> extends ItemSource<V> {
+export interface CreateVirtualCollectionReturn<V = unknown> extends IndexedItemSource<V> {
   /** The windowed items to actually render (`index`, `start`, `size`, …). */
   virtualItems: Accessor<VirtualItem[]>;
   /** Total scroll size in px, for the sizing spacer. */
@@ -153,6 +151,8 @@ export function createVirtualCollection<V = unknown>(
       }),
   );
 
+  const itemId = createItemIds();
+
   const items = createMemo<ReadonlyArray<CollectionItem<V>>>(() => {
     const total = options.count();
     const list: CollectionItem<V>[] = [];
@@ -160,7 +160,7 @@ export function createVirtualCollection<V = unknown>(
       const at = index;
       const data = () => options.getItemData(at);
       list.push({
-        id: options.getItemData(at).id,
+        id: itemId(at),
         element: () => elements().get(at),
         disabled: () => data().disabled ?? false,
         textValue: () => data().textValue ?? elements().get(at)?.textContent?.trim() ?? "",

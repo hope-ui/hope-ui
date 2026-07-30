@@ -17,6 +17,8 @@ export {
   type CollectionItem,
   type CreateCollectionReturn,
   createCollection,
+  createItemIds,
+  type IndexedItemSource,
   type ItemSource,
   type RegisterItemOptions,
 } from "./create-collection";
@@ -25,6 +27,11 @@ export {
   type CreateControllableStateOptions,
   createControllableState,
 } from "./create-controllable-state";
+export {
+  type CreateDataCollectionOptions,
+  type CreateDataCollectionReturn,
+  createDataCollection,
+} from "./create-data-collection";
 export {
   type CreateDismissableOptions,
   createDismissable,

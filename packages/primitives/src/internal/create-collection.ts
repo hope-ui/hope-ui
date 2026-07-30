@@ -41,6 +41,44 @@ export interface ItemSource<V = unknown> {
   readonly scrollIndexIntoView?: (index: number) => void;
 }
 
+/**
+ * An {@link ItemSource} whose rows publish their element **by index** instead of registering
+ * themselves. Both data-derived implementations — `createDataCollection` and
+ * `createVirtualCollection` — build their `CollectionItem`s from an array, so a mounted row has to
+ * say *which* row it is: `registerElement(index, element)` is what resolves
+ * `items()[index].element()` for the `aria-activedescendant` IDREF's target and for
+ * scroll-into-view. {@link createCollection} is the odd one out — there the registrations *are* the
+ * items — which is why this is a separate interface rather than a member of `ItemSource`.
+ */
+export interface IndexedItemSource<V = unknown> extends ItemSource<V> {
+  /** Publish a mounted row's element for `index`, or `null` on unmount. */
+  registerElement: (index: number, element: HTMLElement | null) => void;
+  /** Hand a mounted row to the source's measurer, where it has one (variable-height virtual rows). */
+  measureElement?: (element: HTMLElement | null) => void;
+}
+
+/**
+ * The ids an {@link IndexedItemSource} gives its rows: one generated prefix per collection instance,
+ * plus the row's index — Base UI's `${rootId}-${index}` scheme, where the item's own id is not even
+ * a prop a consumer can set.
+ *
+ * Deliberately **not** derived from the item's value. A value is arbitrary application data, and
+ * usually server data: it can carry whitespace (an IDREF containing a space can never be pointed
+ * at), collide with a second collection rendering the same records on the same page, or simply not
+ * be a legal id — and every one of those failures is silent, breaking `aria-activedescendant` for a
+ * screen-reader user while every test stays green.
+ *
+ * `createUniqueId()` is SSR-stable (the server render and the hydrating client bottom out in the
+ * same `nextChildIdFor(owner)`), so the IDREF still agrees across the round-trip. That is the
+ * property a data-driven source is chosen for, and it survives generated ids intact.
+ *
+ * Call it **once**, where the collection is created — it consumes a hydration id.
+ */
+export function createItemIds(): (index: number) => string {
+  const prefix = createUniqueId();
+  return (index) => `${prefix}-${index}`;
+}
+
 /** Reactive inputs a part hook passes to {@link CreateCollectionReturn.register}. */
 export interface RegisterItemOptions<V = unknown> {
   /**

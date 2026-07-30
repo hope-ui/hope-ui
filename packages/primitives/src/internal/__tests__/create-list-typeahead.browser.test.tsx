@@ -216,7 +216,7 @@ function VirtualTypeaheadHarness(props: { onReady: (api: VApi) => void }) {
     count: () => VCOUNT,
     scrollElement: scrollRef,
     estimateSize: () => VROW,
-    getItemData: (index) => ({ id: `v-${index}`, value: index, textValue: vLabel(index) }),
+    getItemData: (index) => ({ value: index, textValue: vLabel(index) }),
     overscan: 3,
   });
   const focus = createListFocus<number>({ source: collection, element: scrollRef });

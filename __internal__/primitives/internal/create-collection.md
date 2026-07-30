@@ -38,9 +38,23 @@ interface CollectionItem<V = unknown> {
 }
 ```
 
-The other implementation, `createVirtualCollection`, satisfies the same interface but resolves
-`element` only for the windowed slice and provides `scrollIndexIntoView`. A behavior written against
-`ItemSource` works over either — that is the whole point of the seam. See `create-list-focus.md`.
+Two other implementations satisfy the same interface: [`createVirtualCollection`](create-virtual-collection.md)
+(windowed — `element` resolves only for the rendered slice) and
+[`createDataCollection`](create-data-collection.md) (derived from an array, so the items exist before
+any row mounts). Both also provide `scrollIndexIntoView`. A behavior written against `ItemSource`
+works over any of the three — that is the whole point of the seam. See `create-list-focus.md`.
+
+Those two share a second interface declared in this file, `IndexedItemSource<V>` — `ItemSource` plus
+`registerElement(index, element)` and an optional `measureElement`. Both build their items from data,
+so a mounted row has to say *which* row it is; `createCollection` is the odd one out, because there
+the registrations **are** the items.
+
+They also share their id scheme, `createItemIds()`, declared here for the same reason: one generated,
+SSR-stable prefix per collection plus the row's index (`${prefix}-${index}`), which is Base UI's
+combobox scheme. A row's id is deliberately **not** derived from its value — application data makes
+no promise of being whitespace-free, unique across two collections on the page, or a legal id at all,
+and each of those breaks `aria-activedescendant` silently. `createCollection` needs none of this: an
+item registers from its own owner scope, so it can call `createUniqueId()` directly.
 
 `createCollection` deliberately implements **no** `scrollIndexIntoView`, even though its items can be
 clipped: its one remaining consumer is Calendar's roving grid, where the native `.focus()` scrolls on

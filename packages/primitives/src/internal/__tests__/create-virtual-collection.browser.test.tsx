@@ -72,7 +72,7 @@ function VirtualListbox(props: { onReady: (api: HarnessApi) => void }) {
     count: () => COUNT,
     scrollElement: scrollRef,
     estimateSize: () => ROW_HEIGHT,
-    getItemData: (index) => ({ id: `row-${index}`, value: index, textValue: label(index) }),
+    getItemData: (index) => ({ value: index, textValue: label(index) }),
     overscan: 3,
   });
   const focus = createListFocus<number>({ source: collection, element: scrollRef });
@@ -118,6 +118,23 @@ describe("createVirtualCollection", () => {
     expect(offscreen.element()).toBeUndefined();
     expect(offscreen.textValue()).toBe(label(5000));
     expect(offscreen.value()).toBe(5000);
+    dispose();
+  });
+
+  it("gives every row a generated id, offscreen ones included", async () => {
+    let api!: HarnessApi;
+    const { container, dispose } = mount(() => <VirtualListbox onReady={(a) => (api = a)} />);
+    await vi.waitFor(() => expect(mountedIndices(container).length).toBeGreaterThan(0));
+
+    // Ids are the source's own, not `getItemData`'s: application data makes no promise of being a
+    // legal, unique DOM id, and an offscreen row still needs one for `aria-activedescendant`.
+    const offscreen = nth(api.collection.items(), 5000);
+    expect(offscreen.id).not.toMatch(/\s/);
+    expect(offscreen.id.length).toBeGreaterThan(0);
+    expect(offscreen.id).not.toBe(nth(api.collection.items(), 0).id);
+    expect(container.querySelector<HTMLElement>('[data-index="0"]')?.id).toBe(
+      nth(api.collection.items(), 0).id,
+    );
     dispose();
   });
 

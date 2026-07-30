@@ -67,9 +67,10 @@ import { composeEventHandlers, createKeyboardHandler, withDefaults } from "../ut
  */
 export interface CreateListboxOptions<V = unknown> {
   /**
-   * Maps an item to its primitive **value** — the selection identity (compared `===`), the string
-   * submitted to a form, and the item's `id` in virtual mode. Must be unique per item. Default
-   * `(item) => String(item)`. Base UI's `itemToStringValue`.
+   * Maps an item to its primitive **value** — the selection identity (compared `===`) and the string
+   * submitted to a form. **Not** the item's DOM `id`: an index-registered source generates those
+   * itself (`createItemIds`). Must be unique per item. Default `(item) => String(item)`. Base UI's
+   * `itemToStringValue`.
    */
   itemToValue?: (item: V) => string;
   /**
@@ -263,7 +264,6 @@ export function createListbox<V = unknown>(
       getItemData: (index): VirtualItemData<V> => {
         const item = items()[index] as V;
         return {
-          id: itemToValue(item),
           value: item,
           textValue: itemToLabel ? itemToLabel(item) : undefined,
           disabled: merged.getItemDisabled ? merged.getItemDisabled(item) : false,

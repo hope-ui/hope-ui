@@ -40,7 +40,7 @@ function createVirtualCollection<V = unknown>(options: {
   count: Accessor<number>;                                   // full length, reactive
   scrollElement: Accessor<HTMLElement | null | undefined>;   // scroll container signal
   estimateSize: (index: number) => number;                  // px estimate per row
-  getItemData: (index: number) => VirtualItemData<V>;        // id/value/textValue/disabled per index
+  getItemData: (index: number) => VirtualItemData<V>;        // value/textValue/disabled per index
   overscan?: number;                                         // default 5
   horizontal?: boolean;                                      // default false
 }): {
@@ -56,6 +56,11 @@ function createVirtualCollection<V = unknown>(options: {
 
 `VirtualItemData.textValue` is **required for offscreen typeahead** — an unmounted row has no
 `textContent` to fall back to.
+
+`VirtualItemData` carries **no id**: the binding generates one per row through
+[`createItemIds`](create-collection.md), the same scheme `createDataCollection` uses. A caller cannot
+hand one in, which is the point — an id derived from application data is not reliably legal, unique,
+or whitespace-free, and every one of those failures breaks `aria-activedescendant` in silence.
 
 ## Rendering rows
 

@@ -82,9 +82,9 @@ A Select whose focus owner is its own input drives `focus.setFocused` from that 
 
 ## Value & form model (Base UI `itemToValue`, not a comparator)
 
-- **`itemToValue(item) => string`** — the primitive value: selection identity (compared `===`), the
-  string a form submits, and each item's `id` in virtual mode. Must be unique per item. Default
-  `String(item)`.
+- **`itemToValue(item) => string`** — the primitive value: selection identity (compared `===`) and
+  the string a form submits. Must be unique per item. Default `String(item)`. It is **not** an item's
+  DOM `id` — index-registered sources generate those themselves (`create-collection.md`).
 - **`itemToLabel(item) => string`** — typeahead/display text feeding the kernel's `textValue`. When
   omitted, collection mode falls back to the element's trimmed `textContent`; virtual mode needs it
   for offscreen typeahead.
