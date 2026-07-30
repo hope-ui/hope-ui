@@ -81,7 +81,7 @@ An effect guards this: when the element roving last focused disappears **and** f
 arriving; the next arrow/typeahead then re-homes onto a mounted option. It is gated tightly so it never
 *steals* focus — only the element we focused, only when no navigation is mid-flight (that path
 re-focuses the target itself), and only when focus actually landed on `<body>` (not when the user moved
-it elsewhere). It is a no-op in collection mode (nothing unmounts) and in activedescendant mode (focus
+it elsewhere). It is a no-op over a fully-mounted source (nothing unmounts) and in activedescendant mode (focus
 already lives on the container). Note that page navigation `preventDefault`s the native scroll, so the
 common trigger is the wheel/scrollbar; Page keys move the active index and thus focus normally.
 

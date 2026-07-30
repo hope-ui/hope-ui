@@ -1,6 +1,6 @@
 import { Listbox } from "@hope-ui/components/listbox";
-import { createSignal, For } from "solid-js";
-import { FRUITS, type Fruit, FruitItem, itemToLabel, itemToValue } from "./data";
+import { createSignal } from "solid-js";
+import { FRUITS, type Fruit, FruitItem, isItemDisabled, itemToLabel, itemToValue } from "./data";
 
 // The default: single selection, roving focus. Controlled via a signal; the chosen row keeps a
 // check glyph. Arrow keys / Home / End / type-to-search move the highlight; Enter, Space, or a
@@ -11,12 +11,14 @@ export function ListboxBasicDemo() {
   return (
     <Listbox.Root
       aria-label="Choose a fruit"
+      items={FRUITS}
       itemToValue={itemToValue}
       itemToLabel={itemToLabel}
+      isItemDisabled={isItemDisabled}
       value={value()}
       onChange={setValue}
     >
-      <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+      {(fruit) => <FruitItem fruit={fruit} />}
     </Listbox.Root>
   );
 }

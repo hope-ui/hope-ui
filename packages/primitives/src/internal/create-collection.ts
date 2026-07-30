@@ -51,10 +51,66 @@ export interface ItemSource<V = unknown> {
  * items — which is why this is a separate interface rather than a member of `ItemSource`.
  */
 export interface IndexedItemSource<V = unknown> extends ItemSource<V> {
-  /** Publish a mounted row's element for `index`, or `null` on unmount. */
+  /** Publish a mounted row's element for `index`, or `null` to clear that slot. */
   registerElement: (index: number, element: HTMLElement | null) => void;
+  /**
+   * Retire a row's element from wherever it is registered — the teardown half of
+   * {@link registerElement}, and the one a row that can **move** must use.
+   *
+   * Clearing by index is unsafe the moment the data reorders: sibling effects re-run one after
+   * another, so by the time a moved row tears down its old slot another row may already own it, and
+   * a plain read cannot tell (a signal write is not visible until the next flush). Addressing the
+   * element instead makes the removal order-independent — the lookup happens inside the functional
+   * update, which does see the settled map.
+   */
+  unregisterElement: (element: HTMLElement) => void;
   /** Hand a mounted row to the source's measurer, where it has one (variable-height virtual rows). */
   measureElement?: (element: HTMLElement | null) => void;
+}
+
+/**
+ * The shared element registry behind both index-registered sources ({@link IndexedItemSource}) —
+ * `registerElement` publishes a mounted row by index, `unregisterElement` retires it by identity.
+ *
+ * `ownedWrite` because a row unmounts during `<For>` reconciliation (a computation) and its cleanup
+ * writes from within that scope: a deliberate bridge write, not the ancestor-scope mistake the
+ * diagnostic guards. Every write is **functional**, because register/unregister run inside an effect
+ * where reading the map would be an untracked read of a reactive value (`[STRICT_READ_UNTRACKED]`).
+ */
+export function createElementRegistry(): {
+  elements: Accessor<ReadonlyMap<number, HTMLElement>>;
+  registerElement: (index: number, element: HTMLElement | null) => void;
+  unregisterElement: (element: HTMLElement) => void;
+} {
+  const [elements, setElements] = createSignal(new Map<number, HTMLElement>(), {
+    ownedWrite: true,
+  });
+
+  const registerElement = (index: number, element: HTMLElement | null) =>
+    setElements((previous) => {
+      const next = new Map(previous);
+      if (element) {
+        next.set(index, element);
+      } else {
+        next.delete(index);
+      }
+      return next;
+    });
+
+  const unregisterElement = (element: HTMLElement) =>
+    setElements((previous) => {
+      for (const [index, registered] of previous) {
+        if (registered === element) {
+          const next = new Map(previous);
+          next.delete(index);
+          return next;
+        }
+      }
+      // Already gone — a moved row that re-registered under its new index before this ran.
+      return previous;
+    });
+
+  return { elements, registerElement, unregisterElement };
 }
 
 /**

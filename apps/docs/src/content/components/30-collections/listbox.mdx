@@ -33,10 +33,14 @@ import { Listbox } from "@hope-ui/components/listbox";
 
 ## Usage
 
-`Listbox.Root` owns the state (selection, focus, keyboard navigation, type-ahead, ARIA) and renders
-the `role="listbox"` element. Each `Listbox.Item` is an option that self-registers, and
-`Listbox.ItemIndicator` paints a check on the selected row. Map each item to a stable string with
+`Listbox.Root` takes your options as `items` and owns the state (selection, focus, keyboard
+navigation, type-ahead, ARIA) plus the `role="listbox"` element. Its child is a **render callback**
+invoked once per item — return a `Listbox.Item item={item}`, with an optional
+`Listbox.ItemIndicator` to paint a check on the selected row. Map each item to a stable string with
 `itemToValue` (the selection identity) and to its display / type-ahead text with `itemToLabel`.
+
+Your items are your own objects and stay that way: every question the listbox asks about one is an
+**accessor function**, never a required key name.
 
 <Preview>
   <ListboxBasicDemo />
@@ -47,19 +51,18 @@ const [value, setValue] = createSignal<Fruit[]>([]);
 
 <Listbox.Root
   aria-label="Choose a fruit"
+  items={fruits}
   itemToValue={(fruit) => String(fruit.id)}
   itemToLabel={(fruit) => fruit.name}
   value={value()}
   onChange={setValue}
 >
-  <For each={fruits}>
-    {(fruit) => (
-      <Listbox.Item value={fruit}>
-        {fruit.name}
-        <Listbox.ItemIndicator />
-      </Listbox.Item>
-    )}
-  </For>
+  {(fruit) => (
+    <Listbox.Item item={fruit}>
+      {fruit.name}
+      <Listbox.ItemIndicator />
+    </Listbox.Item>
+  )}
 </Listbox.Root>;
 ```
 
@@ -83,9 +86,11 @@ const [value, setValue] = createSignal<Fruit[]>([]);
 
 ## Anatomy
 
-`Listbox.Root` renders the list element; `Listbox.Item` is one option (with an optional
-`Listbox.ItemIndicator` check inside). `Listbox.Group` + `Listbox.GroupLabel` name a section, and
-`Listbox.Separator` divides sections — all collection mode only.
+`Listbox.Root` renders the list element and invokes your callback once per `items` entry;
+`Listbox.Item` is one option (with an optional `Listbox.ItemIndicator` check inside).
+`Listbox.Group` + `Listbox.GroupLabel` name a section, and `Listbox.Separator` divides sections —
+all three appear once you set `groupToItems` (see [Groups](#groups-and-separators)), and none of them
+are available in virtual mode, which is flat.
 
 <Anatomy
   root={{
@@ -121,13 +126,13 @@ const [value, setValue] = createSignal<Fruit[]>([]);
       part: "Listbox.Root",
       element: "div[role=listbox]",
       description:
-        "State owner and the list element (the scroll container in virtual mode). Owns selection, focus, keyboard, type-ahead, ids, and the resolved recipe.",
+        "State owner and the list element (the scroll container in virtual mode). Owns the items, selection, focus, keyboard, type-ahead, ids, and the resolved recipe. Its child is a render callback invoked once per entry.",
     },
     {
       part: "Listbox.Item",
       element: "div[role=option]",
       description:
-        "One option. Self-registers and owns aria-selected, the active/disabled data attributes, and the click/pointer handlers. Give it value (collection) or index (virtual).",
+        "One option. Owns aria-selected, the active/disabled data attributes, and the click/pointer handlers. Give it item (the entry it renders) or, in virtual mode, index.",
     },
     {
       part: "Listbox.ItemIndicator",
@@ -138,17 +143,17 @@ const [value, setValue] = createSignal<Fruit[]>([]);
     {
       part: "Listbox.Group",
       element: "div[role=group]",
-      description: "A labelled section, named by its GroupLabel via aria-labelledby. Collection mode only.",
+      description: "A labelled section, named by its GroupLabel via aria-labelledby. Needs groupToItems; not available in virtual mode.",
     },
     {
       part: "Listbox.GroupLabel",
       element: "div",
-      description: "Names its Group. Self-registers its id as the group's aria-labelledby. Collection mode only.",
+      description: "Names its Group. Self-registers its id as the group's aria-labelledby.",
     },
     {
       part: "Listbox.Separator",
       element: "div[role=presentation]",
-      description: "A decorative hairline between sections (aria-hidden — never reported as an option). Collection mode only.",
+      description: "A decorative hairline between sections (aria-hidden — never reported as an option).",
     },
   ]}
 />
@@ -186,33 +191,61 @@ objects — Listbox never forces you to key by string.
 
 ## Groups and separators
 
-Wrap sections in a `Listbox.Group` with a `Listbox.GroupLabel`, and divide them with a
-`Listbox.Separator`. The group is a `role="group"` named by its label (`aria-labelledby`); the
-separator is decorative (`role="presentation"`). Keyboard navigation flows across groups as one list
-— arrows skip the labels and the separator. Grouping is **collection mode only** — a virtual listbox
-is flat.
+Set `groupToItems` and `items` becomes your **group entries**: it flattens them into navigation
+order, which is the only thing the listbox needs from a group. Your callback then goes one level up —
+it is invoked per group, and you iterate that group's own items with a plain `<For>`.
+
+The group's *name* never reaches the listbox: you render it from your own key, which is why there is
+no `groupToLabel` and no `{ label, items }` shape to conform to. Wrap each section in a
+`Listbox.Group` with a `Listbox.GroupLabel`, and divide them with a `Listbox.Separator`. The group is
+a `role="group"` named by its label (`aria-labelledby`); the separator is decorative
+(`role="presentation"`). Keyboard navigation flows across groups as one list — arrows skip the labels
+and the separator. Grouping is **data mode only** — a virtual listbox is flat.
 
 <Preview>
   <ListboxGroupedDemo />
 </Preview>
 
 ```tsx
-<Listbox.Root aria-label="Choose a fruit" itemToValue={itemToValue} itemToLabel={itemToLabel}>
-  <Listbox.Group>
-    <Listbox.GroupLabel>Citrus</Listbox.GroupLabel>
-    <For each={citrus}>
-      {(fruit) => <FruitItem fruit={fruit} />}
-    </For>
-  </Listbox.Group>
-  <Listbox.Separator />
-  <Listbox.Group>
-    <Listbox.GroupLabel>Berries</Listbox.GroupLabel>
-    <For each={berries}>
-      {(fruit) => <FruitItem fruit={fruit} />}
-    </For>
-  </Listbox.Group>
+// Nested straight from your API — no remapping, no required key names.
+// [{ kind: "Citrus", fruits: [{ id, name }, …] }, …]
+
+<Listbox.Root
+  aria-label="Choose a fruit"
+  items={baskets}
+  groupToItems={(basket) => basket.fruits}
+  itemToValue={itemToValue}
+  itemToLabel={itemToLabel}
+>
+  {(basket, index) => (
+    <>
+      <Show when={index() > 0}>
+        <Listbox.Separator />
+      </Show>
+      <Listbox.Group>
+        <Listbox.GroupLabel>{basket.kind}</Listbox.GroupLabel>
+        <For each={basket.fruits}>
+          {(fruit) => <FruitItem fruit={fruit} />}
+        </For>
+      </Listbox.Group>
+    </>
+  )}
 </Listbox.Root>
 ```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      The rendered order must match the flattened <code>items</code> order — that is what arrow keys
+      and type-ahead traverse. It holds by construction when the inner <code>&lt;For&gt;</code>{" "}
+      iterates the array <code>groupToItems</code> returned, and an <code>item</code> that isn't in{" "}
+      <code>items</code> logs a development warning naming it.
+    </div>
+  }
+/>
 
 ## Sizes
 
@@ -233,28 +266,35 @@ The `size` prop scales density — the row text, padding, gap, and the panel's m
 
 ## Disabled items
 
-Mark a row `disabled` and it is dimmed and skipped by keyboard navigation and type-ahead. `skipDisabled`
-(default `true`) governs the skipping; set it `false` to let the highlight land on disabled rows —
-they still can't be selected. Disable the **whole** list with `disabled` on `Listbox.Root`.
+Answer `isItemDisabled` and the matching rows are dimmed and skipped by keyboard navigation and
+type-ahead. It is a data question, like every other one here, so a row's disabled state is known
+before it ever mounts — which is what lets a closed Select skip it. `skipDisabled` (default `true`)
+governs the skipping; set it `false` to let the highlight land on disabled rows — they still can't be
+selected. Disable the **whole** list with `disabled` on `Listbox.Root`.
 
 <Preview>
   <ListboxDisabledDemo />
 </Preview>
 
 ```tsx
-<Listbox.Item value={fruit} disabled>
-  {fruit.name}
-  <Listbox.ItemIndicator />
-</Listbox.Item>
+<Listbox.Root isItemDisabled={(fruit) => fruit.outOfSeason}>
+  {(fruit) => (
+    <Listbox.Item item={fruit}>
+      {fruit.name}
+      <Listbox.ItemIndicator />
+    </Listbox.Item>
+  )}
+</Listbox.Root>
 ```
 
 ## Virtualization
 
-For very long lists, pass `items` (the full array) and `estimateSize`, and give `Listbox.Root` a
-**render-prop** child `(item, index) => <Listbox.Item index={index}>…`. The list element becomes the
-scroll container; only a window of rows mounts, so 10,000 rows scroll and navigate smoothly — try
-`End`, or type to jump to a row. Selection, focus, and type-ahead all run over the **full** set, so
-offscreen selections survive scrolling and submit with a form.
+For very long lists, add `estimateSize` and the same callback child becomes per **windowed row**,
+returning a `Listbox.Item index={index}` — a recycled row's position is the only thing it knows, so
+it is told rather than resolving its own. The list element becomes the scroll container; only a
+window of rows mounts, so 10,000 rows scroll and navigate smoothly — try `End`, or type to jump to a
+row. Selection, focus, and type-ahead all run over the **full** set, so offscreen selections survive
+scrolling and submit with a form.
 
 <Preview>
   <ListboxVirtualDemo />
@@ -290,7 +330,8 @@ const items = Array.from({ length: 10_000 }, (_, i) => ({ id: i, name: `Item ${i
       The virtual path is windowed with <code>@tanstack/virtual-core</code>, an{" "}
       <strong>optional peer</strong> of <code>@hope-ui/primitives</code> — install it in your app to
       use virtualization (a non-virtualizing install stays dependency-free). Virtual lists are{" "}
-      <strong>flat</strong>: no <code>Group</code> / <code>Separator</code>.
+      <strong>flat</strong>: no <code>Group</code> / <code>Separator</code>, and no{" "}
+      <code>groupToItems</code>.
     </div>
   }
 />
@@ -309,14 +350,13 @@ a form by id, and `required` for native validation.
 
 ```tsx
 <form onSubmit={handleSubmit}>
-  <Listbox.Root 
-    name="fruit" 
-    selectionMode="multiple" 
+  <Listbox.Root
+    name="fruit"
+    selectionMode="multiple"
+    items={fruits}
     itemToValue={(f) => String(f.id)}
   >
-    <For each={fruits}>
-      {(fruit) => <FruitItem fruit={fruit} />}
-    </For>
+    {(fruit) => <FruitItem fruit={fruit} />}
   </Listbox.Root>
   <Button type="submit">Submit</Button>
 </form>
@@ -390,7 +430,7 @@ the part's computed props and spreads them onto your element. `Listbox.Item`, `L
 the single polymorphism API.
 
 ```tsx title="Item as a link row"
-<Listbox.Item value={item} render={(props) => <a href={item.href} {...props} />}>
+<Listbox.Item item={item} render={(props) => <a href={item.href} {...props} />}>
   {item.name}
   <Listbox.ItemIndicator />
 </Listbox.Item>
@@ -470,18 +510,39 @@ export const myPreset = definePreset(hope, {
 <PropsTable
   rows={[
     {
+      prop: "items",
+      type: "readonly G[]",
+      default: "",
+      description:
+        "Required. The whole option set, in navigation order — your items for a flat list, or the group entries when groupToItems is set. The rows are rendered by the children callback, once per entry.",
+    },
+    {
+      prop: "groupToItems",
+      type: "(group: G) => readonly V[]",
+      default: "",
+      description:
+        "Maps a group entry to its own items, flattening items into navigation order. Setting it switches the children callback from per-item to per-group. Not combinable with estimateSize.",
+    },
+    {
       prop: "itemToValue",
       type: "(item: V) => string",
       default: "String",
       description:
-        "Maps an item to its selection identity — compared for equality, submitted to a form, and used as the item id in virtual mode. Must be unique per item.",
+        "Maps an item to its selection identity — compared for equality and submitted to a form. Must be unique per item. It is not the row's DOM id, which is generated.",
     },
     {
       prop: "itemToLabel",
       type: "(item: V) => string",
-      default: "",
+      default: "itemToValue",
       description:
-        "Maps an item to its type-ahead / display text. In collection mode it falls back to the row's textContent; virtual mode needs it for offscreen type-ahead.",
+        "Maps an item to its type-ahead / display text. Read from the data, so it works for a row that has not mounted — there is no textContent fallback.",
+    },
+    {
+      prop: "isItemDisabled",
+      type: "(item: V) => boolean",
+      default: "false",
+      description:
+        "Whether an item is disabled — dimmed, and skipped by focus and type-ahead unless skipDisabled is off.",
     },
     {
       prop: "value",
@@ -558,22 +619,10 @@ export const myPreset = definePreset(hope, {
       description: "Full override of value equality. Defaults to comparing itemToValue(a) === itemToValue(b).",
     },
     {
-      prop: "getItemDisabled",
-      type: "(item: V) => boolean",
-      default: "",
-      description: "Virtual mode: whether the item at an index is disabled (collection mode uses the item's disabled prop).",
-    },
-    {
-      prop: "items",
-      type: "readonly V[]",
-      default: "",
-      description: "Virtual mode: the full data array. Supply with estimateSize to enable windowing.",
-    },
-    {
       prop: "estimateSize",
       type: "(index: number) => number",
       default: "",
-      description: "Virtual mode: estimated row size in px by index. Its presence (with items) selects virtual mode.",
+      description: "Estimated row size in px by index. Its presence selects virtual mode (windowing).",
     },
     {
       prop: "overscan",
@@ -619,43 +668,34 @@ export const myPreset = definePreset(hope, {
     },
     {
       prop: "children",
-      type: "JSX.Element | ((item: V, index: Accessor<number>) => JSX.Element)",
+      type: "(entry: G, index: Accessor<number>) => JSX.Element",
       default: "",
-      description: "The Item/Group children (collection), or a render-prop invoked per windowed row (virtual).",
+      description:
+        "A render callback invoked once per items entry: per item when flat, per group when groupToItems is set, per windowed row in virtual mode. index is what a Separator between groups keys off.",
     },
   ]}
 />
 
 ### Listbox.Item
 
-Provide **exactly one** of `value` (collection mode) or `index` (virtual mode). Plus every native
-`<div>` attribute.
+Provide **exactly one** of `item` (the normal case) or `index` (virtual mode). Plus every native
+`<div>` attribute — `id` is the exception: it is the `aria-activedescendant` target and is generated
+for you. Nothing else about the row is declared here; its label, disabled state and value all come
+from `Listbox.Root`'s accessors.
 
 <PropsTable
   rows={[
     {
-      prop: "value",
+      prop: "item",
       type: "V",
       default: "",
-      description: "Collection mode: this option's selection identity. Required in collection mode; ignored in virtual mode.",
+      description: "The entry this option renders — one element of Listbox.Root's items. Required outside virtual mode; the row resolves its own position from it, so it can sit at any depth (a group's nested For).",
     },
     {
       prop: "index",
       type: "Accessor<number>",
       default: "",
       description: "Virtual mode: this row's index into the full items array (as an accessor). Its presence selects the virtual path.",
-    },
-    {
-      prop: "disabled",
-      type: "boolean",
-      default: "false",
-      description: "Whether this option is disabled (skipped by focus/navigation and dimmed).",
-    },
-    {
-      prop: "textValue",
-      type: "string",
-      default: "",
-      description: "Explicit type-ahead text, overriding itemToLabel / the row's textContent.",
     },
     {
       prop: "render",
@@ -703,7 +743,8 @@ assistive tech, since the option's own `aria-selected` already conveys the selec
 ### Parts
 
 `Listbox.Group`, `Listbox.GroupLabel`, and `Listbox.Separator` each accept their native `<div>`
-attributes plus a `render` prop and a `class`. All three are collection mode only.
+attributes plus a `render` prop and a `class`. All three belong to the grouped (`groupToItems`) shape
+and none are available in virtual mode.
 
 ## Accessibility
 
@@ -726,5 +767,6 @@ Listbox implements the WAI-ARIA
   one, otherwise the first — and Tab lands there directly.
 - **Disabled options stay discoverable.** A disabled row keeps `aria-disabled` and, by default, is
   skipped by navigation; it can never be selected.
-- **Type-ahead.** Typing focuses the next option whose label matches — from `itemToLabel`, an
-  explicit `textValue`, or the row's text.
+- **Type-ahead.** Typing focuses the next option whose label matches, read from `itemToLabel` (else
+  `itemToValue`). Because it comes from your data rather than the rendered text, it reaches rows that
+  have not mounted — an offscreen row in a virtual list, and every option of a closed Select.

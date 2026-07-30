@@ -24,6 +24,9 @@ export function nth<T>(list: ArrayLike<T>, index: number): T {
   return value;
 }
 
+/** Every harness owns the `items` it feeds `createListbox`, so a test tunes everything else. */
+export type ListboxTestOptions<V, G = V> = Omit<CreateListboxOptions<V, G>, "items">;
+
 export interface Fruit {
   id: number;
   name: string;
@@ -37,7 +40,7 @@ export const FRUITS: Fruit[] = [
   { id: 4, name: "Date" },
 ];
 
-export function fruitOptions(): CreateListboxOptions<Fruit> {
+export function fruitOptions(): ListboxTestOptions<Fruit> {
   return {
     itemToValue: (fruit) => String(fruit.id),
     itemToLabel: (fruit) => fruit.name,
@@ -66,20 +69,30 @@ export function selectedValues(container: HTMLElement): string[] {
     .map((element) => element.dataset.value as string);
 }
 
-// ─── Collection-mode harness ────────────────────────────────────────────────────────────────────
+// ─── Data-mode harness (the default source) ─────────────────────────────────────────────────────
 
-export interface CollectionListboxProps<V> {
+export interface DataListboxProps<V> {
   values: V[];
   labelOf: (value: V) => string;
   disabledOf?: (value: V) => boolean;
   ariaLabel?: string;
-  options?: CreateListboxOptions<V>;
+  options?: ListboxTestOptions<V>;
   onReady?: (state: CreateListboxReturn<V>) => void;
 }
 
-/** A standalone `<ul role="listbox">` driving every item off `rootProps` — the convenience binding. */
-export function CollectionListbox<V>(props: CollectionListboxProps<V>): JSX.Element {
-  const state = createListbox<V>(props.options ?? {});
+/**
+ * A standalone `<ul role="listbox">` over an `items` array, driving every item off `rootProps` — the
+ * convenience binding. Each row is rendered from the data and hands the primitive the `item` it
+ * renders, which is what the hook resolves the row's index from.
+ */
+export function DataListbox<V>(props: DataListboxProps<V>): JSX.Element {
+  const state = createListbox<V>({
+    ...props.options,
+    get items() {
+      return props.values;
+    },
+    isItemDisabled: props.disabledOf,
+  });
   props.onReady?.(state);
 
   return (
@@ -91,11 +104,7 @@ export function CollectionListbox<V>(props: CollectionListboxProps<V>): JSX.Elem
       <For each={props.values}>
         {(value) => {
           const [ref, setRef] = createSignal<HTMLLIElement>();
-          const item = createListboxItem<V>(state, {
-            ref,
-            value,
-            disabled: props.disabledOf?.(value),
-          });
+          const item = createListboxItem<V>(state, { ref, item: value });
           return (
             <li ref={setRef} {...item.props} data-value={props.labelOf(value)}>
               {props.labelOf(value)}
@@ -112,7 +121,7 @@ export function CollectionListbox<V>(props: CollectionListboxProps<V>): JSX.Elem
 export interface SelectListboxProps<V> {
   values: V[];
   labelOf: (value: V) => string;
-  options?: CreateListboxOptions<V>;
+  options?: ListboxTestOptions<V>;
   onReady?: (state: CreateListboxReturn<V>) => void;
 }
 
@@ -123,7 +132,13 @@ export interface SelectListboxProps<V> {
  * bind to an owner *outside* the list with no `rootProps`.
  */
 export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
-  const state = createListbox<V>({ ...props.options, focusMode: "activedescendant" });
+  const state = createListbox<V>({
+    ...props.options,
+    get items() {
+      return props.values;
+    },
+    focusMode: "activedescendant",
+  });
   props.onReady?.(state);
 
   return (
@@ -148,7 +163,7 @@ export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
         <For each={props.values}>
           {(value) => {
             const [ref, setRef] = createSignal<HTMLDivElement>();
-            const item = createListboxItem<V>(state, { ref, value });
+            const item = createListboxItem<V>(state, { ref, item: value });
             return (
               <div ref={setRef} {...item.props} data-value={props.labelOf(value)}>
                 {props.labelOf(value)}
@@ -171,7 +186,8 @@ export interface GroupSpec<V> {
 export interface GroupedListboxProps<V> {
   groups: GroupSpec<V>[];
   labelOf: (value: V) => string;
-  options?: CreateListboxOptions<V>;
+  // `groupToItems` is the harness's own — everything else in the option set is `G`-independent.
+  options?: Omit<ListboxTestOptions<V>, "groupToItems">;
   onReady?: (state: CreateListboxReturn<V>) => void;
 }
 
@@ -191,7 +207,7 @@ function Group<V>(props: {
       <For each={props.spec.values}>
         {(value) => {
           const [ref, setRef] = createSignal<HTMLDivElement>();
-          const item = createListboxItem<V>(props.state, { ref, value });
+          const item = createListboxItem<V>(props.state, { ref, item: value });
           return (
             <div ref={setRef} {...item.props} data-value={props.labelOf(value)}>
               {props.labelOf(value)}
@@ -205,10 +221,18 @@ function Group<V>(props: {
 
 /**
  * A grouped listbox (div-based so nested groups stay valid HTML) with a `GroupLabel` per group and a
- * `Separator` between groups.
+ * `Separator` between groups. `items` holds the **group entries**; `groupToItems` flattens them into
+ * navigation order, which is the one thing the kernel needs from a group — a row still resolves its
+ * own position from its `item`, so the inner iteration is a plain `<For>`.
  */
 export function GroupedListbox<V>(props: GroupedListboxProps<V>): JSX.Element {
-  const state = createListbox<V>(props.options ?? {});
+  const state = createListbox<V, GroupSpec<V>>({
+    ...props.options,
+    get items() {
+      return props.groups;
+    },
+    groupToItems: (group) => group.values,
+  });
   props.onReady?.(state);
 
   return (
@@ -242,7 +266,7 @@ export interface VirtualListboxProps {
   count: number;
   rowHeight?: number;
   viewport?: number;
-  options?: CreateListboxOptions<number>;
+  options?: ListboxTestOptions<number>;
   onReady?: (state: CreateListboxReturn<number>) => void;
 }
 

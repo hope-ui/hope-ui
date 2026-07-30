@@ -1,6 +1,6 @@
 import { Listbox } from "@hope-ui/components/listbox";
-import { createSignal, For } from "solid-js";
-import { FRUITS, type Fruit, FruitItem, itemToLabel, itemToValue } from "./data";
+import { createSignal } from "solid-js";
+import { FRUITS, type Fruit, FruitItem, isItemDisabled, itemToLabel, itemToValue } from "./data";
 
 // `selectionMode="multiple"` — Space or click toggles a set, and every chosen row keeps its check
 // glyph. Shift+Arrow extends the selection; Cmd/Ctrl+A selects all. Starts with two rows selected.
@@ -11,12 +11,14 @@ export function ListboxMultipleDemo() {
     <Listbox.Root
       aria-label="Choose fruits"
       selectionMode="multiple"
+      items={FRUITS}
       itemToValue={itemToValue}
       itemToLabel={itemToLabel}
+      isItemDisabled={isItemDisabled}
       value={value()}
       onChange={setValue}
     >
-      <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+      {(fruit) => <FruitItem fruit={fruit} />}
     </Listbox.Root>
   );
 }

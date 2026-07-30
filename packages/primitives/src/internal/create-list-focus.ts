@@ -216,7 +216,8 @@ export function createListFocus<V = unknown>(
   // Tightly gated so it never *steals* focus: only the element we actually focused, only when a
   // navigation isn't already mid-flight (that path re-focuses the target itself via `pendingFocus`),
   // and only when focus truly landed on `<body>` (not when the user moved it elsewhere). It is a no-op
-  // in collection mode (nothing unmounts) and in activedescendant mode (focus lives on the container).
+  // over a fully-mounted source (nothing unmounts) and in activedescendant mode (focus lives on the
+  // container).
   createEffect(
     () => activeItem()?.element(),
     (element) =>

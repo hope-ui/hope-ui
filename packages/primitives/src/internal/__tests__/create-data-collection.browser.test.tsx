@@ -24,8 +24,12 @@ function nth<T>(list: ArrayLike<T>, index: number): T {
  * Deliberately **not** `createRegisteredElement`: the index is reactive here (a row moves when the
  * data does), and reading it inside that hook's `register` callback is an untracked read of a
  * reactive value — `[STRICT_READ_UNTRACKED]`, which `mount()` fails the test on. Tracking both the
- * ref and the index in the effect's compute is also what makes a row that changes position
- * re-register under its new index and clear the old one.
+ * ref and the index in the effect's compute is what makes a row that changes position re-register
+ * under its new one.
+ *
+ * The teardown addresses the **element**, never the index this run registered under: a reorder
+ * re-runs every moved row one after another, so by then another row may already own that index, and
+ * clearing it would delete their live element. See `unregisterElement`.
  */
 function registerRow(
   source: IndexedItemSource,
@@ -39,7 +43,7 @@ function registerRow(
         return;
       }
       source.registerElement(at, element);
-      return () => source.registerElement(at, null);
+      return () => source.unregisterElement(element);
     },
   );
 }
@@ -295,6 +299,39 @@ describe("createDataCollection — element registration", () => {
     await vi.waitFor(() => expect(nth(source.items(), 1).element()).toBeUndefined());
     expect(skus(source.items())).toEqual(["a-1", undefined, undefined]);
     expect(source.items()).toHaveLength(3);
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("keeps every slot resolvable when the data reorders under the mounted rows", async () => {
+    // `<For>` keys by identity, so reordering **moves** the existing rows rather than rebuilding
+    // them: each one re-registers under its new index while its siblings do the same. Retiring by
+    // index instead of by element loses a row here — the vacating row's teardown runs after the
+    // arriving row's registration and deletes it, and nothing else notices (no error, just a
+    // position `aria-activedescendant` can never point at).
+    const [products, setProducts] = createSignal<readonly Product[]>(PRODUCTS);
+    let source!: CreateDataCollectionReturn<Product>;
+    const [listRef, setListRef] = createSignal<HTMLUListElement>();
+
+    const { container, dispose } = mount(() => {
+      source = productSource(products, listRef);
+      return (
+        <ul ref={setListRef} role="listbox" aria-label="reordering products">
+          <For each={products()}>
+            {(product, index) => <DataRow source={source} index={index()} product={product} />}
+          </For>
+        </ul>
+      );
+    });
+    await vi.waitFor(() => expect(skus(source.items())).toEqual(["a-1", "b-2", "c-3"]));
+
+    flush(() => setProducts([...PRODUCTS].reverse()));
+    await vi.waitFor(() => expect(skus(source.items())).toEqual(["c-3", "b-2", "a-1"]));
+
+    // …and a row that leaves still takes its own element with it.
+    flush(() => setProducts([nth(PRODUCTS, 1)]));
+    await vi.waitFor(() => expect(skus(source.items())).toEqual(["b-2"]));
 
     await expectNoA11yViolations(container);
     dispose();

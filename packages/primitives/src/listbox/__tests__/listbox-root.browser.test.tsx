@@ -2,13 +2,15 @@ import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import type { CreateListboxOptions, CreateListboxReturn } from "../index";
+import type { CreateListboxReturn } from "../index";
 import {
   activeValues,
-  CollectionListbox,
+  DataListbox,
   FRUITS,
   type Fruit,
   fruitOptions,
+  GroupedListbox,
+  type ListboxTestOptions,
   listbox,
   mountedIndices,
   nth,
@@ -29,7 +31,7 @@ describe("createListbox — rootProps", () => {
   it("emits role=listbox, vertical orientation, and a stable id", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}
@@ -49,7 +51,7 @@ describe("createListbox — rootProps", () => {
 
   it("marks aria-multiselectable in multiple mode", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), selectionMode: "multiple" }}
@@ -62,7 +64,7 @@ describe("createListbox — rootProps", () => {
 
   it("reflects a disabled list: nothing tabbable + aria-disabled", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), disabled: true }}
@@ -81,7 +83,7 @@ describe("createListbox — rootProps", () => {
 describe("createListbox — roving focus mode", () => {
   it("makes the first item the tab stop, the container untabbable, and no aria-activedescendant", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
+      <DataListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
@@ -94,7 +96,7 @@ describe("createListbox — roving focus mode", () => {
   it("moves real DOM focus with ArrowDown", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}
@@ -114,7 +116,7 @@ describe("createListbox — roving focus mode", () => {
 
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
+      <DataListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
     await expectNoA11yViolations(container);
@@ -125,17 +127,17 @@ describe("createListbox — roving focus mode", () => {
 // ─── Horizontal orientation and RTL ─────────────────────────────────────────────────────────────
 
 describe("createListbox — horizontal orientation and RTL", () => {
-  const horizontal = (extra: CreateListboxOptions<Fruit> = {}): CreateListboxOptions<Fruit> => ({
+  const horizontal = (extra: ListboxTestOptions<Fruit> = {}): ListboxTestOptions<Fruit> => ({
     ...fruitOptions(),
     orientation: "horizontal",
     ...extra,
   });
 
   /** Mounts a horizontal listbox with item 1 (Banana) focused, ready for one arrow press. */
-  async function mountHorizontalAtBanana(options_: CreateListboxOptions<Fruit>) {
+  async function mountHorizontalAtBanana(options_: ListboxTestOptions<Fruit>) {
     let state!: CreateListboxReturn<Fruit>;
     const mounted = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={options_}
@@ -180,7 +182,7 @@ describe("createListbox — horizontal orientation and RTL", () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
       <I18nProvider locale="ar-EG">
-        <CollectionListbox
+        <DataListbox
           values={FRUITS}
           labelOf={label}
           options={horizontal()}
@@ -203,7 +205,7 @@ describe("createListbox — horizontal orientation and RTL", () => {
     // RTL mirrors the inline axis only. A vertical list still reads top-to-bottom.
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), dir: "rtl" }}
@@ -227,7 +229,7 @@ describe("createListbox — highlight follows focus", () => {
   it("paints the entry row on focus in and clears every highlight on focus out (roving)", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}
@@ -251,7 +253,7 @@ describe("createListbox — highlight follows focus", () => {
 
   it("enters on the selected row (APG): the tab stop and the highlight agree", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), defaultValue: [nth(FRUITS, 1)] }}
@@ -270,7 +272,7 @@ describe("createListbox — highlight follows focus", () => {
   it("activates the entry row when the container itself is focused in activedescendant mode", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), focusMode: "activedescendant" }}
@@ -297,7 +299,7 @@ describe("createListbox — activedescendant focus mode", () => {
   it("keeps the container tabbable + owns aria-activedescendant, items untabbable", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), focusMode: "activedescendant" }}
@@ -398,7 +400,7 @@ describe("createListbox — selection", () => {
   it("single: Enter selects the active item, replacing the prior selection", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}
@@ -419,7 +421,7 @@ describe("createListbox — selection", () => {
   it("multiple: Space toggles a set, mod+A selects all", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), selectionMode: "multiple" }}
@@ -443,7 +445,7 @@ describe("createListbox — selection", () => {
   it("none: no item is ever selected and aria-selected is omitted", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), selectionMode: "none" }}
@@ -462,7 +464,7 @@ describe("createListbox — selection", () => {
   it("exposes formValues as the selected items' itemToValue strings", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={{ ...fruitOptions(), selectionMode: "multiple", name: "fruit" }}
@@ -486,7 +488,7 @@ describe("createListbox — typeahead and disabled", () => {
   it("moves the active item to the first match on typing", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}
@@ -504,7 +506,7 @@ describe("createListbox — typeahead and disabled", () => {
   it("skips a disabled item during arrow navigation", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         disabledOf={(fruit) => fruit.name === "Banana"}
@@ -522,6 +524,91 @@ describe("createListbox — typeahead and disabled", () => {
   });
 });
 
+// ─── Grouped data source ────────────────────────────────────────────────────────────────────────
+
+describe("createListbox — grouped data source", () => {
+  const CITRUS: Fruit[] = [
+    { id: 10, name: "Lemon" },
+    { id: 11, name: "Lime" },
+  ];
+  const BERRIES: Fruit[] = [
+    { id: 20, name: "Blueberry" },
+    { id: 21, name: "Raspberry" },
+  ];
+  const BASKETS = [
+    { label: "Citrus", values: CITRUS },
+    { label: "Berries", values: BERRIES },
+  ];
+
+  it("flattens the group entries into one navigation order", async () => {
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <GroupedListbox
+        groups={BASKETS}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    // `groupToItems`' only job: `items()` is the flat run arrow keys and typeahead traverse. The
+    // group's *label* never reaches the kernel — it is rendered from the consumer's own key.
+    expect(state.indexed.items().map((item) => item.textValue())).toEqual([
+      "Lemon",
+      "Lime",
+      "Blueberry",
+      "Raspberry",
+    ]);
+    dispose();
+  });
+
+  it("arrows across a group boundary, skipping the labels and the separator", async () => {
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <GroupedListbox
+        groups={BASKETS}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    state.focus.focusIndex(1); // Lime, the last row of the first group
+    await expect.element(nth(options(container), 1)).toHaveFocus();
+
+    await userEvent.keyboard("{ArrowDown}"); // → Blueberry, the first row of the second group
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Blueberry"]));
+    await expect.element(nth(options(container), 2)).toHaveFocus();
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("resolves a row from its item regardless of how deep it sits in the tree", async () => {
+    // Each option lives inside its group's own `<For>`, two levels below the listbox — and still
+    // registers under the right flat index, which is what `indexOfValue` buys and what makes the
+    // inner iteration a plain `<For>` rather than library chrome.
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <GroupedListbox
+        groups={BASKETS}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    expect(state.indexOfValue("20")).toBe(2); // Blueberry — third in the flattened order
+    await vi.waitFor(() =>
+      expect(nth(state.indexed.items(), 2).element()).toBe(nth(options(container), 2)),
+    );
+    dispose();
+  });
+});
+
 // ─── Virtual source mode ────────────────────────────────────────────────────────────────────────
 
 describe("createListbox — virtual source mode", () => {
@@ -534,9 +621,9 @@ describe("createListbox — virtual source mode", () => {
     ));
     await vi.waitFor(() => expect(mountedIndices(container).length).toBeGreaterThan(0));
 
-    expect(state.source.items()).toHaveLength(COUNT);
+    expect(state.indexed.items()).toHaveLength(COUNT);
     expect(mountedIndices(container).length).toBeLessThan(30);
-    const offscreen = nth(state.source.items(), 2500);
+    const offscreen = nth(state.indexed.items(), 2500);
     expect(offscreen.element()).toBeUndefined();
     expect(offscreen.textValue()).toBe(virtualLabel(2500));
     dispose();

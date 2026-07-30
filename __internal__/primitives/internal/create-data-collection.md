@@ -39,6 +39,7 @@ function createDataCollection<V = unknown, G = V>(options: {
   items: Accessor<ReadonlyArray<CollectionItem<V>>>;          // ItemSource — the flattened rows
   scrollIndexIntoView: (index: number) => void;               // ItemSource
   registerElement: (index: number, element: HTMLElement | null) => void;
+  unregisterElement: (element: HTMLElement) => void;          // retire by identity, not by index
   indexOfValue: (value: string) => number;                    // -1 when unknown
   groups: Accessor<readonly G[] | undefined>;                 // undefined when not grouped
 };
@@ -107,13 +108,17 @@ createEffect(
       return;
     }
     source.registerElement(at, element);
-    return () => source.registerElement(at, null);
+    return () => source.unregisterElement(element);
   },
 );
 ```
 
-That is also what makes a row that changes position re-register under its new index and clear the old
-one. `create-data-collection.browser.test.tsx`'s `registerRow` is the shape to copy.
+Tracking the index is what makes a row that changes position re-register under its new one. **The
+teardown must address the element, not that index** — see
+[`create-collection.md` § "Registration is by index; retirement is by element"](create-collection.md)
+for the reorder that eats a row otherwise. `create-data-collection.browser.test.tsx`'s `registerRow`
+is the shape to copy, and its "keeps every slot resolvable when the data reorders" test is what pins
+it.
 
 ## Scrolling the active row into view
 

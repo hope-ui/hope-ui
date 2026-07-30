@@ -45,9 +45,29 @@ any row mounts). Both also provide `scrollIndexIntoView`. A behavior written aga
 works over any of the three — that is the whole point of the seam. See `create-list-focus.md`.
 
 Those two share a second interface declared in this file, `IndexedItemSource<V>` — `ItemSource` plus
-`registerElement(index, element)` and an optional `measureElement`. Both build their items from data,
-so a mounted row has to say *which* row it is; `createCollection` is the odd one out, because there
-the registrations **are** the items.
+`registerElement(index, element)`, `unregisterElement(element)` and an optional `measureElement`. Both
+build their items from data, so a mounted row has to say *which* row it is; `createCollection` is the
+odd one out, because there the registrations **are** the items. `createElementRegistry()` (also here)
+is the shared implementation of those two writes, so the two sources cannot drift.
+
+### Registration is by index; **retirement is by element**
+
+`registerElement(index, element)` publishes a mounted row. `unregisterElement(element)` retires it,
+addressed by identity rather than by the index it registered under — and that asymmetry is
+load-bearing the moment the data reorders.
+
+`<For>` keys by identity, so a reorder *moves* existing rows instead of rebuilding them: every moved
+row re-registers under its new index, one sibling effect after another. A row tearing down its old
+slot by index therefore has no way to know another row has already claimed it — and it cannot look,
+because a signal write is not visible to a plain read until the next flush. Deleting it anyway drops
+the arriving row's live element and leaves that position with **no `element()` at all**: no error, no
+failing type, just a row `aria-activedescendant` can never point at and scroll-into-view can never
+reach. Addressing the element instead moves the lookup inside the functional update, which does see
+the settled map, and makes the removal order-independent.
+
+Pinned by `create-data-collection.browser.test.tsx` § "keeps every slot resolvable when the data
+reorders under the mounted rows"; the row-side shape is in
+[`createListboxItem`](../listbox/listbox-item.md) § Registration.
 
 They also share their id scheme, `createItemIds()`, declared here for the same reason: one generated,
 SSR-stable prefix per collection plus the row's index (`${prefix}-${index}`), which is Base UI's

@@ -1,5 +1,10 @@
-import { type Accessor, createMemo, createSignal, untrack } from "solid-js";
-import { type CollectionItem, createItemIds, type IndexedItemSource } from "./create-collection";
+import { type Accessor, createMemo, untrack } from "solid-js";
+import {
+  type CollectionItem,
+  createElementRegistry,
+  createItemIds,
+  type IndexedItemSource,
+} from "./create-collection";
 import { scrollIntoView } from "./scroll-into-view";
 
 export interface CreateDataCollectionOptions<V = unknown, G = V> {
@@ -88,23 +93,9 @@ function warnDuplicateValue(value: string): void {
 export function createDataCollection<V = unknown, G = V>(
   options: CreateDataCollectionOptions<V, G>,
 ): CreateDataCollectionReturn<V, G> {
-  // Mounted row elements, keyed by index — the rendered rows publish here on mount and clear on
-  // unmount. `ownedWrite` for the same reason as `createVirtualCollection`'s copy: a row unmounts
-  // during `<For>` reconciliation (a computation) and its cleanup clears its entry from within that
-  // scope, which is a deliberate bridge write, not the ancestor-scope mistake the diagnostic guards.
-  const [elements, setElements] = createSignal(new Map<number, HTMLElement>(), {
-    ownedWrite: true,
-  });
-  const registerElement = (index: number, element: HTMLElement | null) =>
-    setElements((previous) => {
-      const next = new Map(previous);
-      if (element) {
-        next.set(index, element);
-      } else {
-        next.delete(index);
-      }
-      return next;
-    });
+  // Mounted row elements, keyed by index — the rendered rows publish here on mount and retire on
+  // unmount. Shared with `createVirtualCollection`, which registers rows the same way.
+  const { elements, registerElement, unregisterElement } = createElementRegistry();
 
   const groups = () => (options.groupToItems ? options.items() : undefined);
 
@@ -165,5 +156,5 @@ export function createDataCollection<V = unknown, G = V>(
       scrollIntoView(scrollContainer, element);
     });
 
-  return { items, scrollIndexIntoView, registerElement, indexOfValue, groups };
+  return { items, scrollIndexIntoView, registerElement, unregisterElement, indexOfValue, groups };
 }

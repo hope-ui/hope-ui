@@ -1,5 +1,4 @@
 import { Listbox } from "@hope-ui/components/listbox";
-import { For } from "solid-js";
 import { FRUITS, FruitItem, itemToLabel, itemToValue } from "./data";
 
 // Both focus modes side by side. **Roving** (default) moves real DOM focus onto the active option
@@ -14,10 +13,11 @@ export function ListboxFocusModesDemo() {
         <Listbox.Root
           aria-label="Roving listbox"
           focusMode="roving"
+          items={FRUITS.slice(0, 4)}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
         >
-          <For each={FRUITS.slice(0, 4)}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
       </div>
       <div class="flex flex-col gap-2">
@@ -25,10 +25,11 @@ export function ListboxFocusModesDemo() {
         <Listbox.Root
           aria-label="Activedescendant listbox"
           focusMode="activedescendant"
+          items={FRUITS.slice(0, 4)}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
         >
-          <For each={FRUITS.slice(0, 4)}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
       </div>
     </>

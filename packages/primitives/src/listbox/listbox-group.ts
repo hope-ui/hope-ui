@@ -14,8 +14,10 @@ export interface CreateListboxGroupReturn {
  * The group part: a `role="group"` wrapper that names itself from its `GroupLabel`. It owns a label
  * id signal (`createListboxGroupLabel` registers into it), mirroring the `createDialog` →
  * `createDialogTitle` id split. Its `aria-labelledby` falls back to the consumer's rather than
- * overwriting it, so a consumer can label the group directly. Collection mode only — virtual mode is
- * flat. Takes props (not `state`); it holds no listbox behavior.
+ * overwriting it, so a consumer can label the group directly. Pairs with `createListbox`'s
+ * `groupToItems`, which flattens the entries into navigation order and is the only thing the kernel
+ * learns from a group — virtual mode is flat and has none. Takes props (not `state`); it holds no
+ * listbox behavior.
  */
 export function createListboxGroup(
   props: JSX.HTMLAttributes<HTMLElement> = {},

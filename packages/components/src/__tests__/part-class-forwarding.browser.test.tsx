@@ -3,6 +3,7 @@ import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate } from "@internationalized/date";
 import type { JSX } from "@solidjs/web";
+import { For } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { Alert } from "../alert";
 import { Badge } from "../badge";
@@ -56,7 +57,14 @@ interface Fruit {
   id: number;
   name: string;
 }
+interface Basket {
+  kind: string;
+  fruits: Fruit[];
+}
 const APPLE: Fruit = { id: 1, name: "Apple" };
+// Grouped, so one tree probes every Listbox part: `items` holds the group entries and the per-entry
+// callback renders the Group/GroupLabel/Item/ItemIndicator/Separator chain.
+const BASKETS: Basket[] = [{ kind: "Fruits", fruits: [APPLE] }];
 const itemToValue = (fruit: Fruit) => String(fruit.id);
 const itemToLabel = (fruit: Fruit) => fruit.name;
 
@@ -251,18 +259,28 @@ describe("every public part forwards its class to the element it renders", () =>
         <Listbox.Root
           class="probe-root"
           aria-label="fruits"
+          items={BASKETS}
+          groupToItems={(basket) => basket.fruits}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
           value={[APPLE]}
         >
-          <Listbox.Group class="probe-group">
-            <Listbox.GroupLabel class="probe-group-label">Fruits</Listbox.GroupLabel>
-            <Listbox.Item class="probe-item" value={APPLE}>
-              <Listbox.ItemIndicator class="probe-item-indicator" />
-              Apple
-            </Listbox.Item>
-          </Listbox.Group>
-          <Listbox.Separator class="probe-separator" />
+          {(basket: Basket) => (
+            <>
+              <Listbox.Group class="probe-group">
+                <Listbox.GroupLabel class="probe-group-label">{basket.kind}</Listbox.GroupLabel>
+                <For each={basket.fruits}>
+                  {(fruit) => (
+                    <Listbox.Item class="probe-item" item={fruit}>
+                      <Listbox.ItemIndicator class="probe-item-indicator" />
+                      {fruit.name}
+                    </Listbox.Item>
+                  )}
+                </For>
+              </Listbox.Group>
+              <Listbox.Separator class="probe-separator" />
+            </>
+          )}
         </Listbox.Root>
       </Themed>
     ));

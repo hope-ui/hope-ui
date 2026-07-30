@@ -15,7 +15,12 @@ import {
   onCleanup,
   untrack,
 } from "solid-js";
-import { type CollectionItem, createItemIds, type IndexedItemSource } from "./create-collection";
+import {
+  type CollectionItem,
+  createElementRegistry,
+  createItemIds,
+  type IndexedItemSource,
+} from "./create-collection";
 
 /** `@tanstack/virtual-core`'s scroll alignment — declared locally; the core doesn't export it. */
 type ScrollAlignment = "start" | "center" | "end" | "auto";
@@ -51,8 +56,8 @@ export interface CreateVirtualCollectionReturn<V = unknown> extends IndexedItemS
   virtualItems: Accessor<VirtualItem[]>;
   /** Total scroll size in px, for the sizing spacer. */
   totalSize: Accessor<number>;
-  /** Publish a mounted row's element for `index` (or `null` on unmount) so `items()[index].element()`
-   *  resolves for the window. */
+  /** Publish a mounted row's element for `index` (or `null` to clear that slot) so
+   *  `items()[index].element()` resolves for the window. */
   registerElement: (index: number, element: HTMLElement | null) => void;
   /** Hand a mounted row to the virtualizer for exact measurement (needs a `data-index` attribute). */
   measureElement: (element: HTMLElement | null) => void;
@@ -82,23 +87,9 @@ export interface CreateVirtualCollectionReturn<V = unknown> extends IndexedItemS
 export function createVirtualCollection<V = unknown>(
   options: CreateVirtualCollectionOptions<V>,
 ): CreateVirtualCollectionReturn<V> {
-  // Mounted row elements, keyed by index. The window's rows publish here on mount and clear on
-  // unmount, so `items()[index].element()` is defined exactly for the rendered slice. `ownedWrite`
-  // for the same reason as `rendered` below: a row unmounts during `<For>` reconciliation (a
-  // computation), and its cleanup clears its entry from within that scope.
-  const [elements, setElements] = createSignal(new Map<number, HTMLElement>(), {
-    ownedWrite: true,
-  });
-  const registerElement = (index: number, element: HTMLElement | null) =>
-    setElements((previous) => {
-      const next = new Map(previous);
-      if (element) {
-        next.set(index, element);
-      } else {
-        next.delete(index);
-      }
-      return next;
-    });
+  // Mounted row elements, keyed by index, so `items()[index].element()` is defined exactly for the
+  // rendered slice. Shared with `createDataCollection`, which registers rows the same way.
+  const { elements, registerElement, unregisterElement } = createElementRegistry();
 
   // The rendered window, held as plain state the virtualizer's `onChange` writes into. `onChange`
   // fires re-entrantly from deep inside the virtualizer's own memoized graph (`getVirtualItems` →
@@ -182,6 +173,7 @@ export function createVirtualCollection<V = unknown>(
     virtualItems: () => rendered().items,
     totalSize: () => rendered().total,
     registerElement,
+    unregisterElement,
     measureElement: (element) => virtualizer.measureElement(element),
     virtualizer,
   };

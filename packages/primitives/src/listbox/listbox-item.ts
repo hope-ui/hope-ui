@@ -1,7 +1,7 @@
 import type { JSX } from "@solidjs/web";
-import { type Accessor, merge, omit, untrack } from "solid-js";
-import { type CollectionItem, createRegisteredElement, type FocusMoveOptions } from "../internal";
-import { composeEventHandlers, withDefaults } from "../utils";
+import { type Accessor, createEffect, merge, omit, untrack } from "solid-js";
+import type { FocusMoveOptions } from "../internal";
+import { composeEventHandlers } from "../utils";
 import type { CreateListboxReturn } from "./listbox-root";
 
 export interface CreateListboxItemProps<V = unknown> extends JSX.HTMLAttributes<HTMLElement> {
@@ -11,16 +11,20 @@ export interface CreateListboxItemProps<V = unknown> extends JSX.HTMLAttributes<
    * still `undefined`. The consumer still wires `ref={setRef}` on the element itself.
    */
   ref: Accessor<HTMLElement | null | undefined>;
-  /** The item's value. **Required in collection mode** (the registered selection value). Ignored in
-   *  virtual mode, where the value comes from the source's `getItemData`. */
-  value?: V;
-  /** Virtual mode only: this row's index into `state.source.items()`. Its presence selects the
-   *  virtual path (look the item up by index + publish this row's element into the window). */
+  /**
+   * The item this row renders — one element of the listbox's `items`. **Required in data mode**: the
+   * hook resolves the row's position from it (`state.indexOfValue(state.itemToValue(item))`), which
+   * is what lets an option sit anywhere in the subtree, including a group's nested `<For>`. Ignored
+   * in virtual mode, where `index` is the row's identity.
+   */
+  item?: V;
+  /**
+   * **Virtual mode only:** this row's index into `state.indexed.items()`. Its presence selects the
+   * virtual path. It is a mechanism rather than information the author has, which is why data mode
+   * derives it instead — but a windowed row is *recycled*, so its index changes while the component
+   * stays mounted and only the row itself knows it.
+   */
   index?: Accessor<number>;
-  /** Collection mode: whether this item is disabled. Default `false`. */
-  disabled?: boolean;
-  /** Explicit typeahead text, overriding `itemToLabel` / `textContent`. */
-  textValue?: string;
 }
 
 export interface CreateListboxItemReturn {
@@ -42,10 +46,25 @@ export interface CreateListboxItemReturn {
   isDisabled: Accessor<boolean>;
 }
 
+/** Dev-only. A row outside `items` can never be focused, selected, or scrolled to. */
+function warnUnknownItem(value: string): void {
+  // `import.meta.env.DEV` is defined by the consumer's Vite (and vitest); cast locally so this
+  // package needn't pull `vite/client` into `compilerOptions.types`.
+  const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV;
+  if (!isDev) {
+    return;
+  }
+  console.warn(
+    `[hope-ui] createListboxItem: no row matches the item whose value is "${value}". An option's ` +
+      "`item` must be an element of the listbox's `items` — arrow keys and typeahead traverse that " +
+      "array, not the DOM, so a row outside it is unreachable. (A virtual row takes `index` instead.)",
+  );
+}
+
 /**
- * The option part: registers the item and emits its ARIA + state attributes. Works over both source
- * modes — collection (self-register via `state.collection.register`) and virtual (look up
- * `state.source.items()[index]` and publish this row's element into the window). Emits `role="option"`,
+ * The option part: publishes this row's element into the source and emits the item's ARIA + state
+ * attributes. There is **one** code path, because both sources are index-registered — data mode
+ * resolves the index from the `item` it was handed, virtual mode is told it. Emits `role="option"`,
  * `aria-selected`, `aria-disabled`, `data-active`/`data-selected`/`data-disabled`, the roving/AD
  * `tabIndex`, an `onClick` that focuses + selects, and an `onPointerMove` that re-targets the active
  * item **only on real pointer movement** (guarded by the root's `pointerMoved`), so a spurious
@@ -56,40 +75,40 @@ export function createListboxItem<V = unknown>(
   state: CreateListboxReturn<V>,
   props: CreateListboxItemProps<V>,
 ): CreateListboxItemReturn {
-  const merged = withDefaults(props, { disabled: false });
-  const virtualIndex = props.index;
+  const source = state.indexed;
+  // Captured once: a row's mode never changes for its lifetime. Data mode's accessor is a memo read,
+  // which is exactly why the registration below tracks it rather than reading it in an effect body.
+  const index = props.index ?? (() => state.indexOfValue(state.itemToValue(props.item as V)));
 
-  let getItem: () => CollectionItem<V> | undefined;
+  // Publish this row's element under its index — what resolves `items()[index].element()` for the
+  // `aria-activedescendant` IDREF's target and for scroll-into-view. Deliberately **not**
+  // `createRegisteredElement`: in data mode the index is reactive, and reading it inside that hook's
+  // `register` callback is an untracked read of a reactive value (`[STRICT_READ_UNTRACKED]`, which
+  // `mount()` fails a test on). Tracking both in the compute is also what makes a row that changes
+  // position re-register under its new index.
+  createEffect(
+    () => [index(), props.ref()] as const,
+    ([at, element]) => {
+      if (at < 0) {
+        warnUnknownItem(state.itemToValue(props.item as V));
+        return;
+      }
+      if (!element) {
+        return;
+      }
+      source.registerElement(at, element);
+      // Variable-height virtual rows only — the data source has nothing to measure.
+      source.measureElement?.(element);
+      // Retire by **element**, never by the index this run registered under. A reorder re-runs every
+      // moved row, and by the time this teardown fires another row may already own `at` — clearing
+      // it by index would delete *their* live element, leaving that position with no `element()` at
+      // all (no error; just a row `aria-activedescendant` can never point at). See
+      // `IndexedItemSource.unregisterElement`.
+      return () => source.unregisterElement(element);
+    },
+  );
 
-  if (virtualIndex) {
-    // Virtual mode: the CollectionItem is derived from the data source by index. Publish this row's
-    // element into the window (and hand it to the virtualizer for measurement) via
-    // `createRegisteredElement`, so `items()[index].element()` resolves for the rendered slice.
-    createRegisteredElement({
-      ref: merged.ref,
-      register: (element) => {
-        state.virtual?.registerElement(virtualIndex(), element);
-        state.virtual?.measureElement(element);
-      },
-      unregister: () => state.virtual?.registerElement(virtualIndex(), null),
-    });
-    getItem = () => state.source.items()[virtualIndex()];
-  } else {
-    // Collection mode: self-register. `textValue` prefers an explicit prop, then the listbox's
-    // `itemToLabel`. When neither exists it is omitted entirely, so `createCollection` falls back to
-    // the element's trimmed `textContent`.
-    const hasTextValue = merged.textValue != null || state.itemToLabel != null;
-    const registered = state.collection?.register({
-      ref: merged.ref,
-      id: typeof merged.id === "string" ? merged.id : undefined,
-      disabled: () => merged.disabled,
-      value: () => merged.value as V,
-      ...(hasTextValue
-        ? { textValue: () => merged.textValue ?? state.itemToLabel?.(merged.value as V) ?? "" }
-        : {}),
-    });
-    getItem = () => registered;
-  }
+  const getItem = () => source.items()[index()];
 
   // "Highlighted" = the active item **and** the widget holds focus — react-aria's
   // `manager.isFocused && manager.focusedKey === key`. Gating on focus is what stops the highlight from
@@ -105,16 +124,7 @@ export function createListboxItem<V = unknown>(
   };
   const isDisabled = () => getItem()?.disabled() ?? false;
 
-  const activate = (move?: FocusMoveOptions) => {
-    if (virtualIndex) {
-      state.focus.focusIndex(virtualIndex(), move);
-      return;
-    }
-    const item = getItem();
-    if (item) {
-      state.focus.focus(item, move);
-    }
-  };
+  const activate = (move?: FocusMoveOptions) => state.focus.focusIndex(index(), move);
 
   const choose = () => {
     if (state.disabled()) {
@@ -132,18 +142,9 @@ export function createListboxItem<V = unknown>(
     }
   };
 
-  const rest = omit(
-    merged,
-    "ref",
-    "value",
-    "index",
-    "id",
-    "disabled",
-    "textValue",
-    "onClick",
-    "onPointerMove",
-    "onFocus",
-  );
+  // `id` is omitted rather than forwarded: it is the `aria-activedescendant` IDREF, generated by the
+  // source per row (`createItemIds`), so a consumer's own id would silently break the reference.
+  const rest = omit(props, "ref", "item", "index", "id", "onClick", "onPointerMove", "onFocus");
 
   const elementProps = merge(rest, {
     get id() {
@@ -176,13 +177,13 @@ export function createListboxItem<V = unknown>(
       return item ? state.focus.getItemTabIndex(item) : -1;
     },
     get onClick() {
-      return composeEventHandlers<HTMLElement, MouseEvent>(merged.onClick, () => {
+      return composeEventHandlers<HTMLElement, MouseEvent>(props.onClick, () => {
         activate();
         choose();
       });
     },
     get onPointerMove() {
-      return composeEventHandlers<HTMLElement, PointerEvent>(merged.onPointerMove, (event) => {
+      return composeEventHandlers<HTMLElement, PointerEvent>(props.onPointerMove, (event) => {
         if (isDisabled()) {
           return;
         }
@@ -204,7 +205,7 @@ export function createListboxItem<V = unknown>(
       // because `createListFocus` moves DOM focus from inside its own effect — this can run in that
       // effect's tracking scope, and every read here is an imperative sync with real focus, never a
       // dependency (same hazard, same fix, as `createCalendarCell.onFocus`).
-      return composeEventHandlers<HTMLElement, FocusEvent>(merged.onFocus, () => {
+      return composeEventHandlers<HTMLElement, FocusEvent>(props.onFocus, () => {
         untrack(() => {
           if (isDisabled()) {
             return;

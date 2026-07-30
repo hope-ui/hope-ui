@@ -1,10 +1,12 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
+import type { JSX } from "@solidjs/web";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import type { CreateListboxReturn } from "../index";
+import { type CreateListboxReturn, createListbox, createListboxItem } from "../index";
 import {
   activeValues,
-  CollectionListbox,
+  DataListbox,
   FRUITS,
   type Fruit,
   fruitOptions,
@@ -27,11 +29,42 @@ function rowAt(container: HTMLElement, index: number): HTMLElement {
   return container.querySelector(`[data-index="${index}"]`) as HTMLElement;
 }
 
+/**
+ * A one-option listbox that hands `createListboxItem` whatever extra props a test passes — for the
+ * two things a props change breaks silently: an attribute the hand-kept `omit` list stops forwarding,
+ * and an `item` the data never contained.
+ */
+function ProbeListbox(props: {
+  item?: Fruit;
+  // `data-*` is spelled out: Solid's `HTMLAttributes` allows arbitrary ones only through JSX, not in
+  // a plain object literal.
+  extra?: Omit<JSX.HTMLAttributes<HTMLElement>, "ref"> & { "data-testid"?: string };
+}): JSX.Element {
+  const state = createListbox<Fruit>({ items: FRUITS, ...fruitOptions() });
+  const probed = () => props.item ?? (FRUITS[0] as Fruit);
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+  const item = createListboxItem<Fruit>(state, { ...props.extra, ref, item: probed() });
+  return (
+    <div
+      ref={(element) => state.setListboxElement(element)}
+      {...state.rootProps}
+      // Repeated from `rootProps` (same value) so biome can see the role behind the spread — the
+      // shape `GroupedListbox`/`VirtualListbox` already use.
+      role="listbox"
+      aria-label="fruits"
+    >
+      <div ref={setRef} {...item.props}>
+        {probed().name}
+      </div>
+    </div>
+  );
+}
+
 describe("createListboxItem — attributes", () => {
   it("emits role=option and reflects selected/disabled/active state as ARIA + data-*", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         disabledOf={(fruit) => fruit.name === "Date"}
@@ -62,12 +95,93 @@ describe("createListboxItem — attributes", () => {
     await expectNoA11yViolations(container);
     dispose();
   });
+
+  it("forwards the native attributes it does not own onto the option element", async () => {
+    // The `omit` list is hand-kept, so a renamed control prop can quietly start swallowing a
+    // consumer's attributes with a green typecheck and a green suite. Assert them **on the element**,
+    // never on the props object — that is the only place the drift shows.
+    const { container, dispose } = mount(() => (
+      <ProbeListbox
+        extra={{
+          "data-testid": "probe",
+          "aria-describedby": "hint",
+          title: "Pick me",
+          class: "probe-class",
+          style: { color: "rgb(1, 2, 3)" },
+        }}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(1));
+
+    const option = nth(options(container), 0);
+    expect(option.getAttribute("data-testid")).toBe("probe");
+    expect(option.getAttribute("aria-describedby")).toBe("hint");
+    expect(option.getAttribute("title")).toBe("Pick me");
+    expect(option.classList.contains("probe-class")).toBe(true);
+    expect(option.style.color).toBe("rgb(1, 2, 3)");
+    // …while the hook keeps the ones it owns. `id` is deliberately not forwardable: it is the
+    // `aria-activedescendant` IDREF, generated per row by the source.
+    expect(option.getAttribute("role")).toBe("option");
+    expect(option.id).toBeTruthy();
+    dispose();
+  });
+
+  it("warns in dev when the item is not in the listbox's items", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container, dispose } = mount(() => <ProbeListbox item={{ id: 99, name: "Ghost" }} />);
+    await vi.waitFor(() => expect(options(container)).toHaveLength(1));
+
+    // Arrow keys and typeahead traverse `items`, not the DOM, so a row outside it is unreachable —
+    // and nothing else says so: it renders, it just never activates.
+    await vi.waitFor(() =>
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("[hope-ui] createListboxItem")),
+    );
+    expect(warn.mock.calls.flat().join(" ")).toContain('"99"');
+
+    warn.mockRestore();
+    dispose();
+  });
+});
+
+describe("createListboxItem — registration", () => {
+  it("re-registers a row under its new index when the data reorders", async () => {
+    // The registration effect tracks the index *and* the ref, which is what makes a moved row publish
+    // itself under its new slot and clear the old one. Reading the index in the effect body instead
+    // would be an untracked read of a memo — `[STRICT_READ_UNTRACKED]`, which `mount()` fails on, so
+    // this test also pins that the effect keeps its two-argument shape.
+    const [values, setValues] = createSignal<Fruit[]>(FRUITS);
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <DataListbox
+        values={values()}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() =>
+      expect(nth(state.indexed.items(), 0).element()?.textContent).toBe("Apple"),
+    );
+
+    flush(() => setValues([...FRUITS].reverse()));
+
+    await vi.waitFor(() => {
+      expect(nth(state.indexed.items(), 0).element()?.textContent).toBe("Date");
+      expect(nth(state.indexed.items(), 3).element()?.textContent).toBe("Apple");
+    });
+    // Every slot still resolves — nothing was left registered under a stale index.
+    for (const item of state.indexed.items()) {
+      expect(item.element()).toBeDefined();
+    }
+    await expectNoA11yViolations(container);
+    dispose();
+  });
 });
 
 describe("createListboxItem — pointer / click", () => {
   it("clicking an item focuses and selects it", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
+      <DataListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
@@ -82,7 +196,7 @@ describe("createListboxItem — pointer / click", () => {
 
   it("pointer move re-targets the single active item (no second highlight)", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
+      <DataListbox values={FRUITS} labelOf={label} options={fruitOptions()} />
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
@@ -99,7 +213,7 @@ describe("createListboxItem — pointer / click", () => {
   it("does not re-target on a spurious pointermove at unchanged coords (keyboard wins the fight)", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}
@@ -132,7 +246,7 @@ describe("createListboxItem — pointer / click", () => {
 
   it("ignores pointer move on a disabled item", async () => {
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         disabledOf={(fruit) => fruit.name === "Banana"}
@@ -187,7 +301,7 @@ describe("createListboxItem — highlight follows focus", () => {
   it("clears data-active when focus leaves the list, keeps the active index, and repaints on return", async () => {
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
-      <CollectionListbox
+      <DataListbox
         values={FRUITS}
         labelOf={label}
         options={fruitOptions()}

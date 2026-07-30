@@ -49,6 +49,7 @@ function createVirtualCollection<V = unknown>(options: {
   virtualItems: Accessor<VirtualItem[]>;                     // the window to render
   totalSize: Accessor<number>;                               // spacer height/width
   registerElement: (index: number, element: HTMLElement | null) => void;
+  unregisterElement: (element: HTMLElement) => void;        // retire by identity — see create-collection.md
   measureElement: (element: HTMLElement | null) => void;
   virtualizer: Virtualizer<HTMLElement, HTMLElement>;        // escape hatch
 };
@@ -77,7 +78,7 @@ and hands it to `measureElement`, and carries `data-index` so the measurer can i
         createRegisteredElement({
           ref,
           register: (el) => { collection.registerElement(v.index, el); collection.measureElement(el); },
-          unregister: () => collection.registerElement(v.index, null),
+          unregister: (el) => collection.unregisterElement(el),
         });
         return <div ref={setRef} data-index={v.index} role="option"
                     style={{ position: "absolute", top: `${v.start}px`, height: `${v.size}px` }} />;

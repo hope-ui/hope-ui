@@ -2,8 +2,14 @@
 
 The group part of the [listbox family](./listbox-root.md): a `role="group"` wrapper that visually and
 semantically groups a run of options and names itself from its
-[`GroupLabel`](./listbox-group-label.md). Collection mode only — virtual mode is flat (grouped
+[`GroupLabel`](./listbox-group-label.md). Data mode only — virtual mode is flat (grouped
 virtualization is deferred).
+
+**The kernel never sees a group.** `createListbox`'s `groupToItems` flattens `items` into navigation
+order and stops there; this part is what the consumer renders around the resulting run of options,
+and the group's *name* comes from the consumer's own data, not from anything the kernel holds. That
+is why there is no `groupToLabel`, why the inner iteration is a plain `<For>`, and why this hook takes
+no `state`. See [`createListbox` § Grouping](./listbox-root.md).
 
 It takes props (not `state`) — a group holds no listbox behavior, only the label-id linkage. It owns a
 `labelId` signal that `createListboxGroupLabel` registers into (mirroring the `createDialog` →

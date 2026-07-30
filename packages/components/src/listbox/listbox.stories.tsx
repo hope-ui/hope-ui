@@ -1,6 +1,9 @@
 import { I18nProvider } from "@hope-ui/i18n";
+import { createListbox, createListboxItem } from "@hope-ui/primitives/listbox";
+import { composeEventHandlers, createKeyboardHandler } from "@hope-ui/primitives/utils";
+import { useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Accessor, createSignal, For } from "solid-js";
+import { type Accessor, createSignal, For, Show } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Listbox, type ListboxSize } from ".";
 
@@ -13,12 +16,19 @@ import { Listbox, type ListboxSize } from ".";
  * decorator (`.storybook/preview.tsx`) provides the preset; Storybook's Tailwind build compiles the
  * recipe utilities.
  *
+ * **Options are data.** `Listbox.Root` takes the whole option set as `items` and a **render callback**
+ * child invoked once per entry — the single authoring mode. Nothing self-registers, which is what
+ * lets a future Select know its options while its popup is closed.
+ *
  * Highlight follows the keyboard **and** the pointer (they share one active row — hover moves the
  * highlight, it never adds a second), and the check `ItemIndicator` marks the chosen row(s).
  */
 const meta = {
   title: "Components/Listbox",
   component: Listbox.Root,
+  // `items` is a required prop, so Storybook's story type demands `args`. Every story below renders
+  // its own tree, so this is only here to satisfy that requirement.
+  args: { items: [] },
 } satisfies Meta<typeof Listbox.Root>;
 
 export default meta;
@@ -41,13 +51,14 @@ const FRUITS: Fruit[] = [
 
 const itemToValue = (fruit: Fruit) => String(fruit.id);
 const itemToLabel = (fruit: Fruit) => fruit.name;
+const isItemDisabled = (fruit: Fruit) => fruit.disabled ?? false;
 
 // The elevated-surface look a floating consumer (Select/popover) would layer on the standalone list.
 const PANEL = "rounded-lg border border-subtle bg-surface-overlay shadow-md p-1";
 
 function FruitItem(props: { fruit: Fruit }): JSX.Element {
   return (
-    <Listbox.Item value={props.fruit} disabled={props.fruit.disabled}>
+    <Listbox.Item item={props.fruit}>
       <Listbox.ItemIndicator />
       {props.fruit.name}
     </Listbox.Item>
@@ -63,12 +74,14 @@ export const Default: Story = {
         <Listbox.Root
           aria-label="Choose a fruit"
           class={PANEL}
+          items={FRUITS}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
+          isItemDisabled={isItemDisabled}
           value={value()}
           onChange={setValue}
         >
-          <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
       </div>
     );
@@ -86,12 +99,14 @@ export const Multiple: Story = {
           aria-label="Choose fruits"
           class={PANEL}
           selectionMode="multiple"
+          items={FRUITS}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
+          isItemDisabled={isItemDisabled}
           value={value()}
           onChange={setValue}
         >
-          <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
       </div>
     );
@@ -107,65 +122,94 @@ export const None: Story = {
         aria-label="Browse fruits"
         class={PANEL}
         selectionMode="none"
+        items={FRUITS}
         itemToValue={itemToValue}
         itemToLabel={itemToLabel}
+        isItemDisabled={isItemDisabled}
       >
-        <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+        {(fruit) => <FruitItem fruit={fruit} />}
       </Listbox.Root>
     </div>
   ),
 };
 
-/** Grouped sections with labels and a separator between them (collection mode only). */
-export const Grouped: Story = {
-  render: () => {
-    const citrus: Fruit[] = [
+interface Basket {
+  kind: string;
+  fruits: Fruit[];
+}
+
+const BASKETS: Basket[] = [
+  {
+    kind: "Citrus",
+    fruits: [
       { id: 10, name: "Orange" },
       { id: 11, name: "Lemon" },
       { id: 12, name: "Lime" },
-    ];
-    const berries: Fruit[] = [
+    ],
+  },
+  {
+    kind: "Berries",
+    fruits: [
       { id: 20, name: "Strawberry" },
       { id: 21, name: "Blueberry" },
       { id: 22, name: "Raspberry" },
-    ];
-    const [value, setValue] = createSignal<Fruit[]>([berries[0] as Fruit]);
+    ],
+  },
+];
+
+/**
+ * Grouped sections with labels and a separator between them. `items` holds the **group entries** and
+ * `groupToItems` flattens them into navigation order — the only thing the kernel needs from a group,
+ * since the label is rendered from the consumer's own key. The callback then goes one level up: it is
+ * invoked per group, and the group's own items are a plain `<For>`. Each `Listbox.Item` still resolves
+ * its own row from its `item`, so nesting depth is irrelevant to arrow keys and typeahead.
+ */
+export const Grouped: Story = {
+  render: () => {
+    const [value, setValue] = createSignal<Fruit[]>([BASKETS[1]?.fruits[0] as Fruit]);
     return (
       <div style={{ padding: "2rem" }}>
         <Listbox.Root
           aria-label="Choose a fruit"
           class={PANEL}
+          items={BASKETS}
+          groupToItems={(basket) => basket.fruits}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
           value={value()}
           onChange={setValue}
         >
-          <Listbox.Group>
-            <Listbox.GroupLabel>Citrus</Listbox.GroupLabel>
-            <For each={citrus}>{(fruit) => <FruitItem fruit={fruit} />}</For>
-          </Listbox.Group>
-          <Listbox.Separator />
-          <Listbox.Group>
-            <Listbox.GroupLabel>Berries</Listbox.GroupLabel>
-            <For each={berries}>{(fruit) => <FruitItem fruit={fruit} />}</For>
-          </Listbox.Group>
+          {(basket, index) => (
+            <>
+              <Show when={index() > 0}>
+                <Listbox.Separator />
+              </Show>
+              <Listbox.Group>
+                <Listbox.GroupLabel>{basket.kind}</Listbox.GroupLabel>
+                <For each={basket.fruits}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+              </Listbox.Group>
+            </>
+          )}
         </Listbox.Root>
       </div>
     );
   },
 };
 
-/** A disabled row (Elderberry) is dimmed and skipped by keyboard navigation. */
+/** A disabled row (Elderberry) is dimmed and skipped by keyboard navigation. Disabledness is a data
+ *  question now — `isItemDisabled` on the root — so it is known before a row ever mounts. */
 export const DisabledItems: Story = {
   render: () => (
     <div style={{ padding: "2rem" }}>
       <Listbox.Root
         aria-label="Choose a fruit"
         class={PANEL}
+        items={FRUITS}
         itemToValue={itemToValue}
         itemToLabel={itemToLabel}
+        isItemDisabled={isItemDisabled}
       >
-        <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+        {(fruit) => <FruitItem fruit={fruit} />}
       </Listbox.Root>
     </div>
   ),
@@ -185,10 +229,11 @@ export const Sizes: Story = {
               aria-label={`Choose a fruit (${size})`}
               class={PANEL}
               size={size}
+              items={FRUITS.slice(0, 4)}
               itemToValue={itemToValue}
               itemToLabel={itemToLabel}
             >
-              <For each={FRUITS.slice(0, 4)}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+              {(fruit) => <FruitItem fruit={fruit} />}
             </Listbox.Root>
           </div>
         )}
@@ -200,8 +245,8 @@ export const Sizes: Story = {
 /**
  * Both focus modes side by side. **Roving** (default) moves real DOM focus onto the active option and
  * makes it the single tab stop. **Activedescendant** keeps DOM focus on the listbox container and points
- * `aria-activedescendant` at the active option — the model a future Select needs (focus stays on the
- * trigger/input). Tab into each and arrow through it.
+ * `aria-activedescendant` at the active option. Tab into each and arrow through it. The focus owner
+ * still lives *inside* the component here — see "external focus owner" below for the Select shape.
  */
 export const FocusModes: Story = {
   name: "focus modes (roving vs activedescendant)",
@@ -213,10 +258,11 @@ export const FocusModes: Story = {
           aria-label="Roving listbox"
           class={PANEL}
           focusMode="roving"
+          items={FRUITS.slice(0, 4)}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
         >
-          <For each={FRUITS.slice(0, 4)}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
       </div>
       <div style={{ display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
@@ -225,15 +271,113 @@ export const FocusModes: Story = {
           aria-label="Activedescendant listbox"
           class={PANEL}
           focusMode="activedescendant"
+          items={FRUITS.slice(0, 4)}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
         >
-          <For each={FRUITS.slice(0, 4)}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
       </div>
     </div>
   ),
 };
+
+/**
+ * **The Select shape, before Select exists.** DOM focus lives on an `<input role="combobox">` outside
+ * the list; the list is a passive `role="listbox"` container that no option ever focuses. The input
+ * carries `aria-activedescendant`, and `navigation.onKeyDown` + `typeahead.onKeyDown` are composed
+ * onto it — proof that `createListbox`'s pieces bind to an owner outside the widget, which is the
+ * whole premise of the combobox kernel.
+ *
+ * It is written against `@hope-ui/primitives/listbox` rather than `Listbox.Root`, because `Root`
+ * binds `rootProps` (the container `tabindex`, its own `onKeyDown`, its own `aria-activedescendant`)
+ * onto its own element — exactly what a Select must *not* do. The recipe classes are read straight
+ * off `useSlots`, so the look is the real one. `Select` is the component layer for this shape.
+ *
+ * Two things to try: arrow past the bottom of the panel (the active row scrolls itself into view —
+ * nothing moves DOM focus, so the list would otherwise leave it offscreen), and type `f` to jump to
+ * Fig. Enter selects; that keymap is the one piece an external owner has to bring, and the kernel
+ * will own it.
+ */
+export const ExternalFocusOwner: Story = {
+  name: "external focus owner (the Select shape)",
+  render: () => (
+    <div style={{ padding: "2rem" }}>
+      <SelectShape />
+    </div>
+  ),
+};
+
+function SelectShape(): JSX.Element {
+  const [value, setValue] = createSignal<Fruit[]>([]);
+
+  const slots = useSlots({
+    recipe: "listbox",
+    variantsProps: () => ({ size: "md" as const }),
+  });
+
+  const state = createListbox<Fruit>({
+    items: FRUITS,
+    itemToValue,
+    itemToLabel,
+    isItemDisabled,
+    focusMode: "activedescendant",
+    get value() {
+      return value();
+    },
+    onChange: setValue,
+  });
+
+  // `createListbox`'s selection keymap is local to `rootProps`, which a Select never spreads — so an
+  // external owner rebuilds it from `selection.selectActive()`. Three lines here; the combobox kernel
+  // owns it for real (and adds Space, Escape, and open/close).
+  const selectKeys = createKeyboardHandler<HTMLInputElement>().on("Enter", (event) => {
+    event.preventDefault();
+    state.selection.selectActive();
+  });
+
+  return (
+    <div style={{ display: "flex", "flex-direction": "column", gap: "0.5rem", width: "14rem" }}>
+      <input
+        role="combobox"
+        aria-expanded="true"
+        aria-controls={state.id()}
+        aria-activedescendant={state.focus.activeDescendant()}
+        aria-label="Choose a fruit"
+        readonly
+        placeholder="Arrow, or type a letter…"
+        value={value()[0]?.name ?? ""}
+        class="w-full rounded-md border border-subtle bg-surface px-3 py-1.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-focus-halo"
+        onFocus={() => state.focus.setFocused(true)}
+        onBlur={() => state.focus.setFocused(false)}
+        onKeyDown={composeEventHandlers(
+          selectKeys.onKeyDown,
+          state.navigation.onKeyDown,
+          state.typeahead.onKeyDown,
+        )}
+      />
+      <div
+        ref={(element) => state.setListboxElement(element)}
+        id={state.id()}
+        role="listbox"
+        aria-label="Fruits"
+        class={slots.root(`${PANEL} max-h-32`)}
+      >
+        <For each={FRUITS}>
+          {(fruit) => {
+            const [ref, setRef] = createSignal<HTMLDivElement>();
+            const item = createListboxItem<Fruit>(state, { ref, item: fruit });
+            return (
+              <div ref={setRef} {...item.props} class={slots.item()}>
+                {fruit.name}
+              </div>
+            );
+          }}
+        </For>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Native form submission, opt-in via `name`: the listbox renders hidden fields (siblings of the
@@ -258,12 +402,14 @@ export const FormSubmission: Story = {
           class={PANEL}
           selectionMode="multiple"
           name="fruit"
+          items={FRUITS}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
+          isItemDisabled={isItemDisabled}
           value={value()}
           onChange={setValue}
         >
-          <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          {(fruit) => <FruitItem fruit={fruit} />}
         </Listbox.Root>
         <button type="submit" style={{ "align-self": "flex-start" }}>
           Submit
@@ -285,9 +431,10 @@ function makeRows(count: number): Fruit[] {
 }
 
 /**
- * **Virtualization** — pass `items` (the full array) + `estimateSize` and a **render-prop** child
- * `(item, index) => <Listbox.Item index={index}>…`. The list element becomes the scroll container; only
- * a window of rows mounts, so 10,000 rows scroll and navigate smoothly (try End, or type to jump). The
+ * **Virtualization** — add `estimateSize` and the same callback child becomes per **windowed row**,
+ * returning a `<Listbox.Item index={index}>` (a recycled row's position is the only thing it knows,
+ * so it is told rather than resolving its own). The list element becomes the scroll container; only a
+ * window of rows mounts, so 10,000 rows scroll and navigate smoothly (try End, or type to jump). The
  * same `createListbox` state drives selection/focus/typeahead over the **full** set. Flat lists only —
  * no groups in virtual mode.
  *
@@ -378,12 +525,14 @@ export const ReadingDirection: Story = {
               aria-label="اختر فاكهة"
               class={PANEL}
               dir="rtl"
+              items={FRUITS}
               itemToValue={itemToValue}
               itemToLabel={itemToLabel}
+              isItemDisabled={isItemDisabled}
               value={declared()}
               onChange={setDeclared}
             >
-              <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+              {(fruit) => <FruitItem fruit={fruit} />}
             </Listbox.Root>
           </I18nProvider>
         </div>
@@ -393,12 +542,14 @@ export const ReadingDirection: Story = {
           <Listbox.Root
             aria-label="Choose a fruit"
             class={PANEL}
+            items={FRUITS}
             itemToValue={itemToValue}
             itemToLabel={itemToLabel}
+            isItemDisabled={isItemDisabled}
             value={inherited()}
             onChange={setInherited}
           >
-            <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+            {(fruit) => <FruitItem fruit={fruit} />}
           </Listbox.Root>
         </div>
       </div>

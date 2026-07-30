@@ -1,7 +1,7 @@
 import { Listbox } from "@hope-ui/components/listbox";
 import { I18nProvider } from "@hope-ui/i18n";
-import { createSignal, For } from "solid-js";
-import { FRUITS, type Fruit, FruitItem, itemToLabel, itemToValue } from "./data";
+import { createSignal } from "solid-js";
+import { FRUITS, type Fruit, FruitItem, isItemDisabled, itemToLabel, itemToValue } from "./data";
 
 // The same fruits, named in Arabic, so the RTL column reads as an RTL surface rather than as English
 // text in a mirrored box.
@@ -30,13 +30,15 @@ export function ListboxRtlDemo() {
         <I18nProvider locale="en-US">
           <Listbox.Root
             aria-label="Choose a fruit"
+            items={FRUITS}
             itemToValue={itemToValue}
             itemToLabel={itemToLabel}
+            isItemDisabled={isItemDisabled}
             value={ltrValue()}
             onChange={setLtrValue}
             class="w-44"
           >
-            <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+            {(fruit) => <FruitItem fruit={fruit} />}
           </Listbox.Root>
         </I18nProvider>
       </div>
@@ -46,13 +48,15 @@ export function ListboxRtlDemo() {
         <I18nProvider locale="ar-EG">
           <Listbox.Root
             aria-label="اختر فاكهة"
+            items={FRUITS_AR}
             itemToValue={itemToValue}
             itemToLabel={itemToLabel}
+            isItemDisabled={isItemDisabled}
             value={rtlValue()}
             onChange={setRtlValue}
             class="w-44"
           >
-            <For each={FRUITS_AR}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+            {(fruit) => <FruitItem fruit={fruit} />}
           </Listbox.Root>
         </I18nProvider>
       </div>

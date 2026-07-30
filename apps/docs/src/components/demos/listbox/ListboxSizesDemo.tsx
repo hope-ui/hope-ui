@@ -15,10 +15,11 @@ export function ListboxSizesDemo() {
           <Listbox.Root
             aria-label={`Choose a fruit (${size})`}
             size={size}
+            items={FRUITS.slice(0, 4)}
             itemToValue={itemToValue}
             itemToLabel={itemToLabel}
           >
-            <For each={FRUITS.slice(0, 4)}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+            {(fruit) => <FruitItem fruit={fruit} />}
           </Listbox.Root>
         </div>
       )}

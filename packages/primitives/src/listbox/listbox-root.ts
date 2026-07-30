@@ -2,13 +2,12 @@ import { useLocale } from "@hope-ui/i18n";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createSignal, createUniqueId, untrack } from "solid-js";
 import {
-  type CreateCollectionReturn,
   type CreateListFocusReturn,
   type CreateListNavigationReturn,
   type CreateListSelectionReturn,
   type CreateListTypeaheadReturn,
   type CreateVirtualCollectionReturn,
-  createCollection,
+  createDataCollection,
   createListFocus,
   createListNavigation,
   createListSelection,
@@ -16,7 +15,7 @@ import {
   createTextDirectionWarning,
   createVirtualCollection,
   type FocusMode,
-  type ItemSource,
+  type IndexedItemSource,
   type Orientation,
   type SelectionMode,
   type TextDirection,
@@ -34,25 +33,31 @@ import { composeEventHandlers, createKeyboardHandler, withDefaults } from "../ut
  * `Listbox.Root` calls this once and shares the return on context; a headless consumer holds it and
  * threads it into whichever part hooks it needs. Mirrors the `createDialog` split.
  *
- * ## Two item-source modes, one seam
+ * ## Options are data, never mounted elements
  *
- * The list kernel reads an abstract {@link ItemSource}, so `createListbox` picks the concrete source
- * once at creation and everything downstream is identical:
- * - **collection** (default) — `createCollection`, every item mounted and self-registering. Supports
- *   groups + separators. Idiomatic Solid `<For>`.
- * - **virtual** — `createVirtualCollection`, windowed. Selected when both `items` and `estimateSize`
- *   are supplied; `getItemData(index)` is derived from `items` + `itemToValue`/`itemToLabel`/
- *   `getItemDisabled`. Flat lists only.
+ * `items` is **required**, and it is the whole option set — not the rows that happen to be mounted.
+ * That is what lets a Select's options exist while its popup is closed, which is what makes
+ * closed-trigger typeahead, an `allowsEmptyCollection` open guard and a server-rendered `<select>`
+ * for autofill possible without mounting a single row the user may never open. A DOM-registered
+ * source cannot do any of that: it *is* the mounted elements. See `create-data-collection.md`.
+ *
+ * Two concrete sources implement the abstract {@link IndexedItemSource} the list kernel reads, and
+ * `createListbox` picks one **once** at creation:
+ * - **data** (default) — `createDataCollection`. Every row derives from `items`; a mounted row
+ *   publishes its element by index. Supports groups + separators via `groupToItems`.
+ * - **virtual** — `createVirtualCollection`, windowed. Selected by `estimateSize`. Flat lists only.
+ *
+ * Either way a row registers by **index**, so `createListboxItem` has a single code path.
  *
  * ## Two focus modes, and Select-ready
  *
- * `focusMode` toggles `createListFocus` between `"roving"` (default; the active `<li>` holds real DOM
- * focus) and `"activedescendant"` (the focus owner keeps DOM focus and points `aria-activedescendant`
- * at the active option). The focus/keyboard/typeahead primitives are exposed **independently**
- * (`focus`, `navigation`, `typeahead`) so a future Select can bind them to a focus owner *outside*
- * the `<ul>` (its trigger/input): pass that element as the listbox element and attach
+ * `focusMode` toggles `createListFocus` between `"roving"` (default; the active option holds real
+ * DOM focus) and `"activedescendant"` (the focus owner keeps DOM focus and points
+ * `aria-activedescendant` at the active option). The focus/keyboard/typeahead primitives are exposed
+ * **independently** (`focus`, `navigation`, `typeahead`) so a future Select can bind them to a focus
+ * owner *outside* the list (its trigger/input): pass that element as the listbox element and attach
  * `navigation.onKeyDown` / `typeahead.onKeyDown` / `aria-activedescendant` to it. `rootProps` is only
- * the standalone convenience binding them onto the `<ul>`.
+ * the standalone convenience binding them onto the container.
  *
  * ## One active item — no double highlight
  *
@@ -65,21 +70,37 @@ import { composeEventHandlers, createKeyboardHandler, withDefaults } from "../ut
  *
  * Call it **once**, inside a reactive owner scope (a component body, or a `createRoot`).
  */
-export interface CreateListboxOptions<V = unknown> {
+export interface CreateListboxOptions<V = unknown, G = V> {
   /**
-   * Maps an item to its primitive **value** — the selection identity (compared `===`) and the string
-   * submitted to a form. **Not** the item's DOM `id`: an index-registered source generates those
+   * The option set, in navigation order — **required**, and the source every row derives from. Holds
+   * the *items* for a flat list, and the **group entries** when `groupToItems` is set. Pass a getter
+   * for reactive data, exactly as a component prop would.
+   */
+  items: readonly G[];
+  /**
+   * Maps a group entry to its own items. Its **only** job is flattening `items` into navigation
+   * order: the group's *label* never reaches the kernel (a consumer renders it from its own key), so
+   * there is no `groupToLabel` and no `{ label, items }` shape to conform to. Omit for a flat list.
+   * Not combinable with `estimateSize` — windowing is flat by construction.
+   */
+  groupToItems?: (group: G) => readonly V[];
+  /**
+   * Maps an item to its primitive **value** — the selection identity (compared `===`), the string
+   * submitted to a form, and the key a row resolves its own index by ({@link
+   * CreateListboxReturn.indexOfValue}). **Not** the item's DOM `id`: the source generates those
    * itself (`createItemIds`). Must be unique per item. Default `(item) => String(item)`. Base UI's
    * `itemToStringValue`.
    */
   itemToValue?: (item: V) => string;
   /**
    * Maps an item to its **label** — the typeahead/display text feeding the kernel's `textValue`.
-   * When omitted, collection mode falls back to the item element's trimmed `textContent`; virtual
-   * mode has no element to fall back to, so offscreen typeahead needs this. Base UI's
-   * `itemToStringLabel`.
+   * Defaults to `itemToValue`. There is deliberately **no `element.textContent` fallback**: the
+   * point of a data-driven source is that the text is readable before — and without — mounting the
+   * row, which is what offscreen and closed-popup typeahead need. Base UI's `itemToStringLabel`.
    */
   itemToLabel?: (item: V) => string;
+  /** Whether an item is disabled (skipped by focus/navigation, `aria-disabled`). Default `false`. */
+  isItemDisabled?: (item: V) => boolean;
 
   /** Controlled selection. Omit for uncontrolled use via `defaultValue`. For reactive control pass a
    *  getter (`get value() { return signal(); }`), exactly as a component prop would. */
@@ -115,15 +136,10 @@ export interface CreateListboxOptions<V = unknown> {
   /** Whether arrow navigation wraps past the ends. Default `false`. */
   wrap?: boolean;
 
-  /** Virtual mode: the **full** data array. Supply with `estimateSize` to enable windowing. Pass a
-   *  getter for reactive data. */
-  items?: readonly V[];
-  /** Virtual mode: estimated row size in px by index. Its presence (with `items`) selects virtual mode. */
+  /** Estimated row size in px by index. Its presence selects **virtual mode** (windowing). */
   estimateSize?: (index: number) => number;
   /** Virtual mode: overscan rows rendered beyond the window. Default `5`. */
   overscan?: number;
-  /** Virtual mode: whether the item at a given index is disabled (collection mode uses the item prop). */
-  getItemDisabled?: (item: V) => boolean;
 
   /** Native form field name. When set, the component renders hidden inputs from `formValues()`. */
   name?: string;
@@ -139,17 +155,29 @@ export interface CreateListboxOptions<V = unknown> {
 export interface CreateListboxReturn<V = unknown> {
   /** The resolved listbox id (consumer's, else generated). */
   id: Accessor<string>;
-  /** The registered label id (a `Listbox.Label`), or `undefined` — the `<ul>`'s `aria-labelledby`. */
+  /** The registered label id (a `Listbox.Label`), or `undefined` — the container's `aria-labelledby`. */
   labelId: Accessor<string | undefined>;
   /** Register a label id. For a future `Listbox.Label` part. */
   setLabelId: (id: string | undefined) => void;
 
-  /** The abstract item source — either the collection or the virtual collection. */
-  source: ItemSource<V>;
-  /** The self-registering collection, present only in collection mode (for `createListboxItem`). */
-  collection?: CreateCollectionReturn<V>;
-  /** The virtual collection, present only in virtual mode (windowing + element registration). */
+  /**
+   * The item source. Always index-registered — `createDataCollection` (default) or
+   * `createVirtualCollection` — which is why `createListboxItem` has a single code path. Read
+   * `indexed.items()` for the full option set; a row publishes its element with
+   * `indexed.registerElement(index, element)`.
+   */
+  indexed: IndexedItemSource<V>;
+  /** The virtual collection, present only in virtual mode. It carries the windowing metadata a sizer
+   *  needs (`virtualItems()`, `totalSize()`), which the `ItemSource` seam deliberately has no room for. */
   virtual?: CreateVirtualCollectionReturn<V>;
+  /**
+   * The index of the item whose `itemToValue` is `value`, or `-1`. This is how a part resolves its
+   * own row from the `item` it was handed, instead of taking an `index` it has no way to know — so an
+   * option can sit anywhere in the subtree (a group's nested `<For>`). Backed by a `Map` rebuilt with
+   * the data, so it is O(n) per **data change**, not per render. Always `-1` in **virtual** mode,
+   * where a recycled row's position changes under it and `index` is the only honest answer.
+   */
+  indexOfValue: (value: string) => number;
 
   /** The shared focus instance (active item + roving/activedescendant). Bind its pieces to any owner. */
   focus: CreateListFocusReturn<V>;
@@ -162,7 +190,7 @@ export interface CreateListboxReturn<V = unknown> {
 
   /** The resolved value mapper (never undefined). */
   itemToValue: (item: V) => string;
-  /** The label mapper, or `undefined` (defer to `textContent`). Read by `createListboxItem`. */
+  /** The label mapper, or `undefined` (the source then falls back to `itemToValue`). */
   itemToLabel?: (item: V) => string;
   /** The current selection mode. */
   selectionMode: Accessor<SelectionMode>;
@@ -179,7 +207,7 @@ export interface CreateListboxReturn<V = unknown> {
   /** The current selection (`selection.value`, re-exposed). */
   value: Accessor<V[]>;
 
-  /** Register the listbox element (the `<ul>`, or in Select the scroll container). */
+  /** Register the listbox element (the container, and in Select the scroll container). */
   setListboxElement: (element: HTMLElement | null | undefined) => void;
   /**
    * The pointer fight-guard: returns `true` (and records the coords) only when `(x, y)` differ from
@@ -201,8 +229,23 @@ export interface CreateListboxReturn<V = unknown> {
   rootProps: Omit<JSX.HTMLAttributes<HTMLElement>, "ref">;
 }
 
-export function createListbox<V = unknown>(
-  options: CreateListboxOptions<V> = {},
+/** Dev-only. Windowing measures a flat run of rows, so there is no window a group could live in. */
+function warnVirtualGrouping(): void {
+  // `import.meta.env.DEV` is defined by the consumer's Vite (and vitest); cast locally so this
+  // package needn't pull `vite/client` into `compilerOptions.types`. Same shape as
+  // `createTextDirectionWarning`.
+  const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV;
+  if (!isDev) {
+    return;
+  }
+  console.warn(
+    "[hope-ui] createListbox: `groupToItems` and `estimateSize` cannot be combined — windowing " +
+      "measures a flat run of rows. `estimateSize` wins and the groups are ignored; drop one.",
+  );
+}
+
+export function createListbox<V = unknown, G = V>(
+  options: CreateListboxOptions<V, G>,
 ): CreateListboxReturn<V> {
   // `withDefaults`, not `merge`: `merge` resolves by key *presence*, so a wrapper forwarding an unset
   // prop (present with value `undefined`) would beat the default. See `withDefaults`' doc.
@@ -244,17 +287,21 @@ export function createListbox<V = unknown>(
     active: () => orientation() === "horizontal",
   });
 
-  // The source is decided **once**: a listbox is either fully mounted (collection) or windowed
-  // (virtual) for its lifetime, never switching. Virtual when both `items` and `estimateSize` exist.
-  const virtualized = merged.estimateSize != null && merged.items != null;
+  // The source is decided **once**: a listbox is either fully data-driven or windowed for its
+  // lifetime, never switching. Virtual when `estimateSize` is supplied.
+  const virtualized = merged.estimateSize != null;
 
-  let collection: CreateCollectionReturn<V> | undefined;
   let virtual: CreateVirtualCollectionReturn<V> | undefined;
-  let source: ItemSource<V>;
+  let indexed: IndexedItemSource<V>;
+  let indexOfValue: (value: string) => number;
 
   if (virtualized) {
+    if (merged.groupToItems != null) {
+      warnVirtualGrouping();
+    }
     const estimateSize = merged.estimateSize as (index: number) => number;
-    const items = () => merged.items ?? [];
+    // Grouping is off in this branch (warned above), so the entries *are* the items.
+    const items = () => merged.items as unknown as readonly V[];
     virtual = createVirtualCollection<V>({
       count: () => items().length,
       scrollElement: listboxElement,
@@ -266,21 +313,32 @@ export function createListbox<V = unknown>(
         return {
           value: item,
           textValue: itemToLabel ? itemToLabel(item) : undefined,
-          disabled: merged.getItemDisabled ? merged.getItemDisabled(item) : false,
+          disabled: merged.isItemDisabled ? merged.isItemDisabled(item) : false,
         };
       },
     });
-    source = virtual;
+    indexed = virtual;
+    // A windowed row is recycled — its index changes while the component stays mounted — so the row
+    // knows its position and the value cannot resolve one. `createListboxItem` says so in dev.
+    indexOfValue = () => -1;
   } else {
-    collection = createCollection<V>();
-    source = collection;
+    const data = createDataCollection<V, G>({
+      items: () => merged.items,
+      groupToItems: merged.groupToItems,
+      itemToValue,
+      itemToLabel,
+      isItemDisabled: merged.isItemDisabled,
+      scrollElement: listboxElement,
+    });
+    indexed = data;
+    indexOfValue = data.indexOfValue;
   }
 
   // Both annotated explicitly: `entryIndex` forward-references `selection`, so without the annotations
   // TypeScript sees a cyclic initializer (`focus` → `entryIndex` → `selection` → `focus`) and widens
   // both to `any`. The reference itself is safe — see the `entryIndex` note below.
   const focus: CreateListFocusReturn<V> = createListFocus<V>({
-    source,
+    source: indexed,
     focusMode,
     disabled,
     skipDisabled: () => merged.skipDisabled,
@@ -434,9 +492,9 @@ export function createListbox<V = unknown>(
     id,
     labelId,
     setLabelId,
-    source,
-    collection,
+    indexed,
     virtual,
+    indexOfValue,
     focus,
     selection,
     navigation,

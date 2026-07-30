@@ -4,7 +4,7 @@ import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Listbox } from "../index";
@@ -93,26 +93,22 @@ function FruitListbox(props: FruitListboxProps): JSX.Element {
     <Themed>
       <Listbox.Root
         aria-label="fruits"
+        items={FRUITS}
         itemToValue={itemToValue}
         itemToLabel={itemToLabel}
+        isItemDisabled={props.disabledOf}
         selectionMode={props.selectionMode}
         focusMode={props.focusMode}
         name={props.name}
         dir={props.dir}
         onChange={props.onChange}
       >
-        <For each={FRUITS}>
-          {(fruit) => (
-            <Listbox.Item
-              value={fruit}
-              data-value={fruit.name}
-              disabled={props.disabledOf?.(fruit)}
-            >
-              <Listbox.ItemIndicator />
-              {fruit.name}
-            </Listbox.Item>
-          )}
-        </For>
+        {(fruit) => (
+          <Listbox.Item item={fruit} data-value={fruit.name}>
+            <Listbox.ItemIndicator />
+            {fruit.name}
+          </Listbox.Item>
+        )}
       </Listbox.Root>
     </Themed>
   );
@@ -338,17 +334,20 @@ describe("Listbox selection glyph", () => {
   it("lets a per-instance ItemIndicator child override the built-in check", async () => {
     const { container, dispose } = mount(() => (
       <Themed>
-        <Listbox.Root aria-label="fruits" itemToValue={itemToValue} itemToLabel={itemToLabel}>
-          <For each={FRUITS}>
-            {(fruit) => (
-              <Listbox.Item value={fruit} data-value={fruit.name}>
-                <Listbox.ItemIndicator>
-                  <CustomIcon mark="custom" />
-                </Listbox.ItemIndicator>
-                {fruit.name}
-              </Listbox.Item>
-            )}
-          </For>
+        <Listbox.Root
+          aria-label="fruits"
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+        >
+          {(fruit) => (
+            <Listbox.Item item={fruit} data-value={fruit.name}>
+              <Listbox.ItemIndicator>
+                <CustomIcon mark="custom" />
+              </Listbox.ItemIndicator>
+              {fruit.name}
+            </Listbox.Item>
+          )}
         </Listbox.Root>
       </Themed>
     ));
@@ -371,15 +370,18 @@ describe("Listbox selection glyph", () => {
 
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={withCheckIcon}>
-        <Listbox.Root aria-label="fruits" itemToValue={itemToValue} itemToLabel={itemToLabel}>
-          <For each={FRUITS}>
-            {(fruit) => (
-              <Listbox.Item value={fruit} data-value={fruit.name}>
-                <Listbox.ItemIndicator />
-                {fruit.name}
-              </Listbox.Item>
-            )}
-          </For>
+        <Listbox.Root
+          aria-label="fruits"
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+        >
+          {(fruit) => (
+            <Listbox.Item item={fruit} data-value={fruit.name}>
+              <Listbox.ItemIndicator />
+              {fruit.name}
+            </Listbox.Item>
+          )}
         </Listbox.Root>
       </ThemeProvider>
     ));
@@ -398,22 +400,25 @@ describe("Listbox selection glyph", () => {
     let indicatorRef: HTMLElement | undefined;
     const { container, dispose } = mount(() => (
       <Themed>
-        <Listbox.Root aria-label="fruits" itemToValue={itemToValue} itemToLabel={itemToLabel}>
-          <For each={FRUITS}>
-            {(fruit) => (
-              <Listbox.Item value={fruit} data-value={fruit.name}>
-                <Listbox.ItemIndicator
-                  id="chosen"
-                  class="ring-2"
-                  data-testid="indicator"
-                  ref={(element: HTMLElement) => {
-                    indicatorRef = element;
-                  }}
-                />
-                {fruit.name}
-              </Listbox.Item>
-            )}
-          </For>
+        <Listbox.Root
+          aria-label="fruits"
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+        >
+          {(fruit) => (
+            <Listbox.Item item={fruit} data-value={fruit.name}>
+              <Listbox.ItemIndicator
+                id="chosen"
+                class="ring-2"
+                data-testid="indicator"
+                ref={(element: HTMLElement) => {
+                  indicatorRef = element;
+                }}
+              />
+              {fruit.name}
+            </Listbox.Item>
+          )}
         </Listbox.Root>
       </Themed>
     ));
@@ -447,6 +452,7 @@ describe("Listbox selection glyph", () => {
       <Themed>
         <Listbox.Root
           aria-label="fruits"
+          items={FRUITS}
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
           ref={(element: HTMLElement) => {
@@ -454,13 +460,11 @@ describe("Listbox selection glyph", () => {
           }}
           render={(renderProps) => <div {...renderProps} data-custom-shell="" />}
         >
-          <For each={FRUITS}>
-            {(fruit) => (
-              <Listbox.Item value={fruit} data-value={fruit.name}>
-                {fruit.name}
-              </Listbox.Item>
-            )}
-          </For>
+          {(fruit) => (
+            <Listbox.Item item={fruit} data-value={fruit.name}>
+              {fruit.name}
+            </Listbox.Item>
+          )}
         </Listbox.Root>
       </Themed>
     ));
@@ -478,6 +482,146 @@ describe("Listbox selection glyph", () => {
     nth(options(container), 0).focus();
     await userEvent.keyboard("{ArrowDown}");
     await vi.waitFor(() => expect(nth(options(container), 1)).toHaveAttribute("data-active"));
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+// ─── Grouping (the callback goes one level up) ──────────────────────────────────────────────────
+
+interface Basket {
+  kind: string;
+  fruits: Fruit[];
+}
+
+const BASKETS: Basket[] = [
+  {
+    kind: "Citrus",
+    fruits: [
+      { id: 10, name: "Lemon" },
+      { id: 11, name: "Lime" },
+    ],
+  },
+  {
+    kind: "Berries",
+    fruits: [
+      { id: 20, name: "Blueberry" },
+      { id: 21, name: "Raspberry" },
+    ],
+  },
+];
+
+function GroupedListbox(): JSX.Element {
+  return (
+    <Themed>
+      <Listbox.Root
+        aria-label="fruits by kind"
+        items={BASKETS}
+        groupToItems={(basket) => basket.fruits}
+        itemToValue={itemToValue}
+        itemToLabel={itemToLabel}
+      >
+        {(basket, index) => (
+          <>
+            <Show when={index() > 0}>
+              <Listbox.Separator />
+            </Show>
+            <Listbox.Group>
+              <Listbox.GroupLabel>{basket.kind}</Listbox.GroupLabel>
+              <For each={basket.fruits}>
+                {(fruit) => (
+                  <Listbox.Item item={fruit} data-value={fruit.name}>
+                    <Listbox.ItemIndicator />
+                    {fruit.name}
+                  </Listbox.Item>
+                )}
+              </For>
+            </Listbox.Group>
+          </>
+        )}
+      </Listbox.Root>
+    </Themed>
+  );
+}
+
+describe("Listbox — grouping", () => {
+  it("invokes the callback per group and navigates the flattened items order across them", async () => {
+    const { container, dispose } = mount(() => <GroupedListbox />);
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    expect(container.querySelectorAll('[data-slot="listbox-group"]')).toHaveLength(2);
+    expect(container.querySelectorAll('[data-slot="listbox-separator"]')).toHaveLength(1);
+    expect(
+      [...container.querySelectorAll('[data-slot="listbox-group-label"]')].map(
+        (element) => element.textContent,
+      ),
+    ).toEqual(["Citrus", "Berries"]);
+
+    // The options sit two levels down, inside each group's own `<For>` — and still arrow as one list.
+    await userEvent.click(nth(options(container), 1)); // Lime, last of the first group
+    await userEvent.keyboard("{ArrowDown}"); // → Blueberry, first of the second
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Blueberry"]));
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+// ─── Item prop forwarding ───────────────────────────────────────────────────────────────────────
+
+describe("Listbox.Item — DOM prop forwarding", () => {
+  it("puts the native attributes it does not consume on the option element", async () => {
+    // The `omit` lists in `listbox-item.ts`/`listbox-item.tsx` are hand-kept, and renaming a control
+    // prop is exactly the change that starts swallowing a consumer's attributes with a green
+    // typecheck and a green suite. Assert them **on the element**.
+    let itemRef: HTMLElement | undefined;
+    const { container, dispose } = mount(() => (
+      <Themed>
+        {/* A real target for the forwarded `aria-describedby` — a dangling IDREF is an axe
+        `aria-valid-attr-value` incomplete, and it would be the test's bug, not the part's. */}
+        <span id="hint">Pick one</span>
+        <Listbox.Root
+          aria-label="fruits"
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+        >
+          {(fruit) => (
+            <Listbox.Item
+              item={fruit}
+              data-value={fruit.name}
+              data-testid={`row-${fruit.id}`}
+              title={fruit.name}
+              aria-describedby="hint"
+              class="probe-item"
+              style={{ color: "rgb(1, 2, 3)" }}
+              ref={(element: HTMLElement) => {
+                itemRef = element;
+              }}
+            >
+              {fruit.name}
+            </Listbox.Item>
+          )}
+        </Listbox.Root>
+      </Themed>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    const apple = nth(options(container), 0);
+    expect(apple.getAttribute("data-testid")).toBe("row-1");
+    expect(apple.getAttribute("title")).toBe("Apple");
+    expect(apple.getAttribute("aria-describedby")).toBe("hint");
+    expect(apple.style.color).toBe("rgb(1, 2, 3)");
+    // The consumer's class rides the recipe's `item` slot, never instead of it.
+    expect(apple.className).toContain("probe-item");
+    expect(apple.className).toContain("cursor-default");
+    // A consumer `ref` reaches the element even though the primitive needs its own signal accessor.
+    expect(itemRef).toBe(nth(options(container), 3));
+    // …and the hook keeps what it owns: `id` is the activedescendant IDREF, generated by the source.
+    expect(apple.getAttribute("role")).toBe("option");
+    expect(apple.id).toBeTruthy();
+    expect(apple.getAttribute("data-slot")).toBe("listbox-item");
 
     await expectNoA11yViolations(container);
     dispose();
@@ -578,18 +722,17 @@ describe("Listbox — native form submission", () => {
         >
           <Listbox.Root
             aria-label="fruits"
+            items={FRUITS}
             selectionMode="multiple"
             name="fruit"
             itemToValue={itemToValue}
             itemToLabel={itemToLabel}
           >
-            <For each={FRUITS}>
-              {(fruit) => (
-                <Listbox.Item value={fruit} data-value={fruit.name}>
-                  {fruit.name}
-                </Listbox.Item>
-              )}
-            </For>
+            {(fruit) => (
+              <Listbox.Item item={fruit} data-value={fruit.name}>
+                {fruit.name}
+              </Listbox.Item>
+            )}
           </Listbox.Root>
           <button type="submit">Submit</button>
         </form>
@@ -761,18 +904,17 @@ describe("Listbox — RTL", () => {
       <Themed>
         <Listbox.Root
           aria-label="fruits"
+          items={FRUITS}
           dir="rtl"
           orientation="horizontal"
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
         >
-          <For each={FRUITS}>
-            {(fruit) => (
-              <Listbox.Item value={fruit} data-value={fruit.name}>
-                {fruit.name}
-              </Listbox.Item>
-            )}
-          </For>
+          {(fruit) => (
+            <Listbox.Item item={fruit} data-value={fruit.name}>
+              {fruit.name}
+            </Listbox.Item>
+          )}
         </Listbox.Root>
       </Themed>
     ));
@@ -819,17 +961,16 @@ describe("Listbox — RTL", () => {
         <Themed>
           <Listbox.Root
             aria-label="fruits"
+            items={FRUITS}
             orientation="horizontal"
             itemToValue={itemToValue}
             itemToLabel={itemToLabel}
           >
-            <For each={FRUITS}>
-              {(fruit) => (
-                <Listbox.Item value={fruit} data-value={fruit.name}>
-                  {fruit.name}
-                </Listbox.Item>
-              )}
-            </For>
+            {(fruit) => (
+              <Listbox.Item item={fruit} data-value={fruit.name}>
+                {fruit.name}
+              </Listbox.Item>
+            )}
           </Listbox.Root>
         </Themed>
       </I18nProvider>
@@ -870,17 +1011,16 @@ describe("Listbox — RTL", () => {
           <Themed>
             <Listbox.Root
               aria-label="fruits"
+              items={FRUITS}
               orientation="horizontal"
               itemToValue={itemToValue}
               itemToLabel={itemToLabel}
             >
-              <For each={FRUITS}>
-                {(fruit) => (
-                  <Listbox.Item value={fruit} data-value={fruit.name}>
-                    {fruit.name}
-                  </Listbox.Item>
-                )}
-              </For>
+              {(fruit) => (
+                <Listbox.Item item={fruit} data-value={fruit.name}>
+                  {fruit.name}
+                </Listbox.Item>
+              )}
             </Listbox.Root>
           </Themed>
         </I18nProvider>
