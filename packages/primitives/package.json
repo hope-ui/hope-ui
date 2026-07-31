@@ -14,6 +14,7 @@
   "hope": {
     "entries": {
       "calendar": "src/calendar/index.ts",
+      "combobox": "src/combobox/index.ts",
       "dialog": "src/dialog/index.ts",
       "hidden-select": "src/hidden-select/index.ts",
       "listbox": "src/listbox/index.ts",
@@ -28,6 +29,10 @@
     "./calendar": {
       "types": "./dist/calendar/index.d.ts",
       "solid": "./dist/calendar/index.jsx"
+    },
+    "./combobox": {
+      "types": "./dist/combobox/index.d.ts",
+      "solid": "./dist/combobox/index.jsx"
     },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",

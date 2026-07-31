@@ -135,6 +135,15 @@ export interface CreateListboxOptions<V = unknown, G = V> {
   skipDisabled?: boolean;
   /** Whether arrow navigation wraps past the ends. Default `false`. */
   wrap?: boolean;
+  /**
+   * Called with the index typeahead matched, instead of the default "highlight it"
+   * (`focus.focusIndex`). The seam a composed widget intercepts to **select** the match rather than
+   * highlight it, which is what closed-trigger typeahead needs — a Select whose popup is shut has no
+   * row to highlight, and native `<select>` changes the value outright (react-aria's
+   * `onTypeSelect → setSelectedKey`, Base UI's `onMatch`). `createCombobox` is the caller; a
+   * standalone listbox never sets it. Read once, at creation: configuration, not reactive input.
+   */
+  onTypeaheadMatch?: (index: number) => void;
 
   /** Estimated row size in px by index. Its presence selects **virtual mode** (windowing). */
   estimateSize?: (index: number) => number;
@@ -370,7 +379,11 @@ export function createListbox<V = unknown, G = V>(
   // `sensitivity: "base"` folds diacritics and case, so a `cafe` query matches `Café` — see
   // `createCollator`'s doc for why the sliced comparison is a matched, not guarded, limitation.
   const typeaheadCollator = createCollator({ usage: "search", sensitivity: "base" });
-  const typeahead = createListTypeahead<V>({ focus, collator: typeaheadCollator });
+  const typeahead = createListTypeahead<V>({
+    focus,
+    collator: typeaheadCollator,
+    onMatch: merged.onTypeaheadMatch,
+  });
 
   // The pointer/keyboard fight-guard. See `pointerMoved`'s doc + this hook's "one active item" note.
   const [pointerCoords, setPointerCoords] = createSignal<{ x: number; y: number } | null>(null);

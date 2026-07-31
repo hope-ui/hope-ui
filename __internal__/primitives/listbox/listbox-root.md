@@ -163,6 +163,7 @@ function createListbox<V = unknown, G = V>(options: {
   disabled?: boolean;                              // default false
   skipDisabled?: boolean;                          // default true
   wrap?: boolean;                                  // default false
+  onTypeaheadMatch?: (index: number) => void;      // default: focus.focusIndex — see below
   estimateSize?: (index: number) => number;        // presence selects virtual mode
   overscan?: number;                               // virtual mode, default 5
   name?: string; form?: string; required?: boolean; // form submission
@@ -227,6 +228,16 @@ which drives both the `dir` prop and a bare `<I18nProvider locale="ar-EG">`, and
 `rootProps.onKeyDown` composes the selection keys in front of `navigation.onKeyDown` then
 `typeahead.onKeyDown`; `createKeyboardHandler` matches modifiers exactly, so `shift+ArrowDown` and the
 plain `ArrowDown` never collide, and Space is caught before typeahead's text fallback can type it.
+
+### `onTypeaheadMatch` — the seam a composed widget intercepts
+
+Forwarded straight to `createListTypeahead`'s `onMatch`, which defaults to `focus.focusIndex` ("move
+the highlight"). A standalone listbox never sets it.
+
+It exists for the widget that has **nowhere to move the highlight to**: a Select whose popup is shut
+still owns its option set (the options are data), and native `<select>` changes the *value* when you
+type at a closed one. [`createCombobox`](../combobox/combobox-root.md) passes a handler that selects
+while closed and highlights while open. Read once, at creation — configuration, not reactive input.
 
 ## Call it once, in an owner scope
 

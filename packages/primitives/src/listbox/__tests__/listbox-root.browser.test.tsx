@@ -522,6 +522,30 @@ describe("createListbox — typeahead and disabled", () => {
     await vi.waitFor(() => expect(activeValues(container)).toEqual(["Cherry"]));
     dispose();
   });
+
+  it("hands a match to `onTypeaheadMatch` instead of the highlight, when one is given", async () => {
+    // The seam a composed widget intercepts — `createCombobox` uses it to *select* the match while
+    // its popup is shut, where there is no row to highlight. A standalone listbox never sets it.
+    const onTypeaheadMatch = vi.fn();
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <DataListbox
+        values={FRUITS}
+        labelOf={label}
+        options={{ ...fruitOptions(), onTypeaheadMatch }}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    state.focus.focusIndex(0);
+    await userEvent.keyboard("c"); // → Cherry, index 2
+
+    expect(onTypeaheadMatch).toHaveBeenCalledWith(2);
+    // …and the default "move the highlight" did not also happen.
+    expect(activeValues(container)).toEqual(["Apple"]);
+    dispose();
+  });
 });
 
 // ─── Grouped data source ────────────────────────────────────────────────────────────────────────
