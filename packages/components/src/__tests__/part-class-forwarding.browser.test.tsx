@@ -13,6 +13,7 @@ import { CloseButton } from "../close-button";
 import { Dialog } from "../dialog";
 import { Listbox } from "../listbox";
 import { Popover } from "../popover";
+import { Select } from "../select";
 
 /**
  * The cross-component pin for **one** invariant: every public part that renders a host element puts
@@ -295,5 +296,101 @@ describe("every public part forwards its class to the element it renders", () =>
     });
     await expectNoA11yViolations(container);
     dispose();
+  });
+
+  // Select's popup portals out of the mount container, so the probe runs against the document.
+  // `Select.Root` and `Select.Portal` render no element of their own and are exempt by design — every
+  // other part carries a recipe slot, so unlike Popover there is no slot-less part to pin separately.
+  // The tree is grouped and opened, since nothing renders until it is.
+  //
+  // It is also the one tree here that needs **landmarks**. An open Select's IDREFs cross the portal in
+  // both directions (`aria-activedescendant` out, `aria-labelledby` back), so axe has to see the whole
+  // document — and axe's `region` rule then flags a bare `<body>` child, which is a fact about this
+  // harness page rather than about Select. So the control sits in a named region and the popup portals
+  // into a `<main>`, the landmarks a real page has. `select.browser.test.tsx` does the same.
+  it("Select", async () => {
+    const portalMount = document.createElement("main");
+    document.body.appendChild(portalMount);
+    const { dispose } = mount(() => (
+      <Themed>
+        <div role="region" aria-label="Select probe">
+          <Select.Root
+            items={BASKETS}
+            groupToItems={(basket) => basket.fruits}
+            itemToValue={itemToValue}
+            itemToLabel={itemToLabel}
+            defaultValue={APPLE}
+            defaultOpen
+          >
+            <Select.Trigger
+              class="probe-trigger"
+              aria-label="fruits"
+              style={{ position: "fixed", top: "120px", left: "40px", width: "180px" }}
+            >
+              <Select.Value class="probe-value" placeholder="Pick a fruit" />
+              <Select.Icon class="probe-icon" />
+            </Select.Trigger>
+            <Select.Portal mount={portalMount}>
+              <Select.Positioner class="probe-positioner">
+                <Select.Content class="probe-content">
+                  <Select.List class="probe-list">
+                    {(basket) => (
+                      <>
+                        <Select.Group class="probe-group">
+                          <Select.GroupLabel class="probe-group-label">
+                            {(basket as Basket).kind}
+                          </Select.GroupLabel>
+                          <For each={(basket as Basket).fruits}>
+                            {(fruit) => (
+                              <Select.Item class="probe-item" item={fruit}>
+                                <Select.ItemText class="probe-item-text">
+                                  {fruit.name}
+                                </Select.ItemText>
+                                <Select.ItemIndicator class="probe-item-indicator" />
+                              </Select.Item>
+                            )}
+                          </For>
+                        </Select.Group>
+                        <Select.Separator class="probe-separator" />
+                      </>
+                    )}
+                  </Select.List>
+                </Select.Content>
+              </Select.Positioner>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+      </Themed>
+    ));
+
+    // The layer is `visibility: hidden` until the first measurement lands; axe would otherwise
+    // inspect that pre-positioned intermediate and return an `incomplete` nobody can act on.
+    await vi.waitFor(() => {
+      const positioner = document.querySelector<HTMLElement>('[data-slot="select-positioner"]');
+      expect(positioner?.style.visibility).not.toBe("hidden");
+    });
+
+    expectProbedClasses(document, {
+      "select-trigger": "probe-trigger",
+      "select-value": "probe-value",
+      "select-icon": "probe-icon",
+      "select-positioner": "probe-positioner",
+      "select-content": "probe-content",
+      "select-list": "probe-list",
+      "select-group": "probe-group",
+      "select-group-label": "probe-group-label",
+      "select-separator": "probe-separator",
+      "select-item": "probe-item",
+      "select-item-text": "probe-item-text",
+      "select-item-indicator": "probe-item-indicator",
+    });
+    await expectNoA11yViolations(document.body, {
+      // Axe returns `aria-valid-attr-value` as *incomplete* for any element carrying both
+      // `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by
+      // construction. The IDREF itself is pinned in `select.browser.test.tsx`.
+      allowIncomplete: ["aria-valid-attr-value"],
+    });
+    dispose();
+    portalMount.remove();
   });
 });

@@ -13,3 +13,4 @@ export * from "./close-button";
 export * from "./dialog";
 export * from "./listbox";
 export * from "./popover";
+export * from "./select";

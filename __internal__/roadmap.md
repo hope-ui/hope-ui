@@ -132,8 +132,8 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
 | Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes, native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21) |
-| Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select |
-| Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer |
+| Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select. **No virtual mode** — see §3 |
+| Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer. Inherits Select's **no virtual mode** — see §3, where the filter is what makes it worth revisiting |
 | Autocomplete | Collections | 2/5 | Combobox, minus selection state | **not a rename of Combobox** — free-text value, list is suggestions. See #21 |
 | Menu / DropdownMenu | Overlays | 5/5 | `createCollection` + `createFloating`* + `createHoverIntent`* + submenus | |
 | ContextMenu | Overlays | 2/5 | Menu variant (pointer-anchored) | |
@@ -287,6 +287,43 @@ JSX-preserved build.
 
 Whatever lands should be enforced by the type system or a `scripts/check-*.mjs`, not by a comment —
 the current defense is two comments telling the next reader not to tidy.
+
+### Virtualization for Select and Combobox
+
+**Neither has a virtual mode, and the exclusion is deliberate rather than unfinished.** `Listbox`
+ships one — `estimateSize` selects `createVirtualCollection`, `Listbox.Item` takes an `index`, and
+`Listbox.Root` renders the sizer — but `Select` `Omit`s `estimateSize`/`overscan` from its props
+entirely, and `Combobox` will inherit that when it lands.
+
+**Why it cannot just be switched on.** A windowed row is *recycled*: its position changes while the
+component stays mounted, so only the row itself can know its index, which is why `Listbox.Item` takes
+one. Select's item deliberately takes **only `item`** and resolves its own position through
+`indexOfValue` — that is what lets an option sit at any depth, and therefore what makes grouping a
+plain nested `<For>` instead of library-emitted chrome. `indexOfValue` returns `-1` by construction in
+virtual mode, so an item-only row in a windowed list would dev-warn once per row and register nothing.
+Excluding the option from the type turns that silent nothing into a compile error. Rationale and the
+rejected alternative are in [`components/decisions.md`](components/decisions.md) § Select.
+
+**Why it will be asked for.** A Select over a few hundred options is the common case and needs
+nothing; the pressure comes from Combobox, where a filter over several thousand rows is the ordinary
+shape (a country/currency/SKU picker) and mounting the unfiltered set is the visible cost. The
+machinery is already paid for — `createVirtualCollection`, `scrollIndexIntoView`, and the windowing
+half of `createListboxItem` all exist and are exercised by Listbox.
+
+**Candidate directions, none chosen:**
+1. A separate `Select.VirtualItem` / `Combobox.VirtualItem` part taking `index`, with `List` emitting
+   the sizer when `estimateSize` is set. Keeps `item` meaning one thing on the common path; costs a
+   second row part and a second authoring shape to document.
+2. Teach the data source to keep an identity→index map that survives windowing, so `indexOfValue`
+   answers in virtual mode too and `Select.Item` stays item-only. The honest version of "just make it
+   work", and the expensive one: it needs the full item set resident anyway, which is most of what
+   windowing was avoiding.
+3. Leave both non-virtual and route the case to `Listbox` inside a `Popover`. Cheapest, and loses the
+   trigger ARIA, closed-trigger typeahead and the hidden `<select>` — i.e. most of what Select is.
+
+**The constraint on any fix:** it must not put "provide exactly one of `item` / `index`" back on the
+common path. That sentence being absent from Select's API is the whole return on decision 6, and a
+grouped list is the shape that pays for it.
 
 ---
 

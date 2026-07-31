@@ -53,6 +53,7 @@ export const HYDRATION_ENTRIES: Record<string, string> = {
   dialog: join(repoRoot, "packages/components/src/dialog/__tests__/dialog.ssr-entry.tsx"),
   listbox: join(repoRoot, "packages/components/src/listbox/__tests__/listbox.ssr-entry.tsx"),
   popover: join(repoRoot, "packages/components/src/popover/__tests__/popover.ssr-entry.tsx"),
+  select: join(repoRoot, "packages/components/src/select/__tests__/select.ssr-entry.tsx"),
   calendar: join(repoRoot, "packages/components/src/calendar/__tests__/calendar.ssr-entry.tsx"),
   // The two locale-plumbing variants of the calendar tree, hydrated against a non-`en-US` browser to
   // prove both survive the round-trip: zero-config (`-no-provider`) and a provider with no `locale`

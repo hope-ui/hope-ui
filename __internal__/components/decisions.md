@@ -120,3 +120,45 @@ The accepted cost is that `Dialog.Close` now requires a `ThemeProvider`, and the
 component may import a sibling component's subpath dates from this change. Its two constraints — no
 circular component imports, and never couple a component's behavior to a heavier sibling — are what
 keep that from becoming a licence to compose anything with anything.
+
+## Select
+
+### A `Select.Item index` prop, so virtual mode works
+**Why not:** `index` is a *mechanism*, not information the author has, and the whole reason
+`Select.Item` takes `item` is that a row can then sit anywhere in the subtree — which is what makes
+grouping a plain nested `<For>` rather than a library-emitted wrapper. Reintroducing `index` for the
+one mode that needs it would put both on the public surface and make "provide exactly one of" the
+API's first sentence.
+
+The cost is real and is paid deliberately: **Select has no virtual mode.** `indexOfValue` is `-1` by
+construction in virtual mode, so an item-only row could never register there — it would dev-warn per
+row and silently do nothing. So `estimateSize`/`overscan` are `Omit`-ted from `SelectRootProps`,
+which turns that into a compile error instead. A virtualized picker is `Listbox`'s job, and
+`Listbox.Item` keeps its `index` for exactly this reason.
+
+**Revisit if:** a virtualized Select is actually asked for. The honest shape would be a separate
+`Select.VirtualItem` part, not a second meaning for `item`.
+
+### A `matchTriggerWidth` recipe variant, mirroring Popover's `matchAnchorWidth`
+**Why not:** Popover has two genuinely competing widths (shrink-wrapped, or pinned to the anchor),
+which is why its recipe spends compound variants keeping the losing one from ever being emitted. A
+Select has **one**: the popup matches the trigger, always. Making that an axis would introduce the
+base-width-beaten-by-a-variant-width override that machinery exists to prevent, in exchange for an
+option nobody picking a Select wants. `w-(--anchor-width)` therefore sits alone in the `positioner`
+base, and a consumer who needs something else overrides that slot.
+
+### A `placeholder` recipe slot for the empty value
+**Why not:** Nothing extra is *rendered* when the selection is empty — the same element shows
+different text — so a slot would be a second class list for one element. `createComboboxValue`
+already writes a present-empty `data-placeholder`, so the recipe styles one `data-placeholder:`
+variant on the `value` slot. Same argument Listbox's contract makes against a `selectionMode` variant:
+a state is not a slot.
+
+### Deriving `Select.List`'s iteration from `state.list.indexed` instead of putting `items` on context
+**Why not:** The kernel's source is **flattened** into navigation order, which is exactly what the
+keymap needs and exactly what `Select.List` must not iterate — the group boundaries are gone from it.
+`createDataCollection` does expose a `groups()` accessor, but it is not on the abstract
+`IndexedItemSource` the listbox return is typed at, so reaching it means casting the source back to a
+concrete implementation inside a component. The consumer's own array is the only place the grouped
+shape still exists, so `Select.Root` puts it on the context and `Select.List` iterates that —
+`Listbox.Root` already iterates its own `merged.items` the same way.

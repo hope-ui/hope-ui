@@ -18,7 +18,8 @@
       "close-button": "src/close-button/index.ts",
       "dialog": "src/dialog/index.ts",
       "listbox": "src/listbox/index.ts",
-      "popover": "src/popover/index.ts"
+      "popover": "src/popover/index.ts",
+      "select": "src/select/index.ts"
     }
   },
   "exports": {
@@ -53,6 +54,10 @@
     "./popover": {
       "types": "./dist/popover/index.d.ts",
       "solid": "./dist/popover/index.jsx"
+    },
+    "./select": {
+      "types": "./dist/select/index.d.ts",
+      "solid": "./dist/select/index.jsx"
     },
     "./package.json": "./package.json"
   },

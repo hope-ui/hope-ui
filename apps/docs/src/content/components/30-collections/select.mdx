@@ -1,0 +1,1254 @@
+import { Alert } from "@hope-ui/components/alert";
+import { SelectBasicDemo } from "~/components/demos/select/SelectBasicDemo";
+import { SelectControlledDemo } from "~/components/demos/select/SelectControlledDemo";
+import { SelectObjectItemsDemo } from "~/components/demos/select/SelectObjectItemsDemo";
+import { SelectMultipleDemo } from "~/components/demos/select/SelectMultipleDemo";
+import { SelectGroupedDemo } from "~/components/demos/select/SelectGroupedDemo";
+import { SelectSizesDemo } from "~/components/demos/select/SelectSizesDemo";
+import { SelectFormDemo } from "~/components/demos/select/SelectFormDemo";
+import { SelectPolymorphicDemo } from "~/components/demos/select/SelectPolymorphicDemo";
+import { Anatomy } from "~/components/Anatomy";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "Trigger that opens a list of options to choose from.";
+
+export const description =
+  "A trigger showing the current choice, and a floating list of options to change it — the ARIA 1.2 combobox pattern, with the keyboard, type-ahead, grouping and native form submission a plain select element gives you, and none of its styling limits.";
+
+# Select
+
+{description}
+
+## Import
+
+```tsx
+import { Select } from "@hope-ui/components/select";
+```
+
+`Select` is a **compound** component — a namespace object whose parts you compose yourself. See the
+[Anatomy](#anatomy) below for every part and how they nest.
+
+## Usage
+
+`Select.Root` takes the whole option set as `items` and owns the state (selection, open/close,
+keyboard, type-ahead, positioning, ARIA); it renders **no element** of its own. `Select.Trigger` is
+the control the reader sees and the widget's focus owner, holding a `Select.Value` (the current
+choice) and a `Select.Icon` (the chevron). Everything from `Select.Portal` down is the popup, and
+`Select.List` takes a **render callback** invoked once per `items` entry.
+
+For the simplest case — an array of strings — there is nothing to configure: the item *is* its value,
+its label, and its type-ahead text.
+
+<Preview>
+  <SelectBasicDemo />
+</Preview>
+
+```tsx
+<Select.Root items={["Apple", "Banana", "Cherry"]}>
+  <Select.Trigger aria-label="Choose a fruit">
+    <Select.Value placeholder="Pick a fruit" />
+    <Select.Icon />
+  </Select.Trigger>
+  <Select.Portal>
+    <Select.Positioner>
+      <Select.Content>
+        <Select.List>
+          {(entry) => (
+            <Select.Item item={entry}>
+              <Select.ItemText>{entry as string}</Select.ItemText>
+              <Select.ItemIndicator />
+            </Select.Item>
+          )}
+        </Select.List>
+      </Select.Content>
+    </Select.Positioner>
+  </Select.Portal>
+</Select.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="danger"
+  class="not-prose"
+  description={
+    <div>
+      <strong>Name the trigger.</strong> Select ships no <code>Label</code> part — labelling a field
+      is a future <code>Field</code>'s job — so an <code>aria-label</code>, or an{" "}
+      <code>aria-labelledby</code> pointing at your own <code>&lt;label&gt;</code>, is mandatory on{" "}
+      <code>Select.Trigger</code>. A nameless <code>role="combobox"</code> is an axe{" "}
+      <code>aria-input-field-name</code> violation, and the <code>role="listbox"</code> popup
+      inherits its name from the trigger, so one missing attribute leaves both unnamed.
+    </div>
+  }
+/>
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Because Select reads a recipe, it needs a <code>&lt;ThemeProvider&gt;</code> ancestor fed a
+      preset, as every styled hope-ui component does.
+    </div>
+  }
+/>
+
+## Anatomy
+
+The nesting below the portal is fixed, and it is [`Popover`](/components/popover)'s spine: `Portal`
+lifts the layer out of the page's stacking and overflow contexts, `Positioner` is the element the
+positioning engine measures and moves, and `Content` is the card. The split between the last two is
+load-bearing — the card's enter/exit `translate` would otherwise fight the `translate()` written onto
+the positioner.
+
+`Content` and `List` stay distinct for a different reason: a `role="listbox"` may only contain options
+and groups, so anything that is *not* an option belongs in the card beside the list, never inside it.
+
+<Anatomy
+  root={{
+    name: "Select.Root",
+    children: [
+      {
+        name: "Select.Trigger",
+        children: [{ name: "Select.Value" }, { name: "Select.Icon" }],
+      },
+      {
+        name: "Select.Portal",
+        children: [
+          {
+            name: "Select.Positioner",
+            children: [
+              {
+                name: "Select.Content",
+                children: [
+                  {
+                    name: "Select.List",
+                    children: [
+                      {
+                        name: "Select.Item",
+                        children: [{ name: "Select.ItemText" }, { name: "Select.ItemIndicator" }],
+                      },
+                      {
+                        name: "Select.Group",
+                        note: "with groupToItems",
+                        children: [{ name: "Select.GroupLabel" }, { name: "Select.Item" }],
+                      },
+                      { name: "Select.Separator", note: "optional" },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }}
+/>
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Select.Root",
+      element: "—",
+      description:
+        "State owner: the items, selection, open state, keyboard, type-ahead, ids, positioning, and the resolved recipe. Renders no host element — a context provider plus the hidden native field.",
+    },
+    {
+      part: "Select.Trigger",
+      element: "button[role=combobox]",
+      description:
+        "The control, and the focus owner: it keeps DOM focus open or closed, owns the entire keymap, and is the element the popup is positioned against. Wires aria-haspopup / aria-expanded / aria-controls / aria-activedescendant.",
+    },
+    {
+      part: "Select.Value",
+      element: "span",
+      description:
+        "The current selection's text inside the trigger. Its id is prepended to the trigger's aria-labelledby, so the value is announced before the label. Carries data-placeholder while nothing is selected.",
+    },
+    {
+      part: "Select.Icon",
+      element: "span",
+      description:
+        "The chevron. Decorative and aria-hidden — it says nothing the trigger's aria-expanded does not. Renders the theme's chevronIcon unless given children.",
+    },
+    {
+      part: "Select.Portal",
+      element: "—",
+      description:
+        "Portals the Positioner to document.body (client-only), so no ancestor's overflow or transform can clip the popup.",
+    },
+    {
+      part: "Select.Positioner",
+      element: "div",
+      description:
+        "The measured layer. Its position / left / top / transform are written inline by the positioning engine; it reports the resolved geometry as data-side / data-align and publishes --anchor-width and --available-height.",
+    },
+    {
+      part: "Select.Content",
+      element: "div",
+      description:
+        "The card, and the behavior hub: dismissal, and — under modal, the default — hiding the rest of the page from assistive tech plus the scroll lock. Carries no role: the card is chrome.",
+    },
+    {
+      part: "Select.List",
+      element: "div[role=listbox]",
+      description:
+        "The options' container and the scroll container. Iterates Root's items itself: its child is a render callback invoked once per entry.",
+    },
+    {
+      part: "Select.Item",
+      element: "div[role=option]",
+      description:
+        "One option. Owns aria-selected, the active/selected/disabled data attributes, and the pointer handlers. Give it item — the entry it renders; it resolves its own position from that, so it can sit at any depth.",
+    },
+    {
+      part: "Select.ItemText",
+      element: "span",
+      description:
+        "The option's label — a truncating box, so a long label ellipsizes instead of pushing the check out of its gutter. Optional: a row may put its label straight in Select.Item's children.",
+    },
+    {
+      part: "Select.ItemIndicator",
+      element: "span",
+      description:
+        "The selection check, shown only while its row is selected. Renders the theme's checkIcon unless given children.",
+    },
+    {
+      part: "Select.Group",
+      element: "div[role=group]",
+      description:
+        "A labelled section, named by its GroupLabel via aria-labelledby. Needs groupToItems on Root.",
+    },
+    {
+      part: "Select.GroupLabel",
+      element: "div",
+      description: "Names its Group. Self-registers its id as the group's aria-labelledby.",
+    },
+    {
+      part: "Select.Separator",
+      element: "div[role=presentation]",
+      description:
+        "A decorative hairline between sections (aria-hidden — never reported as an option).",
+    },
+  ]}
+/>
+
+## Controlled value
+
+Left uncontrolled, a Select owns its selection; `defaultValue` gives it a starting one. Drive `value`
+and handle `onChange` to own it yourself.
+
+The value is a **scalar in single mode** — a single Select hands back the item itself, never
+`[item]`, and `null` is how "nothing selected" is spelled. Whether it is a scalar or an array is
+inferred from `selectionMode`, so nothing is cast at the call site.
+
+<Preview>
+  <SelectControlledDemo />
+</Preview>
+
+```tsx
+const [fruit, setFruit] = createSignal<string | null>("Cherry");
+
+<Select.Root items={FRUIT_NAMES} value={fruit()} onChange={setFruit}>
+  {/* … */}
+</Select.Root>;
+```
+
+The open state works the same way: `defaultOpen` for uncontrolled, or `open` + `onOpenChange` to own
+it. Every path in and out — the trigger, a keystroke, Escape, an outside press, picking an option —
+routes through `onOpenChange` first.
+
+```tsx
+<Select.Root open={open()} onOpenChange={setOpen}>…</Select.Root>
+```
+
+## Your own objects
+
+Your items are your own objects and stay that way: every question the Select asks about one is an
+**accessor function**, never a required key name.
+
+- `itemToValue` — the selection identity (compared for equality, and the string a form submits).
+  Defaults to `String`.
+- `itemToLabel` — the display and type-ahead text. Defaults to `itemToValue`.
+- `isItemDisabled` — whether the row is dimmed and skipped. `skipDisabled` (default `true`) governs
+  the skipping; disable the **whole** control with `disabled` on `Select.Root`.
+
+All three are answered from the **data**, before a row has mounted — which is what lets a *closed*
+Select run type-ahead over the whole set, and what lets it skip a disabled option it has never
+rendered.
+
+<Preview>
+  <SelectObjectItemsDemo />
+</Preview>
+
+```tsx
+<Select.Root
+  items={fruits}
+  itemToValue={(fruit) => String(fruit.id)}
+  itemToLabel={(fruit) => fruit.name}
+  isItemDisabled={(fruit) => fruit.outOfSeason}
+  defaultValue={fruits[2]}
+>
+  {/* … */}
+  <Select.List>{(fruit: Fruit) => <FruitItem fruit={fruit} />}</Select.List>
+</Select.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      <code>Select.List</code>'s callback parameter is the one thing you annotate yourself:{" "}
+      <code>{"{(fruit: Fruit) => …}"}</code>. A generic cannot flow through a Solid context, so the
+      item type <code>Select.Root</code> inferred cannot reach the parts below it — the annotation is
+      what binds it, at the one call site that knows. Everything nested inside then infers normally,
+      including the group's own <code>&lt;For&gt;</code>. <code>Select.Value</code>'s summary callback
+      works the same way.
+    </div>
+  }
+/>
+
+## Selection modes
+
+`selectionMode` controls how many options can be chosen at once — the same vocabulary
+[`Listbox`](/components/listbox) uses, never a `multiple` boolean:
+
+- **`single`** (default) — one option; choosing another replaces it, and the popup closes.
+- **`multiple`** — a set; the popup stays open while you tick rows, because
+  `shouldCloseOnSelect` defaults to `selectionMode !== "multiple"`.
+- **`none`** — nothing is ever selected; the arrows and type-ahead still move the highlight. A menu
+  of commands rather than a field.
+
+The mode also types the value: scalar (`V | null`) in `single`, an array (`V[]`) in `multiple`.
+
+A comma-joined list of labels overflows a trigger fast, so `Select.Value` takes a **callback** and
+lets you summarize the selection instead. It receives the selected items — an array in *both* modes,
+because that is the shape the underlying list holds.
+
+<Preview>
+  <SelectMultipleDemo />
+</Preview>
+
+```tsx
+<Select.Root selectionMode="multiple" value={fruits()} onChange={setFruits}>
+  <Select.Trigger aria-label="Choose fruits">
+    <Select.Value placeholder="Any fruit">
+      {(values: Fruit[]) =>
+        values.length === 1 ? (values[0] as Fruit).name : `${values.length} fruits selected`
+      }
+    </Select.Value>
+    <Select.Icon />
+  </Select.Trigger>
+  {/* … */}
+</Select.Root>
+```
+
+With no `children`, `Select.Value` joins the selected labels with `", "` — which is exactly right for
+a single Select, and the reason the callback exists for the others.
+
+## Groups and separators
+
+Set `groupToItems` and `items` becomes your **group entries**: it flattens them into navigation order,
+which is the only thing the Select needs from a group. Your callback then goes one level up — it is
+invoked per group, and you iterate that group's own items with a plain `<For>`.
+
+The group's *name* never reaches the Select: you render it from your own key, which is why there is no
+`groupToLabel` and no `{ label, items }` shape to conform to. Wrap each section in a `Select.Group`
+with a `Select.GroupLabel`, and divide them with a `Select.Separator`. Keyboard navigation flows
+across groups as one list — the arrows skip the labels and the hairline.
+
+<Preview>
+  <SelectGroupedDemo />
+</Preview>
+
+```tsx
+// Nested straight from your API — no remapping, no required key names.
+// [{ kind: "Citrus", fruits: [{ id, name }, …] }, …]
+
+<Select.Root
+  items={baskets}
+  groupToItems={(basket) => basket.fruits}
+  itemToValue={itemToValue}
+  itemToLabel={itemToLabel}
+>
+  {/* … */}
+  <Select.List>
+    {(basket: Basket, index) => (
+      <>
+        <Show when={index() > 0}>
+          <Select.Separator />
+        </Show>
+        <Select.Group>
+          <Select.GroupLabel>{basket.kind}</Select.GroupLabel>
+          <For each={basket.fruits}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+        </Select.Group>
+      </>
+    )}
+  </Select.List>
+</Select.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      The rendered order must match the flattened <code>items</code> order — that is what the arrow
+      keys and type-ahead traverse. It holds by construction when the inner <code>&lt;For&gt;</code>{" "}
+      iterates the array <code>groupToItems</code> returned, and an <code>item</code> that isn't in{" "}
+      <code>items</code> logs a development warning naming it.
+    </div>
+  }
+/>
+
+## Sizes
+
+The `size` prop scales density across `sm`, `md` (the default), and `lg` — and it scales the trigger
+**and** the popup together, because the two have to agree: a `lg` control opening an `md` list is the
+one way this can look broken. There is no color axis; a Select is a neutral control over a neutral
+overlay, and its only accents are the transient highlight and the persistent selection.
+
+<Preview>
+  <SelectSizesDemo />
+</Preview>
+
+```tsx
+<Select.Root size="sm">…</Select.Root>
+<Select.Root size="md">…</Select.Root>
+<Select.Root size="lg">…</Select.Root>
+```
+
+## Long option lists
+
+The popup caps its height at the space measured to the viewport edge (`--available-height`) and
+`Select.List` scrolls inside the card, so the rounded corners and the border stay still while the rows
+move. Arrowing past the fold scrolls the highlighted row into view — in this pattern nothing else
+would, since no option ever takes DOM focus.
+
+Nothing renders until the popup opens, either. The options are **data** held on `Select.Root`, not
+mounted elements, so a form with ten Selects mounts zero option lists; the closed control still runs
+type-ahead over the full set, still knows whether the list would be empty, and still server-renders
+every native `<option>` for autofill.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      <strong>Select does not virtualize, on purpose.</strong> There is no{" "}
+      <code>estimateSize</code> / <code>overscan</code> here: a windowed row is <em>recycled</em>, so
+      its position changes while it stays mounted and only the row itself knows it — which is why{" "}
+      <code>Listbox.Item</code> takes an <code>index</code>. <code>Select.Item</code> takes only{" "}
+      <code>item</code>, and excluding the option from the type turns "every row silently warns and
+      nothing registers" into a compile error. For a picker over tens of thousands of rows, reach for
+      a <a href="/components/listbox">Listbox</a> instead.
+    </div>
+  }
+/>
+
+## The popup
+
+`side` picks which side of the trigger the popup prefers (default `"bottom"`) and `align` skids it
+along that side's cross axis (default `"center"`) — but both are a **preference**, not a promise: near
+a viewport edge the card flips to the opposite side and slides to stay in view, and what the parts
+report as `data-side` / `data-align` is where it actually landed. The component's own defaults are a
+`sideOffset` of `4` (the small gap a picker keeps from its control) and a `collisionPadding` of `8`
+(the gutter kept off the viewport edge).
+
+The width is not a decision you make: the popup always matches the trigger, via the `--anchor-width`
+the positioner publishes and the recipe spends. That is what a Select *is*. Override the `positioner`
+slot if you need something else.
+
+```tsx
+<Select.Root side="top" sideOffset={8} collisionPadding={16} flip={false}>…</Select.Root>
+```
+
+`Select.Portal` renders the layer at the end of `<body>`, so a Select inside a scroll container, a
+table cell, or a `transform`ed ancestor is never clipped by it — while the position stays glued to the
+trigger as the container scrolls (`autoUpdate`, on by default). Pass `mount` to portal somewhere else,
+and `trackAnchorMotion` for a trigger that moves under a CSS transform.
+
+An open Select is **modal** by default: the rest of the page is hidden from assistive technology and
+body scroll is locked. Note what that does *not* include — no focus trap and no backdrop, because
+focus never leaves the trigger in the first place. Pass `modal={false}` to keep the page scrollable
+behind the popup.
+
+Finally, `allowsEmptyCollection` (default `false`) keeps the popup shut when there is nothing to
+choose from — a guard only a data-driven option set can offer, since a DOM-registered collection is
+always empty before it opens.
+
+## Dismissal
+
+An open Select light-dismisses three ways, each independently switchable: **Escape**, a **pointer-down
+outside** the popup, and **focus landing outside** it. All three are on by default, and focus returns
+to the trigger — where, in this pattern, it never left.
+
+```tsx
+<Select.Root closeOnEscape={false} closeOnInteractOutside={false}>…</Select.Root>
+```
+
+A Select nested inside a Dialog or a Popover takes the first Escape on its own and leaves the layer
+below it standing; set `bubbles` if you'd rather one keystroke took the whole chain.
+
+```tsx title="One Escape closes this popup and everything under it"
+<Select.Root bubbles={{ escapeKey: true }}>…</Select.Root>
+```
+
+## Native form submission
+
+Set `name` and the Select renders a real, visually-clipped `<select>` beside the trigger — so a plain
+`<form>` submit carries the choice with no extra wiring. The submitted strings are the `itemToValue`
+values (here, the fruit ids), not the labels. Add `form` to associate the field with a form by id.
+
+Because it is a **real** `<select>` holding one `<option>` per item — server-side too — three things
+come for free that a hidden input cannot give you: the browser can **autofill** it, `required`
+genuinely **blocks** submission (and moves focus to the trigger rather than to a control nobody can
+see), and the form's **reset** button puts the selection back to where it started.
+
+<Preview>
+  <SelectFormDemo />
+</Preview>
+
+```tsx
+<form onSubmit={handleSubmit}>
+  <Select.Root name="fruit" required items={fruits} itemToValue={(f) => String(f.id)}>
+    {/* … */}
+  </Select.Root>
+  <Button type="submit">Submit</Button>
+</form>
+```
+
+## Keyboard interactions
+
+Select implements the WAI-ARIA 1.2 combobox keyboard pattern. Every key is handled on the **trigger**,
+because there is nowhere else for it to live: no option is ever focused, so no option ever receives a
+keystroke.
+
+<DataTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "closed", label: "Closed" },
+    { key: "open", label: "Open" },
+  ]}
+  rows={[
+    {
+      key: "↓ / Alt + ↓",
+      closed: "Opens the popup on the first option.",
+      open: "Moves the highlight to the next option (disabled rows are skipped).",
+    },
+    {
+      key: "↑",
+      closed: "Opens the popup on the last option.",
+      open: "Moves the highlight to the previous option.",
+    },
+    { key: "Alt + ↑", closed: "Opens the popup on the last option.", open: "Closes the popup." },
+    {
+      key: "Enter / Space",
+      closed: "Opens the popup on the selected option.",
+      open: "Selects the highlighted option, and closes unless shouldCloseOnSelect is off.",
+    },
+    {
+      key: "Escape",
+      closed: "Not consumed — a Select inside a Dialog never swallows the Dialog's Escape.",
+      open: "Closes the popup. Focus stays on the trigger.",
+    },
+    { key: "Home / End", closed: "", open: "Moves the highlight to the first / last option." },
+    { key: "PageUp / PageDown", closed: "", open: "Moves the highlight by a page." },
+    {
+      key: "type to search",
+      closed: "Selects the first matching option outright, without opening — native <select> behavior.",
+      open: "Moves the highlight to the first matching option.",
+    },
+  ]}
+/>
+
+Type-ahead reads `itemToLabel` (else `itemToValue`) from your data rather than the rendered text,
+which is what lets a closed Select match a row that has never mounted. It is collator-backed with
+`sensitivity: "base"`, so typing `cafe` matches `Café`. The closed-selects-outright shortcut is single
+mode only: in `multiple`, a repeated letter would select and immediately deselect, so a closed match
+sets the highlight for the next open instead.
+
+## Polymorphism
+
+Render a part as a different element or component with the `render` prop — a function that receives
+the part's computed props and spreads them onto your element. Every part except `Select.Root` and
+`Select.Portal` accepts it. There is **no `as` prop**; `render` is the single polymorphism API.
+
+<Preview>
+  <SelectPolymorphicDemo />
+</Preview>
+
+```tsx title="The trigger, wearing your own chrome"
+<Select.Trigger
+  aria-label="Choose a fruit"
+  render={(props) => <button {...props} class="rounded-full border border-strong px-4 py-1.5" />}
+>
+  <Select.Value placeholder="Pick a fruit" />
+  <Select.Icon />
+</Select.Trigger>
+```
+
+Setting `class` *after* the spread is what replaces the recipe's `trigger` chrome rather than merging
+into it. Everything else rides through the spread untouched — the `role="combobox"`, the popup ARIA,
+and the whole keymap.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      A <code>render</code> target must spread <strong>every</strong> prop it is handed,{" "}
+      <code>ref</code> included, and it must be a valid host for the role it is given (a{" "}
+      <code>role="listbox"</code> on a <code>&lt;section&gt;</code> is an axe violation). The internal
+      refs are load-bearing and fail <em>silently</em>: the trigger's is the positioning anchor and
+      the one element modality spares, the positioner's is what gets measured and moved, the
+      content's is what dismissal and the scroll lock read, and the list's is the scroll container an
+      offscreen highlighted row is scrolled inside.
+    </div>
+  }
+/>
+
+If the target is not a real `<button>`, pass `nativeButton={false}` on `Select.Trigger` alongside it,
+so the disabled behavior switches to `tabIndex` / `aria-disabled` and keyboard activation is
+synthesized.
+
+## Theming
+
+Select's look comes from the active preset's recipe. It is **two surfaces in one recipe** — a form
+control and a floating card — with a single `size` axis and no color axis. Override styling at three
+levels, applied in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` →
+instance `slotClasses` / part `class`**.
+
+### Parts
+
+Every styled part carries a `data-slot` attribute you can target, and each is addressable by name
+through `slotClasses`. There is no `root` slot (`Select.Root` renders no element) and no `portal`
+slot, for the same reason.
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      slot: "trigger",
+      attr: "select-trigger",
+      description: "The control: the raised surface, the hairline, the focus ring, the density.",
+    },
+    {
+      slot: "value",
+      attr: "select-value",
+      description:
+        "The current selection's text. The empty state is this slot's data-placeholder: variant, not a slot of its own — nothing extra is rendered when the selection is empty, only styled differently.",
+    },
+    { slot: "icon", attr: "select-icon", description: "The chevron's box." },
+    {
+      slot: "positioner",
+      attr: "select-positioner",
+      description:
+        "The measured layer, where --anchor-width and --available-height are published. Stacking and width only — never anything positional, which would fight the inline style the engine writes.",
+    },
+    {
+      slot: "content",
+      attr: "select-content",
+      description: "The popup card, its elevation, and the enter/exit transition.",
+    },
+    {
+      slot: "list",
+      attr: "select-list",
+      description: "The scroll container inside the card.",
+    },
+    {
+      slot: "item",
+      attr: "select-item",
+      description: "An option row — carries the highlight and the selected/disabled state.",
+    },
+    { slot: "itemText", attr: "select-item-text", description: "The option's truncating label box." },
+    {
+      slot: "itemIndicator",
+      attr: "select-item-indicator",
+      description: "The selection check's placement in the trailing gutter.",
+    },
+    { slot: "group", attr: "select-group", description: "A labelled section wrapper." },
+    {
+      slot: "groupLabel",
+      attr: "select-group-label",
+      description: "The small, muted section label.",
+    },
+    {
+      slot: "separator",
+      attr: "select-separator",
+      description: "The hairline divider between sections.",
+    },
+  ]}
+/>
+
+The positioner and the content also report the resolved geometry as `data-side` / `data-align`, and
+their transition state as `data-presence` — which is how the preset animates the card in from the
+trigger's direction. The highlight is `data-active` on a row, never a `hover:` state: the keyboard and
+the pointer share one active option, so a hover background would paint a second highlight the moment
+the cursor lagged a frame behind.
+
+```css title="Targeting the resolved side"
+[data-slot="select-content"][data-side="top"] { /* … */ }
+```
+
+### Overriding one Select
+
+Set `slotClasses` on `Select.Root` to reach any slot from one place, or put `class` on an individual
+part. Use literal class strings so your Tailwind build can see them.
+
+```tsx
+<Select.Root slotClasses={{ content: "shadow-2xl", item: "rounded-md font-mono" }}>
+  {/* … */}
+</Select.Root>
+
+// …or per part:
+<Select.Trigger class="font-mono">…</Select.Trigger>
+```
+
+The two glyphs are per-instance overridable as plain children — `Select.Icon` and
+`Select.ItemIndicator` each render the theme's default only when given none.
+
+```tsx
+<Select.Icon>
+  <CaretIcon />
+</Select.Icon>
+```
+
+### App-wide defaults & overrides
+
+Set the default `size`, both glyphs, and global part classes for **every** Select through the theme
+with `definePreset`, then pass the derived preset to `ThemeProvider`. `defaultProps` resolve at
+**instance ?? preset ?? builtin** precedence, so an explicit prop on a single Select always wins.
+
+```tsx title="theme.tsx"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    select: {
+      defaultProps: {
+        size: "sm",
+        chevronIcon: () => <CaretIcon />,
+        checkIcon: () => <TickIcon />,
+      },
+      slotClasses: { content: "rounded-none" },
+    },
+  },
+});
+```
+
+Both glyphs are **factories** (`() => JSX.Element`), never a built element: a preset value is one
+object shared by every instance, and an already-built Solid node would *move* rather than be reused.
+
+`size` is the recipe's only variant, so it is the one styling prop defaultable app-wide. Positioning,
+`selectionMode`, `modal` and the dismissal props change behavior rather than looks and stay on the
+instance.
+
+## API
+
+### Select.Root
+
+`Select.Root<V, M>` is generic in your item type `V` and its selection mode `M`. It renders no host
+element, so it takes no native attributes — only the props below.
+
+<PropsTable
+  rows={[
+    {
+      prop: "items",
+      type: "readonly G[]",
+      default: "",
+      description:
+        "Required. The whole option set, in navigation order — your items for a flat list, or the group entries when groupToItems is set. Held here rather than in the popup, which is what lets a closed Select do type-ahead and server-render its native options.",
+    },
+    {
+      prop: "groupToItems",
+      type: "(group: G) => readonly V[]",
+      default: "",
+      description:
+        "Maps a group entry to its own items, flattening items into navigation order. Setting it switches Select.List's callback from per-item to per-group.",
+    },
+    {
+      prop: "itemToValue",
+      type: "(item: V) => string",
+      default: "String",
+      description:
+        "Maps an item to its selection identity — compared for equality and submitted to a form. Must be unique per item. It is not the row's DOM id, which is generated.",
+    },
+    {
+      prop: "itemToLabel",
+      type: "(item: V) => string",
+      default: "itemToValue",
+      description:
+        "Maps an item to its display / type-ahead text. Read from the data, so it works for a row that has not mounted — there is no textContent fallback.",
+    },
+    {
+      prop: "isItemDisabled",
+      type: "(item: V) => boolean",
+      default: "false",
+      description:
+        "Whether an item is disabled — dimmed, and skipped by navigation and type-ahead unless skipDisabled is off. It can never be selected.",
+    },
+    {
+      prop: "isItemEqualToValue",
+      type: "(a: V, b: V) => boolean",
+      default: "by itemToValue",
+      description:
+        "Full override of value equality. Defaults to comparing itemToValue(a) === itemToValue(b).",
+    },
+    {
+      prop: "selectionMode",
+      type: '"single" | "multiple" | "none"',
+      default: '"single"',
+      description:
+        "How many options can be selected at once. It also types value / defaultValue / onChange as a scalar or an array.",
+    },
+    {
+      prop: "value",
+      type: "V | null (single) · V[] (multiple)",
+      default: "",
+      description:
+        "Controlled selection. null is a controlled 'nothing selected'; omit the prop entirely for uncontrolled use.",
+    },
+    {
+      prop: "defaultValue",
+      type: "V | null (single) · V[] (multiple)",
+      default: "",
+      description: "Initial selection when uncontrolled.",
+    },
+    {
+      prop: "onChange",
+      type: "(value: V | null | V[]) => void",
+      default: "",
+      description: "Called on every selection change, in the same shape as value.",
+    },
+    {
+      prop: "open",
+      type: "boolean",
+      default: "",
+      description: "Controlled open state. Leave unset for uncontrolled (defaults to defaultOpen).",
+    },
+    {
+      prop: "defaultOpen",
+      type: "boolean",
+      default: "false",
+      description: "Initial open state when uncontrolled.",
+    },
+    {
+      prop: "onOpenChange",
+      type: "(open: boolean) => void",
+      default: "",
+      description:
+        "Called on every open/close request — the trigger, a keystroke, Escape, an outside press, and choosing an option.",
+    },
+    {
+      prop: "allowsEmptyCollection",
+      type: "boolean",
+      default: "false",
+      description:
+        "Whether the popup may open with no options in it. A listbox with nothing to choose from is a dead end.",
+    },
+    {
+      prop: "shouldCloseOnSelect",
+      type: "boolean",
+      default: 'selectionMode !== "multiple"',
+      description:
+        "Whether choosing an option closes the popup. Applied to every path that selects — Enter, Space, and a click.",
+    },
+    {
+      prop: "modal",
+      type: "boolean",
+      default: "true",
+      description:
+        "Whether an open popup hides the rest of the page from assistive tech and locks body scroll. No focus trap and no backdrop either way — focus never leaves the trigger.",
+    },
+    {
+      prop: "closeOnEscape",
+      type: "boolean",
+      default: "true",
+      description: "Whether Escape closes the popup.",
+    },
+    {
+      prop: "closeOnInteractOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether a pointer-down outside the popup closes it.",
+    },
+    {
+      prop: "closeOnFocusOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether focus landing outside the popup closes it.",
+    },
+    {
+      prop: "bubbles",
+      type: "boolean | { escapeKey?: boolean; outsidePress?: boolean }",
+      default: "false",
+      description:
+        "Whether a dismissal consumed by a layer opened above this popup also closes it. Off for both channels: the topmost layer alone dismisses.",
+    },
+    {
+      prop: "side",
+      type: '"top" | "right" | "bottom" | "left" | "inline-start" | "inline-end"',
+      default: '"bottom"',
+      description:
+        "Preferred side of the trigger. The two inline values resolve against the layer's reading direction.",
+    },
+    {
+      prop: "align",
+      type: '"start" | "center" | "end"',
+      default: '"center"',
+      description: "Alignment along the side's cross axis.",
+    },
+    {
+      prop: "sideOffset",
+      type: "number",
+      default: "4",
+      description: "Distance from the trigger, in px — the small gap a picker keeps from its control.",
+    },
+    {
+      prop: "alignOffset",
+      type: "number",
+      default: "0",
+      description: "Skid along the alignment axis, in px.",
+    },
+    {
+      prop: "flip",
+      type: "boolean",
+      default: "true",
+      description: "Flip to the opposite side when the preferred one would overflow.",
+    },
+    {
+      prop: "shift",
+      type: "boolean",
+      default: "true",
+      description: "Slide along the alignment axis to stay in view.",
+    },
+    {
+      prop: "collisionPadding",
+      type: "number | Partial<Record<Side, number>>",
+      default: "8",
+      description: "Gutter kept between the popup and the collision boundary.",
+    },
+    {
+      prop: "collisionBoundary",
+      type: "Element | Element[] | Rect | 'clippingAncestors'",
+      default: '"clippingAncestors"',
+      description: "What the popup must stay inside.",
+    },
+    {
+      prop: "strategy",
+      type: '"absolute" | "fixed"',
+      default: '"absolute"',
+      description: "CSS position used for the positioner.",
+    },
+    {
+      prop: "autoUpdate",
+      type: "boolean",
+      default: "true",
+      description: "Keep the position current through scroll and resize.",
+    },
+    {
+      prop: "trackAnchorMotion",
+      type: "boolean",
+      default: "false",
+      description: "Re-measure every animation frame — for a trigger that moves under a transform.",
+    },
+    {
+      prop: "name",
+      type: "string",
+      default: "",
+      description:
+        "Native form field name. When set, a real, visually-clipped <select> carrying every option is rendered beside the trigger.",
+    },
+    {
+      prop: "form",
+      type: "string",
+      default: "",
+      description: "Associates the hidden field with a form by id.",
+    },
+    {
+      prop: "required",
+      type: "boolean",
+      default: "false",
+      description:
+        "Marks the field required: an empty selection blocks the form submit and moves focus to the trigger.",
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "Disable the whole control — reflected on the trigger and on the hidden field.",
+    },
+    {
+      prop: "id",
+      type: "string",
+      default: "generated",
+      description: "Base id for the widget's generated ids.",
+    },
+    {
+      prop: "skipDisabled",
+      type: "boolean",
+      default: "true",
+      description: "Whether navigation and type-ahead skip disabled items.",
+    },
+    {
+      prop: "wrap",
+      type: "boolean",
+      default: "false",
+      description: "Whether arrow navigation wraps past the ends of the list.",
+    },
+    {
+      prop: "orientation",
+      type: '"vertical" | "horizontal"',
+      default: '"vertical"',
+      description: "The arrow-key axis and aria-orientation of the option list.",
+    },
+    {
+      prop: "dir",
+      type: '"ltr" | "rtl"',
+      default: "useLocale()",
+      description:
+        "Mirrors this Select's navigation on its own, overriding the page's direction. Unset, it follows the page.",
+    },
+    {
+      prop: "size",
+      type: '"sm" | "md" | "lg"',
+      default: '"md"',
+      description: "The density scale — the trigger and the popup's rows together.",
+    },
+    {
+      prop: "chevronIcon",
+      type: "() => JSX.Element",
+      default: "built-in chevron",
+      description:
+        "The trigger's default chevron, as a factory. Overridable app-wide from a preset, and per instance with Select.Icon's children.",
+    },
+    {
+      prop: "checkIcon",
+      type: "() => JSX.Element",
+      default: "built-in check",
+      description:
+        "The default selection glyph, as a factory. Overridable app-wide from a preset, and per instance with Select.ItemIndicator's children.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"select">',
+      default: "",
+      description:
+        "Per-slot class overrides, keyed by trigger, value, icon, positioner, content, list, group, groupLabel, separator, item, itemText, itemIndicator.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The Select anatomy (Trigger + Portal > …).",
+    },
+  ]}
+/>
+
+### Select.Trigger
+
+Plus every native `<button>` attribute — `aria-label` or `aria-labelledby` among them, and one of the
+two is required.
+
+<PropsTable
+  rows={[
+    {
+      prop: "nativeButton",
+      type: "boolean",
+      default: "true",
+      description:
+        "Set false when a render target is not a real <button>: the disabled behavior switches to tabIndex / aria-disabled and keyboard activation is synthesized.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the trigger as another element or component. Receives its computed props, ref included — the ref is the positioning anchor and the one element modality spares.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the trigger slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Select.Value
+
+Plus every native `<span>` attribute except `children`.
+
+<PropsTable
+  rows={[
+    {
+      prop: "placeholder",
+      type: "JSX.Element",
+      default: "",
+      description:
+        "What to show while nothing is selected. Rendered with data-placeholder on the element, so the recipe can dim it.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element | ((values: V[]) => JSX.Element)",
+      default: "joined labels",
+      description:
+        "Overrides how the selection is displayed. As a callback it receives the selected items — an array in both selection modes, and V is inferred from the annotation you write. With no children, the labels are joined with a comma.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render the value as another element or component. Receives its computed props.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the value slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Select.List
+
+Plus every native `<div>` attribute except `children`.
+
+<PropsTable
+  rows={[
+    {
+      prop: "children",
+      type: "(entry: G, index: Accessor<number>) => JSX.Element",
+      default: "",
+      description:
+        "A render callback invoked once per Select.Root items entry: per item when flat, per group when groupToItems is set. index is what a Separator between groups keys off. G is inferred from the annotation you write on this callback — the one type annotation the grouped API costs.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the list container as another element or component. Receives its computed props and the ref that registers it as the scroll container. Re-targets the container — not the same thing as the per-entry callback above.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the list slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Select.Item
+
+Plus every native `<div>` attribute — `id` is the exception: it is the `aria-activedescendant` target
+and is generated for you. Nothing else about the row is declared here; its label, disabled state and
+value all come from `Select.Root`'s accessors.
+
+<PropsTable
+  rows={[
+    {
+      prop: "item",
+      type: "V",
+      default: "",
+      description:
+        "Required. The entry this option renders — one element of Select.Root's items (or of a group's own items). The row resolves its own position from it, so it can sit at any depth. There is deliberately no index prop.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the option as another element or component. Receives its computed props and the ref that publishes the row — an aria-activedescendant target and what scroll-into-view moves.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the item slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Select.Portal
+
+<PropsTable
+  rows={[
+    {
+      prop: "mount",
+      type: "Element",
+      default: "document.body",
+      description: "Where to portal the Positioner.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The Positioner subtree.",
+    },
+  ]}
+/>
+
+### Parts
+
+`Select.Icon`, `Select.Positioner`, `Select.Content`, `Select.Group`, `Select.GroupLabel`,
+`Select.Separator`, `Select.ItemText`, and `Select.ItemIndicator` each accept their native element
+attributes plus a `render` prop and a `class`. `Select.Icon` and `Select.ItemIndicator` also take
+`children` — a custom glyph replacing the theme's default for that one instance; `aria-hidden` is the
+one attribute neither forwards, since the trigger's `aria-expanded` and the option's `aria-selected`
+already convey what they show.
+
+## Accessibility
+
+Select implements the WAI-ARIA
+[combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) pattern (ARIA 1.2), with a
+`role="listbox"` popup.
+
+- **Give the trigger an accessible name.** There is no `Label` part, so pass `aria-label` — or
+  `aria-labelledby` pointing at your own `<label>` — on `Select.Trigger`. A nameless
+  `role="combobox"` is an axe `aria-input-field-name` violation, and the popup inherits its name from
+  the trigger, so one missing attribute leaves both unnamed.
+- **The value is announced before the label.** `Select.Value` registers its id and it is *prepended*
+  to the trigger's `aria-labelledby` — content-based naming would read them the other way round,
+  which is backwards for a field whose whole purpose is its value.
+- **Focus never leaves the trigger.** No option ever takes DOM focus; the highlight is
+  `aria-activedescendant` on the trigger plus `data-active` on the row, and that attribute is
+  additionally gated on the widget actually holding focus, so the highlight never lingers after you
+  tab away.
+- **No dangling IDREFs.** `aria-controls` and `aria-activedescendant` are present only while the
+  popup is open, so a page of closed Selects carries no attribute naming an element that isn't in the
+  DOM.
+- **Roles and state are wired for you.** The trigger is `role="combobox"` with `aria-haspopup` and
+  `aria-expanded`, the list `role="listbox"` (with `aria-multiselectable` in multiple mode), each
+  option `role="option"` with `aria-selected`, groups `role="group"`, and the separator
+  `role="presentation"` — never `role="separator"`, which is an invalid `listbox` child.
+- **One highlight, keyboard and pointer.** The arrows and the cursor share a single active option, so
+  the two can never paint two highlights; the selection check is separate from that transient
+  highlight. Opening on Enter or Space lands on the *selected* option, and an offscreen highlight is
+  scrolled into view.
+- **Disabled options stay discoverable.** A disabled row keeps `aria-disabled` and, by default, is
+  skipped by navigation; it can never be selected.
+- **A real form control underneath.** With `name`, the clipped `<select>` is what browser autofill
+  matches, what makes `required` genuinely block a submit (moving focus to the visible trigger), and
+  what a native form `reset` restores.
+- **Motion is reduced-motion aware.** The card's fade-and-scale drops to an instant open/close when
+  the user has `prefers-reduced-motion` enabled.
