@@ -131,9 +131,9 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
-| Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes, native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21) |
-| Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select. **No virtual mode** — see §3 |
-| Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer. Inherits Select's **no virtual mode** — see §3, where the filter is what makes it worth revisiting |
+| Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes, native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21). **Missing `ItemText`** — see §3 |
+| Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select. **No virtual mode yet** — §3 says close it the way Listbox did |
+| Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer. Inherits Select's **no virtual mode** — §3, and the filter is what makes closing it urgent |
 | Autocomplete | Collections | 2/5 | Combobox, minus selection state | **not a rename of Combobox** — free-text value, list is suggestions. See #21 |
 | Menu / DropdownMenu | Overlays | 5/5 | `createCollection` + `createFloating`* + `createHoverIntent`* + submenus | |
 | ContextMenu | Overlays | 2/5 | Menu variant (pointer-anchored) | |
@@ -288,42 +288,89 @@ JSX-preserved build.
 Whatever lands should be enforced by the type system or a `scripts/check-*.mjs`, not by a comment —
 the current defense is two comments telling the next reader not to tidy.
 
-### Virtualization for Select and Combobox
+### Virtualization for Select and Combobox — close the gap the way Listbox already did
 
-**Neither has a virtual mode, and the exclusion is deliberate rather than unfinished.** `Listbox`
-ships one — `estimateSize` selects `createVirtualCollection`, `Listbox.Item` takes an `index`, and
-`Listbox.Root` renders the sizer — but `Select` `Omit`s `estimateSize`/`overscan` from its props
-entirely, and `Combobox` will inherit that when it lands.
+**Select ships without a virtual mode and Combobox will inherit that, and it should not stay that
+way.** `Listbox` has one: `estimateSize` selects `createVirtualCollection`, `Listbox.Root` renders the
+sizer, and rows come back through the same per-entry callback. `Select` `Omit`s
+`estimateSize`/`overscan` from `SelectRootProps` outright.
 
-**Why it cannot just be switched on.** A windowed row is *recycled*: its position changes while the
-component stays mounted, so only the row itself can know its index, which is why `Listbox.Item` takes
-one. Select's item deliberately takes **only `item`** and resolves its own position through
-`indexOfValue` — that is what lets an option sit at any depth, and therefore what makes grouping a
-plain nested `<For>` instead of library-emitted chrome. `indexOfValue` returns `-1` by construction in
-virtual mode, so an item-only row in a windowed list would dev-warn once per row and register nothing.
-Excluding the option from the type turns that silent nothing into a compile error. Rationale and the
-rejected alternative are in [`components/decisions.md`](components/decisions.md) § Select.
+**Listbox needs no extra part to do it, and neither should Select.** `Listbox.Item` is *one* part with
+two mutually exclusive props — `item` in data mode, `index?: Accessor<number>` in virtual mode, "provide
+exactly one" — and that is the whole of the public cost. A separate `Select.VirtualItem` part was
+floated when this entry was first written and is the wrong answer: it invents a second row component
+and a second authoring shape for a catalog whose other collection component solves the same problem
+with one optional prop. **Mirror Listbox.** Any divergence here is an inconsistency to justify, not a
+default.
 
-**Why it will be asked for.** A Select over a few hundred options is the common case and needs
-nothing; the pressure comes from Combobox, where a filter over several thousand rows is the ordinary
-shape (a country/currency/SKU picker) and mounting the unfiltered set is the visible cost. The
-machinery is already paid for — `createVirtualCollection`, `scrollIndexIntoView`, and the windowing
-half of `createListboxItem` all exist and are exercised by Listbox.
+**Why it does not work today, mechanically.** A windowed row is *recycled*: its position changes while
+the component stays mounted, so only the row itself can know its index. Select's item takes **only
+`item`** and resolves its position through `indexOfValue`, which returns `-1` by construction in
+virtual mode — so an item-only row in a windowed list dev-warns once per row and registers nothing.
+Omitting the option from the props type is what turns that silent nothing into a compile error. It was
+a scope call at the end of phase 3, not a finding that the design cannot support windowing.
 
-**Candidate directions, none chosen:**
-1. A separate `Select.VirtualItem` / `Combobox.VirtualItem` part taking `index`, with `List` emitting
-   the sizer when `estimateSize` is set. Keeps `item` meaning one thing on the common path; costs a
-   second row part and a second authoring shape to document.
-2. Teach the data source to keep an identity→index map that survives windowing, so `indexOfValue`
-   answers in virtual mode too and `Select.Item` stays item-only. The honest version of "just make it
-   work", and the expensive one: it needs the full item set resident anyway, which is most of what
-   windowing was avoiding.
-3. Leave both non-virtual and route the case to `Listbox` inside a `Popover`. Cheapest, and loses the
-   trigger ARIA, closed-trigger typeahead and the hidden `<select>` — i.e. most of what Select is.
+**The work is component-layer only.** `CreateComboboxOptions` already extends the listbox options
+including `estimateSize`/`overscan`, `createListbox` already picks `createVirtualCollection` from
+them, `state.list.virtual` is already on the kernel's return, and `createListboxItem`'s indexed branch
+already handles registration, measurement and `data-index`. Nothing in `primitives/` needs to change.
+What is missing is three edits per component: drop the `Omit`, give `Select.Item`/`Combobox.Item` the
+same optional `index` Listbox's has, and have `Select.List`/`Combobox.List` emit the sizer and iterate
+`virtual.virtualItems()` when `estimateSize` is set — the `ListboxRows` shape in `listbox-root.tsx`,
+moved down a level because Select's iteration lives on `List` rather than `Root`.
 
-**The constraint on any fix:** it must not put "provide exactly one of `item` / `index`" back on the
-common path. That sentence being absent from Select's API is the whole return on decision 6, and a
-grouped list is the shape that pays for it.
+**What it costs, stated plainly.** One sentence back on the public API: *provide exactly one of `item`
+/ `index`*. Decision 6 removed that sentence, and `components/decisions.md` § Select records the
+removal as the return on making grouping a plain nested `<For>` — which it is, and which survives,
+because grouping and windowing never combine (`groupToItems` + `estimateSize` is already a dev error
+in `createListbox`). The two props are disjoint by mode, not competing on the same list.
+
+**Why it will be asked for.** A Select over a few hundred options needs nothing. The pressure comes
+from Combobox, where a filter over several thousand rows is the ordinary shape (a country / currency /
+SKU picker) and mounting the unfiltered set is the visible cost.
+
+**Also update, when this lands:** `components/decisions.md` § Select — its "A `Select.Item index` prop,
+so virtual mode works" entry is superseded by this one and should say so rather than sit there
+contradicting it.
+
+### One row vocabulary across every collection component — `Listbox` is missing `ItemText`
+
+**`Select` ships `Select.ItemText`; `Listbox` has no `Listbox.ItemText`.** Same row, same job, two
+anatomies — a consumer who learns one and moves to the other finds a part that has silently
+disappeared. `Combobox` inherits Select's shape, so as of today the catalog is 2-to-1 in favour of the
+part existing, which makes Listbox the outlier rather than Select the innovation.
+
+**Give Listbox the part.** It is presentational — a shrinkable, truncating box for the row's label, so
+a long label ellipsizes instead of pushing the selection glyph out of its reserved `pe-8` gutter — and
+it carries no ARIA and no behavior, exactly as `Select.ItemText` does. It stays **optional**: a row may
+still put its label straight in `Listbox.Item`'s children, which is what every existing demo, story and
+test does, so nothing migrates.
+
+It is explicitly **not** the typeahead text. That comes from `Listbox.Root`'s `itemToLabel`, readable
+before — and without — the row being mounted, which is the property the data-driven source exists for.
+Worth saying out loud in the part's JSDoc: an `ItemText` that looked like it fed matching would be read
+as the source of truth by the next person, and it is not.
+
+**What it touches:**
+- `packages/components/src/listbox/listbox-item-text.tsx` + the barrel — a near-verbatim port of
+  `select-item-text.tsx`.
+- `@hope-ui/theming`'s `ListboxSlot` gains `"itemText"`, plus the hope preset's `listbox` recipe and
+  both contract tests (`recipe-registry.test.ts` **and** `preset.test.ts` each carry their own
+  `satisfies RecipeRegistry` object).
+- `part-class-forwarding.browser.test.tsx` — one probe row; the script cannot see the DOM.
+- `apps/docs`' `listbox.mdx` anatomy + parts tables.
+
+**One judgement call to make deliberately:** adding a slot to a shipped recipe contract is a breaking
+change for any third-party preset, which is what `THEMING_CONTRACT_VERSION` exists to signal. At
+v0.0.0 with no published presets it is free — decide whether that is a bump or a documented "additive
+before 1.0", and write the answer down either way.
+
+**The general rule this is an instance of:** the row vocabulary
+(`Item` / `ItemText` / `ItemIndicator`) and the section vocabulary (`Group` / `GroupLabel` /
+`Separator`) are **one vocabulary shared by every collection component**, not per-component anatomies
+that happen to overlap. Menu, CommandPalette and TreeView all land on the same rows; each divergence
+gets more expensive to reconcile after those ship than before, which is why this sits here rather than
+in a component's own backlog.
 
 ---
 
