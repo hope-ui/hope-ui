@@ -468,10 +468,47 @@ describe("directional CSS declarations in .css", () => {
     passes(".a {\n  border-bottom-left-radius: 2px;\n  border-top-right-radius: 2px;\n}", ".css");
   });
 
-  it("does not run the class-token pass on CSS", () => {
-    // Only declarations are read; a utility name in a `@apply` or a selector is out of this pass's
-    // reach (see the report accompanying this test file).
+  it("does not read a class name in a selector as a utility", () => {
+    // A `.pl-2` selector DEFINES a class; it is not Tailwind applying one, so it stays out of
+    // scope. `@apply pl-2` below is the case that is in scope.
     passes(".pl-2 {\n  color: red;\n}", ".css");
+  });
+
+  it("flags a physical utility inlined with @apply", () => {
+    // Regression: `@apply` smuggles utilities into a stylesheet, where the declaration pass cannot
+    // see them and the class-token pass did not run — so this was checked by nothing.
+    // `apps/docs/src/styles/app.css` uses the directive, so the surface is live.
+    expect(onlyViolation(".card {\n  @apply pl-2;\n}", ".css").message).toBe(
+      'physical utility "pl-2" — use ps-* instead of pl-*',
+    );
+    expect(onlyViolation(".card {\n  @apply pl-2;\n}", ".css").line).toBe(2);
+  });
+
+  it("reads every utility in an @apply list, not just the first", () => {
+    const messages = messagesOf(".card {\n  @apply flex pl-2 mr-4 gap-2;\n}", ".css");
+    expect(messages).toHaveLength(2);
+    expect(messages[0]).toContain('"pl-2"');
+    expect(messages[1]).toContain('"mr-4"');
+  });
+
+  it("honours a variant chain inside @apply", () => {
+    passes(".card {\n  @apply ltr:pl-2 rtl:pr-2;\n}", ".css");
+    passes(".card {\n  @apply ps-2;\n}", ".css");
+  });
+
+  it("honours rtl-ok: inside a CSS comment above the @apply", () => {
+    passes(
+      ".card {\n  /* rtl-ok: mirrors a physical scrollbar gutter */\n  @apply pl-2;\n}",
+      ".css",
+    );
+  });
+
+  it("does not read an @apply named inside a CSS comment", () => {
+    passes(".card {\n  /* do not write @apply pl-2; here */\n  color: red;\n}", ".css");
+  });
+
+  it("does not read a physical declaration named inside a CSS comment", () => {
+    passes(".card {\n  /* padding-left: 1px; is wrong */\n  color: red;\n}", ".css");
   });
 });
 

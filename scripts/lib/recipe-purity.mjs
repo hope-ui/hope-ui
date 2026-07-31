@@ -30,7 +30,15 @@ export const PATTERNS = [
   },
   {
     label: "alpha modifier on a color utility",
-    re: /\b(?:bg|text|border|ring|outline|fill|stroke|shadow|decoration|accent|caret|divide|from|via|to)-[\w-]+\/\d{1,3}\b/g,
+    // The modifier is a plain 1–3 digit percentage (`bg-primary/50`) OR an arbitrary value
+    // (`bg-primary/[0.5]`, `/[12.5%]`, `/[var(--a)]`). The bracket form is the same sin spelled
+    // differently, and it used to escape both this pattern (which required digits) and the
+    // arbitrary-value pattern above (which only fires on `--hope-`/`color-mix` inside the brackets).
+    re: /\b(?:bg|text|border|ring|outline|fill|stroke|shadow|decoration|accent|caret|divide|from|via|to)-[\w-]+\/(?:\d{1,3}\b|\[[^\]]*\])/g,
+    // `text-sm/6` is Tailwind's font-size/line-height shorthand, not a color with an alpha —
+    // `text-` is in the prefix list above, so without this a correct recipe is rejected. Scoped to
+    // the font-size scale rather than "any bare number", so `text-primary/50` still fails.
+    except: /^text-(?:xs|sm|base|lg|xl|[2-9]xl)\/(?:\d+|\[[^\]]*\])$/,
     hint: "author the translucent color as its own token (e.g. focus-halo) — do not mix it in the recipe",
   },
   {
@@ -52,11 +60,16 @@ export function recipePurityViolations(source) {
 
   /** @type {Array<{ line: number; message: string }>} */
   const violations = [];
-  for (const { label, re, hint } of PATTERNS) {
+  for (const { label, re, except, hint } of PATTERNS) {
     // The patterns are module-scope `/g` regexes shared across every file the script scans, so
     // `lastIndex` has to be cleared before each run.
     re.lastIndex = 0;
     for (const match of classText.matchAll(re)) {
+      // A pattern's `except` carves out a utility that is shaped like the sin but isn't one. It is
+      // matched against the whole candidate, so it can only ever narrow that one pattern.
+      if (except?.test(match[0])) {
+        continue;
+      }
       violations.push({
         line: lineAt(classText, match.index),
         message: `${label}: "${match[0]}" — ${hint}`,

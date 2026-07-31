@@ -88,6 +88,53 @@ const PHYSICAL_STYLE_WRITES = [
 const MDX_CLASS_ATTRIBUTE = /\bclass(?:Name)?\s*=\s*"([^"\n]*)"/g;
 const MDX_SLOT_CLASSES_BLOCK = /\bslotClasses\s*=\s*\{\{([^}]*)\}\}/g;
 const QUOTED_STRING = /"([^"\n]*)"/g;
+/** The utility list a stylesheet inlines with `@apply`, up to the terminating `;` or block edge. */
+const APPLY_DIRECTIVE = /@apply\s+([^;{}]*)/g;
+
+/**
+ * A copy of `source` with everything blanked except the spans `collect` hands to `keep`, offsets and
+ * newlines preserved so a match's line number still points at the original file. The class-token
+ * pass wants only the text that can hold a utility, and every language locates that differently.
+ *
+ * @param {string} source
+ * @param {(keep: (start: number, text: string) => void) => void} collect
+ */
+function blankExcept(source, collect) {
+  const values = source.split("").map((c) => (c === "\n" ? "\n" : " "));
+  collect((start, text) => {
+    for (let i = 0; i < text.length; i++) {
+      values[start + i] = text[i];
+    }
+  });
+  return values.join("");
+}
+
+/**
+ * CSS block comments blanked, offsets preserved. CSS has no `//` form, and its `/` also appears in
+ * shorthand values (`font: 12px/1.5`), so this is a few lines of its own rather than a reach for the
+ * JS tokenizer in `source-projection.mjs`.
+ *
+ * @param {string} source
+ */
+function blankCssComments(source) {
+  const out = source.split("");
+  let index = 0;
+  while (index < source.length) {
+    if (source[index] === "/" && source[index + 1] === "*") {
+      const end = source.indexOf("*/", index + 2);
+      const stop = end === -1 ? source.length : end + 2;
+      for (let i = index; i < stop; i++) {
+        if (out[i] !== "\n") {
+          out[i] = " ";
+        }
+      }
+      index = stop;
+      continue;
+    }
+    index++;
+  }
+  return out.join("");
+}
 
 /**
  * Pass 4's table. Every entry is anchored to a PROPERTY position, which is the whole reason the pass
@@ -222,41 +269,52 @@ export function rtlSafetyViolations(source, extension) {
   };
 
   if (extension === ".css") {
+    // Comments blanked first, so a physical property or an `@apply` named in prose is not a
+    // finding. `hasReasonedExemption` still reads the raw lines, which is what lets the `rtl-ok:`
+    // marker live in a `/* … */` above the offending line.
+    const css = blankCssComments(source);
+
     for (const { re, logical } of PHYSICAL_CSS_DECLARATIONS) {
       re.lastIndex = 0;
-      for (const match of source.matchAll(re)) {
-        report(lineAt(source, match.index), `physical CSS "${match[1]}" — use ${logical}`);
+      for (const match of css.matchAll(re)) {
+        report(lineAt(css, match.index), `physical CSS "${match[1]}" — use ${logical}`);
       }
     }
+
+    // `@apply` smuggles Tailwind utilities into a stylesheet, where the declaration pass above
+    // cannot see them and the class-token pass never ran at all — so `@apply pl-2;` was checked by
+    // nothing. `apps/docs/src/styles/app.css` uses the directive, so the surface is live.
+    APPLY_DIRECTIVE.lastIndex = 0;
+    const applied = blankExcept(css, (keep) => {
+      for (const match of css.matchAll(APPLY_DIRECTIVE)) {
+        keep(match.index + match[0].indexOf(match[1], "@apply".length), match[1]);
+      }
+    });
+    checkClassTokens(applied);
+
     return violations;
   }
 
   if (extension === ".mdx") {
     // Project onto the class-bearing values alone, preserving every offset so a match's line number
     // still points at the original file.
-    const values = source.split("").map((c) => (c === "\n" ? "\n" : " "));
-    /** @param {number} start @param {string} text */
-    const keep = (start, text) => {
-      for (let i = 0; i < text.length; i++) {
-        values[start + i] = text[i];
-      }
-    };
-
-    for (const re of [MDX_CLASS_ATTRIBUTE, MDX_SLOT_CLASSES_BLOCK]) {
-      re.lastIndex = 0;
-      for (const match of source.matchAll(re)) {
-        const groupStart = match.index + match[0].indexOf(match[1], 1);
-        if (re === MDX_CLASS_ATTRIBUTE) {
-          keep(groupStart, match[1]);
-          continue;
-        }
-        QUOTED_STRING.lastIndex = 0;
-        for (const inner of match[1].matchAll(QUOTED_STRING)) {
-          keep(groupStart + inner.index + 1, inner[1]);
+    const values = blankExcept(source, (keep) => {
+      for (const re of [MDX_CLASS_ATTRIBUTE, MDX_SLOT_CLASSES_BLOCK]) {
+        re.lastIndex = 0;
+        for (const match of source.matchAll(re)) {
+          const groupStart = match.index + match[0].indexOf(match[1], 1);
+          if (re === MDX_CLASS_ATTRIBUTE) {
+            keep(groupStart, match[1]);
+            continue;
+          }
+          QUOTED_STRING.lastIndex = 0;
+          for (const inner of match[1].matchAll(QUOTED_STRING)) {
+            keep(groupStart + inner.index + 1, inner[1]);
+          }
         }
       }
-    }
-    checkClassTokens(values.join(""));
+    });
+    checkClassTokens(values);
     return violations;
   }
 

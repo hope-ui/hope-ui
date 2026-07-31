@@ -235,12 +235,49 @@ describe("reporting", () => {
 // Known-but-unfixed behavior, pinned here so a fix shows up as a red test rather than a surprise.
 // Both are reported in __internal__/theming.md's terms: the rule is about *computed* colors, and
 // these two cases are the rule disagreeing with that definition.
-describe("known gaps in the rule (pinned, not endorsed)", () => {
-  it("misses an arbitrary alpha modifier — the same sin spelled with brackets", () => {
-    expect(flagged("bg-primary/[0.5] bg-primary/[12.5%] bg-primary/[var(--alpha)]")).toEqual([]);
+describe("the alpha modifier spelled with brackets", () => {
+  // Regression: the pattern required `/\d{1,3}`, and the arbitrary-value pattern only fires on
+  // `--hope-`/`color-mix` inside the brackets — so the bracket form of the exact sin the rule bans
+  // escaped both and a recipe could compute a translucent color unchallenged.
+  it("flags an arbitrary alpha modifier", () => {
+    expect(flagged("bg-primary/[0.5] bg-primary/[12.5%] bg-primary/[var(--alpha)]")).toEqual([
+      "bg-primary/[0.5]",
+      "bg-primary/[12.5%]",
+      "bg-primary/[var(--alpha)]",
+    ]);
   });
 
-  it("false-positives on text-<size>/<leading>, which is a font-size shorthand, not a color", () => {
-    expect(flagged("text-sm/6")).toEqual(["text-sm/6"]);
+  it("flags it across the prefix list, not just bg-", () => {
+    for (const utility of ["text-primary/[0.5]", "border-subtle/[0.2]", "ring-focus/[var(--a)]"]) {
+      expect(flagged(utility), utility).toEqual([utility]);
+    }
+  });
+
+  it("still flags the numeric form", () => {
+    expect(flagged("bg-primary/50")).toEqual(["bg-primary/50"]);
+  });
+});
+
+describe("text-<size>/<leading> is a font-size shorthand, not a color", () => {
+  // Regression: `text-` is in the prefix list, so Tailwind's font-size/line-height shorthand was
+  // reported as an alpha modifier and a correct recipe was rejected.
+  it("does not flag the font-size scale with a numeric leading", () => {
+    for (const utility of ["text-xs/4", "text-sm/6", "text-base/6", "text-lg/7", "text-2xl/9"]) {
+      expect(flagged(utility), utility).toEqual([]);
+    }
+  });
+
+  it("does not flag it with an arbitrary leading", () => {
+    expect(flagged("text-sm/[1.5]")).toEqual([]);
+  });
+
+  it("still flags a real color alpha on text-", () => {
+    // The carve-out is scoped to the font-size scale, not to "any bare number after text-".
+    expect(flagged("text-primary/50")).toEqual(["text-primary/50"]);
+    expect(flagged("text-foreground-muted/[0.5]")).toEqual(["text-foreground-muted/[0.5]"]);
+  });
+
+  it("does not let the carve-out leak to another prefix", () => {
+    expect(flagged("bg-sm/6")).toEqual(["bg-sm/6"]);
   });
 });
