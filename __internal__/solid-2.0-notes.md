@@ -158,6 +158,33 @@ the installed package, not read from docs.
   file. Fixed by `refresh: { disabled: true }` on the Solid Vite plugin in `vitest.config.ts` — tests
   never need HMR. If a "props vanish only for imported components" symptom reappears, check this
   setting before assuming a merge/omit bug.
+- **A static child plus a dynamic sibling inside `<select>` (or any other element with a
+  restrictive HTML content model) crashes the *non-hydratable* compile — and no test in this repo
+  can see it.** `babel-preset-solid` emits the client template with closing tags **omitted**
+  (`omitLastClosingTag` / `omitNestedClosingTags`) unless `hydratable: true`, and it represents each
+  dynamic child position as a `<!>` comment placeholder. So
+
+  ```tsx
+  <select>
+    <option value="">…</option>   {/* static */}
+    <For each={items()}>…</For>   {/* dynamic → <!> */}
+  </select>
+  ```
+
+  compiles to the template `…<select tabindex=-1><option value label= > <!><!>`, and the HTML
+  parser's *"in select"* insertion mode — with no `</option>` to close on — makes both comments
+  **children of the `<option>`**. The generated walk then does `_el$4.nextSibling.nextSibling` on a
+  `null` and throws `Cannot read properties of null (reading 'nextSibling')`, halting the whole
+  reactive system.
+
+  **Fix: make the restricted element's children a *single* dynamic expression** — one `<For>` over a
+  memo that includes the would-be-static rows. A lone dynamic child needs no placeholder at all, so
+  there is nothing for the parser to misplace. `hidden-select.tsx`'s `nativeOptions` is the shape.
+
+  The `hydratable: true` compile emits `templateWithClosingTags` and does **not** reproduce it, and
+  the `browser` Vitest project is the only one with a DOM — so **every test here compiles the safe
+  variant**. Storybook (`hydratable: false`, like a plain client app) is the only feedback loop that
+  catches it, which is one more reason a story is not done until it has been opened.
 - Browser tests import `page` from `vitest/browser`.
 - **The trigger for `children()` is a component-valued *prop* read more than once in a render —
   and the `<Show>` `when`+body idiom is the special case where it is load-bearing for hydration.**

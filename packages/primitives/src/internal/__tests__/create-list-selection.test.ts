@@ -83,6 +83,34 @@ describe("firstSelectedIndex", () => {
   });
 });
 
+describe("setValue", () => {
+  it("replaces the whole selection in one write", () => {
+    // The shape the item-wise mutators cannot express, and why this exists: a native control hands
+    // back an arbitrary set in one gesture (`HiddenSelect`'s `<select>` change, its form reset).
+    // `deselectAll()` + N × `select()` would not do — a Solid 2.0 write is invisible to a plain read
+    // until the next flush, so each `select` would read the pre-write value.
+    const items = [item("a"), item("b"), item("c")];
+    const { selection, dispose } = setup(items);
+    flush(() => selection.select(nth(items, 0)));
+
+    flush(() => selection.setValue(["b", "c"]));
+
+    expect(selection.value()).toEqual(["b", "c"]);
+    dispose();
+  });
+
+  it("clears the selection when given an empty array", () => {
+    const items = [item("a"), item("b")];
+    const { selection, dispose } = setup(items);
+    flush(() => selection.select(nth(items, 1)));
+
+    flush(() => selection.setValue([]));
+
+    expect(selection.value()).toEqual([]);
+    dispose();
+  });
+});
+
 /** Array access that asserts presence — under `noUncheckedIndexedAccess`, `list[i]` is `T | undefined`. */
 function nth<T>(list: ArrayLike<T>, index: number): T {
   const value = list[index];

@@ -1,3 +1,4 @@
+import { HiddenSelect } from "@hope-ui/primitives/hidden-select";
 import {
   type CreateListboxOptions,
   type CreateListboxReturn,
@@ -8,7 +9,7 @@ import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { ListboxSize, ListboxThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Accessor, For, merge, omit, Show } from "solid-js";
+import { type Accessor, createSignal, For, merge, omit } from "solid-js";
 import { CheckIcon } from "../icons";
 import { ListboxContext, type ListboxContextValue } from "./listbox-context";
 
@@ -102,11 +103,11 @@ export interface ListboxRootProps<V = unknown, G = V>
  * **sizer** `<div>` of the full scroll height (`state.virtual.totalSize()`) inside which only the
  * windowed `virtualItems()` mount. Flat lists only — no `Group`/`GroupLabel`/`Separator`.
  *
- * In **both** modes, **followed by** — when `name` is set — one visually-hidden native field per
- * selected value, so the listbox submits with a form. The hidden inputs are **siblings of the list
- * element, never inside it** (an `<input>` is not a valid `listbox` child). The *decision of what to
- * submit* (`state.formValues()`) lives in the primitive over the **full** set (so virtual multi-select
- * submits offscreen selections too); this layer only maps it to inputs.
+ * In **both** modes, **followed by** — when `name` is set — the kernel's `HiddenSelect`, so the
+ * listbox submits with a form, autofills, honours `required` and survives a form `reset`. It is a
+ * **sibling of the list element, never inside it** (neither an `<input>` nor a `<select>` is a valid
+ * `listbox` child), and it owns every decision about what to submit; this layer only hands it the
+ * state and the element to focus when a blocked submit reports the field invalid.
  *
  * `Listbox.Root<V, G>` is generic **at its props**; the generics cannot flow through Solid context, so
  * the `createListbox` return is cast to `CreateListboxReturn<unknown>` for the provider (see
@@ -262,6 +263,16 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
     },
   });
 
+  // The list element goes two places: to the primitive (its scroll container, and what the dev
+  // direction warning measures) and to `HiddenSelect`, which focuses it when a blocked submit
+  // reports the field invalid — a hidden control cannot take that focus itself. `CreateListboxReturn`
+  // exposes only the setter, so the second consumer needs its own signal.
+  const [listElement, setListElement] = createSignal<HTMLElement | null>();
+  const setElement = (element: HTMLDivElement) => {
+    state.setListboxElement(element);
+    setListElement(element);
+  };
+
   return (
     <ListboxContext value={context}>
       {/* Generics on the element's own type, so a consumer's `render` callback receives div-shaped
@@ -271,17 +282,16 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
         as: "div",
         render: merged.render,
         props: elementProps as unknown as ListboxRootElementProps,
-        ref: state.setListboxElement,
+        ref: setElement,
       })}
-      {/* Native form submission, opt-in via `name`: one hidden field per selected value, valued
-      `itemToValue(item)` (always a string) over the **full** set (offscreen virtual selections
-      included). Siblings of the list element — an `<input>` is not a valid `listbox` child.
-      Mirrors React Aria's `HiddenSelect`. */}
-      <Show when={state.name()}>
-        <For each={state.formValues()}>
-          {(value) => <input type="hidden" name={state.name()} value={value} form={state.form()} />}
-        </For>
-      </Show>
+      {/* Native form submission, opt-in via `name`. The kernel's `HiddenSelect` renders the real
+      control — a clipped `<select>` while the option set is small enough for browser autofill to be
+      worth it, one `<input>` per value past that — carrying `name`/`form`/`required`/`disabled`,
+      writing an autofilled choice back into the selection, and restoring the default selection on
+      the form's `reset`. It is a **sibling** of the list element, never inside it: neither an
+      `<input>` nor a `<select>` is a valid `listbox` child. `triggerRef` is the list element, the
+      visible control focus lands on when a blocked submit reports the field invalid. */}
+      <HiddenSelect state={state} triggerRef={listElement} />
     </ListboxContext>
   );
 }

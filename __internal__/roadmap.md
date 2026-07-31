@@ -131,7 +131,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
-| Listbox ✅ | Collections | core | `createCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), collection **and** virtual modes, native-form hidden inputs. Underlies Select/Combobox via the combobox kernel (#21) |
+| Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes, native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21) |
 | Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select |
 | Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer |
 | Autocomplete | Collections | 2/5 | Combobox, minus selection state | **not a rename of Combobox** — free-text value, list is suggestions. See #21 |

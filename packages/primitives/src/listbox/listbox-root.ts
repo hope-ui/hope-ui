@@ -141,7 +141,7 @@ export interface CreateListboxOptions<V = unknown, G = V> {
   /** Virtual mode: overscan rows rendered beyond the window. Default `5`. */
   overscan?: number;
 
-  /** Native form field name. When set, the component renders hidden inputs from `formValues()`. */
+  /** Native form field name. When set, the component renders a `HiddenSelect` over `formValues()`. */
   name?: string;
   /** Associates the hidden field(s) with a form by id. */
   form?: string;

@@ -137,8 +137,11 @@ A Select whose focus owner is its own input drives `focus.setFocused` from that 
   exactly. The consumer-facing `V | V[]` shape is the combobox kernel's job (decision 4 of the
   Select plan), not this hook's.
 - **Form submission (opt-in).** `formValues()` is the selected items' `itemToValue` strings — always
-  strings, so objects serialize cleanly. `name`/`form`/`required` are surfaced for the component to
-  render hidden fields (siblings of the list, never inside it). Mirrors React Aria's `HiddenSelect`.
+  strings, so objects serialize cleanly. `name`/`form`/`required` are surfaced for
+  [`HiddenSelect`](../hidden-select/hidden-select.md), which the component renders as a **sibling**
+  of the list (neither an `<input>` nor a `<select>` is a valid `listbox` child). It is that
+  primitive — not this hook — that turns `required` into a submit the browser actually blocks, and
+  it writes an autofilled choice back through `selection.setValue`.
 
 ## `createListbox(options)`
 

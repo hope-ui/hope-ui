@@ -1,5 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";
+import { sharedConfig } from "solid-js";
 
 export interface HydratedComponent {
   container: HTMLElement;
@@ -36,6 +37,14 @@ function bootstrapHydration(): () => void {
   const globals = globalThis as HydrationGlobals;
   globals._$HY = { events: [], completed: new WeakSet(), r: {} };
   return () => {
+    // Drained before the global goes: `runHydrationEvents()` — which `babel-preset-solid` emits for
+    // any top-level template element carrying a **delegated** event (`onInput`, `onClick`, …) —
+    // queues a microtask that replays the queue and then writes `_$HY.events = null`. A test that
+    // hydrates and disposes synchronously runs that microtask *after* this teardown, and the write
+    // would throw on an `undefined` global. Clearing the queue first makes it return early, which
+    // is also exactly where Solid itself leaves things once the queue is drained. `_$HY` still goes
+    // away, so nothing leaks into the next test.
+    sharedConfig.events = null;
     globals._$HY = undefined;
   };
 }

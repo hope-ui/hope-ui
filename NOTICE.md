@@ -13,7 +13,7 @@ upstream and stating that it has been modified.
 
 - **Project:** https://github.com/adobe/react-spectrum (`@react-aria/*`, `@react-stately/*`)
 - **License:** Apache License, Version 2.0 — full text in [`licenses/LICENSE-APACHE-2.0.txt`](licenses/LICENSE-APACHE-2.0.txt)
-- **Copyright:** Copyright 2020 Adobe. All rights reserved.
+- **Copyright:** Copyright 2020 Adobe. All rights reserved. (`useFormReset.ts` and `useFormValidation.ts` carry a 2023 copyright line; each derived file's header names its own.)
 
 The following files are derived from this work. **All of them have been modified**, and each
 carries an attribution header naming its upstream source:
@@ -27,6 +27,8 @@ carries an attribution header naming its upstream source:
 | `packages/primitives/src/internal/create-hide-outside.ts` | `@react-aria/overlays` — `src/ariaHideOutside.ts` (the layer stack, `keepVisible`, the always-visible marker) |
 | `packages/primitives/src/internal/create-dismissable.ts` | `@react-aria/overlays` — `src/useOverlay.ts` (the visible-layer stack and its topmost check) |
 | `packages/primitives/src/internal/scroll-into-view.ts` | `@react-aria/utils` — `src/scrollIntoView.ts` (the scroll-port arithmetic and the `"nearest"` minimum-distance delta) |
+| `packages/primitives/src/hidden-select/hidden-select.tsx` | `@react-aria/select` — `src/HiddenSelect.tsx` (the `<select>`-vs-`<input>` size cutoff, the clipped visually-hidden technique, the placeholder `<option>`, the empty-collection fallback, the `required`-on-`<input type="text">` trick) |
+| `packages/primitives/src/hidden-select/create-hidden-select.ts` | `@react-aria/utils` — `src/useFormReset.ts`, and `@react-aria/form` — `src/useFormValidation.ts` (the form-scoped `reset` listener, and the `invalid` listener with its first-invalid-control scan) |
 
 `@internationalized/date` is also an Adobe Apache-2.0 work. hope-ui consumes it as an ordinary npm
 dependency and never bundles it — it is resolved as a bare specifier in the published output and

@@ -28,6 +28,7 @@ function createListSelection<V>(options: {
   isItemEqualToValue?: (a: V, b: V) => boolean;               // default key(a) === key(b)
 }): {
   value: Accessor<V[]>;
+  setValue(value: V[]): void; // replace the whole selection in ONE write — see below
   isSelected(item): boolean;
   firstSelectedIndex(): number; // lowest selected index in focus.items(), else -1; the entry row
   select(item): void;      // add (single replaces); sets anchor
@@ -50,6 +51,18 @@ Equality precedence: an explicit `isItemEqualToValue` wins outright; otherwise t
 `itemToValue(a) === itemToValue(b)`; with neither, `itemToValue` is identity so it collapses to plain
 `===`. (The older `compareByIdOrReference` / `ValueComparator<V>` in
 [`@hope-ui/primitives/utils`](../utils/equality.md) is retained only for `createListExpansion`.)
+
+## `setValue` — the one mutation that isn't item-wise
+
+Every other mutator takes a `CollectionItem`, and should stay that way: it is what keeps selection
+and focus talking about the same rows. `setValue` exists for the one shape they cannot express — a
+**native** control handing back an arbitrary set in a single gesture. `HiddenSelect` needs it twice:
+when browser autofill (or a mobile picker) changes the hidden `<select>`, and when the owning form
+is reset and the widget has to revert to its default selection.
+
+It has to be **one** write. A SolidJS 2.0 signal write is not visible to a plain read until the next
+flush, so `deselectAll()` followed by N × `select(item)` would have every `select` read the
+pre-write value and keep only the last one.
 
 ## Modes and behaviors
 

@@ -7,11 +7,16 @@ import { renderToStringAsync } from "@solidjs/web";
 // helper gets its own `hydrate-fixture` subject (registered in `vitest-hydration-bridge.ts`) rather
 // than borrowing a component's — no cross-package coupling, no invented markup.
 
-export function Tree(): JSX.Element {
+// The click handler is load-bearing even though the server never serializes it: `click` is a
+// **delegated** event, and `babel-preset-solid` emits a `runHydrationEvents()` call for any
+// top-level template element carrying one. That call queues a microtask which, once hydration
+// settles, writes `_$HY.events = null` — landing *after* a synchronous `dispose()`. Keeping it here
+// is what holds `bootstrapHydration`'s teardown honest.
+export function Tree(props: { onProbeClick?: () => void }): JSX.Element {
   return (
-    <div data-probe="root">
+    <button type="button" data-probe="root" onClick={() => props.onProbeClick?.()}>
       <span>hydrate-fixture probe</span>
-    </div>
+    </button>
   );
 }
 

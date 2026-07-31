@@ -69,6 +69,26 @@ describe("hydrateFixture", () => {
     dispose();
   });
 
+  it("leaves a hydrated delegated handler live, and its replay queue drained on dispose", async () => {
+    // Two things at once, both about the delegated-event path `Tree`'s `onClick` exists to reach.
+    // The handler must survive hydration — a silent client-render fallback would keep working here,
+    // but the reuse check above already rules that out. And `dispose()` has to drain Solid's
+    // hydration-event queue: the `runHydrationEvents()` microtask writes `_$HY.events = null` once
+    // hydration settles, which for a synchronous hydrate-then-dispose lands after the bootstrap is
+    // gone. Un-drained it throws from a microtask — an unhandled error that fails the whole file,
+    // never the assertion below.
+    const clicks: number[] = [];
+    const { container, dispose } = hydrateFixture(probeServerHtml, () => (
+      <Tree onProbeClick={() => clicks.push(1)} />
+    ));
+
+    (container.querySelector('[data-probe="root"]') as HTMLElement).click();
+    expect(clicks).toHaveLength(1);
+
+    dispose();
+    await Promise.resolve();
+  });
+
   it("throws when the client tree structurally diverges, shifting the hydration keys", () => {
     // The failure half. Prepending an element before the matching `Tree` shifts every hydration key
     // after it — `_hk` is a path through the component tree — so `hydrate()` can't find the server's

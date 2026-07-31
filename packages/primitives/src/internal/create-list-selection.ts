@@ -50,6 +50,15 @@ export interface CreateListSelectionOptions<V> {
 export interface CreateListSelectionReturn<V> {
   /** The current selection, in no particular order. */
   value: Accessor<V[]>;
+  /**
+   * Replace the whole selection in **one** write — the controllable state's own setter. Every other
+   * mutation here is expressed in terms of an item, and should stay that way; this exists for the
+   * one shape they cannot express, a *native* control handing back an arbitrary set in a single
+   * gesture (`HiddenSelect`'s `<select>` change from autofill, and its form-reset restore). It has
+   * to be one write: a Solid 2.0 signal write is not visible to a plain read until the next flush,
+   * so `deselectAll()` followed by N × `select()` would each read the pre-write value.
+   */
+  setValue(value: V[]): void;
   /** Whether `item` is selected. */
   isSelected(item: CollectionItem<V>): boolean;
   /**
@@ -245,6 +254,7 @@ export function createListSelection<V>(
 
   return {
     value,
+    setValue,
     isSelected,
     firstSelectedIndex,
     select,

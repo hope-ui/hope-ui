@@ -338,11 +338,15 @@ const items = Array.from({ length: 10_000 }, (_, i) => ({ id: i, name: `Item ${i
 
 ## Native form submission
 
-Set `name` and the listbox renders hidden inputs (siblings of the list element) valued
-`itemToValue(item)` for each selected row — so a plain `<form>` submit carries the selection with no
-extra wiring. The submitted strings are the `itemToValue` values (here, the fruit ids), and in
-virtual multi-select even offscreen selections are included. Add `form` to associate the inputs with
-a form by id, and `required` for native validation.
+Set `name` and the listbox renders a visually-hidden native `<select>` beside the list — so a plain
+`<form>` submit carries the selection with no extra wiring. The submitted strings are the
+`itemToValue` values (here, the fruit ids), and in virtual multi-select even offscreen selections are
+included. Add `form` to associate the field with a form by id.
+
+Because it is a **real** `<select>` holding one `<option>` per item, three things come for free that
+a hidden input cannot give you: the browser can **autofill** it, `required` genuinely **blocks**
+submission (and moves focus to the list rather than to a control nobody can see), and the form's
+**reset** button puts the selection back to where it started.
 
 <Preview>
   <ListboxFormDemo />
@@ -634,19 +638,21 @@ export const myPreset = definePreset(hope, {
       prop: "name",
       type: "string",
       default: "",
-      description: "Native form field name. When set, hidden inputs are rendered from the selection.",
+      description:
+        "Native form field name. When set, a visually-hidden native <select> is rendered from the selection.",
     },
     {
       prop: "form",
       type: "string",
       default: "",
-      description: "Associates the hidden field(s) with a form by id.",
+      description: "Associates the hidden field with a form by id.",
     },
     {
       prop: "required",
       type: "boolean",
       default: "false",
-      description: "Marks the field required for native validation.",
+      description:
+        "Marks the field required: an empty selection blocks the form submit and moves focus to the list.",
     },
     {
       prop: "slotClasses",

@@ -15,6 +15,7 @@
     "entries": {
       "calendar": "src/calendar/index.ts",
       "dialog": "src/dialog/index.ts",
+      "hidden-select": "src/hidden-select/index.ts",
       "listbox": "src/listbox/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "popover": "src/popover/index.ts",
@@ -31,6 +32,10 @@
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
+    },
+    "./hidden-select": {
+      "types": "./dist/hidden-select/index.d.ts",
+      "solid": "./dist/hidden-select/index.jsx"
     },
     "./listbox": {
       "types": "./dist/listbox/index.d.ts",

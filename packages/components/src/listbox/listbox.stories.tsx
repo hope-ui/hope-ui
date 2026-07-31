@@ -384,9 +384,10 @@ function SelectShape(): JSX.Element {
 }
 
 /**
- * Native form submission, opt-in via `name`: the listbox renders hidden fields (siblings of the
- * list element) valued `itemToValue(item)` for each selected row, so a plain `<form>` submit carries the
- * selection. Submit and watch the captured `FormData` render below.
+ * Native form submission, opt-in via `name`: the listbox renders the kernel's `HiddenSelect` (a
+ * sibling of the list element) — a visually-clipped real `<select name="fruit">` holding one
+ * `<option>` per item, with the selected ones marked. So a plain `<form>` submit carries the
+ * selection, and the browser can autofill it. Submit and watch the captured `FormData` render below.
  */
 export const FormSubmission: Story = {
   name: "native form submission (name)",
@@ -418,6 +419,56 @@ export const FormSubmission: Story = {
         <button type="submit" style={{ "align-self": "flex-start" }}>
           Submit
         </button>
+        <output style={{ "font-size": "0.875rem" }}>
+          {submitted() ? `Submitted fruit=[${submitted()?.join(", ")}]` : "Not submitted yet"}
+        </output>
+      </form>
+    );
+  },
+};
+
+/**
+ * **`required` blocks the submit, and moves focus to the list.** Press Submit with nothing selected:
+ * the browser refuses (the hidden `<select>`'s placeholder option fails `valueMissing`) and focus
+ * lands on the list rather than on a control nobody can see. Pick a fruit and it submits; **Reset**
+ * puts the selection back to what the listbox was created with, which no hand-rolled hidden input
+ * ever did.
+ *
+ * This is a real behavior, not decoration: until the hidden field became a `<select>`, `required`
+ * was accepted and silently ignored — `<input type="hidden">` is barred from constraint validation.
+ * Nothing on screen said so, which is exactly why it needs a story.
+ */
+export const RequiredFormField: Story = {
+  name: "native form submission (required)",
+  render: () => {
+    const [submitted, setSubmitted] = createSignal<string[] | null>(null);
+    const [value, setValue] = createSignal<Fruit[]>([]);
+    return (
+      <form
+        style={{ display: "flex", "flex-direction": "column", gap: "1rem", padding: "2rem" }}
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(new FormData(event.currentTarget).getAll("fruit").map(String));
+        }}
+      >
+        <Listbox.Root
+          aria-label="Choose a fruit"
+          class={PANEL}
+          name="fruit"
+          required
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          isItemDisabled={isItemDisabled}
+          value={value()}
+          onChange={setValue}
+        >
+          {(fruit) => <FruitItem fruit={fruit} />}
+        </Listbox.Root>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button type="submit">Submit</button>
+          <button type="reset">Reset</button>
+        </div>
         <output style={{ "font-size": "0.875rem" }}>
           {submitted() ? `Submitted fruit=[${submitted()?.join(", ")}]` : "Not submitted yet"}
         </output>
