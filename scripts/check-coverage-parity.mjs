@@ -37,9 +37,15 @@
 // missing its `## Rejected alternatives` section — the architectures that were genuinely on the
 // table and lost. That check is keyed off the DOC TREE, not off `REQUIRES_DOC`: an `internal/`
 // doc is optional to *write*, but once written it carries the same obligation, and those are the
-// rationale-densest files in the repo. See REQUIRES_REJECTED_ALTERNATIVES below.
+// rationale-densest files in the repo. See REQUIRES_REJECTED_ALTERNATIVES below. That rule's own
+// logic lives in `lib/rejected-alternatives.mjs` — this file is an executable that walks the repo
+// and exits, so the rule had to move out of it to be testable on its own.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, sep } from "node:path";
+import {
+  REJECTED_ALTERNATIVES_HEADING,
+  rejectedAlternativesProblem,
+} from "./lib/rejected-alternatives.mjs";
 import { blankNonCode } from "./lib/source-projection.mjs";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
@@ -71,15 +77,6 @@ const REQUIRES_DOC = new Set(["primitives", "i18n"]);
 // history most likely to be "simplified" back into the bug it was written to avoid. So the rule is
 // "a doc that exists carries the section", not "a doc that was required carries the section".
 const REQUIRES_REJECTED_ALTERNATIVES = new Set(["primitives", "i18n"]);
-const REJECTED_ALTERNATIVES_HEADING = "Rejected alternatives";
-// The escape hatch, in the same shape as `class-forwarding-ok:` / `rtl-ok:`. The reason is
-// mandatory and must be at least this many words, so it can't decay into a blanket `n/a` silencer:
-// four words is enough to force a sentence fragment that names *why* the shape was uncontested
-// ("pure data, no contested shape") or points at the file that owns the contested decision
-// ("the catalog choice lives in ../catalogs.md").
-// `[\s\S]` rather than `[^]` so the reason may wrap across lines; biome rejects the latter.
-const NO_REJECTED_ALTERNATIVES = /<!--\s*no-rejected-alternatives:(?<reason>[\s\S]*?)-->/;
-const MIN_ESCAPE_HATCH_REASON_WORDS = 4;
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
 // `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
 // files are the two halves of the SSR → hydrate round-trip, and neither project can do both:
@@ -215,109 +212,6 @@ function isStoryFile(path) {
  */
 function isDocExemptSource(pkg, path) {
   return pkg === "primitives" && /[/\\]src[/\\]internal[/\\]/.test(path);
-}
-
-/**
- * The markdown with every fenced code block blanked — the same idea as `blankNonCode` for TS, and
- * for the same reason: a doc is free to *show* the heading or the escape-hatch comment in an
- * example without thereby satisfying the rule. Line count is preserved, so line-based scanning
- * downstream still lines up with the original file.
- * @param {string} markdown
- */
-function blankFencedCode(markdown) {
-  const lines = markdown.split("\n");
-  /** The character (` or ~) opening the fence we are inside, or null at the top level. */
-  let fenceChar = null;
-
-  return lines
-    .map((line) => {
-      const marker = /^\s*(`{3,}|~{3,})/.exec(line);
-      if (fenceChar === null) {
-        if (marker) {
-          fenceChar = marker[1][0];
-          return "";
-        }
-        return line;
-      }
-      if (marker && marker[1][0] === fenceChar) {
-        fenceChar = null;
-      }
-      return "";
-    })
-    .join("\n");
-}
-
-/**
- * The lines beneath `## Rejected alternatives`, up to the next `#`/`##` heading — or null when the
- * section is absent.
- * @param {string} prose A `blankFencedCode` result.
- */
-function rejectedAlternativesSection(prose) {
-  const lines = prose.split("\n");
-  const heading = new RegExp(`^##\\s+${REJECTED_ALTERNATIVES_HEADING}\\s*$`);
-  const start = lines.findIndex((line) => heading.test(line));
-  if (start === -1) {
-    return null;
-  }
-
-  const body = lines.slice(start + 1);
-  const end = body.findIndex((line) => /^#{1,2}\s/.test(line));
-  return end === -1 ? body : body.slice(0, end);
-}
-
-/**
- * Why this doc fails the rejected-alternatives rule, or null when it passes.
- *
- * A doc passes by carrying either a populated `## Rejected alternatives` section or the escape
- * hatch — never both, since a file claiming it had no contested alternative while listing several
- * is a hatch someone forgot to delete after writing the section.
- *
- * "Populated" is two things, because both stubs are what a rule like this decays into: at least one
- * `### <alternative>` entry, and a `**Why not:**` line under each one. An entry with no consequence
- * beneath it records that a choice existed but not what happened when it lost, which is the only
- * part a future reader needs.
- *
- * @param {string} markdown
- */
-function rejectedAlternativesProblem(markdown) {
-  const prose = blankFencedCode(markdown);
-  const section = rejectedAlternativesSection(prose);
-  const hatch = NO_REJECTED_ALTERNATIVES.exec(prose);
-
-  if (section && hatch) {
-    return `carries both a \`## ${REJECTED_ALTERNATIVES_HEADING}\` section and a \`no-rejected-alternatives:\` escape hatch — delete the hatch`;
-  }
-
-  if (hatch) {
-    const words = hatch.groups.reason.trim().split(/\s+/).filter(Boolean);
-    return words.length >= MIN_ESCAPE_HATCH_REASON_WORDS
-      ? null
-      : `\`no-rejected-alternatives:\` needs a reason of at least ${MIN_ESCAPE_HATCH_REASON_WORDS} words saying what made the shape uncontested (or pointing at the doc that owns the contested decision)`;
-  }
-
-  if (!section) {
-    return `missing a \`## ${REJECTED_ALTERNATIVES_HEADING}\` section (or a \`<!-- no-rejected-alternatives: <reason> -->\` comment)`;
-  }
-
-  /** @type {Array<{ title: string; hasWhyNot: boolean }>} */
-  const entries = [];
-  for (const line of section) {
-    const entryHeading = /^###\s+(?<title>.+?)\s*$/.exec(line);
-    if (entryHeading) {
-      entries.push({ title: entryHeading.groups.title, hasWhyNot: false });
-    } else if (entries.length > 0 && /^\s*\*\*Why not:\*\*\s*\S/.test(line)) {
-      entries.at(-1).hasWhyNot = true;
-    }
-  }
-
-  if (entries.length === 0) {
-    return `\`## ${REJECTED_ALTERNATIVES_HEADING}\` has no \`### <alternative>\` entry beneath it`;
-  }
-  const unexplained = entries.find((entry) => !entry.hasWhyNot);
-  if (unexplained) {
-    return `\`## ${REJECTED_ALTERNATIVES_HEADING}\` entry "${unexplained.title}" has no \`**Why not:** <consequence>\` line`;
-  }
-  return null;
 }
 
 /** Whether a path lives inside a `__tests__/` subtree (tests + their support modules + fixtures). */

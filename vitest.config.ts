@@ -40,7 +40,10 @@ export default defineConfig({
           // `document` at all it is *impossible* to write one here by accident, rather than
           // merely discouraged.
           environment: "node",
-          include: ["packages/*/src/**/*.test.{ts,tsx}"],
+          // `scripts/` rides in this project rather than getting a fourth one: the split is by
+          // module resolution (see the header), and a check-script test needs no special
+          // resolution at all — no solid, no DOM, no aliases. It is exactly "node, pure logic".
+          include: ["packages/*/src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
           exclude: nodeExclude,
           setupFiles: jestDomOptOut,
         },

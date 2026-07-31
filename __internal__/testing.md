@@ -20,6 +20,13 @@ Foo.ssr.test.ts(x)      → ssr
 Foo.browser.test.ts(x)  → browser
 ```
 
+The `unit` project also picks up `scripts/**/*.test.mjs` — the check scripts' own tests, which need
+no solid, no DOM and no aliases, so they want exactly what `unit` already is rather than a fourth
+project. A check script is an executable that walks the repo and exits, so the rule under test has
+to live in `scripts/lib/` to be importable: `lib/rejected-alternatives.mjs` is the worked example,
+alongside the older `lib/source-projection.mjs`. Note that the Definition of Done does **not** reach
+`scripts/` — a check script is tested when its failure mode is silent acceptance, not by rule.
+
 ## Why the split is by *module resolution*, not by taste
 
 `solid-js` and `@solidjs/web` each ship **two builds**, chosen by `package.json#exports` conditions:

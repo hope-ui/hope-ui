@@ -238,7 +238,14 @@ delete.
 beneath it, an entry with no `**Why not:**` line, a hatch whose reason is under four words, and a
 file carrying both. Fenced code blocks are blanked first (`blankFencedCode`, the markdown analogue
 of `blankNonCode`), so a doc can *show* the heading or the hatch in an example without thereby
-satisfying the rule.
+satisfying the rule — as this file and `CLAUDE.md` both do.
+
+The rule lives in `scripts/lib/rejected-alternatives.mjs`, not in the check script, and is pinned by
+`scripts/lib/__tests__/rejected-alternatives.test.mjs`. It is the one check script carrying a test,
+because it is the one whose regressions are **silent**: every loophole here — a stub section, an
+entry with no consequence, a one-word hatch, a heading shown inside a fence — leaves a doc that
+reads as though it records its history while recording nothing. `check-class-forwarding` and
+`check-rtl-safety` fail loudly when they break; this one would just stop asking.
 
 The check is keyed off the **doc tree**, not off `REQUIRES_DOC`. A `packages/primitives/src/internal/`
 file is doc-*exempt* (item 2's exception) — but the docs written there anyway are the longest and
