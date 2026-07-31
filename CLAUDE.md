@@ -153,6 +153,15 @@ The set:
 - "Calls" = outside a comment, string, or `it.skip`, and not merely imported.
 
 Also required:
+- **Rejected alternatives:** every `.md` under `__internal__/primitives|i18n` ends with a
+  `## Rejected alternatives` section — one `### <alternative>` + `**Why not:** <consequence>` entry
+  per shape that was genuinely on the table (`**Revisit if:**` optional), so the reasoning outlives
+  the commit message that holds it. Divergence from React Aria / Base UI / Zag / Kobalte is the case
+  most worth recording. **Never invent one** — a file with no contested alternative takes
+  `<!-- no-rejected-alternatives: <reason> -->` instead (reason mandatory, ≥ 4 words; never both).
+  Enforced by `pnpm check:coverage-parity`, keyed off the doc tree, so a doc-exempt `internal/` doc
+  written anyway still owes one. Component/theming rationale goes in
+  `__internal__/components/decisions.md`, not `apps/docs/`. See `__internal__/definition-of-done.md`.
 - `expectNoA11yViolations` fails on axe **violations** *and* **`incomplete`** results. Name a
   genuinely undecidable one in `allowIncomplete` at the call site with a reason; never silence the
   category. See `__internal__/internal-test-utils/axe/axe.md`.

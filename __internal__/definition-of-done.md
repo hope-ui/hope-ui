@@ -40,6 +40,9 @@ The set:
    The composed families (`dialog`, `calendar`, `listbox`, `modal-backdrop`) and the `utils/` helpers
    still carry one, since those are the surface an advanced consumer actually composes.
 
+   Every such doc also carries a **`## Rejected alternatives`** section — the shapes that were
+   genuinely on the table and what happened when they lost. See *Rejected alternatives* below.
+
    `@hope-ui/theming` and `@hope-ui/components` carry **no** repo usage doc; their public API is
    documented in the doc website (`apps/docs/`).
 3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (one per
@@ -164,6 +167,106 @@ A slot read **exactly once — inside a `<Show>` or not — needs nothing** (a s
 `<Show>`), nor does a static/directly-written child — a reflexive `children()` there only adds a
 memo and shifts `_hk`. Full decision procedure: `__internal__/solid-2.0-notes.md` (search "`children()`
 decision procedure").
+
+## Rejected alternatives
+
+A usage doc records *what* a primitive does — API, keyboard table, ARIA pattern — but on its own it
+never records *why it has that shape*. That reasoning lives in commit messages, PR threads, and one
+person's head, and it decays the fastest of anything in the repo. The failure mode is specific: a
+maintainer reads a strange-looking primitive, finds no reason for the strangeness, assumes it is
+accidental, and "simplifies" it straight back into the bug it was written to avoid.
+
+So every `.md` under `__internal__/primitives/` and `__internal__/i18n/` ends with:
+
+```markdown
+## Rejected alternatives
+
+### <the alternative, named as a thing, not a sentence>
+**Why not:** <the concrete consequence — a bug, a constraint, an SSR/a11y/perf failure>
+**Revisit if:** <the condition that would flip the decision>
+```
+
+- **One entry per option that was actually on the table.** Not a survey of everything imaginable —
+  an entry for a shape nobody seriously proposed is noise that makes the real ones cheaper to skim
+  past.
+- **`Why not:` names a consequence, not a taste.** "Diverges `_hk` on hydration", not "felt
+  cleaner". If the sentence would still read true with the subject swapped out, it isn't a
+  consequence.
+- **`Revisit if:` is optional.** Plenty of rejections have no honest revisit condition —
+  `element.scrollIntoView()` will never stop walking every scrollable ancestor. Write one when the
+  decision genuinely hangs on something that could change (an upstream fix, a Solid release, a
+  second consumer); leave it out otherwise. Manufacturing one to fill the template is the same
+  failure as inventing the entry.
+- **Rejecting prior art is the most valuable case.** Where this kernel deliberately does *not*
+  follow React Aria / Base UI / Zag / Kobalte, that divergence is exactly the history worth keeping
+  — it is what a maintainer will otherwise "fix" by porting the upstream shape back in.
+  `calendar-group.md`'s two entries (`createDismissable`, and React Aria's VoiceOver virtual-click
+  guard) are the model.
+
+**Never invent an entry.** Recover real history from `git log` / `git blame` on the source file,
+from `plan.md` / `roadmap.md` / `solid-2.0-notes.md` / `reference-implementations.md`, and from
+rationale already sitting in the doc's own prose or in source comments. If none of that turns up a
+contested decision, use the escape hatch. Fabricated rationale is strictly worse than none: the next
+reader cites it as fact.
+
+**Move rationale, don't copy it.** A section that *is* a rejection (`## Why not
+element.scrollIntoView()`) becomes an entry outright. Where the long form is load-bearing
+explanatory prose the surrounding doc still needs, the entry states the consequence in one sentence
+and links to it — a pointer, not a second copy that drifts.
+
+### The escape hatch
+
+A file whose shape had no contested alternative carries, instead of the section:
+
+```markdown
+<!-- no-rejected-alternatives: <reason> -->
+```
+
+The reason is **mandatory and at least four words**, enforced, so it cannot decay into a blanket
+`n/a`. It says what made the shape uncontested, or points at the doc that owns the contested
+decision — the per-locale catalogs (`i18n/locales/*.md`) are the archetype: the choices that were
+argued (locale prefix matching and the fallback chain, one shared plural template vs a function per
+locale) belong to `catalogs.md` and `messages.md`, not to `fr.md`.
+
+A file may not carry both the hatch and the section; that combination is a hatch someone forgot to
+delete.
+
+### What is enforced
+
+`pnpm check:coverage-parity` reads every `.md` under `__internal__/primitives/` and
+`__internal__/i18n/` and fails on: a missing section with no hatch, a section with no `###` entry
+beneath it, an entry with no `**Why not:**` line, a hatch whose reason is under four words, and a
+file carrying both. Fenced code blocks are blanked first (`blankFencedCode`, the markdown analogue
+of `blankNonCode`), so a doc can *show* the heading or the hatch in an example without thereby
+satisfying the rule.
+
+The check is keyed off the **doc tree**, not off `REQUIRES_DOC`. A `packages/primitives/src/internal/`
+file is doc-*exempt* (item 2's exception) — but the docs written there anyway are the longest and
+most contested in the repo (`create-floating.md`, `create-dismissable.md`, `create-hide-outside.md`),
+so exempting them would exempt precisely the history most at risk. The rule is therefore "a doc that
+exists carries the section", not "a doc that was required carries the section". Writing an optional
+`internal/` doc still costs a section; deleting one to dodge that is not a trade anyone should make.
+
+### `@hope-ui/components` and `@hope-ui/theming`
+
+Both have contested decisions worth keeping, and neither gets a per-file section.
+
+Per-file is wrong there: by the layering rule, a component is assembly + theme, so its *behavior*
+rationale belongs to the primitive it composes — which already carries an enforced section. A
+per-component rule would be answered by an escape hatch nearly every time, which is exactly the
+decay this rule exists to prevent.
+
+But the component layer does own real, currently-unrecorded decisions — Alert's compound
+context/children owner, CloseButton's surface-adaptive `currentColor` with no `variant`, the
+`solid·outline·soft·ghost·link` variant vocabulary. Those go in **one decision log per package**,
+`__internal__/components/decisions.md`, using the same entry shape but keyed by component rather
+than by file. Never in `apps/docs/` — that is the public API reference, and architecture rationale
+on the doc website is both wrong for the audience and a commitment we don't want to make.
+`@hope-ui/theming` gets its own log when it has a second entry to put in one.
+
+The log is **author discipline, not enforced**: there is no per-file anchor to hang it on, and a
+per-folder check that cannot tell whether a component *had* a contested decision would only
+manufacture escape hatches.
 
 ## The three test projects, and the SSR round trip
 

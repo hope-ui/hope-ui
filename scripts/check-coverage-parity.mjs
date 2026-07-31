@@ -32,6 +32,12 @@
 // kernel, demoted from public API — see __internal__/plan.md "Recommended architecture") need a
 // test but NOT a consumer-facing `.md`. The composed families (dialog/calendar/i18n/modal-backdrop)
 // and utils/ still need one. See `isDocExemptSource` below.
+//
+// Finally, it fails if any usage doc under `__internal__/primitives/` or `__internal__/i18n/` is
+// missing its `## Rejected alternatives` section — the architectures that were genuinely on the
+// table and lost. That check is keyed off the DOC TREE, not off `REQUIRES_DOC`: an `internal/`
+// doc is optional to *write*, but once written it carries the same obligation, and those are the
+// rationale-densest files in the repo. See REQUIRES_REJECTED_ALTERNATIVES below.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, sep } from "node:path";
 import { blankNonCode } from "./lib/source-projection.mjs";
@@ -57,6 +63,23 @@ const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components", "theming", "i
 // website (apps/docs), so those per-symbol docs were retired. Decoupled from REQUIRES_TEST_AND_DOC
 // so a package can require a test without requiring a doc.
 const REQUIRES_DOC = new Set(["primitives", "i18n"]);
+// Doc trees under `__internal__/` whose every `.md` must record the alternatives that were
+// considered and rejected. Deliberately keyed off the doc tree rather than off REQUIRES_DOC: a
+// `primitives/src/internal/` file is doc-EXEMPT (isDocExemptSource), but the docs written there
+// anyway are the longest and most contested in the repo — `create-floating.md`,
+// `create-dismissable.md`, `create-hide-outside.md` — and exempting exactly those would exempt the
+// history most likely to be "simplified" back into the bug it was written to avoid. So the rule is
+// "a doc that exists carries the section", not "a doc that was required carries the section".
+const REQUIRES_REJECTED_ALTERNATIVES = new Set(["primitives", "i18n"]);
+const REJECTED_ALTERNATIVES_HEADING = "Rejected alternatives";
+// The escape hatch, in the same shape as `class-forwarding-ok:` / `rtl-ok:`. The reason is
+// mandatory and must be at least this many words, so it can't decay into a blanket `n/a` silencer:
+// four words is enough to force a sentence fragment that names *why* the shape was uncontested
+// ("pure data, no contested shape") or points at the file that owns the contested decision
+// ("the catalog choice lives in ../catalogs.md").
+// `[\s\S]` rather than `[^]` so the reason may wrap across lines; biome rejects the latter.
+const NO_REJECTED_ALTERNATIVES = /<!--\s*no-rejected-alternatives:(?<reason>[\s\S]*?)-->/;
+const MIN_ESCAPE_HATCH_REASON_WORDS = 4;
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
 // `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
 // files are the two halves of the SSR → hydrate round-trip, and neither project can do both:
@@ -192,6 +215,109 @@ function isStoryFile(path) {
  */
 function isDocExemptSource(pkg, path) {
   return pkg === "primitives" && /[/\\]src[/\\]internal[/\\]/.test(path);
+}
+
+/**
+ * The markdown with every fenced code block blanked — the same idea as `blankNonCode` for TS, and
+ * for the same reason: a doc is free to *show* the heading or the escape-hatch comment in an
+ * example without thereby satisfying the rule. Line count is preserved, so line-based scanning
+ * downstream still lines up with the original file.
+ * @param {string} markdown
+ */
+function blankFencedCode(markdown) {
+  const lines = markdown.split("\n");
+  /** The character (` or ~) opening the fence we are inside, or null at the top level. */
+  let fenceChar = null;
+
+  return lines
+    .map((line) => {
+      const marker = /^\s*(`{3,}|~{3,})/.exec(line);
+      if (fenceChar === null) {
+        if (marker) {
+          fenceChar = marker[1][0];
+          return "";
+        }
+        return line;
+      }
+      if (marker && marker[1][0] === fenceChar) {
+        fenceChar = null;
+      }
+      return "";
+    })
+    .join("\n");
+}
+
+/**
+ * The lines beneath `## Rejected alternatives`, up to the next `#`/`##` heading — or null when the
+ * section is absent.
+ * @param {string} prose A `blankFencedCode` result.
+ */
+function rejectedAlternativesSection(prose) {
+  const lines = prose.split("\n");
+  const heading = new RegExp(`^##\\s+${REJECTED_ALTERNATIVES_HEADING}\\s*$`);
+  const start = lines.findIndex((line) => heading.test(line));
+  if (start === -1) {
+    return null;
+  }
+
+  const body = lines.slice(start + 1);
+  const end = body.findIndex((line) => /^#{1,2}\s/.test(line));
+  return end === -1 ? body : body.slice(0, end);
+}
+
+/**
+ * Why this doc fails the rejected-alternatives rule, or null when it passes.
+ *
+ * A doc passes by carrying either a populated `## Rejected alternatives` section or the escape
+ * hatch — never both, since a file claiming it had no contested alternative while listing several
+ * is a hatch someone forgot to delete after writing the section.
+ *
+ * "Populated" is two things, because both stubs are what a rule like this decays into: at least one
+ * `### <alternative>` entry, and a `**Why not:**` line under each one. An entry with no consequence
+ * beneath it records that a choice existed but not what happened when it lost, which is the only
+ * part a future reader needs.
+ *
+ * @param {string} markdown
+ */
+function rejectedAlternativesProblem(markdown) {
+  const prose = blankFencedCode(markdown);
+  const section = rejectedAlternativesSection(prose);
+  const hatch = NO_REJECTED_ALTERNATIVES.exec(prose);
+
+  if (section && hatch) {
+    return `carries both a \`## ${REJECTED_ALTERNATIVES_HEADING}\` section and a \`no-rejected-alternatives:\` escape hatch — delete the hatch`;
+  }
+
+  if (hatch) {
+    const words = hatch.groups.reason.trim().split(/\s+/).filter(Boolean);
+    return words.length >= MIN_ESCAPE_HATCH_REASON_WORDS
+      ? null
+      : `\`no-rejected-alternatives:\` needs a reason of at least ${MIN_ESCAPE_HATCH_REASON_WORDS} words saying what made the shape uncontested (or pointing at the doc that owns the contested decision)`;
+  }
+
+  if (!section) {
+    return `missing a \`## ${REJECTED_ALTERNATIVES_HEADING}\` section (or a \`<!-- no-rejected-alternatives: <reason> -->\` comment)`;
+  }
+
+  /** @type {Array<{ title: string; hasWhyNot: boolean }>} */
+  const entries = [];
+  for (const line of section) {
+    const entryHeading = /^###\s+(?<title>.+?)\s*$/.exec(line);
+    if (entryHeading) {
+      entries.push({ title: entryHeading.groups.title, hasWhyNot: false });
+    } else if (entries.length > 0 && /^\s*\*\*Why not:\*\*\s*\S/.test(line)) {
+      entries.at(-1).hasWhyNot = true;
+    }
+  }
+
+  if (entries.length === 0) {
+    return `\`## ${REJECTED_ALTERNATIVES_HEADING}\` has no \`### <alternative>\` entry beneath it`;
+  }
+  const unexplained = entries.find((entry) => !entry.hasWhyNot);
+  if (unexplained) {
+    return `\`## ${REJECTED_ALTERNATIVES_HEADING}\` entry "${unexplained.title}" has no \`**Why not:** <consequence>\` line`;
+  }
+  return null;
 }
 
 /** Whether a path lives inside a `__tests__/` subtree (tests + their support modules + fixtures). */
@@ -362,6 +488,28 @@ for (const pkg of packageDirs) {
   }
 }
 
+// Every usage doc records not just what its primitive does, but which other shapes were on the
+// table and what happened when they lost. Without it the reasoning survives only in commit
+// messages, and a maintainer reading a strange-looking primitive assumes the strangeness is
+// accidental and "simplifies" it back into the bug it was written to avoid. See
+// __internal__/definition-of-done.md "Rejected alternatives".
+const undocumentedAlternatives = [];
+for (const pkg of REQUIRES_REJECTED_ALTERNATIVES) {
+  const docDir = join(repoRoot, "__internal__", pkg);
+  let docFiles;
+  try {
+    docFiles = walk(docDir).filter((f) => f.endsWith(".md"));
+  } catch {
+    continue;
+  }
+  for (const doc of docFiles) {
+    const problem = rejectedAlternativesProblem(readFileSync(doc, "utf8"));
+    if (problem) {
+      undocumentedAlternatives.push(`${relative(repoRoot, doc)} — ${problem}`);
+    }
+  }
+}
+
 // A leaf `src/<name>/` folder must hold only its implementation, its `index.ts`, and (components)
 // its `*.stories.tsx`. Tests, `__fixtures__/`, and `__screenshots__/` belong in a `__tests__/`
 // subfolder; any usage doc belongs under `__internal__/`. Anything of those kinds sitting
@@ -404,20 +552,29 @@ for (const pkg of packageDirs) {
   }
 }
 
-if (missing.length > 0 || sprawl.length > 0) {
-  if (missing.length > 0) {
-    console.error("Definition of Done violated — missing test/doc coverage:\n");
-    for (const line of missing) {
+const failures = [
+  ["Definition of Done violated — missing test/doc coverage:", missing],
+  ["Leaf source folders must stay flat-free:", sprawl],
+  [
+    `Every usage doc records the alternatives it rejected (\`## ${REJECTED_ALTERNATIVES_HEADING}\`):`,
+    undocumentedAlternatives,
+  ],
+];
+const total = failures.reduce((sum, [, lines]) => sum + lines.length, 0);
+
+if (total > 0) {
+  let printedAnySection = false;
+  for (const [headline, lines] of failures) {
+    if (lines.length === 0) {
+      continue;
+    }
+    console.error(`${printedAnySection ? "\n" : ""}${headline}\n`);
+    for (const line of lines) {
       console.error(`  - ${line}`);
     }
+    printedAnySection = true;
   }
-  if (sprawl.length > 0) {
-    console.error(`${missing.length > 0 ? "\n" : ""}Leaf source folders must stay flat-free:\n`);
-    for (const line of sprawl) {
-      console.error(`  - ${line}`);
-    }
-  }
-  console.error(`\n${missing.length + sprawl.length} issue(s) found.`);
+  console.error(`\n${total} issue(s) found.`);
   process.exit(1);
 }
 
@@ -425,6 +582,7 @@ console.log(
   "check:coverage-parity passed — every primitives source file has a test and a doc under " +
     "__internal__/ (the internal-kernel src/internal/ files are doc-exempt); every theming source " +
     "file has a test; every component FOLDER has a test, a story, an executing renderToStringAsync() " +
-    "and an executing hydrate(); every browser test that mounts DOM also runs axe; and no leaf " +
-    "source folder has flat test/doc/fixture sprawl.",
+    "and an executing hydrate(); every browser test that mounts DOM also runs axe; every usage doc " +
+    "under __internal__/primitives|i18n records its rejected alternatives; and no leaf source " +
+    "folder has flat test/doc/fixture sprawl.",
 );
