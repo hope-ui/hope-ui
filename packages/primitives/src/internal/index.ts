@@ -151,6 +151,14 @@ export {
   type TextDirection,
 } from "./create-text-direction-warning";
 export {
+  type CreateTextInputOptions,
+  type CreateTextInputReturn,
+  createTextInput,
+  type TextInputBehaviorProps,
+  type TextInputElement,
+  type TextInputSelection,
+} from "./create-text-input";
+export {
   type CreateVirtualCollectionOptions,
   type CreateVirtualCollectionReturn,
   createVirtualCollection,
