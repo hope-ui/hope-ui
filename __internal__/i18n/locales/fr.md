@@ -8,8 +8,9 @@ fall back to `MESSAGES_EN`.
 - **Parity:** must mirror every key in `en.ts` — enforced by the `I18nCatalog` type at compile time and
   by the parity test in `fr.test.ts`.
 - **Plural rule:** French treats `count <= 1` as singular (so both `0` and `1` stay singular), unlike
-  English's singular-only-at-`1`. That is why `calendar.datesSelected` is a per-locale function rather
-  than a shared template.
+  English's singular-only-at-`1`. That is why the count-bearing keys (`calendar.datesSelected`,
+  `combobox.countAnnouncement`) are per-locale functions rather than a shared template. Both inflect
+  the noun *and* its participle/adjective: `2 dates sélectionnées`, `2 options disponibles`.
 
 <!-- no-rejected-alternatives: catalog data — the argued choice this file illustrates,
 per-locale plural *functions* rather than one shared template, belongs to `../messages.md`; catalog

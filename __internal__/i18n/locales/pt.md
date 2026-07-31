@@ -5,8 +5,8 @@ Built-in **Portuguese** catalog, selected when the active locale's primary subta
 
 - Uses European Portuguese wording (e.g. *Seguinte*, *Vista de mês*); Brazilian variants map here too
   and can be overridden per key via the `I18nProvider` `messages` config.
-- `datesSelected` plural: singular only at `1`, with feminine agreement (`1 data selecionada` /
-  `2 datas selecionadas`).
+- Both count-bearing keys: singular only at `1`, with feminine agreement — `1 data selecionada` /
+  `2 datas selecionadas`, `1 opção disponível` / `2 opções disponíveis`.
 
 <!-- no-rejected-alternatives: catalog data — the European-versus-Brazilian wording
 question is the regional-variant decision owned by `../catalogs.md` (one catalog per primary subtag,

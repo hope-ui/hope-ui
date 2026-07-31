@@ -13,4 +13,15 @@ describe("MESSAGES_SV", () => {
     expect(fn({ count: 1 })).toBe("1 datum valt");
     expect(fn({ count: 2 })).toBe("2 datum valda");
   });
+
+  it("carries the Swedish combobox strings", () => {
+    expect(MESSAGES_SV.combobox.triggerLabel).toBe("Visa förslag");
+    expect(MESSAGES_SV.combobox.clearLabel).toBe("Rensa");
+  });
+
+  it("pluralizes countAnnouncement (neuter 'alternativ' is invariant; adjective agrees)", () => {
+    const fn = MESSAGES_SV.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 alternativ tillgängligt");
+    expect(fn({ count: 2 })).toBe("2 alternativ tillgängliga");
+  });
 });

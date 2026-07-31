@@ -10,6 +10,7 @@ import { Badge } from "../badge";
 import { Button } from "../button";
 import { Calendar } from "../calendar";
 import { CloseButton } from "../close-button";
+import { Combobox } from "../combobox";
 import { Dialog } from "../dialog";
 import { Listbox } from "../listbox";
 import { Popover } from "../popover";
@@ -389,6 +390,144 @@ describe("every public part forwards its class to the element it renders", () =>
       // `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by
       // construction. The IDREF itself is pinned in `select.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
+    });
+    dispose();
+    portalMount.remove();
+  });
+
+  it("Combobox", async () => {
+    const portalMount = document.createElement("main");
+    document.body.appendChild(portalMount);
+    const { dispose } = mount(() => (
+      <Themed>
+        <div role="region" aria-label="Combobox probe">
+          <Combobox.Root
+            items={BASKETS}
+            groupToItems={(basket) => basket.fruits}
+            itemToValue={itemToValue}
+            itemToLabel={itemToLabel}
+            defaultValue={APPLE}
+            defaultOpen
+          >
+            <Combobox.Control
+              class="probe-control"
+              style={{ position: "fixed", top: "120px", left: "40px", width: "220px" }}
+            >
+              <Combobox.Input class="probe-input" aria-label="fruits" />
+              {/* `alwaysVisible`, because `Combobox.Clear` hides itself when there is nothing to
+                  clear — and a part that rendered nothing would pass this probe vacuously. */}
+              <Combobox.Clear class="probe-clear" alwaysVisible />
+              <Combobox.Trigger class="probe-trigger">
+                <Combobox.Icon class="probe-icon" />
+              </Combobox.Trigger>
+            </Combobox.Control>
+            <Combobox.Portal mount={portalMount}>
+              <Combobox.Positioner class="probe-positioner">
+                <Combobox.Content class="probe-content">
+                  <Combobox.List class="probe-list">
+                    {(basket, _index, fruits) => (
+                      <>
+                        <Combobox.Group class="probe-group">
+                          <Combobox.GroupLabel class="probe-group-label">
+                            {(basket as Basket).kind}
+                          </Combobox.GroupLabel>
+                          <For each={fruits() as Fruit[]}>
+                            {(fruit) => (
+                              <Combobox.Item class="probe-item" item={fruit}>
+                                <Combobox.ItemText class="probe-item-text">
+                                  {fruit.name}
+                                </Combobox.ItemText>
+                                <Combobox.ItemIndicator class="probe-item-indicator" />
+                              </Combobox.Item>
+                            )}
+                          </For>
+                        </Combobox.Group>
+                        <Combobox.Separator class="probe-separator" />
+                      </>
+                    )}
+                  </Combobox.List>
+                  {/* `Combobox.Empty` renders only while the filtered list is empty, so it is probed
+                      in its own tree below rather than here. */}
+                  <Combobox.Status class="probe-status" />
+                </Combobox.Content>
+              </Combobox.Positioner>
+            </Combobox.Portal>
+          </Combobox.Root>
+        </div>
+      </Themed>
+    ));
+
+    await vi.waitFor(() => {
+      const positioner = document.querySelector<HTMLElement>('[data-slot="combobox-positioner"]');
+      expect(positioner?.style.visibility).not.toBe("hidden");
+    });
+
+    expectProbedClasses(document, {
+      "combobox-control": "probe-control",
+      "combobox-input": "probe-input",
+      "combobox-clear": "probe-clear",
+      "combobox-trigger": "probe-trigger",
+      "combobox-icon": "probe-icon",
+      "combobox-positioner": "probe-positioner",
+      "combobox-content": "probe-content",
+      "combobox-list": "probe-list",
+      "combobox-status": "probe-status",
+      "combobox-group": "probe-group",
+      "combobox-group-label": "probe-group-label",
+      "combobox-separator": "probe-separator",
+      "combobox-item": "probe-item",
+      "combobox-item-text": "probe-item-text",
+      "combobox-item-indicator": "probe-item-indicator",
+    });
+    await expectNoA11yViolations(document.body, {
+      // The chevron carries both `aria-haspopup` and `aria-controls` while open — see the note on
+      // Select. The IDREF itself is pinned in `combobox.browser.test.tsx`.
+      allowIncomplete: ["aria-valid-attr-value"],
+    });
+    dispose();
+    portalMount.remove();
+  });
+
+  it("Combobox.Empty", async () => {
+    // Its own tree, because the part renders only while the filtered option set is empty — which
+    // means an `items={[]}` root, which in turn is only openable because `Combobox.Root` flips the
+    // kernel's `allowsEmptyCollection` default to `true`.
+    const portalMount = document.createElement("main");
+    document.body.appendChild(portalMount);
+    const { dispose } = mount(() => (
+      <Themed>
+        <div role="region" aria-label="Combobox empty probe">
+          <Combobox.Root items={[] as Fruit[]} defaultOpen>
+            <Combobox.Control style={{ position: "fixed", top: "120px", left: "40px" }}>
+              <Combobox.Input aria-label="fruits" />
+            </Combobox.Control>
+            <Combobox.Portal mount={portalMount}>
+              <Combobox.Positioner>
+                <Combobox.Content>
+                  <Combobox.List>{() => null}</Combobox.List>
+                  <Combobox.Empty class="probe-empty">Nothing found.</Combobox.Empty>
+                </Combobox.Content>
+              </Combobox.Positioner>
+            </Combobox.Portal>
+          </Combobox.Root>
+        </div>
+      </Themed>
+    ));
+
+    await vi.waitFor(() => {
+      const positioner = document.querySelector<HTMLElement>('[data-slot="combobox-positioner"]');
+      expect(positioner?.style.visibility).not.toBe("hidden");
+    });
+
+    expectProbedClasses(document, { "combobox-empty": "probe-empty" });
+    await expectNoA11yViolations(document.body, {
+      // An empty `role="listbox"` is exactly the state this tree exists to render, and axe cannot
+      // decide it: `aria-required-children` returns *incomplete* for a container with no owned
+      // children, because "populated later" is legitimate and indistinguishable from "malformed". It
+      // is also the state the APG combobox pattern asks for — a query that matches nothing keeps the
+      // popup open so `Combobox.Empty` can say so — and the message lives beside the listbox rather
+      // than inside it precisely because `listbox` may only contain options and groups.
+      allowIncomplete: ["aria-required-children"],
     });
     dispose();
     portalMount.remove();

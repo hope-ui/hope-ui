@@ -55,6 +55,14 @@ interface I18nMessageMap {
     /** Announced committed multiple selection. */
     datesSelected: { count: number };
   };
+  combobox: {
+    /** The chevron button's `aria-label`. It sits outside the tab order, but pointer + AT users reach it. */
+    triggerLabel: undefined;
+    /** The clear-value button's `aria-label`. */
+    clearLabel: undefined;
+    /** Live-region announcement of how many options the current filter left. */
+    countAnnouncement: { count: number };
+  };
 }
 
 /** Dotted, component-namespaced message keys — `"calendar.today"`, `"common.close"`, … (derived). */

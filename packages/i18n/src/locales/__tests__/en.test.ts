@@ -19,4 +19,16 @@ describe("MESSAGES_EN", () => {
     expect(fn({ count: 1 })).toBe("1 date selected");
     expect(fn({ count: 2 })).toBe("2 dates selected");
   });
+
+  it("carries the English combobox strings", () => {
+    expect(MESSAGES_EN.combobox.triggerLabel).toBe("Show suggestions");
+    expect(MESSAGES_EN.combobox.clearLabel).toBe("Clear");
+  });
+
+  it("pluralizes countAnnouncement with the English rule (singular only at 1)", () => {
+    const fn = MESSAGES_EN.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 0 })).toBe("0 options available");
+    expect(fn({ count: 1 })).toBe("1 option available");
+    expect(fn({ count: 2 })).toBe("2 options available");
+  });
 });

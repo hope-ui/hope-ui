@@ -50,6 +50,7 @@ export const HYDRATION_ENTRIES: Record<string, string> = {
     repoRoot,
     "packages/components/src/close-button/__tests__/close-button.ssr-entry.tsx",
   ),
+  combobox: join(repoRoot, "packages/components/src/combobox/__tests__/combobox.ssr-entry.tsx"),
   dialog: join(repoRoot, "packages/components/src/dialog/__tests__/dialog.ssr-entry.tsx"),
   listbox: join(repoRoot, "packages/components/src/listbox/__tests__/listbox.ssr-entry.tsx"),
   popover: join(repoRoot, "packages/components/src/popover/__tests__/popover.ssr-entry.tsx"),

@@ -22,7 +22,18 @@ export interface CreateListboxGroupReturn {
 export function createListboxGroup(
   props: JSX.HTMLAttributes<HTMLElement> = {},
 ): CreateListboxGroupReturn {
-  const [labelId, setLabelId] = createSignal<string | undefined>();
+  // `ownedWrite` because the label registers into this from a **descendant's** lifecycle, via
+  // `createRegisteredId` — and the group can be unmounted by a `<For>` reconciliation rather than by
+  // an effect cleanup. Combobox's filter is what does it: a query that empties a group drops the
+  // group entry, `<For>` disposes the row *inside its own memo*, and the label's `onSettled` teardown
+  // then writes here from an owned scope. Without this, that write throws
+  // `[REACTIVE_WRITE_IN_OWNED_SCOPE]` — which does not merely fail the group, it **halts the whole
+  // reactive system**, so nothing on the page updates again. Same reasoning and the same escape hatch
+  // as `create-collection.ts`'s registry, and it is framework-sanctioned rather than a suppression:
+  // being written by a descendant is what this signal is *for*.
+  const [labelId, setLabelId] = createSignal<string | undefined>(undefined, {
+    ownedWrite: true,
+  });
 
   const elementProps = merge(props, {
     get role() {

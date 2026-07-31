@@ -13,4 +13,15 @@ describe("MESSAGES_PT", () => {
     expect(fn({ count: 1 })).toBe("1 data selecionada");
     expect(fn({ count: 2 })).toBe("2 datas selecionadas");
   });
+
+  it("carries the Portuguese combobox strings", () => {
+    expect(MESSAGES_PT.combobox.triggerLabel).toBe("Mostrar sugestões");
+    expect(MESSAGES_PT.combobox.clearLabel).toBe("Limpar");
+  });
+
+  it("pluralizes countAnnouncement (singular only at 1, feminine agreement)", () => {
+    const fn = MESSAGES_PT.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 opção disponível");
+    expect(fn({ count: 2 })).toBe("2 opções disponíveis");
+  });
 });

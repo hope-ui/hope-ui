@@ -17,6 +17,7 @@ import { badgeRecipe } from "./badge";
 import { buttonRecipe } from "./button";
 import { calendarRecipe } from "./calendar";
 import { closeButtonRecipe } from "./close-button";
+import { comboboxRecipe } from "./combobox";
 import { dialogRecipe } from "./dialog";
 import { listboxRecipe } from "./listbox";
 import { popoverRecipe } from "./popover";
@@ -29,6 +30,7 @@ export const hopeRecipes = {
   button: buttonRecipe,
   calendar: calendarRecipe,
   closeButton: closeButtonRecipe,
+  combobox: comboboxRecipe,
   dialog: dialogRecipe,
   listbox: listboxRecipe,
   popover: popoverRecipe,

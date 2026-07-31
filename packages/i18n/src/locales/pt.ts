@@ -22,4 +22,10 @@ export const MESSAGES_PT: I18nCatalog = {
     datesSelected: ({ count }) =>
       `${count} ${count === 1 ? "data selecionada" : "datas selecionadas"}`,
   },
+  combobox: {
+    triggerLabel: "Mostrar sugestões",
+    clearLabel: "Limpar",
+    countAnnouncement: ({ count }) =>
+      `${count} ${count === 1 ? "opção disponível" : "opções disponíveis"}`,
+  },
 };

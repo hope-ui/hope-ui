@@ -26,4 +26,10 @@ export const MESSAGES_FR: I18nCatalog = {
     datesSelected: ({ count }) =>
       `${count} date${count <= 1 ? "" : "s"} sélectionnée${count <= 1 ? "" : "s"}`,
   },
+  combobox: {
+    triggerLabel: "Afficher les suggestions",
+    clearLabel: "Effacer",
+    countAnnouncement: ({ count }) =>
+      `${count} option${count <= 1 ? "" : "s"} disponible${count <= 1 ? "" : "s"}`,
+  },
 };

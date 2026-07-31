@@ -13,4 +13,15 @@ describe("MESSAGES_EL", () => {
     expect(fn({ count: 1 })).toBe("1 επιλεγμένη ημερομηνία");
     expect(fn({ count: 2 })).toBe("2 επιλεγμένες ημερομηνίες");
   });
+
+  it("carries the Greek combobox strings", () => {
+    expect(MESSAGES_EL.combobox.triggerLabel).toBe("Εμφάνιση προτάσεων");
+    expect(MESSAGES_EL.combobox.clearLabel).toBe("Εκκαθάριση");
+  });
+
+  it("pluralizes countAnnouncement (singular only at 1, feminine agreement)", () => {
+    const fn = MESSAGES_EL.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 διαθέσιμη επιλογή");
+    expect(fn({ count: 2 })).toBe("2 διαθέσιμες επιλογές");
+  });
 });

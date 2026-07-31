@@ -13,4 +13,15 @@ describe("MESSAGES_FI", () => {
     expect(fn({ count: 1 })).toBe("1 päivämäärä valittu");
     expect(fn({ count: 2 })).toBe("2 päivämäärää valittu");
   });
+
+  it("carries the Finnish combobox strings", () => {
+    expect(MESSAGES_FI.combobox.triggerLabel).toBe("Näytä ehdotukset");
+    expect(MESSAGES_FI.combobox.clearLabel).toBe("Tyhjennä");
+  });
+
+  it("pluralizes countAnnouncement (count != 1 takes the partitive singular)", () => {
+    const fn = MESSAGES_FI.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 vaihtoehto saatavilla");
+    expect(fn({ count: 2 })).toBe("2 vaihtoehtoa saatavilla");
+  });
 });

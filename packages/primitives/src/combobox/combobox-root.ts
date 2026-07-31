@@ -229,10 +229,26 @@ export interface CreateComboboxReturn<V = unknown, M extends SelectionMode = "si
   /** Register the value id. Called by `createComboboxValue` from the value's own scope. */
   setValueId: (id: string | undefined) => void;
 
-  /** The trigger element: the focus owner, the positioning anchor, and the one spared element. */
+  /** The trigger element: the focus owner, and — unless an outer anchor is registered — the
+   *  positioning anchor and the one spared element. */
   triggerElement: Accessor<HTMLElement | undefined>;
-  /** Register the trigger element. Wired to `createComboboxTrigger`'s `setRef`. */
+  /** Register the trigger element. Wired to `createComboboxTrigger`'s / `createComboboxInput`'s
+   *  `setRef`. */
   setTriggerElement: (element: HTMLElement | undefined) => void;
+  /**
+   * The widget's **outer box**, when it is larger than the focus owner. Optional: with none, the
+   * focus owner plays both parts, which is right for Select — its trigger *is* the whole control.
+   *
+   * Combobox's focus owner is an `<input>` sitting inside a bordered shell alongside a chevron and a
+   * clear button, and that difference breaks two things if it goes unregistered. The popup would be
+   * measured against the input and land narrower than the field it belongs to; and the two gutter
+   * buttons would sit outside `sparedElements`, so a pointerdown on the chevron would dismiss in the
+   * capture phase and its own `click` would reopen — the popup could never be closed by the control
+   * that opened it. `Combobox.Control` registers itself here.
+   */
+  anchorElement: Accessor<HTMLElement | undefined>;
+  /** Register the outer box. Wired to `Combobox.Control`'s `ref`. */
+  setAnchorElement: (element: HTMLElement | undefined) => void;
   /** The positioner element — what `floating.floatingStyles()` is spread onto. */
   positionerElement: Accessor<HTMLElement | undefined>;
   /** Register the positioner element. Wired to `createComboboxPositioner`'s `setRef`. */
@@ -248,11 +264,12 @@ export interface CreateComboboxReturn<V = unknown, M extends SelectionMode = "si
   setListElement: (element: HTMLElement | null | undefined) => void;
 
   /**
-   * The trigger, once registered — one array serving two mechanisms that are really one
-   * requirement. It is `createDismissable`'s `exclude` (or a pointerdown on the trigger dismisses in
-   * the capture phase and the trigger's own `click` reopens, so the popup can never be closed by the
-   * control that opened it) **and** `createHideOutside`'s `spare` (or the trigger goes `inert`,
-   * losing focus, the pointer, and the same toggle).
+   * Everything that counts as "the control" rather than "outside" — the registered anchor and the
+   * focus owner. One array serving two mechanisms that are really one requirement. It is
+   * `createDismissable`'s `exclude` (or a pointerdown on the control dismisses in the capture phase
+   * and its own `click` reopens, so the popup can never be closed by the control that opened it)
+   * **and** `createHideOutside`'s `spare` (or the control goes `inert`, losing focus, the pointer,
+   * and the same toggle).
    */
   sparedElements: Accessor<HTMLElement[]>;
   /** The **shared** popup presence for `Content` + `Positioner`. Gate their render on `mounted()`. */
@@ -304,6 +321,7 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
   const [valueId, setValueId] = createSignal<string | undefined>();
 
   const [triggerElement, setTriggerElement] = createSignal<HTMLElement>();
+  const [anchorElement, setAnchorElement] = createSignal<HTMLElement>();
   const [positionerElement, setPositionerElement] = createSignal<HTMLElement>();
   const [contentElement, setContentElement] = createSignal<HTMLElement>();
 
@@ -395,10 +413,21 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     setOpenState(next);
   };
 
-  // A memo, so the array's identity only changes when the trigger does.
+  // A memo, so the array's identity only changes when one of the two elements does. Both are listed
+  // even when the focus owner is a descendant of the anchor: overlap is harmless to `exclude` and
+  // `spare`, and a tree that registers no anchor (Select, or a Combobox whose `Control` is
+  // re-targeted to something that drops the ref) must not silently lose the focus owner.
   const sparedElements = createMemo<HTMLElement[]>(() => {
+    const spared: HTMLElement[] = [];
+    const anchor = anchorElement();
     const trigger = triggerElement();
-    return trigger === undefined ? [] : [trigger];
+    if (anchor !== undefined) {
+      spared.push(anchor);
+    }
+    if (trigger !== undefined && trigger !== anchor) {
+      spared.push(trigger);
+    }
+    return spared;
   });
 
   // Eager (created while `open` is `false`) so opening drives `entering → entered` rather than
@@ -410,7 +439,9 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     // its hidden, unpositioned branch the instant the popup closes — while the presence is still
     // holding it mounted for its exit transition.
     active: () => contentPresence.mounted(),
-    anchor: triggerElement,
+    // The outer box when one is registered, else the focus owner. See `anchorElement`: measuring a
+    // Combobox against its bare `<input>` lands the popup narrower than the shell around it.
+    anchor: () => anchorElement() ?? triggerElement(),
     floating: positionerElement,
     // Unconditional, as on Popover: `createComboboxPositioner` publishes `--anchor-width` /
     // `--available-height` on every combobox, so a recipe's `w-(--anchor-width)` always resolves.
@@ -512,6 +543,8 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     setValueId,
     triggerElement,
     setTriggerElement: (element) => setTriggerElement(element),
+    anchorElement,
+    setAnchorElement: (element) => setAnchorElement(element),
     positionerElement,
     setPositionerElement: (element) => setPositionerElement(element),
     contentElement,

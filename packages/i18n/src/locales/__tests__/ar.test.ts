@@ -19,4 +19,19 @@ describe("MESSAGES_AR", () => {
     expect(fn({ count: 11 })).toBe("تم تحديد 11 تاريخًا"); // many (n%100 = 11–99)
     expect(fn({ count: 100 })).toBe("تم تحديد 100 تاريخ"); // other (n%100 = 0/1/2 for n ≥ 100)
   });
+
+  it("carries the Arabic combobox strings", () => {
+    expect(MESSAGES_AR.combobox.triggerLabel).toBe("عرض الاقتراحات");
+    expect(MESSAGES_AR.combobox.clearLabel).toBe("مسح");
+  });
+
+  it("pluralizes countAnnouncement with the six Arabic CLDR categories", () => {
+    const fn = MESSAGES_AR.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 0 })).toBe("لا توجد خيارات متاحة"); // zero
+    expect(fn({ count: 1 })).toBe("خيار واحد متاح"); // one
+    expect(fn({ count: 2 })).toBe("خياران متاحان"); // two
+    expect(fn({ count: 3 })).toBe("3 خيارات متاحة"); // few (n%100 = 3–10)
+    expect(fn({ count: 11 })).toBe("11 خيارًا متاحًا"); // many (n%100 = 11–99)
+    expect(fn({ count: 100 })).toBe("100 خيار متاح"); // other (n%100 = 0/1/2 for n ≥ 100)
+  });
 });

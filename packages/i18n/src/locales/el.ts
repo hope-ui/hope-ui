@@ -22,4 +22,10 @@ export const MESSAGES_EL: I18nCatalog = {
     datesSelected: ({ count }) =>
       `${count} ${count === 1 ? "επιλεγμένη ημερομηνία" : "επιλεγμένες ημερομηνίες"}`,
   },
+  combobox: {
+    triggerLabel: "Εμφάνιση προτάσεων",
+    clearLabel: "Εκκαθάριση",
+    countAnnouncement: ({ count }) =>
+      `${count} ${count === 1 ? "διαθέσιμη επιλογή" : "διαθέσιμες επιλογές"}`,
+  },
 };

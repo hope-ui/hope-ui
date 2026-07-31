@@ -10,6 +10,7 @@ export * from "./badge";
 export * from "./button";
 export * from "./calendar";
 export * from "./close-button";
+export * from "./combobox";
 export * from "./dialog";
 export * from "./listbox";
 export * from "./popover";

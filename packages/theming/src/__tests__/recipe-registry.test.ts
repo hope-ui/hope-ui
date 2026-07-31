@@ -5,6 +5,7 @@ import type { BadgeRecipeVariants, BadgeSlot } from "../recipes/badge";
 import type { ButtonRecipeVariants, ButtonSlot } from "../recipes/button";
 import type { CalendarRecipeVariants, CalendarSlot } from "../recipes/calendar";
 import type { CloseButtonRecipeVariants, CloseButtonSlot } from "../recipes/close-button";
+import type { ComboboxRecipeVariants, ComboboxSlot } from "../recipes/combobox";
 import type { DialogRecipeVariants, DialogSlot } from "../recipes/dialog";
 import type { ListboxRecipeVariants, ListboxSlot } from "../recipes/listbox";
 import type { PopoverRecipeVariants, PopoverSlot } from "../recipes/popover";
@@ -13,8 +14,8 @@ import type { SlotClassFn } from "../slot-recipe";
 
 // The registry declares each hope-authored component's recipe contract directly (no module
 // augmentation), so a conforming theme provides every recipe named in it — here, `alert`, `badge`,
-// `button`, `calendar`, `closeButton`, `dialog`, `listbox`, `popover`, and `select`. This is a
-// compile-time assignability check (verified by `pnpm typecheck`).
+// `button`, `calendar`, `closeButton`, `combobox`, `dialog`, `listbox`, `popover`, and `select`.
+// This is a compile-time assignability check (verified by `pnpm typecheck`).
 const _theme = {
   alert: (props?: AlertRecipeVariants): Record<AlertSlot, SlotClassFn> => ({
     root: () => `alert alert--${props?.variant ?? "default"}`,
@@ -53,6 +54,24 @@ const _theme = {
   closeButton: (props?: CloseButtonRecipeVariants): Record<CloseButtonSlot, SlotClassFn> => ({
     root: () => `close close--${props?.size ?? "sm"}`,
     icon: () => "close__icon",
+  }),
+  combobox: (props?: ComboboxRecipeVariants): Record<ComboboxSlot, SlotClassFn> => ({
+    control: () => `combobox__control combobox__control--${props?.size ?? "md"}`,
+    input: () => "combobox__input",
+    clear: () => "combobox__clear",
+    trigger: () => "combobox__trigger",
+    icon: () => "combobox__icon",
+    positioner: () => "combobox__positioner",
+    content: () => "combobox__content",
+    list: () => "combobox__list",
+    empty: () => "combobox__empty",
+    status: () => "combobox__status",
+    group: () => "combobox__group",
+    groupLabel: () => "combobox__group-label",
+    separator: () => "combobox__separator",
+    item: () => "combobox__item",
+    itemText: () => "combobox__item-text",
+    itemIndicator: () => "combobox__item-indicator",
   }),
   dialog: (props?: DialogRecipeVariants): Record<DialogSlot, SlotClassFn> => ({
     backdrop: () => "dialog__backdrop",

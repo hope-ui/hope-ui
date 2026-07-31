@@ -13,4 +13,15 @@ describe("MESSAGES_IT", () => {
     expect(fn({ count: 1 })).toBe("1 data selezionata");
     expect(fn({ count: 2 })).toBe("2 date selezionate");
   });
+
+  it("carries the Italian combobox strings", () => {
+    expect(MESSAGES_IT.combobox.triggerLabel).toBe("Mostra suggerimenti");
+    expect(MESSAGES_IT.combobox.clearLabel).toBe("Cancella");
+  });
+
+  it("pluralizes countAnnouncement (singular only at 1, feminine agreement)", () => {
+    const fn = MESSAGES_IT.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 opzione disponibile");
+    expect(fn({ count: 2 })).toBe("2 opzioni disponibili");
+  });
 });

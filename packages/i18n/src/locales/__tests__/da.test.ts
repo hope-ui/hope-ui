@@ -13,4 +13,15 @@ describe("MESSAGES_DA", () => {
     expect(fn({ count: 1 })).toBe("1 dato valgt");
     expect(fn({ count: 2 })).toBe("2 datoer valgt");
   });
+
+  it("carries the Danish combobox strings", () => {
+    expect(MESSAGES_DA.combobox.triggerLabel).toBe("Vis forslag");
+    expect(MESSAGES_DA.combobox.clearLabel).toBe("Ryd");
+  });
+
+  it("pluralizes countAnnouncement (singular only at 1, adjective agrees)", () => {
+    const fn = MESSAGES_DA.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 mulighed tilgængelig");
+    expect(fn({ count: 2 })).toBe("2 muligheder tilgængelige");
+  });
 });

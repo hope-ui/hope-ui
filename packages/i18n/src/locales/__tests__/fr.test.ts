@@ -28,4 +28,16 @@ describe("MESSAGES_FR", () => {
     expect(fn({ count: 1 })).toBe("1 date sélectionnée");
     expect(fn({ count: 2 })).toBe("2 dates sélectionnées");
   });
+
+  it("carries the French combobox strings", () => {
+    expect(MESSAGES_FR.combobox.triggerLabel).toBe("Afficher les suggestions");
+    expect(MESSAGES_FR.combobox.clearLabel).toBe("Effacer");
+  });
+
+  it("pluralizes countAnnouncement with the French rule (singular at count <= 1)", () => {
+    const fn = MESSAGES_FR.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 0 })).toBe("0 option disponible");
+    expect(fn({ count: 1 })).toBe("1 option disponible");
+    expect(fn({ count: 2 })).toBe("2 options disponibles");
+  });
 });

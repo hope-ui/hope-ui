@@ -6,6 +6,7 @@ import type { BadgeRecipe } from "../recipes/badge";
 import type { ButtonRecipe } from "../recipes/button";
 import type { CalendarRecipe } from "../recipes/calendar";
 import type { CloseButtonRecipe } from "../recipes/close-button";
+import type { ComboboxRecipe } from "../recipes/combobox";
 import type { DialogRecipe } from "../recipes/dialog";
 import type { ListboxRecipe } from "../recipes/listbox";
 import type { PopoverRecipe } from "../recipes/popover";
@@ -50,6 +51,24 @@ const stubCalendarRecipe: CalendarRecipe = () => ({
 const stubCloseButtonRecipe: CloseButtonRecipe = () => ({
   root: () => "",
   icon: () => "",
+});
+const stubComboboxRecipe: ComboboxRecipe = () => ({
+  control: () => "",
+  input: () => "",
+  clear: () => "",
+  trigger: () => "",
+  icon: () => "",
+  positioner: () => "",
+  content: () => "",
+  list: () => "",
+  empty: () => "",
+  status: () => "",
+  group: () => "",
+  groupLabel: () => "",
+  separator: () => "",
+  item: () => "",
+  itemText: () => "",
+  itemIndicator: () => "",
 });
 const stubDialogRecipe: DialogRecipe = () => ({
   backdrop: () => "",
@@ -99,6 +118,7 @@ const registry: RecipeRegistry = {
   button: stubRecipe,
   calendar: stubCalendarRecipe,
   closeButton: stubCloseButtonRecipe,
+  combobox: stubComboboxRecipe,
   dialog: stubDialogRecipe,
   listbox: stubListboxRecipe,
   popover: stubPopoverRecipe,

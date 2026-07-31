@@ -21,4 +21,9 @@ export const MESSAGES_DE: I18nCatalog = {
     selectedRange: "{{start}} bis {{end}} ausgewählt",
     datesSelected: ({ count }) => `${count} ${count === 1 ? "Datum" : "Daten"} ausgewählt`,
   },
+  combobox: {
+    triggerLabel: "Vorschläge anzeigen",
+    clearLabel: "Löschen",
+    countAnnouncement: ({ count }) => `${count} ${count === 1 ? "Option" : "Optionen"} verfügbar`,
+  },
 };

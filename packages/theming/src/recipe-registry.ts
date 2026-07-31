@@ -17,6 +17,7 @@ import type { BadgeRecipe } from "./recipes/badge";
 import type { ButtonRecipe } from "./recipes/button";
 import type { CalendarRecipe } from "./recipes/calendar";
 import type { CloseButtonRecipe } from "./recipes/close-button";
+import type { ComboboxRecipe } from "./recipes/combobox";
 import type { DialogRecipe } from "./recipes/dialog";
 import type { ListboxRecipe } from "./recipes/listbox";
 import type { PopoverRecipe } from "./recipes/popover";
@@ -40,6 +41,7 @@ export interface RecipeRegistry {
   button: ButtonRecipe;
   calendar: CalendarRecipe;
   closeButton: CloseButtonRecipe;
+  combobox: ComboboxRecipe;
   dialog: DialogRecipe;
   listbox: ListboxRecipe;
   popover: PopoverRecipe;

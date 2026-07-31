@@ -2,7 +2,7 @@ import type { I18nCatalog } from "../messages";
 
 /**
  * Built-in **Finnish** (`fi`) catalog. Contract + shape: `../messages.ts`; registered in `catalogs.ts`.
- * A count other than 1 takes the partitive singular (`päivämäärää`); see `fi.md`.
+ * A count other than 1 takes the partitive singular (`päivämäärää`, `vaihtoehtoa`); see `fi.md`.
  */
 export const MESSAGES_FI: I18nCatalog = {
   common: {
@@ -23,5 +23,11 @@ export const MESSAGES_FI: I18nCatalog = {
     selectedDate: "Valittu {{date}}",
     selectedRange: "Valittu {{start}}–{{end}}",
     datesSelected: ({ count }) => `${count} ${count === 1 ? "päivämäärä" : "päivämäärää"} valittu`,
+  },
+  combobox: {
+    triggerLabel: "Näytä ehdotukset",
+    clearLabel: "Tyhjennä",
+    countAnnouncement: ({ count }) =>
+      `${count} ${count === 1 ? "vaihtoehto" : "vaihtoehtoa"} saatavilla`,
   },
 };

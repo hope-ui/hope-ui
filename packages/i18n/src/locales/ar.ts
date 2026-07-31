@@ -3,8 +3,8 @@ import type { I18nCatalog } from "../messages";
 /**
  * Built-in **Arabic** (`ar`) catalog — Modern Standard Arabic. Contract + shape: `../messages.ts`;
  * registered in `catalogs.ts`. Arabic is right-to-left (`getReadingDirection("ar") === "rtl"`), and its
- * cardinal plural has the full six CLDR categories (zero/one/two/few/many/other); `datesSelected`
- * implements that rule (see `ar.md`).
+ * cardinal plural has the full six CLDR categories (zero/one/two/few/many/other); both count-bearing
+ * keys (`calendar.datesSelected`, `combobox.countAnnouncement`) implement that rule (see `ar.md`).
  */
 export const MESSAGES_AR: I18nCatalog = {
   common: {
@@ -44,6 +44,30 @@ export const MESSAGES_AR: I18nCatalog = {
         return `تم تحديد ${count} تاريخًا`;
       }
       return `تم تحديد ${count} تاريخ`;
+    },
+  },
+  combobox: {
+    triggerLabel: "عرض الاقتراحات",
+    clearLabel: "مسح",
+    // Same six Arabic CLDR cardinal categories as `calendar.datesSelected` above.
+    countAnnouncement: ({ count }) => {
+      if (count === 0) {
+        return "لا توجد خيارات متاحة";
+      }
+      if (count === 1) {
+        return "خيار واحد متاح";
+      }
+      if (count === 2) {
+        return "خياران متاحان";
+      }
+      const mod100 = count % 100;
+      if (mod100 >= 3 && mod100 <= 10) {
+        return `${count} خيارات متاحة`;
+      }
+      if (mod100 >= 11 && mod100 <= 99) {
+        return `${count} خيارًا متاحًا`;
+      }
+      return `${count} خيار متاح`;
     },
   },
 };

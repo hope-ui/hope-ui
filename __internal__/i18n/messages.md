@@ -15,8 +15,11 @@ An internal **nested** `I18nMessageMap` groups keys by component and gives each 
 interface I18nMessageMap {
   common: { close: undefined };
   calendar: { label: undefined; /* … */ selectedDate: { date: string }; datesSelected: { count: number } };
+  combobox: { triggerLabel: undefined; clearLabel: undefined; countAnnouncement: { count: number } };
 }
 ```
+
+`common` (cross-component strings) stays first; component groups follow it, alphabetically.
 
 Everything else is **derived** from it, so a key is declared exactly once:
 
@@ -41,9 +44,17 @@ The catalogs `MESSAGES_EN` / `MESSAGES_FR` are exported from `locales/en.ts` and
 - **One place to add a key.** Add a group/key to `I18nMessageMap`, then to every locale catalog in
   `./locales/`. Because `I18nCatalog` is derived from the map, a catalog missing the key — or drifting
   a param type — is a **compile error**, not a runtime miss.
-- **Plurals are functions.** Count-bearing keys (`calendar.datesSelected`) are functions so each
-  locale encodes its own rule: English is singular only at `1`; French treats `count <= 1` as
-  singular. Everything else is a plain string with optional `{{param}}` placeholders.
+- **Plurals are functions.** Count-bearing keys (`calendar.datesSelected`,
+  `combobox.countAnnouncement`) are functions so each locale encodes its own rule: English is singular
+  only at `1`; French treats `count <= 1` as singular. Everything else is a plain string with optional
+  `{{param}}` placeholders.
+- **Combobox vocabulary follows React Aria.** `combobox.triggerLabel` ("Show suggestions") and
+  `combobox.countAnnouncement` mirror the *intent* of `@react-aria/combobox`'s `buttonLabel` and
+  `countAnnouncement` — a proven pair of strings for the chevron's accessible name and the
+  filtered-count live region. Only the vocabulary is borrowed: React Aria expresses its counts as ICU
+  MessageFormat plurals in per-locale JSON, this contract as per-locale functions, and every
+  translation here is authored from scratch. No copied expression, so no `@license` header and no
+  `NOTICE.md` row — see `CLAUDE.md` § Third-party attribution.
 - **Dates are not i18n's job.** Months/weekdays/day-numbers are already locale-formatted upstream by
   `@internationalized/date` + `Intl` (keyed off the calendar's `locale`); the interpolated keys
   receive those **already-formatted strings** as params.
@@ -55,10 +66,19 @@ Resolution (overlay → catalog → key) lives in `translate.ts`; see `translate
 ## Tests
 
 `messages.test.ts` (unit) covers the shared `interpolate`. Each catalog is tested beside its file:
-`locales/en.test.ts` (frozen English values + English plural rule) and `locales/fr.test.ts` (en/fr
-**key parity** + French values + the `count <= 1` plural rule).
+`locales/en.test.ts` (frozen English values + the English plural rules) and `locales/fr.test.ts`
+(en/fr **key parity** + French values + the `count <= 1` plural rules).
 
 ## Rejected alternatives
+
+### `clearLabel` in `common`, shared with every clearable field
+**Why not:** it reads generic like `common.close`, but "Clear" is not one string across the surfaces
+that will want it — a combobox clears a *selection*, a search field clears *the query*, a filter chip
+clears *a facet*, and several locales inflect for that object (pl `Wyczyść` vs `Usuń`, de `Löschen`
+vs `Zurücksetzen`). Promoting it to `common` would force one wording on all of them and make the
+later split a breaking key rename. A group per component keeps each string retranslatable in place.
+**Revisit if:** two component groups end up with a byte-identical `clearLabel` in all twelve
+catalogs — then the duplication is real and `common` earns it.
 
 ### One shared plural template across locales
 **Why not:** no single template spans the rules the shipped catalogs need — English is singular only

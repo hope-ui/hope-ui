@@ -1,15 +1,20 @@
 import type { JSX } from "@solidjs/web";
 import { createSignal, For, merge, Show } from "solid-js";
-import type { SelectionMode } from "../../internal";
+import { createTextInput, type SelectionMode } from "../../internal";
 import { createListboxItem } from "../../listbox";
 import {
   type CreateComboboxOptions,
   type CreateComboboxReturn,
+  type CreateComboboxToggleProps,
   type CreateComboboxTriggerProps,
   createCombobox,
+  createComboboxClear,
   createComboboxContent,
+  createComboboxInput,
   createComboboxList,
   createComboboxPositioner,
+  createComboboxStatus,
+  createComboboxToggle,
   createComboboxTrigger,
   createComboboxValue,
 } from "../index";
@@ -50,6 +55,31 @@ export const FRUITS = ["Apple", "Banana", "Cherry", "Date", "Açaí"];
  * stay inside it — a trigger `userEvent` cannot reach fails every test here.
  */
 const TRIGGER_STYLE: JSX.CSSProperties = { position: "fixed", top: "620px", left: "40px" };
+
+/**
+ * The control shell's style. Opaque on purpose: a `position: fixed` element over an unpainted page
+ * leaves axe unable to resolve what is behind its text, and `color-contrast` comes back
+ * **incomplete** — which `expectNoA11yViolations` fails on, correctly. Giving it a real background
+ * and colour makes the check decidable instead of suppressing it, and this package compiles no CSS
+ * of its own so nothing else would.
+ */
+const CONTROL_STYLE: JSX.CSSProperties = {
+  ...TRIGGER_STYLE,
+  background: "#ffffff",
+  color: "#000000",
+};
+
+/**
+ * The two gutter buttons are **sized and empty**, which is both halves of what they need.
+ *
+ * *Sized*, because a childless `<button>` — and especially a childless `<div role="button">` — is
+ * zero-height, and Playwright's click waits forever for an element that is never "visible and
+ * stable". *Empty*, because the real parts render an SVG glyph: giving these a text glyph instead
+ * would put text over a `position: fixed` ancestor this package paints no CSS for, and axe returns
+ * `color-contrast` as **incomplete** for it — a fact about the harness, not about the hooks. Their
+ * accessible name comes from `aria-label`, which is what the hooks actually own.
+ */
+const GUTTER_BUTTON_STYLE: JSX.CSSProperties = { width: "20px", height: "20px" };
 
 export interface ComboboxHarnessProps<V> {
   values: V[];
@@ -166,6 +196,203 @@ export function ComboboxHarness<V>(props: ComboboxHarnessProps<V>): JSX.Element 
       ) : null}
     </>
   );
+}
+
+// ─── The input-focus-owner harness (the Combobox shape) ──────────────────────────────────────────
+//
+// The same kernel with the focus owner swapped: `role="combobox"` on an `<input>` instead of a
+// `<button>`, no typeahead, and the chevron/clear buttons beside it. It renders `Combobox`'s parts
+// (`createComboboxInput` / `createComboboxToggle` / `createComboboxClear` / `createComboboxStatus`)
+// against the same `createCombobox` state, so the kernel's two personalities can be driven
+// side by side.
+//
+// The text value is created **here**, not inside the input part — the same place `Combobox.Root`
+// creates it, because the kernel owns no text value and the filter derives from it.
+
+export interface ComboboxInputHarnessProps<V> {
+  values: V[];
+  labelOf?: (value: V) => string;
+  /** Everything except `items`, which the harness owns. */
+  options?: Omit<CreateComboboxOptions<V, SelectionMode>, "items">;
+  inputProps?: JSX.InputHTMLAttributes<HTMLInputElement>;
+  toggleProps?: CreateComboboxToggleProps;
+  /** Accept the highlighted option. Defaults to selecting it and writing its label into the field. */
+  onCommit?: () => void;
+  /** Restore the last committed text. Defaults to the selection's label. */
+  onRevert?: () => void;
+  /** Render the `Clear` button. */
+  withClear?: boolean;
+  /** Render the `Status` live region. */
+  withStatus?: boolean;
+  /** Render the chevron as a `<div>` — the shape a `render` prop produces, for `nativeButton: false`. */
+  toggleAs?: "button" | "div";
+  /** A focusable control *after* the widget, so Tab has somewhere to leave to. */
+  withOutsideButton?: boolean;
+  onReady?: (state: CreateComboboxReturn<V, SelectionMode>) => void;
+}
+
+export function ComboboxInputHarness<V>(props: ComboboxInputHarnessProps<V>): JSX.Element {
+  const labelOf = (value: V) => props.labelOf?.(value) ?? String(value);
+
+  const overrides: Omit<CreateComboboxOptions<V, SelectionMode>, "items"> = props.options ?? {};
+  const state = createCombobox<V, SelectionMode>(
+    // `modal: false` first, so a test can still override it: `merge` resolves by key *presence*, and
+    // the overrides come second. It is what `Combobox.Root` passes, and it matters here — the kernel
+    // defaults to `true`, and `createHideOutside` would mark the harness's own outside button
+    // `inert`, so every Tab/blur assertion would silently be testing nothing.
+    merge({ modal: false }, overrides, {
+      get items() {
+        return props.values;
+      },
+    }),
+  );
+  props.onReady?.(state);
+
+  const textInput = createTextInput<HTMLInputElement>({});
+
+  const committedText = () => {
+    const selected = state.list.value();
+    return selected.length === 0 ? "" : labelOf(selected[0] as V);
+  };
+
+  const commit =
+    props.onCommit ??
+    (() => {
+      const active = state.list.focus.activeItem();
+      if (active !== undefined) {
+        state.list.selection.selectOne(active);
+        // `CollectionItem.value` is an accessor — a recycled virtual row's item changes under it.
+        textInput.setValue(labelOf(active.value()));
+        return;
+      }
+      textInput.setValue(committedText());
+    });
+
+  const revert = props.onRevert ?? (() => textInput.setValue(committedText()));
+
+  const input = createComboboxInput(
+    state,
+    merge({ "aria-label": "Fruit" }, props.inputProps ?? {}, {
+      textInput,
+      onCommit: commit,
+      onRevert: revert,
+    }),
+  );
+  const toggle = createComboboxToggle(state, props.toggleProps ?? {});
+  const positioner = createComboboxPositioner(state, {});
+  const content = createComboboxContent(state, {});
+  const list = createComboboxList(state, {});
+
+  function ClearPart(): JSX.Element {
+    const clear = createComboboxClear(state, {
+      onClear: () => {
+        textInput.setValue("");
+        state.list.selection.deselectAll();
+      },
+    });
+    return (
+      <button data-testid="clear" {...clear.props} style={GUTTER_BUTTON_STYLE} ref={clear.setRef} />
+    );
+  }
+
+  // A nested component, so the announcer's effect is scoped to the part that actually renders —
+  // exactly as `Combobox.Status` is, and which is what makes "announces once per open" observable.
+  function StatusPart(): JSX.Element {
+    const status = createComboboxStatus(state, {});
+    return (
+      <div
+        data-testid="status"
+        {...(status.props as unknown as JSX.HTMLAttributes<HTMLDivElement>)}
+      >
+        {status.message()}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* The shell `Combobox.Control` is: the positioning anchor, and the outer edge of "not
+          outside" for dismissal. The ref is cast because the kernel types it over `HTMLElement`. */}
+      <div
+        data-testid="control"
+        style={CONTROL_STYLE}
+        ref={state.setAnchorElement as (element: HTMLDivElement) => void}
+      >
+        <input data-testid="input" {...input.props} ref={input.setRef} />
+        <Show when={props.withClear}>
+          <ClearPart />
+        </Show>
+        {/* The chevron carries a glyph so it has a box: a childless `<div role="button">` is
+            zero-height, and Playwright's click waits forever for a "stable, visible" element. */}
+        <Show
+          when={props.toggleAs !== "div"}
+          fallback={
+            // Re-targeting a different tag is the case that casts, at the call site.
+            <div
+              data-testid="toggle"
+              {...(toggle.props as unknown as JSX.HTMLAttributes<HTMLDivElement>)}
+              style={GUTTER_BUTTON_STYLE}
+              ref={toggle.setRef as unknown as (element: HTMLDivElement) => void}
+            >
+              ▾
+            </div>
+          }
+        >
+          <button
+            data-testid="toggle"
+            {...toggle.props}
+            style={GUTTER_BUTTON_STYLE}
+            ref={toggle.setRef}
+          />
+        </Show>
+      </div>
+      <Show when={positioner.mounted()}>
+        <div data-testid="positioner" {...positioner.props} ref={positioner.setRef}>
+          <div data-testid="content" {...content.props} ref={content.setRef}>
+            <div data-testid="list" {...list.props} ref={list.setRef}>
+              <For each={props.values}>
+                {(item) => {
+                  const [ref, setRef] = createSignal<HTMLDivElement>();
+                  const option = createListboxItem<V>(state.list, { ref, item });
+                  return (
+                    <div ref={setRef} {...option.props} data-value={labelOf(item)}>
+                      {labelOf(item)}
+                    </div>
+                  );
+                }}
+              </For>
+            </div>
+            <Show when={props.withStatus}>
+              <StatusPart />
+            </Show>
+          </div>
+        </div>
+      </Show>
+      {props.withOutsideButton ? (
+        <button type="button" data-testid="outside">
+          outside
+        </button>
+      ) : null}
+    </>
+  );
+}
+
+export const inputOf = (container: Element) =>
+  container.querySelector('[data-testid="input"]') as HTMLInputElement;
+export const toggleOf = (container: Element) =>
+  container.querySelector('[data-testid="toggle"]') as HTMLButtonElement;
+export const clearOf = (container: Element) =>
+  container.querySelector('[data-testid="clear"]') as HTMLButtonElement | null;
+export const statusOf = (container: Element) =>
+  container.querySelector('[data-testid="status"]') as HTMLElement | null;
+
+/** The option `aria-activedescendant` currently names, by its label — resolved off the **input**. */
+export function activeLabelForInput(container: Element): string | undefined {
+  const id = inputOf(container).getAttribute("aria-activedescendant");
+  if (id == null) {
+    return undefined;
+  }
+  return optionsOf(container).find((option) => option.id === id)?.dataset.value;
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────────────────────────

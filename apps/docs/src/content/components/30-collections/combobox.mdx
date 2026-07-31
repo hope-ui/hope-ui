@@ -1,0 +1,1556 @@
+import { Alert } from "@hope-ui/components/alert";
+import { ComboboxBasicDemo } from "~/components/demos/combobox/ComboboxBasicDemo";
+import { ComboboxFilterModesDemo } from "~/components/demos/combobox/ComboboxFilterModesDemo";
+import { ComboboxNoMatchesDemo } from "~/components/demos/combobox/ComboboxNoMatchesDemo";
+import { ComboboxAsyncSearchDemo } from "~/components/demos/combobox/ComboboxAsyncSearchDemo";
+import { ComboboxControlledDemo } from "~/components/demos/combobox/ComboboxControlledDemo";
+import { ComboboxAllowsCustomValueDemo } from "~/components/demos/combobox/ComboboxAllowsCustomValueDemo";
+import { ComboboxMultipleDemo } from "~/components/demos/combobox/ComboboxMultipleDemo";
+import { ComboboxGroupedDemo } from "~/components/demos/combobox/ComboboxGroupedDemo";
+import { ComboboxMenuTriggerDemo } from "~/components/demos/combobox/ComboboxMenuTriggerDemo";
+import { ComboboxSizesDemo } from "~/components/demos/combobox/ComboboxSizesDemo";
+import { ComboboxDisabledDemo } from "~/components/demos/combobox/ComboboxDisabledDemo";
+import { Anatomy } from "~/components/Anatomy";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "Text field that filters a list of options as you type.";
+
+export const description =
+  "A text field that narrows a list of options as you type, and a floating listbox to choose from — the ARIA 1.2 combobox pattern with an editable focus owner: the same kernel as Select, with the trigger swapped for an input and a collator-backed filter on top.";
+
+# Combobox
+
+{description}
+
+## Import
+
+```tsx
+import { Combobox } from "@hope-ui/components/combobox";
+```
+
+`Combobox` is a **compound** component — a namespace object whose parts you compose yourself. See the
+[Anatomy](#anatomy) below for every part and how they nest.
+
+## Usage
+
+A Combobox is a [`Select`](/components/select) with its focus owner swapped and a filter added. The
+`role="combobox"` moves off a `<button>` and onto an `<input>`, so the control is something you type
+into, and `Combobox.Root` narrows `items` as you do.
+
+`Combobox.Root` takes the whole option set as `items` and owns the state (selection, the text, the
+filter, open/close, keyboard, positioning, ARIA); it renders **no element** of its own.
+`Combobox.Control` is the bordered shell, holding the `Combobox.Input` that owns focus, an optional
+`Combobox.Clear`, and the `Combobox.Trigger` chevron. Everything from `Combobox.Portal` down is the
+popup: `Combobox.List` takes a **render callback** invoked once per surviving entry, with
+`Combobox.Empty` and `Combobox.Status` beside it in the card.
+
+<Preview>
+  <ComboboxBasicDemo />
+</Preview>
+
+```tsx
+<Combobox.Root items={fruits} itemToValue={itemToValue} itemToLabel={itemToLabel}>
+  <Combobox.Control>
+    <Combobox.Input aria-label="Choose a fruit" placeholder="Search fruit…" />
+    <Combobox.Clear />
+    <Combobox.Trigger>
+      <Combobox.Icon />
+    </Combobox.Trigger>
+  </Combobox.Control>
+  <Combobox.Portal>
+    <Combobox.Positioner>
+      <Combobox.Content>
+        <Combobox.List>
+          {(fruit: Fruit) => (
+            <Combobox.Item item={fruit}>
+              <Combobox.ItemText>{fruit.name}</Combobox.ItemText>
+              <Combobox.ItemIndicator />
+            </Combobox.Item>
+          )}
+        </Combobox.List>
+        <Combobox.Empty>No fruit matches that.</Combobox.Empty>
+        <Combobox.Status />
+      </Combobox.Content>
+    </Combobox.Positioner>
+  </Combobox.Portal>
+</Combobox.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="danger"
+  class="not-prose"
+  description={
+    <div>
+      <strong>Name the input.</strong> Combobox ships no <code>Label</code> part — labelling a field
+      is a future <code>Field</code>'s job — so an <code>aria-label</code>, or an{" "}
+      <code>aria-labelledby</code> pointing at your own <code>&lt;label&gt;</code>, is mandatory on{" "}
+      <code>Combobox.Input</code>. A nameless <code>role="combobox"</code> is an axe{" "}
+      <code>aria-input-field-name</code> violation, and the <code>role="listbox"</code> popup
+      inherits its name from the input, so one missing attribute leaves both unnamed.
+    </div>
+  }
+/>
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Because Combobox reads a recipe, it needs a <code>&lt;ThemeProvider&gt;</code> ancestor fed a
+      preset, as every styled hope-ui component does.
+    </div>
+  }
+/>
+
+### Options are data
+
+`items` is the whole option set, held on `Combobox.Root` rather than in the popup — and **nothing
+renders until the popup opens**. A page of ten closed Comboboxes mounts zero option lists, while each
+one still knows how many options it has and what the filter would leave.
+
+Your items stay your own objects: every question the Combobox asks about one is an **accessor
+function**, never a required key name.
+
+- `itemToValue` — the selection identity, compared for equality. Defaults to `String`.
+- `itemToLabel` — the display text, and what the built-in filters match against. Defaults to
+  `itemToValue`.
+- `isItemDisabled` — whether the row is dimmed and skipped. Disable the **whole** control with
+  `disabled` on `Combobox.Root`.
+
+```tsx
+<Combobox.Root
+  items={fruits}
+  itemToValue={(fruit) => String(fruit.id)}
+  itemToLabel={(fruit) => fruit.name}
+  isItemDisabled={(fruit) => fruit.outOfSeason}
+/>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      <code>Combobox.List</code>'s callback parameter is the one thing you annotate yourself:{" "}
+      <code>{"{(fruit: Fruit) => …}"}</code>. A generic cannot flow through a Solid context, so the
+      item type <code>Combobox.Root</code> inferred cannot reach the parts below it — the annotation
+      is what binds it, at the one call site that knows. Everything nested inside then infers
+      normally, including the group's own <code>&lt;For&gt;</code>.
+    </div>
+  }
+/>
+
+## Anatomy
+
+The nesting below the portal is fixed, and it is [`Popover`](/components/popover)'s spine: `Portal`
+lifts the layer out of the page's stacking and overflow contexts, `Positioner` is the element the
+positioning engine measures and moves, and `Content` is the card. The split between the last two is
+load-bearing — the card's enter/exit `translate` would otherwise fight the `translate()` written onto
+the positioner.
+
+`Content` and `List` stay distinct for a different reason, and on a Combobox it is the one that
+matters most: a `role="listbox"` may only contain options and groups, so **`Combobox.Empty` and
+`Combobox.Status` live in the card beside the list, never inside it.** Put either in there and a
+screen reader counts it as an option.
+
+<Anatomy
+  root={{
+    name: "Combobox.Root",
+    children: [
+      {
+        name: "Combobox.Control",
+        children: [
+          { name: "Combobox.Input" },
+          { name: "Combobox.Clear", note: "optional" },
+          { name: "Combobox.Trigger", children: [{ name: "Combobox.Icon" }] },
+        ],
+      },
+      {
+        name: "Combobox.Portal",
+        children: [
+          {
+            name: "Combobox.Positioner",
+            children: [
+              {
+                name: "Combobox.Content",
+                children: [
+                  {
+                    name: "Combobox.List",
+                    children: [
+                      {
+                        name: "Combobox.Item",
+                        children: [
+                          { name: "Combobox.ItemText" },
+                          { name: "Combobox.ItemIndicator" },
+                        ],
+                      },
+                      {
+                        name: "Combobox.Group",
+                        note: "with groupToItems",
+                        children: [{ name: "Combobox.GroupLabel" }, { name: "Combobox.Item" }],
+                      },
+                      { name: "Combobox.Separator", note: "optional" },
+                    ],
+                  },
+                  { name: "Combobox.Empty", note: "beside the list" },
+                  { name: "Combobox.Status", note: "beside the list" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }}
+/>
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Combobox.Root",
+      element: "—",
+      description:
+        "State owner: the items, the filter derived from the text, the selection, open state, keyboard, ids, positioning, and the resolved recipe. Renders no host element — a context provider and nothing else.",
+    },
+    {
+      part: "Combobox.Control",
+      element: "div",
+      description:
+        "The bordered shell around the input and the two gutter buttons — the part Select does not have. It exists because the focus ring has to move outward: Select's box is its focus owner, this one holds it, so the recipe draws the ring with focus-within. It also registers itself as the popup's positioning anchor and as the outer edge of \"not outside\" for dismissal.",
+    },
+    {
+      part: "Combobox.Input",
+      element: "input[role=combobox]",
+      description:
+        "The text field, and the widget's focus owner: it keeps DOM focus open or closed, owns the entire keymap, and points aria-activedescendant at the highlighted option. Wires aria-autocomplete / aria-expanded / aria-controls, and switches off the browser's own autocomplete so it cannot overlay the popup with a second list.",
+    },
+    {
+      part: "Combobox.Clear",
+      element: "button",
+      description:
+        "Empties the field — the text and the selection both — and hands focus back to the input. tabindex=\"-1\", with a localized aria-label. Renders nothing while there is nothing to clear, unless alwaysVisible is set.",
+    },
+    {
+      part: "Combobox.Trigger",
+      element: "button",
+      description:
+        "The chevron: a pointer affordance for opening the popup, and nothing else. It carries no role=\"combobox\", no keymap and no aria-activedescendant — a second combobox in one tree would give a screen reader two fields. tabindex=\"-1\", with a localized aria-label.",
+    },
+    {
+      part: "Combobox.Icon",
+      element: "span",
+      description:
+        "The chevron glyph. Decorative and aria-hidden — it says nothing the input's aria-expanded does not. Renders the theme's chevronIcon unless given children.",
+    },
+    {
+      part: "Combobox.Portal",
+      element: "—",
+      description:
+        "Portals the Positioner to document.body (client-only), so no ancestor's overflow or transform can clip the popup.",
+    },
+    {
+      part: "Combobox.Positioner",
+      element: "div",
+      description:
+        "The measured layer. Its position / left / top / transform are written inline by the positioning engine; it reports the resolved geometry as data-side / data-align and publishes --anchor-width and --available-height.",
+    },
+    {
+      part: "Combobox.Content",
+      element: "div",
+      description:
+        "The card, and the behavior hub: dismissal, plus the assistive-tech hiding and scroll lock when modal is on (it is off by default here). Carries no role: the card is chrome, and it holds more than the list.",
+    },
+    {
+      part: "Combobox.List",
+      element: "div[role=listbox]",
+      description:
+        "The options' container and the scroll container. Iterates the surviving entries itself: its child is a render callback invoked once per entry the filter kept.",
+    },
+    {
+      part: "Combobox.Empty",
+      element: "div",
+      description:
+        "The \"nothing matched\" message, rendered only while the filtered set is empty. Not a live region — Status is, and two regions would announce the same fact twice. This is what a sighted reader sees.",
+    },
+    {
+      part: "Combobox.Status",
+      element: "div[role=status]",
+      description:
+        "The result count, shown and announced. Filtering is the one thing a combobox does that a screen reader cannot otherwise observe: focus does not move, the text is the user's own, and the list silently gets shorter.",
+    },
+    {
+      part: "Combobox.Item",
+      element: "div[role=option]",
+      description:
+        "One option. Owns aria-selected, the active/selected/disabled data attributes, and the pointer handlers. Give it item — the entry it renders; it resolves its own position from that, so it can sit at any depth.",
+    },
+    {
+      part: "Combobox.ItemText",
+      element: "span",
+      description:
+        "The option's label — a truncating box, so a long label ellipsizes instead of pushing the check out of its gutter.",
+    },
+    {
+      part: "Combobox.ItemIndicator",
+      element: "span",
+      description:
+        "The selection check, shown only while its row is selected. Renders the theme's checkIcon unless given children. In multiple mode it is the only thing reporting what is chosen.",
+    },
+    {
+      part: "Combobox.Group",
+      element: "div[role=group]",
+      description:
+        "A labelled section, named by its GroupLabel via aria-labelledby. Needs groupToItems on Root.",
+    },
+    {
+      part: "Combobox.GroupLabel",
+      element: "div",
+      description: "Names its Group. Self-registers its id as the group's aria-labelledby.",
+    },
+    {
+      part: "Combobox.Separator",
+      element: "div[role=presentation]",
+      description:
+        "A decorative hairline between sections (aria-hidden — never reported as an option).",
+    },
+  ]}
+/>
+
+## Filtering
+
+`filter` decides how `items` narrows as the user types — and it is the only thing the popup ever
+shows. `Combobox.Root` derives one array from your `items` and the current text, and everything
+downstream falls out of it: the rows, the count `Combobox.Status` announces, the emptiness
+`Combobox.Empty` reports, and the set the arrow keys traverse.
+
+- **`"contains"`** (the default) — the label contains the query anywhere.
+- **`"startsWith"`** — the label begins with it.
+- **a function** — `(item, query) => boolean`, receiving the raw item, so it can match on fields the
+  label never shows.
+- **`false`** — no filtering at all. See [Async search](#async-search).
+
+<Preview>
+  <ComboboxFilterModesDemo />
+</Preview>
+
+```tsx
+<Combobox.Root filter="contains">…</Combobox.Root>
+<Combobox.Root filter="startsWith">…</Combobox.Root>
+<Combobox.Root filter={(fruit: Fruit, query) => String(fruit.id) === query}>…</Combobox.Root>
+```
+
+The two built-ins are **collator-backed** (`{ usage: "search", sensitivity: "base" }`), so they fold
+**case and diacritics together**: `cafe` matches `Café au lait melon` and `acai` matches `Açaí`.
+`toLowerCase()` folds only case and matches neither — it fails silently for every accented language.
+The same collator backs [`Select`](/components/select)'s type-ahead, so the two agree on what
+"matches" means.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Filtering pauses <strong>while an IME composition is in progress</strong>. A half-typed CJK word
+      matches nothing, so filtering on it would empty the list and flash <code>Combobox.Empty</code>{" "}
+      on every keystroke of a multi-key character. The final text lands on{" "}
+      <code>compositionend</code> and the filter runs once.
+    </div>
+  }
+/>
+
+Opening a **committed** field with the chevron shows everything, not the matches for the label sitting
+in it — otherwise picking "Apple" would leave you re-opening onto a one-row list. Only typing narrows;
+committing, reverting and choosing an option all put the full set back.
+
+### Nothing matched
+
+A query that matches nothing keeps the popup **open**, so `Combobox.Empty` can say so. That is why
+`Combobox.Root` defaults `allowsEmptyCollection` to `true` where the underlying kernel defaults it to
+`false` — closing would take the part whose whole job is reporting the dead end off screen with it.
+
+<Preview>
+  <ComboboxNoMatchesDemo />
+</Preview>
+
+```tsx
+<Combobox.Content>
+  <Combobox.List>{/* … */}</Combobox.List>
+  <Combobox.Empty>No fruit matches that.</Combobox.Empty>
+  <Combobox.Status />
+</Combobox.Content>
+```
+
+`Combobox.Status` is the other half, and it is **visible on purpose**: the count helps a sighted
+reader too, and a visually-hidden live region is one `display: none` away from announcing nothing at
+all. Pass a callback to reword or localize it.
+
+```tsx
+<Combobox.Status>{(count) => `${count} fruits`}</Combobox.Status>
+```
+
+### Async search
+
+Set `filter={false}` and nothing is filtered: `items` is passed through untouched, keeping its array
+identity, so the rows on screen are exactly the ones you handed back. The search moves to
+`onInputValueChange`, which fires on every keystroke.
+
+<Preview>
+  <ComboboxAsyncSearchDemo />
+</Preview>
+
+```tsx
+const [results, setResults] = createSignal<Fruit[]>([]);
+
+<Combobox.Root
+  items={results()}
+  filter={false}
+  onInputValueChange={async (query) => setResults(await searchFruit(query))}
+>
+  {/* … */}
+</Combobox.Root>;
+```
+
+Debouncing and cancellation are yours to own — this is the shape that hands you the keystrokes, not
+one that hides them.
+
+## Controlled value
+
+A Combobox has **two** values, controllable independently.
+
+- The **selection** — `value` + `onChange`, with `defaultValue` for uncontrolled use. It is a
+  **scalar in single mode**: a single Combobox hands back the item itself, never `[item]`, and `null`
+  is how "nothing selected" is spelled. Whether it is a scalar or an array is inferred from
+  `selectionMode`, so nothing is cast at the call site.
+- The **text** — `inputValue` + `onInputValueChange`, with `defaultInputValue` for uncontrolled use.
+  It defaults to the initially-selected item's label in single mode, so `defaultValue={apple}` shows
+  "Apple" from the first frame.
+
+<Preview>
+  <ComboboxControlledDemo />
+</Preview>
+
+```tsx
+const [fruit, setFruit] = createSignal<Fruit | null>(null);
+const [text, setText] = createSignal("");
+
+<Combobox.Root
+  items={fruits}
+  value={fruit()}
+  onChange={setFruit}
+  inputValue={text()}
+  onInputValueChange={setText}
+>
+  {/* … */}
+</Combobox.Root>;
+```
+
+`onInputValueChange` fires on typing, on each IME composition update, and on every commit and
+revert — so it is the whole story of what the field says, not just what was typed into it.
+
+The open state works the same way: `defaultOpen` for uncontrolled, or `open` + `onOpenChange` to own
+it. Every path in and out — a keystroke, the chevron, Escape, an outside press, picking an option —
+routes through `onOpenChange` first.
+
+## Custom values
+
+Text that matches no option has to end somewhere, and `allowsCustomValue` picks the ending.
+
+- **`false`** (the default) — Enter, Tab or blur **reverts** the field to the current selection's
+  label. That is what stops a picker showing one value while reporting another.
+- **`true`** — the text stands on its own. It survives the commit, and the selection is left
+  untouched.
+
+<Preview>
+  <ComboboxAllowsCustomValueDemo />
+</Preview>
+
+```tsx
+<Combobox.Root allowsCustomValue items={fruits} onInputValueChange={setQuery}>
+  {/* … */}
+</Combobox.Root>
+```
+
+Either way, committing with an option **highlighted** selects it — `allowsCustomValue` only governs
+what happens when nothing is highlighted.
+
+## Selection modes
+
+`selectionMode` controls how many options can be chosen at once — the same vocabulary
+[`Listbox`](/components/listbox) and [`Select`](/components/select) use, never a `multiple` boolean:
+
+- **`single`** (default) — one option; choosing another replaces it, the field takes its label, and
+  the popup closes.
+- **`multiple`** — a set; the popup stays open while you tick rows, because `shouldCloseOnSelect`
+  defaults to `selectionMode !== "multiple"`.
+- **`none`** — nothing is ever selected; the arrows still move the highlight. A command palette
+  rather than a field.
+
+The mode also types the value: scalar (`V | null`) in `single`, an array (`V[]`) in `multiple`.
+
+In `multiple`, the input stays the **query** rather than becoming a joined list of labels — there is
+no one label to show — and it is cleared after each pick so the next search starts fresh. That makes
+the checks in the list the only report of what is chosen, which is why `Combobox.ItemIndicator` is
+not optional in a multi-select tree.
+
+<Preview>
+  <ComboboxMultipleDemo />
+</Preview>
+
+```tsx
+<Combobox.Root selectionMode="multiple" value={fruits()} onChange={setFruits} items={FRUITS}>
+  {/* … */}
+</Combobox.Root>
+```
+
+## Groups and separators
+
+Set `groupToItems` and `items` becomes your **group entries**: it flattens them into navigation order,
+which is the only thing the Combobox needs from a group. Your callback then goes one level up — it is
+invoked per group, and you iterate that group's own items with a plain `<For>`.
+
+The group's *name* never reaches the Combobox: you render it from your own key, which is why there is
+no `groupToLabel` and no `{ label, items }` shape to conform to. Keyboard navigation flows across
+groups as one list — the arrows skip the labels and the hairline.
+
+Filtering runs **inside** each group and drops the ones left empty, so a heading never survives its
+last row.
+
+<Preview>
+  <ComboboxGroupedDemo />
+</Preview>
+
+```tsx
+<Combobox.Root items={baskets} groupToItems={(basket) => basket.fruits}>
+  {/* … */}
+  <Combobox.List>
+    {(basket: Basket, index, fruits: Accessor<Fruit[]>) => (
+      <>
+        <Show when={index() > 0}>
+          <Combobox.Separator />
+        </Show>
+        <Combobox.Group>
+          <Combobox.GroupLabel>{basket.kind}</Combobox.GroupLabel>
+          <For each={fruits()}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+        </Combobox.Group>
+      </>
+    )}
+  </Combobox.List>
+</Combobox.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="danger"
+  class="not-prose"
+  description={
+    <div>
+      <strong>Iterate the third argument, and read it inside the inner <code>&lt;For&gt;</code>.</strong>{" "}
+      It is that group's <em>filtered</em> items — reaching into your own <code>basket.fruits</code>{" "}
+      instead renders every row the query just removed. And it is an <strong>accessor</strong>, not an
+      array, for the reason <code>index</code> is: <code>&lt;For&gt;</code> diffs by reference, so a
+      group that survives a narrowing query is <em>reused</em> and this callback never runs again — a
+      captured array would be the previous query's. Reading it in the callback body rather than in a
+      tracking scope is a <code>[STRICT_READ_UNTRACKED]</code> diagnostic saying exactly this.
+    </div>
+  }
+/>
+
+This is the one API difference from `Select.List`, whose callback has no third argument because
+nothing ever narrows its groups.
+
+## What opens the popup
+
+`menuTrigger` decides what opens the popup **on its own** — and only that. The chevron and the arrow
+keys open it in all three modes, which is what keeps `"manual"` usable from the keyboard.
+
+- **`"input"`** (default) — the first keystroke opens it, with the top match highlighted so Enter
+  commits it. A search field.
+- **`"focus"`** — focusing the field opens it. Suits a short, browsable list.
+- **`"manual"`** — only the chevron or an arrow key opens it. Suits a field whose text matters more
+  than its list.
+
+<Preview>
+  <ComboboxMenuTriggerDemo />
+</Preview>
+
+```tsx
+<Combobox.Root menuTrigger="focus">…</Combobox.Root>
+```
+
+## Sizes
+
+The `size` prop scales density across `sm`, `md` (the default), and `lg` — and it scales the control
+**and** the popup together, because the two have to agree: a `lg` field opening an `md` list is the
+one way this can look broken. There is no color axis; a Combobox is a neutral control over a neutral
+overlay, and its only accents are the transient highlight and the persistent selection.
+
+<Preview>
+  <ComboboxSizesDemo />
+</Preview>
+
+```tsx
+<Combobox.Root size="sm">…</Combobox.Root>
+<Combobox.Root size="md">…</Combobox.Root>
+<Combobox.Root size="lg">…</Combobox.Root>
+```
+
+## Disabled
+
+`disabled` on `Combobox.Root` turns the whole control off — the shell dims, the input takes no text
+and no focus, and nothing opens. `isItemDisabled` turns a single row off: it stays in the list and
+keeps `aria-disabled`, so it is still discoverable, but navigation skips it (`skipDisabled`, on by
+default) and it can never be selected.
+
+<Preview>
+  <ComboboxDisabledDemo />
+</Preview>
+
+```tsx
+<Combobox.Root disabled>…</Combobox.Root>
+<Combobox.Root isItemDisabled={(fruit) => fruit.outOfSeason}>…</Combobox.Root>
+```
+
+## Long option lists
+
+The popup caps its height at the space measured to the viewport edge (`--available-height`) and
+`Combobox.List` scrolls inside the card, so the rounded corners, the border and the pinned status line
+stay still while the rows move. Arrowing past the fold scrolls the highlighted row into view — in this
+pattern nothing else would, since no option ever takes DOM focus.
+
+Two things `Select` offers are **deliberately absent here**, and both are compile errors rather than
+silent breakage:
+
+<DataTable
+  columns={[
+    { key: "missing", label: "Not available", code: true },
+    { key: "why", label: "Why" },
+  ]}
+  rows={[
+    {
+      missing: "estimateSize / overscan",
+      why: "Virtualization. A windowed row is recycled — it stays mounted while its position changes — so Combobox.Item's item→index lookup cannot work, and every row would silently register nothing. For a picker over tens of thousands of rows, reach for a Listbox.",
+    },
+    {
+      missing: "name / form / required",
+      why: "Native form submission. Select renders a real, clipped <select> holding one <option> per item; a Combobox's option set is the filtered one, so the same field would drop options as the user typed and submit whatever the query happened to leave. Read the selection from onChange instead.",
+    },
+  ]}
+/>
+
+## The popup
+
+`side` picks which side of the control the popup prefers (default `"bottom"`) and `align` skids it
+along that side's cross axis (default `"center"`) — but both are a **preference**, not a promise: near
+a viewport edge the card flips to the opposite side and slides to stay in view, and what the parts
+report as `data-side` / `data-align` is where it actually landed. The component's own defaults are a
+`sideOffset` of `4` and a `collisionPadding` of `8`.
+
+The width is not a decision you make: the popup always matches the control, via the `--anchor-width`
+the positioner publishes and the recipe spends. Override the `positioner` slot if you need something
+else.
+
+```tsx
+<Combobox.Root side="top" sideOffset={8} collisionPadding={16} flip={false}>…</Combobox.Root>
+```
+
+`Combobox.Portal` renders the layer at the end of `<body>`, so a Combobox inside a scroll container, a
+table cell, or a `transform`ed ancestor is never clipped by it — while the position stays glued to the
+control as the container scrolls (`autoUpdate`, on by default). Pass `mount` to portal somewhere else,
+and `trackAnchorMotion` for a control that moves under a CSS transform.
+
+An open Combobox is **not modal**, the opposite of `Select`'s default. Hiding the rest of the page
+from assistive tech and locking body scroll is right for a picker the user has committed to, and wrong
+for a search field they are still typing into. Pass `modal` to turn it on.
+
+## Dismissal
+
+An open Combobox light-dismisses three ways, each independently switchable: **Escape**, a
+**pointer-down outside** the popup, and **focus landing outside** it. All three are on by default, and
+focus stays in the input — where, in this pattern, it never left.
+
+Escape does one more thing here than it does on a Select: it **reverts** the field to the last
+committed text before closing.
+
+```tsx
+<Combobox.Root closeOnEscape={false} closeOnInteractOutside={false}>…</Combobox.Root>
+```
+
+A Combobox nested inside a Dialog or a Popover takes the first Escape on its own and leaves the layer
+below it standing; set `bubbles` if you'd rather one keystroke took the whole chain.
+
+```tsx title="One Escape closes this popup and everything under it"
+<Combobox.Root bubbles={{ escapeKey: true }}>…</Combobox.Root>
+```
+
+## Keyboard interactions
+
+Combobox implements the WAI-ARIA 1.2 combobox keyboard pattern. Every key is handled on the
+**input**, because there is nowhere else for it to live: no option is ever focused, and neither
+gutter button is in the tab order — so **Tab crosses the whole widget in one press**.
+
+<DataTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "closed", label: "Closed" },
+    { key: "open", label: "Open" },
+  ]}
+  rows={[
+    {
+      key: "↓ / Alt + ↓",
+      closed: "Opens the popup on the first option.",
+      open: "Moves the highlight to the next option (disabled rows are skipped).",
+    },
+    {
+      key: "↑",
+      closed: "Opens the popup on the last option.",
+      open: "Moves the highlight to the previous option.",
+    },
+    { key: "Alt + ↑", closed: "Opens the popup on the last option.", open: "Closes the popup." },
+    {
+      key: "Enter",
+      closed: "Not consumed — a Combobox in a form still submits it.",
+      open: "Commits the highlighted option and closes. With nothing highlighted, reverts unless allowsCustomValue.",
+    },
+    {
+      key: "Tab",
+      closed: "Moves to the next control.",
+      open: "Commits, then lets focus leave. The gutter buttons are not tab stops.",
+    },
+    {
+      key: "Escape",
+      closed: "Not consumed — a Combobox inside a Dialog never swallows the Dialog's Escape.",
+      open: "Reverts the text to the last committed value and closes. Focus stays in the input.",
+    },
+    {
+      key: "Home / End",
+      closed: "Moves the caret, as in any text field.",
+      open: "Moves the highlight to the first / last option.",
+    },
+    { key: "PageUp / PageDown", closed: "Not consumed.", open: "Moves the highlight by a page." },
+    {
+      key: "← / →",
+      closed: "Moves the caret.",
+      open: "Drops the highlight, then moves the caret — editing text again means Enter must not commit a stale row.",
+    },
+    {
+      key: "printable / Space",
+      closed: "Types. Opens the popup when menuTrigger is 'input'.",
+      open: "Types, and re-filters the list.",
+    },
+  ]}
+/>
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      <strong>There is no type-ahead.</strong> The input <em>is</em> the search buffer, so a second
+      one racing it would be a bug — that is the one behavior{" "}
+      <a href="/components/select">Select</a> has and Combobox deliberately drops. It is also why{" "}
+      <code>Space</code> and every printable key are unbound: they type.
+    </div>
+  }
+/>
+
+## Polymorphism
+
+Render a part as a different element or component with the `render` prop — a function that receives
+the part's computed props and spreads them onto your element. Every part except `Combobox.Root` and
+`Combobox.Portal` accepts it. There is **no `as` prop**; `render` is the single polymorphism API.
+
+```tsx title="The chevron, as a div"
+<Combobox.Trigger
+  nativeButton={false}
+  render={(props) => <div {...props} class="grid size-8 place-items-center" />}
+>
+  <Combobox.Icon />
+</Combobox.Trigger>
+```
+
+Setting `class` *after* the spread is what replaces the recipe's slot chrome rather than merging into
+it. Everything else rides through the spread untouched — the popup ARIA, the localized `aria-label`,
+the `tabindex="-1"` and the focus-preserving pointerdown.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      A <code>render</code> target must spread <strong>every</strong> prop it is handed,{" "}
+      <code>ref</code> included, and it must be a valid host for the role it is given (a{" "}
+      <code>role="listbox"</code> on a <code>&lt;section&gt;</code> is an axe violation). The internal
+      refs are load-bearing and fail <em>silently</em>: the control's is the positioning anchor and
+      the outer edge of "not outside", the input's is the element the text state writes into (drop it
+      and there is no controlled value, no commit and no revert), the positioner's is what gets
+      measured and moved, the content's is what dismissal reads, and the list's is the scroll
+      container an offscreen highlighted row is scrolled inside.
+    </div>
+  }
+/>
+
+If a re-targeted `Combobox.Trigger` or `Combobox.Clear` is not a real `<button>`, pass
+`nativeButton={false}` alongside it, so the disabled behavior switches to `tabIndex` /
+`aria-disabled` and keyboard activation is synthesized.
+
+## Theming
+
+Combobox's look comes from the active preset's recipe. It is **two surfaces in one recipe** — a form
+control and a floating card — with a single `size` axis and no color axis. Override styling at three
+levels, applied in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` →
+instance `slotClasses` / part `class`**.
+
+### Parts
+
+Every styled part carries a `data-slot` attribute you can target, and each is addressable by name
+through `slotClasses`. There is no `root` slot (`Combobox.Root` renders no element) and no `portal`
+slot, for the same reason.
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      slot: "control",
+      attr: "combobox-control",
+      description:
+        "The bordered shell: the raised surface, the hairline, the density — and the focus ring, drawn with focus-within, because the element that takes focus is inside it.",
+    },
+    {
+      slot: "input",
+      attr: "combobox-input",
+      description:
+        "The text field. Deliberately chrome-free (no border, no background, no outline): a second box here would fight the control's. The empty state is the native placeholder: pseudo-element, so no slot and no data-* of its own.",
+    },
+    {
+      slot: "clear",
+      attr: "combobox-clear",
+      description: "The reset button's hit area and its wash. No focus ring — it is not a tab stop.",
+    },
+    {
+      slot: "trigger",
+      attr: "combobox-trigger",
+      description: "The chevron's hit area, and nothing else — the control draws the chrome.",
+    },
+    { slot: "icon", attr: "combobox-icon", description: "The chevron's box." },
+    {
+      slot: "positioner",
+      attr: "combobox-positioner",
+      description:
+        "The measured layer, where --anchor-width and --available-height are published. Stacking and width only — never anything positional, which would fight the inline style the engine writes.",
+    },
+    {
+      slot: "content",
+      attr: "combobox-content",
+      description: "The popup card, its elevation, and the enter/exit transition.",
+    },
+    { slot: "list", attr: "combobox-list", description: "The scroll container inside the card." },
+    {
+      slot: "empty",
+      attr: "combobox-empty",
+      description: "The no-results message, in the card beside the list.",
+    },
+    {
+      slot: "status",
+      attr: "combobox-status",
+      description:
+        "The pinned result count. It does not shrink when the list does, so the count stays visible while the rows scroll.",
+    },
+    {
+      slot: "item",
+      attr: "combobox-item",
+      description: "An option row — carries the highlight and the selected/disabled state.",
+    },
+    {
+      slot: "itemText",
+      attr: "combobox-item-text",
+      description: "The option's truncating label box.",
+    },
+    {
+      slot: "itemIndicator",
+      attr: "combobox-item-indicator",
+      description: "The selection check's placement in the trailing gutter.",
+    },
+    { slot: "group", attr: "combobox-group", description: "A labelled section wrapper." },
+    {
+      slot: "groupLabel",
+      attr: "combobox-group-label",
+      description: "The small, muted section label.",
+    },
+    {
+      slot: "separator",
+      attr: "combobox-separator",
+      description: "The hairline divider between sections.",
+    },
+  ]}
+/>
+
+The positioner and the content also report the resolved geometry as `data-side` / `data-align`, and
+their transition state as `data-presence` — which is how the preset animates the card in from the
+control's direction. The highlight is `data-active` on a row, never a `hover:` state: the keyboard and
+the pointer share one active option, so a hover background would paint a second highlight the moment
+the cursor lagged a frame behind. It matters more here than anywhere, since focus never leaves the
+input and `data-active` is the only signal there is.
+
+```css title="Targeting the resolved side"
+[data-slot="combobox-content"][data-side="top"] { /* … */ }
+```
+
+### Overriding one Combobox
+
+Set `slotClasses` on `Combobox.Root` to reach any slot from one place, or put `class` on an individual
+part. Use literal class strings so your Tailwind build can see them.
+
+```tsx
+<Combobox.Root slotClasses={{ content: "shadow-2xl", item: "rounded-md font-mono" }}>
+  {/* … */}
+</Combobox.Root>
+
+// …or per part:
+<Combobox.Input class="font-mono" />
+```
+
+The three glyphs are per-instance overridable as plain children — `Combobox.Icon`,
+`Combobox.ItemIndicator` and `Combobox.Clear` each render the theme's default only when given none.
+
+```tsx
+<Combobox.Icon>
+  <CaretIcon />
+</Combobox.Icon>
+```
+
+### App-wide defaults & overrides
+
+Set the default `size`, all three glyphs, and global part classes for **every** Combobox through the
+theme with `definePreset`, then pass the derived preset to `ThemeProvider`. `defaultProps` resolve at
+**instance ?? preset ?? builtin** precedence, so an explicit prop on a single Combobox always wins.
+
+```tsx title="theme.tsx"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    combobox: {
+      defaultProps: {
+        size: "sm",
+        chevronIcon: () => <CaretIcon />,
+        checkIcon: () => <TickIcon />,
+        clearIcon: () => <CrossIcon />,
+      },
+      slotClasses: { content: "rounded-none" },
+    },
+  },
+});
+```
+
+All three glyphs are **factories** (`() => JSX.Element`), never a built element: a preset value is one
+object shared by every instance, and an already-built Solid node would *move* rather than be reused.
+
+`size` is the recipe's only variant, so it is the one styling prop defaultable app-wide. `filter`,
+`menuTrigger`, `selectionMode`, `modal` and the dismissal props change behavior rather than looks and
+stay on the instance.
+
+## API
+
+### Combobox.Root
+
+`Combobox.Root<V, M, G>` is generic in your item type `V`, its selection mode `M`, and the shape of an
+`items` entry `G` (the same as `V` for a flat list, the group's shape with `groupToItems` set). It
+renders no host element, so it takes no native attributes — only the props below.
+
+<PropsTable
+  rows={[
+    {
+      prop: "items",
+      type: "readonly G[]",
+      default: "",
+      description:
+        "Required. The whole option set, in navigation order — your items for a flat list, or the group entries when groupToItems is set. Held here rather than in the popup, so a closed Combobox still knows what it has without mounting a row.",
+    },
+    {
+      prop: "filter",
+      type: '"contains" | "startsWith" | ((item: V, query: string) => boolean) | false',
+      default: '"contains"',
+      description:
+        "How items narrows as the user types. The two built-ins are collator-backed, so cafe matches Café. false disables filtering entirely — the async-search shape, where you fetch on onInputValueChange and hand back the results as items.",
+    },
+    {
+      prop: "inputValue",
+      type: "string",
+      default: "",
+      description: "Controlled text in the input. Omit the prop entirely for uncontrolled use.",
+    },
+    {
+      prop: "defaultInputValue",
+      type: "string",
+      default: "the selected item's label",
+      description:
+        'Initial text when uncontrolled. Defaults to the initially-selected item\'s label in single mode, and to "" otherwise.',
+    },
+    {
+      prop: "onInputValueChange",
+      type: "(value: string) => void",
+      default: "",
+      description:
+        "Called on every text change: typing, each IME composition update, and every commit and revert.",
+    },
+    {
+      prop: "allowsCustomValue",
+      type: "boolean",
+      default: "false",
+      description:
+        "Whether text matching no option survives a commit. Off, Enter / Tab / blur revert the field to the current selection's label. On, the text stands alone and the selection is left untouched.",
+    },
+    {
+      prop: "menuTrigger",
+      type: '"input" | "focus" | "manual"',
+      default: '"input"',
+      description:
+        "What opens the popup on its own — typing, focusing, or nothing. All three leave the arrow keys and the chevron working.",
+    },
+    {
+      prop: "groupToItems",
+      type: "(group: G) => readonly V[]",
+      default: "",
+      description:
+        "Maps a group entry to its own items, flattening items into navigation order. Setting it switches Combobox.List's callback from per-item to per-group, and adds the filtered-items third argument.",
+    },
+    {
+      prop: "itemToValue",
+      type: "(item: V) => string",
+      default: "String",
+      description:
+        "Maps an item to its selection identity, compared for equality. Must be unique per item. It is not the row's DOM id, which is generated.",
+    },
+    {
+      prop: "itemToLabel",
+      type: "(item: V) => string",
+      default: "itemToValue",
+      description:
+        "Maps an item to its display text — what the field shows once committed, and what the built-in filters match against. Read from the data, so it works for a row that has not mounted.",
+    },
+    {
+      prop: "isItemDisabled",
+      type: "(item: V) => boolean",
+      default: "false",
+      description:
+        "Whether an item is disabled — dimmed, and skipped by navigation unless skipDisabled is off. It can never be selected.",
+    },
+    {
+      prop: "isItemEqualToValue",
+      type: "(a: V, b: V) => boolean",
+      default: "by itemToValue",
+      description:
+        "Full override of value equality. Defaults to comparing itemToValue(a) === itemToValue(b).",
+    },
+    {
+      prop: "selectionMode",
+      type: '"single" | "multiple" | "none"',
+      default: '"single"',
+      description:
+        "How many options can be selected at once. It also types value / defaultValue / onChange as a scalar or an array.",
+    },
+    {
+      prop: "value",
+      type: "V | null (single) · V[] (multiple)",
+      default: "",
+      description:
+        "Controlled selection. null is a controlled 'nothing selected'; omit the prop entirely for uncontrolled use.",
+    },
+    {
+      prop: "defaultValue",
+      type: "V | null (single) · V[] (multiple)",
+      default: "",
+      description:
+        "Initial selection when uncontrolled. In single mode it also seeds the input's text.",
+    },
+    {
+      prop: "onChange",
+      type: "(value: V | null | V[]) => void",
+      default: "",
+      description: "Called on every selection change, in the same shape as value.",
+    },
+    {
+      prop: "open",
+      type: "boolean",
+      default: "",
+      description: "Controlled open state. Leave unset for uncontrolled (defaults to defaultOpen).",
+    },
+    {
+      prop: "defaultOpen",
+      type: "boolean",
+      default: "false",
+      description: "Initial open state when uncontrolled.",
+    },
+    {
+      prop: "onOpenChange",
+      type: "(open: boolean) => void",
+      default: "",
+      description:
+        "Called on every open/close request — a keystroke, the chevron, Escape, an outside press, and choosing an option.",
+    },
+    {
+      prop: "allowsEmptyCollection",
+      type: "boolean",
+      default: "true",
+      description:
+        "Whether the popup may open with no options in it. True here, unlike Select: an empty result is the normal outcome of typing, and closing would hide Combobox.Empty.",
+    },
+    {
+      prop: "shouldCloseOnSelect",
+      type: "boolean",
+      default: 'selectionMode !== "multiple"',
+      description:
+        "Whether choosing an option closes the popup. Applied to every path that selects — Enter, Tab, and a click.",
+    },
+    {
+      prop: "modal",
+      type: "boolean",
+      default: "false",
+      description:
+        "Whether an open popup hides the rest of the page from assistive tech and locks body scroll. False here, unlike Select: marking the page inert is wrong for a field the user is still typing into.",
+    },
+    {
+      prop: "closeOnEscape",
+      type: "boolean",
+      default: "true",
+      description: "Whether Escape reverts the text and closes the popup.",
+    },
+    {
+      prop: "closeOnInteractOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether a pointer-down outside the popup closes it.",
+    },
+    {
+      prop: "closeOnFocusOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether focus landing outside the popup closes it.",
+    },
+    {
+      prop: "bubbles",
+      type: "boolean | { escapeKey?: boolean; outsidePress?: boolean }",
+      default: "false",
+      description:
+        "Whether a dismissal consumed by a layer opened above this popup also closes it. Off for both channels: the topmost layer alone dismisses.",
+    },
+    {
+      prop: "side",
+      type: '"top" | "right" | "bottom" | "left" | "inline-start" | "inline-end"',
+      default: '"bottom"',
+      description:
+        "Preferred side of the control. The two inline values resolve against the layer's reading direction.",
+    },
+    {
+      prop: "align",
+      type: '"start" | "center" | "end"',
+      default: '"center"',
+      description: "Alignment along the side's cross axis.",
+    },
+    {
+      prop: "sideOffset",
+      type: "number",
+      default: "4",
+      description: "Distance from the control, in px — the small gap a picker keeps from its field.",
+    },
+    {
+      prop: "alignOffset",
+      type: "number",
+      default: "0",
+      description: "Skid along the alignment axis, in px.",
+    },
+    {
+      prop: "flip",
+      type: "boolean",
+      default: "true",
+      description: "Flip to the opposite side when the preferred one would overflow.",
+    },
+    {
+      prop: "shift",
+      type: "boolean",
+      default: "true",
+      description: "Slide along the alignment axis to stay in view.",
+    },
+    {
+      prop: "collisionPadding",
+      type: "number | Partial<Record<Side, number>>",
+      default: "8",
+      description: "Gutter kept between the popup and the collision boundary.",
+    },
+    {
+      prop: "collisionBoundary",
+      type: "Element | Element[] | Rect | 'clippingAncestors'",
+      default: '"clippingAncestors"',
+      description: "What the popup must stay inside.",
+    },
+    {
+      prop: "strategy",
+      type: '"absolute" | "fixed"',
+      default: '"absolute"',
+      description: "CSS position used for the positioner.",
+    },
+    {
+      prop: "autoUpdate",
+      type: "boolean",
+      default: "true",
+      description: "Keep the position current through scroll and resize.",
+    },
+    {
+      prop: "trackAnchorMotion",
+      type: "boolean",
+      default: "false",
+      description: "Re-measure every animation frame — for a control that moves under a transform.",
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "Disable the whole control — the shell dims and the input takes no text or focus.",
+    },
+    {
+      prop: "id",
+      type: "string",
+      default: "generated",
+      description: "Base id for the widget's generated ids.",
+    },
+    {
+      prop: "skipDisabled",
+      type: "boolean",
+      default: "true",
+      description: "Whether navigation skips disabled items.",
+    },
+    {
+      prop: "wrap",
+      type: "boolean",
+      default: "false",
+      description: "Whether arrow navigation wraps past the ends of the list.",
+    },
+    {
+      prop: "orientation",
+      type: '"vertical" | "horizontal"',
+      default: '"vertical"',
+      description: "The arrow-key axis and aria-orientation of the option list.",
+    },
+    {
+      prop: "dir",
+      type: '"ltr" | "rtl"',
+      default: "useLocale()",
+      description:
+        "Mirrors this Combobox's navigation on its own, overriding the page's direction. Unset, it follows the page.",
+    },
+    {
+      prop: "size",
+      type: '"sm" | "md" | "lg"',
+      default: '"md"',
+      description: "The density scale — the control and the popup's rows together.",
+    },
+    {
+      prop: "chevronIcon",
+      type: "() => JSX.Element",
+      default: "built-in chevron",
+      description:
+        "The trigger's default chevron, as a factory. Overridable app-wide from a preset, and per instance with Combobox.Icon's children.",
+    },
+    {
+      prop: "checkIcon",
+      type: "() => JSX.Element",
+      default: "built-in check",
+      description:
+        "The default selection glyph, as a factory. Overridable app-wide from a preset, and per instance with Combobox.ItemIndicator's children.",
+    },
+    {
+      prop: "clearIcon",
+      type: "() => JSX.Element",
+      default: "built-in ✕",
+      description:
+        "The clear button's default glyph, as a factory. Overridable app-wide from a preset, and per instance with Combobox.Clear's children.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"combobox">',
+      default: "",
+      description:
+        "Per-slot class overrides, keyed by control, input, clear, trigger, icon, positioner, content, list, empty, status, group, groupLabel, separator, item, itemText, itemIndicator.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The Combobox anatomy (Control + Portal > …).",
+    },
+  ]}
+/>
+
+### Combobox.Input
+
+Plus every native `<input>` attribute except `value` — `aria-label` or `aria-labelledby` among them,
+and one of the two is required. `placeholder` is the usual one to set. `autocomplete`, `autocorrect`,
+`autocapitalize` and `spellcheck` are switched off for you (the browser's own suggestions would
+overlay the popup with a second, unrelated list) and defer to yours if you pass them.
+
+<PropsTable
+  rows={[
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the input as another element or component. Receives its computed props, ref included — the ref is the element the text state writes into, so a target that drops it has no controlled value, no commit and no revert.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the input slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Combobox.List
+
+Plus every native `<div>` attribute except `children`.
+
+<PropsTable
+  rows={[
+    {
+      prop: "children",
+      type: "(entry: G, index: Accessor<number>, items: Accessor<I[]>) => JSX.Element",
+      default: "",
+      description:
+        "A render callback invoked once per surviving entry: per item when flat, per group when groupToItems is set. index is what a Separator between groups keys off. The third argument is that group's filtered items, and it is an accessor — read it inside the inner <For>, never in the callback body. G and I are inferred from the annotations you write on this callback.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the list container as another element or component. Receives its computed props and the ref that registers it as the scroll container. Re-targets the container — not the same thing as the per-entry callback above.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the list slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Combobox.Item
+
+Plus every native `<div>` attribute — `id` is the exception: it is the `aria-activedescendant` target
+and is generated for you. Nothing else about the row is declared here; its label, disabled state and
+value all come from `Combobox.Root`'s accessors.
+
+<PropsTable
+  rows={[
+    {
+      prop: "item",
+      type: "V",
+      default: "",
+      description:
+        "Required. The entry this option renders — one element of the filtered set Combobox.List handed you (or of a group's own filtered items). The row resolves its own position from it, so it can sit at any depth. There is deliberately no index prop, and an item outside the current entries logs a development warning naming it — which is also the tripwire for rendering an unfiltered list.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the option as another element or component. Receives its computed props and the ref that publishes the row — an aria-activedescendant target and what scroll-into-view moves.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the item slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Combobox.Clear
+
+Plus every native `<button>` attribute.
+
+<PropsTable
+  rows={[
+    {
+      prop: "alwaysVisible",
+      type: "boolean",
+      default: "false",
+      description:
+        "Whether to render while the field is already empty. Off, the button appears only once there is text or a selection to clear — what every search field does.",
+    },
+    {
+      prop: "nativeButton",
+      type: "boolean",
+      default: "true",
+      description:
+        "Set false when a render target is not a real <button>: the disabled behavior switches to tabIndex / aria-disabled and keyboard activation is synthesized.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "theme clearIcon",
+      description: "A custom glyph, replacing the theme's default for this one button.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the clear button as another element or component. Receives its computed props — the localized aria-label, the tabindex and the focus-preserving pointerdown ride on them.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the clear slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Combobox.Trigger
+
+Plus every native `<button>` attribute.
+
+<PropsTable
+  rows={[
+    {
+      prop: "nativeButton",
+      type: "boolean",
+      default: "true",
+      description:
+        "Set false when a render target is not a real <button>: the disabled behavior switches to tabIndex / aria-disabled and keyboard activation is synthesized.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "<Combobox.Icon />",
+      description: "The chevron. With none, renders Combobox.Icon.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the chevron button as another element or component. Receives its computed props — the popup ARIA, the localized aria-label and the tabindex ride on them.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the trigger slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Combobox.Status
+
+Plus every native `<div>` attribute except `children`.
+
+<PropsTable
+  rows={[
+    {
+      prop: "children",
+      type: "JSX.Element | ((count: number) => JSX.Element)",
+      default: "localized count",
+      description:
+        "Replaces the default message. As a callback it receives the number of options the current filter left, so an app can reword or localize it.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render the status as another element or component. Receives its computed props — role=\"status\" and the live-region attributes. Pick a target that can hold text and stays mounted.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the status slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Combobox.Portal
+
+<PropsTable
+  rows={[
+    {
+      prop: "mount",
+      type: "Element",
+      default: "document.body",
+      description: "Where to portal the Positioner.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The Positioner subtree.",
+    },
+  ]}
+/>
+
+### Parts
+
+`Combobox.Control`, `Combobox.Icon`, `Combobox.Positioner`, `Combobox.Content`, `Combobox.Empty`,
+`Combobox.Group`, `Combobox.GroupLabel`, `Combobox.Separator`, `Combobox.ItemText`, and
+`Combobox.ItemIndicator` each accept their native element attributes plus a `render` prop and a
+`class`. `Combobox.Icon`, `Combobox.ItemIndicator` and `Combobox.Empty` also take `children` —
+respectively a custom glyph replacing the theme's default for that one instance, and the no-results
+message. `aria-hidden` is the one attribute the two glyph parts do not forward, since the input's
+`aria-expanded` and the option's `aria-selected` already convey what they show.
+
+## Accessibility
+
+Combobox implements the WAI-ARIA
+[combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) pattern (ARIA 1.2), with an editable
+`role="combobox"` and a `role="listbox"` popup.
+
+- **Give the input an accessible name.** There is no `Label` part, so pass `aria-label` — or
+  `aria-labelledby` pointing at your own `<label>` — on `Combobox.Input`. A nameless
+  `role="combobox"` is an axe `aria-input-field-name` violation, and the popup inherits its name from
+  the input, so one missing attribute leaves both unnamed.
+- **DOM focus never leaves the input.** No option is ever focused; the highlight is
+  `aria-activedescendant` on the input plus `data-active` on the row. Both gutter buttons sit outside
+  the tab order and refuse focus on press, so the widget is a **single tab stop** and a click on the
+  chevron never blurs the field.
+- **The result count is announced.** `Combobox.Status` is a `role="status"` live region reporting how
+  many options the filter left — the one thing a combobox does that a screen reader cannot otherwise
+  observe, since focus does not move and the list just gets shorter. The first count is announced
+  through a body-level region, because a live region that mounts with its text is usually silent.
+- **No dangling IDREFs.** `aria-controls` and `aria-activedescendant` are present only while the
+  popup is open, so a page of closed Comboboxes carries no attribute naming an element that isn't in
+  the DOM.
+- **Roles and state are wired for you.** The input is `role="combobox"` with `aria-expanded` and
+  `aria-autocomplete="list"`, the list `role="listbox"` (with `aria-multiselectable` in multiple
+  mode), each option `role="option"` with `aria-selected`, groups `role="group"`, and the separator
+  `role="presentation"` — never `role="separator"`, which is an invalid `listbox` child.
+- **Both gutter buttons are named.** The chevron and the clear button each carry a localized
+  `aria-label` from `@hope-ui/i18n`, because a bare glyph is an axe `button-name` violation and
+  unusable by voice control. Override either with your own `aria-label`.
+- **One highlight, keyboard and pointer.** The arrows and the cursor share a single active option, so
+  the two can never paint two highlights; the selection check is separate from that transient
+  highlight. An offscreen highlight is scrolled into view, and re-filtering re-anchors it to the first
+  surviving row rather than leaving it pointing into the previous list.
+- **Disabled options stay discoverable.** A disabled row keeps `aria-disabled` and, by default, is
+  skipped by navigation; it can never be selected.
+- **Motion is reduced-motion aware.** The card's fade-and-scale drops to an instant open/close when
+  the user has `prefers-reduced-motion` enabled.

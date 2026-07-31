@@ -25,4 +25,9 @@ export const MESSAGES_EN: I18nCatalog = {
     selectedRange: "Selected {{start}} to {{end}}",
     datesSelected: ({ count }) => `${count} date${count === 1 ? "" : "s"} selected`,
   },
+  combobox: {
+    triggerLabel: "Show suggestions",
+    clearLabel: "Clear",
+    countAnnouncement: ({ count }) => `${count} option${count === 1 ? "" : "s"} available`,
+  },
 };

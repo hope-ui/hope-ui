@@ -21,4 +21,10 @@ export const MESSAGES_DA: I18nCatalog = {
     selectedRange: "Valgt {{start}} til {{end}}",
     datesSelected: ({ count }) => `${count} ${count === 1 ? "dato" : "datoer"} valgt`,
   },
+  combobox: {
+    triggerLabel: "Vis forslag",
+    clearLabel: "Ryd",
+    countAnnouncement: ({ count }) =>
+      `${count} ${count === 1 ? "mulighed tilgængelig" : "muligheder tilgængelige"}`,
+  },
 };

@@ -149,9 +149,28 @@ leaves the trigger in activedescendant mode, so there is nothing to trap — and
 which would cover the trigger, making it unclickable and breaking toggle-to-close. React Aria's Select
 composes exactly this pair (`usePreventScroll` + `ariaHideOutside`).
 
-`state.sparedElements` is the trigger, and it feeds **both** `createHideOutside`'s `spare` and
-`createDismissable`'s `exclude`. It is one requirement wearing two mechanisms: drop it from either and
-toggle-to-close breaks, in a different way each time.
+`state.sparedElements` is everything that counts as "the control" rather than "outside", and it feeds
+**both** `createHideOutside`'s `spare` and `createDismissable`'s `exclude`. It is one requirement
+wearing two mechanisms: drop it from either and toggle-to-close breaks, in a different way each time.
+
+## The anchor is the outer box, when there is one
+
+`triggerElement` is the focus owner, and by default it is also the positioning anchor and the sole
+spared element. That is right for Select, whose trigger **is** the whole control.
+
+Combobox's focus owner is an `<input>` sitting inside a bordered shell alongside a chevron and a clear
+button, so it registers that shell as `anchorElement` (`Combobox.Control`'s `ref`). Two things break
+if it does not, both silently:
+
+- the popup is measured against the bare `<input>`, so `--anchor-width` lands narrower than the field
+  it belongs to and the card stops short of the gutter buttons;
+- the two gutter buttons fall **outside** `sparedElements`, so a pointerdown on the chevron dismisses
+  in the capture phase and its own `click` reopens — the popup can never be closed by the control that
+  opened it.
+
+`sparedElements` therefore holds the anchor **and** the focus owner, deduplicated. Listing a
+descendant alongside its ancestor is harmless to both consumers, and it means a tree that registers no
+anchor still spares the element focus actually lives on.
 
 ## No `omit` list — and that absence is deliberate
 

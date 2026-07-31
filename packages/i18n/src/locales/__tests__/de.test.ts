@@ -13,4 +13,15 @@ describe("MESSAGES_DE", () => {
     expect(fn({ count: 1 })).toBe("1 Datum ausgewählt");
     expect(fn({ count: 2 })).toBe("2 Daten ausgewählt");
   });
+
+  it("carries the German combobox strings", () => {
+    expect(MESSAGES_DE.combobox.triggerLabel).toBe("Vorschläge anzeigen");
+    expect(MESSAGES_DE.combobox.clearLabel).toBe("Löschen");
+  });
+
+  it("pluralizes countAnnouncement (singular only at 1)", () => {
+    const fn = MESSAGES_DE.combobox.countAnnouncement as (p: { count: number }) => string;
+    expect(fn({ count: 1 })).toBe("1 Option verfügbar");
+    expect(fn({ count: 2 })).toBe("2 Optionen verfügbar");
+  });
 });

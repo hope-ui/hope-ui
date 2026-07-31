@@ -21,4 +21,10 @@ export const MESSAGES_SV: I18nCatalog = {
     selectedRange: "Valt {{start}} till {{end}}",
     datesSelected: ({ count }) => `${count} datum ${count === 1 ? "valt" : "valda"}`,
   },
+  combobox: {
+    triggerLabel: "Visa förslag",
+    clearLabel: "Rensa",
+    countAnnouncement: ({ count }) =>
+      `${count} alternativ ${count === 1 ? "tillgängligt" : "tillgängliga"}`,
+  },
 };
