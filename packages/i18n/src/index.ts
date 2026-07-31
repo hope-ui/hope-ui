@@ -2,6 +2,7 @@
 // NOTICE.md), plus the in-house message catalog + resolver (`t`). No external i18n runtime
 // dependency.
 
+export { createCollator } from "./collator";
 export {
   createDefaultLocale,
   getDefaultLocale,

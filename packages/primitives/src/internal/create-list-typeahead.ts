@@ -8,6 +8,20 @@ export interface CreateListTypeaheadOptions<V = unknown> {
   focus: CreateListFocusReturn<V>;
   /** Milliseconds of inactivity before the buffer resets. Default `500`. Reactive. */
   delay?: Accessor<number>;
+  /**
+   * Called with the matched index instead of the default `focus.focusIndex`. The seam a future
+   * Select/Combobox kernel intercepts to **select** the match rather than highlight it while its
+   * popup is closed — native `<select>` behavior, react-aria's `onTypeSelect → setSelectedKey`,
+   * Base UI's `onMatch`. A plain listbox never sets this, so its behavior is unchanged.
+   */
+  onMatch?: (index: number) => void;
+  /**
+   * When present, match with `collator.compare(textValue.slice(0, query.length), query) === 0`
+   * instead of `textValue.toLowerCase().startsWith(query.toLowerCase())` — folding diacritics (and,
+   * with `sensitivity: "base"`, case) the way `toLowerCase()` cannot: `café` matches a `cafe` query.
+   * `@hope-ui/i18n`'s `createCollator` builds one from the active locale.
+   */
+  collator?: Accessor<Intl.Collator>;
 }
 
 export interface CreateListTypeaheadReturn {
@@ -26,10 +40,11 @@ export interface CreateListTypeaheadReturn {
 /**
  * Type-to-focus over the list's items, layered on a [`createListFocus`](../create-list-focus/create-list-focus.md)
  * instance. Buffers characters, resets after a delay, and matches item `textValue`s
- * case-insensitively — moving the active item through `focus.focusIndex`, so a match in an unmounted
- * virtualized row scrolls in and focuses just like navigation. Modeled on Angular Aria's
- * `list-typeahead` and Angular CDK's standalone `typeahead`; the matching rules (start point,
- * repeated-letter cycling, leading-space handling) follow react-aria's `useTypeSelect`.
+ * case-insensitively (or via a `collator` — diacritic-insensitively too) — moving the active item
+ * through `onMatch`, which defaults to `focus.focusIndex` so a match in an unmounted virtualized row
+ * scrolls in and focuses just like navigation. Modeled on Angular Aria's `list-typeahead` and Angular
+ * CDK's standalone `typeahead`; the matching rules (start point, repeated-letter cycling,
+ * leading-space handling) follow react-aria's `useTypeSelect`.
  *
  * Matching:
  * - **Extend** — typing distinct characters ("b", then "a") searches the full buffer ("ba") from the
@@ -43,6 +58,7 @@ export function createListTypeahead<V = unknown>(
 ): CreateListTypeaheadReturn {
   const { focus } = options;
   const delay = () => options.delay?.() ?? 500;
+  const onMatch = options.onMatch ?? focus.focusIndex;
 
   const [isTyping, setIsTyping] = createSignal(false);
   let buffer = "";
@@ -51,6 +67,19 @@ export function createListTypeahead<V = unknown>(
 
   onCleanup(() => clearTimeout(timeout));
 
+  /** Whether `textValue` matches `query` at its start, collated when a collator is given. */
+  const matchesQuery = (textValue: string, query: string): boolean => {
+    const collator = options.collator?.();
+    if (collator) {
+      // The same `slice` react-aria's `ListKeyboardDelegate`/`useFilter` use: it counts UTF-16 code
+      // units, not collation elements, so a query/target pair that normalizes differently (a
+      // decomposed combining mark against a precomposed character) can slice mid-grapheme. Matched
+      // rather than guarded — see `create-list-typeahead.md`.
+      return collator.compare(textValue.slice(0, query.length), query) === 0;
+    }
+    return textValue.toLowerCase().startsWith(query.toLowerCase());
+  };
+
   /** First focusable item whose `textValue` starts with `query`, scanning from `start`, wrapping. */
   const matchFrom = (query: string, start: number): number => {
     const items = focus.items();
@@ -58,12 +87,11 @@ export function createListTypeahead<V = unknown>(
     if (length === 0) {
       return -1;
     }
-    const lower = query.toLowerCase();
     const from = start < 0 ? 0 : start % length;
     for (let offset = 0; offset < length; offset++) {
       const index = (from + offset) % length;
       const item = items[index];
-      if (item && focus.isFocusable(item) && item.textValue().toLowerCase().startsWith(lower)) {
+      if (item && focus.isFocusable(item) && matchesQuery(item.textValue(), query)) {
         return index;
       }
     }
@@ -102,7 +130,7 @@ export function createListTypeahead<V = unknown>(
     }
 
     if (index >= 0) {
-      focus.focusIndex(index);
+      onMatch(index);
     }
 
     timeout = setTimeout(() => {

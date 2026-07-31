@@ -47,6 +47,10 @@ const FRUITS: Fruit[] = [
   { id: 4, name: "Date" },
   { id: 5, name: "Elderberry", disabled: true },
   { id: 6, name: "Fig" },
+  // Accented, so typing its plain-ASCII prefix ("acai") in the external-focus-owner story below
+  // exercises the collator-backed typeahead this step added — `toLowerCase().startsWith()` alone
+  // could never match this.
+  { id: 7, name: "Açaí" },
 ];
 
 const itemToValue = (fruit: Fruit) => String(fruit.id);

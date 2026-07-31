@@ -1,4 +1,4 @@
-import { useLocale } from "@hope-ui/i18n";
+import { createCollator, useLocale } from "@hope-ui/i18n";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createSignal, createUniqueId, untrack } from "solid-js";
 import {
@@ -367,7 +367,10 @@ export function createListbox<V = unknown, G = V>(
     textDirection: direction,
   });
 
-  const typeahead = createListTypeahead<V>({ focus });
+  // `sensitivity: "base"` folds diacritics and case, so a `cafe` query matches `Café` — see
+  // `createCollator`'s doc for why the sliced comparison is a matched, not guarded, limitation.
+  const typeaheadCollator = createCollator({ usage: "search", sensitivity: "base" });
+  const typeahead = createListTypeahead<V>({ focus, collator: typeaheadCollator });
 
   // The pointer/keyboard fight-guard. See `pointerMoved`'s doc + this hook's "one active item" note.
   const [pointerCoords, setPointerCoords] = createSignal<{ x: number; y: number } | null>(null);
