@@ -60,3 +60,33 @@ are owned here. `role` is `props.role ?? state.role()` — a direct consumer `ro
 wins, otherwise it comes from `createDialog`'s `role` option (default `"dialog"`, or `"alertdialog"`).
 The styled `@hope-ui/components` `Dialog` sets `role` once on `Dialog.Root` (→ `createDialog`), so the
 component layer threads nothing.
+
+## Rejected alternatives
+
+### A `createPresence` created inside this hook
+**Why not:** this part is mounted lazily on open, so a presence created here sees `present` already
+`true` on its first run and the first-run latch puts it straight on `entered` — the card appears
+instantly, the authored enter transition never fires, and no test fails (`95cee52`). It mirrors
+`state.contentPresence`, created eagerly on the root while still closed; see *Reflects the shared
+presence* above and [`create-presence.md`](../internal/create-presence.md), which owns the full entry.
+
+### Computed `aria-labelledby` / `aria-describedby` / `role` / `id` that overwrite the consumer's
+**Why not:** `merge` gives the *last* source precedence and treats a getter returning `undefined` as a
+real value, so a bare `get "aria-labelledby"()` erased a consumer's own value whenever no `Title` was
+mounted — leaving the dialog with no accessible name, an axe `aria-dialog-name` violation in *their*
+app — and left `role`/`id` unoverridable, which put the APG `alertdialog` pattern out of reach
+(`5674fae`). Each falls back with `??` instead; only `aria-modal` and `data-presence` stay owned here,
+since both derive from state the consumer does not control.
+
+### Creating `createFocusTrap` or `createHideOutside` before `createFocusRestore`
+**Why not:** sibling effects run, and clean up on re-run, in creation order — so the restore's
+`document.activeElement` snapshot would be taken after the trap had already moved focus and after
+`inert` had blurred the trigger, and focus would be handed back to the wrong element or to nothing.
+The order is load-bearing, not stylistic; see
+[`create-focus-restore.md`](../internal/create-focus-restore.md).
+
+### Forwarding `closeOnEscape` / `closeOnInteractOutside` as one-time reads
+**Why not:** `createDismissable` reads both live inside its keydown/pointerdown handlers, so a value
+read once in this hook body freezes them — a consumer flipping a toggle after mount would have no
+effect — and the read itself is an untracked signal read in a hook body, i.e. `STRICT_READ_UNTRACKED`,
+which `mount()` fails a test on. They are forwarded as getters.

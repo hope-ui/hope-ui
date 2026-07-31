@@ -15,12 +15,6 @@ function scrollIntoView(
 Derived from Adobe React Spectrum's `@react-aria/utils` `scrollIntoView` (Apache-2.0) — see the
 `@license` header on the file and the `NOTICE.md` rows.
 
-## Why not `element.scrollIntoView()`
-
-The native call walks **every** scrollable ancestor up to the document. Inside a floating popup that
-means revealing an option scrolls the page, which drags the popup itself out from under the reader.
-This one touches the container it is given and nothing else.
-
 ## Why it is needed at all
 
 `aria-activedescendant` moves no DOM focus. Roving focus has been hiding that: a real `.focus()`
@@ -61,14 +55,6 @@ class as the `getBoundingClientRect()` reads `check:rtl-safety` deliberately nev
 is handled explicitly: the vertical scrollbar occupies the inline **end**, which is the left edge
 under `direction: rtl`, so the port shrinks on the other side there.
 
-## Not ported
-
-- **`scrollIntoViewport`** — react-aria's second export, which walks scroll parents up to (and
-  sometimes including) the page. Not needed: floating-ui's `shift`/`flip` keeps the popup on screen
-  and modal Selects lock page scroll.
-- **The iOS/WebKit scrollbar-side branch** — overlay scrollbars measure zero thickness there, so the
-  compensation it guards is already `0`.
-
 ## SSR
 
 Pure DOM measurement, called only from client-side focus moves. It is never reached during a server
@@ -82,3 +68,21 @@ render, so it carries no `isServer` guard.
   `createVirtualCollection` does **not**: it routes through `virtualizer.scrollToIndex`, which also
   has to *mount* the row. `createCollection` implements no `scrollIndexIntoView` at all — its one
   remaining consumer, Calendar, is roving, where the native `.focus()` scrolls on its own.
+
+## Rejected alternatives
+
+### `element.scrollIntoView()` (the native call)
+**Why not:** it walks **every** scrollable ancestor up to the document, so revealing an option inside a
+floating popup scrolls the page — and drags the popup itself out from under the reader. This function
+touches the container it is given and nothing else.
+
+### React Aria's `scrollIntoViewport`
+**Why not:** the second export of the file this one derives from, it walks scroll parents up to (and
+sometimes including) the page — the containment problem again, for the callers that actually want it.
+Nothing here does: floating-ui's `shift`/`flip` already keeps the popup on screen, and a modal Select
+locks page scroll. Deliberately absent rather than overlooked, and recorded as such in the package's
+`NOTICE.md`.
+
+### React Aria's iOS/WebKit scrollbar-side branch
+**Why not:** it compensates for a scrollbar on the opposite side under WebKit, and overlay scrollbars
+measure zero thickness there — so the correction it guards is already `0` and the branch is inert.

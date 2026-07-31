@@ -20,3 +20,19 @@ stop blocking the pointer and lose its hover/transition/pointer handlers. Return
 falls back to `"presentation"` (consumer wins); `data-presence` is owned here. This is *not* what
 makes a modal dialog inert — that is the pointer-blocking modal backdrop (`createDialogPortal` +
 `ModalBackdrop`).
+
+## Rejected alternatives
+
+### Leaving the backdrop within `createHideOutside`'s reach
+**Why not:** an `inert` element is transparent to hit testing, so a backdrop that let itself be hidden
+would silently stop blocking the pointer and lose its hover styles, transitions and pointer handlers —
+still painted, still styled, and unreachable by the mouse, with the layer reporting itself modal the
+whole time. Registering the element in `state.sparedElements` is the whole reason this part touches
+`createRegisteredElement`.
+
+### This part as the modal pointer blocker
+**Why not:** it is optional and purely decorative, so a modal dialog whose consumer renders no
+`Backdrop` would leave the page behind clickable. Pointer blocking belongs to `ModalBackdrop`, which
+`createDialogPortal` gates on `open() && modal()` and renders whether or not a visible backdrop
+exists — modality must not depend on a styling choice. Both are spared from `inert`, and rendering
+both is normal; see [`modal-backdrop.md`](../modal-backdrop/modal-backdrop.md).

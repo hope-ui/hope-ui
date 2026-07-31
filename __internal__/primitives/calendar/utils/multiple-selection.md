@@ -26,3 +26,11 @@ makes `isSelected` the same-day membership test it has always been.
 
 The toggled `CalendarDate[]` is kept sorted so `onValueChange` payloads are deterministic. Ported
 verbatim from the Angular calendar.
+
+## Rejected alternatives
+
+### Keeping the toggled set in click order
+**Why not:** the same set of days reached by clicking in a different order then emits a
+differently-ordered `onValueChange` payload, so the emitted value is no longer determined by the
+selection alone — a consumer diffing or serializing it sees a change where the selection is identical.
+Re-sorting on every add costs one comparison sort over a set the size of a month's clicks.

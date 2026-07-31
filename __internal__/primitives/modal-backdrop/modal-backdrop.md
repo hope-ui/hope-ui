@@ -3,10 +3,10 @@
 An invisible, viewport-covering element that blocks pointer interaction with everything
 behind a modal layer. Base UI ships an equivalent `InternalBackdrop` for the same reason.
 
-The only component in `@hope-ui/primitives`. It's here rather than inside `Dialog` because
-every modal layer needs it verbatim — a modal Popover, a modal Select — and copying fifteen
-lines of stacking-order-sensitive CSS into each is how the ordering rules below get quietly
-lost.
+One of the two DOM-rendering members of `@hope-ui/primitives`, alongside
+[`HiddenSelect`](../hidden-select/hidden-select.md). It lives in the kernel rather than inside
+`Dialog` because every modal layer needs it verbatim — a modal Popover, a modal Select — and
+each copy would carry the ordering rules below (see *Rejected alternatives*).
 
 ## API
 
@@ -20,16 +20,6 @@ style="position: fixed; inset: 0">`.
 **Always pass `ref`, and add the element to `createHideOutside`'s `spare` list.** An `inert`
 element is transparent to hit testing, so a backdrop that let itself be hidden would silently
 stop blocking the pointer — the one job it exists for.
-
-## Why it survives alongside `inert`
-
-`createHideOutside` already applies `inert` to outside content, which blocks the pointer
-natively. So this looks redundant — and it isn't.
-
-`inert` only blocks the pointer on elements the layer **actually marked**. An element inserted
-into the page between the walk and the `MutationObserver` callback is briefly clickable. This
-backdrop covers the viewport unconditionally, so it isn't. That belt-and-braces guarantee is
-the whole reason it exists; Base UI keeps its `InternalBackdrop` for the same reason.
 
 ## Channels and mechanisms
 
@@ -62,8 +52,6 @@ As the **first child of the portal** — before any consumer backdrop, before th
 
 Everything it should block comes earlier in the document; everything that must stay
 interactive comes later. Both are positioned, so DOM order decides paint and hit-test order.
-Putting it *inside* the popup instead (where Base UI puts theirs) would cover the consumer's
-own backdrop and silently swallow its hover styles and pointer handlers.
 
 ### The popup must be positioned
 
@@ -93,3 +81,27 @@ ships source, so literal host elements compile per environment; see `__internal_
 `@solidjs/web`'s server build refuses to run at all (`Portal` throws server-side), so the
 backdrop is simply absent from the SSR HTML and mounts on the client after hydration — the
 `isServer` gate on the portal wrapper is what keeps that from crashing the render.
+
+## Rejected alternatives
+
+### `inert` alone, with no pointer-blocking backdrop
+
+**Why not:** `inert` only blocks the pointer on elements the layer **actually marked**, so an
+element inserted into the page between `createHideOutside`'s walk and its `MutationObserver`
+callback is briefly clickable — with the layer reporting itself fully modal the whole time. This
+backdrop covers the viewport unconditionally, so no insertion order can open that window. Base UI
+keeps its `InternalBackdrop` for the same reason.
+
+### `Dialog` owning the backdrop
+
+**Why not:** every modal layer needs it verbatim — a modal Popover, a modal Select — so each would
+carry its own copy of fifteen lines of stacking-order-sensitive CSS, and the ordering rules above
+(first child of the portal, positioned popup, spared from `inert`) get quietly lost one copy at a
+time. Keeping it in the kernel is what makes `Popover` able to compose modality without composing
+`Dialog`.
+
+### Rendering it inside the popup, where Base UI puts theirs
+
+**Why not:** it would cover the consumer's own backdrop (`Dialog.Backdrop`) and silently swallow its
+hover styles and pointer handlers — the consumer's element is still there, still styled, and no
+longer reachable by the mouse.

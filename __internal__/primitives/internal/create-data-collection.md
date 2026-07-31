@@ -158,3 +158,39 @@ const source = createDataCollection<Product>({
 });
 const focus = createListFocus({ source, focusMode: () => "activedescendant", element: listRef });
 ```
+
+## Rejected alternatives
+
+### DOM-registered options, kept by force-mounting the closed popup
+**Why not:** `createCollection` *is* the mounted elements, so a closed Select reports
+`focus.items() === []` and loses closed-trigger typeahead, a meaningful `allowsEmptyCollection` open
+guard, and a server-rendered `<select>` for autofill all at once — see *Why a third source* above.
+Mounting the options anyway to keep the registry is worse than the problem: tabbing through a form
+with ten Selects would mount ten full option lists.
+
+### A dual authoring mode — data-driven *or* element-registered
+**Why not:** the element-registered half stays wrong in exactly the ways above, and silently: its
+server render has registered nothing by the time markup is emitted, so every option shipped
+`tabindex="0"` instead of the one selected row carrying the roving tab stop. `items` became required
+on `createListbox` — one authoring mode, no degraded path — while the repo is at `v0.0.0` and
+unpublished, so the break cost no migration.
+
+### Row ids derived from `itemToValue`
+**Why not:** a value is arbitrary application data, usually from a server. It can carry whitespace (an
+IDREF containing a space can never be pointed at), collide with a second collection listing the same
+records on the same page, or simply not be a legal id — and every one of those breaks
+`aria-activedescendant` for screen-reader users only, with every test green. Generated ids cost
+nothing in return, since `createUniqueId()` is SSR-stable. See *Ids are generated, not the value*
+above.
+
+### An `index` prop on the row part, or a hidden per-row context
+**Why not:** a part cannot know its own flat index — it would have to be threaded down through every
+level of the consumer's markup, so nesting depth would become part of the API and a group's inner
+iteration could not be a plain `<For>`. `indexOfValue` resolves the row from the `item` the part was
+already handed, over a `Map` rebuilt per data change, so a row can sit at any depth.
+
+### `createRegisteredElement` for the row registration
+**Why not:** its `register` callback runs in an effect body, and this row's index is **reactive** —
+reading it there is an untracked read of a reactive value (`[STRICT_READ_UNTRACKED]`, which `mount()`
+fails a test on). Tracking the index and the ref together in the effect's compute is also what makes a
+row that changes position re-register under its new index. See *Registering a row* above.

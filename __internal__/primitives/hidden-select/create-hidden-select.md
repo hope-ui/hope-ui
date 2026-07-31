@@ -89,3 +89,28 @@ remounted, which re-runs the effect with a fresh element. Disposing the owner re
 
 Everything is inside `createEffect`, which never runs server-side — no listener is attached and no
 DOM is touched during a server render.
+
+## Rejected alternatives
+
+### Letting the browser report the invalid control itself
+
+**Why not:** the browser anchors its validation bubble to the control that failed, which here is a
+1px clipped `<select>` — or, past the option cutoff, a `display: none` `<input>` it refuses to point
+at at all (*"An invalid form control is not focusable"*). The user gets a blocked submit with no
+visible explanation, or none at all. Cancelling the report suppresses only the bubble; the
+constraint still blocks submission, and focus moves to the visible control instead. See *Invalid*
+above.
+
+### Taking focus on every `invalid` event
+
+**Why not:** a form with an empty required text field above the widget would land the user on the
+widget rather than on the first field they have to fix — the browser's own behavior is to focus the
+first invalid control, and a hidden field that jumps the queue silently reorders the form. The scan
+matches it (React Aria's `getFirstInvalidInput`).
+
+### Tracking `defaultValue()` as an effect dependency
+
+**Why not:** both listeners would be torn down and reattached on every selection change, for a value
+only ever read at reset time. It is `untrack`ed rather than left implicit because `form.reset()` can
+be called from inside an effect, where a plain read trips `[STRICT_READ_UNTRACKED]` and `mount()`
+fails the test.

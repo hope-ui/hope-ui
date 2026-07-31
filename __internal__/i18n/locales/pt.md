@@ -7,3 +7,7 @@ Built-in **Portuguese** catalog, selected when the active locale's primary subta
   and can be overridden per key via the `I18nProvider` `messages` config.
 - `datesSelected` plural: singular only at `1`, with feminine agreement (`1 data selecionada` /
   `2 datas selecionadas`).
+
+<!-- no-rejected-alternatives: catalog data — the European-versus-Brazilian wording
+question is the regional-variant decision owned by `../catalogs.md` (one catalog per primary subtag,
+overridable per key), not a rejection recorded here. -->

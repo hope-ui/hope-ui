@@ -28,3 +28,12 @@ The accessible name is therefore still the localized `common.close` message ("Cl
 it is `CloseButton` that provides it, not this hook. A **headless** consumer wiring
 `createDialogCloseTrigger` directly onto a bare `<button>` (rather than through `CloseButton`) supplies
 its own `aria-label` and `type="button"`.
+
+## Rejected alternatives
+
+### A `type="button"` and an accessible name defaulted on the hook
+**Why not:** this hook did own both — a `withDefaults` `type` plus a `useLocale()` lookup of the
+localized close message — until `Dialog.CloseTrigger` became a `CloseButton` (over `createButton`),
+which already owns them (`c57d16f`). Two owners for one default can disagree, and it put an
+`@hope-ui/i18n` lookup inside a hook family that otherwise takes no locale and renders nothing. See
+*Minimal by design* above; a headless consumer supplies both itself.

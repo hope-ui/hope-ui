@@ -71,3 +71,25 @@ function isYearOutOfRange(yearStart, min?, max?): boolean;         // whole-peri
 The predicates are ported verbatim from the Angular calendar's `utils/boundary.ts`; `constrainDate` and
 `lastAvailableDateFrom` are new, from React Aria. `firstSelectableDateFrom` has no React Aria
 counterpart — RA has no Shift+Arrow extension to walk for.
+
+## Rejected alternatives
+
+### A commit-time guard on the completing activate (instead of deriving a bound)
+**Why not:** it leaves the arrows and the pointer free to cross an unavailable day, so the tentative
+band previews — and the second click commits — a range spanning days the calendar refuses; the paint
+guard that cut those days back out only made the hole visible. Deriving the anchor's available run with
+`lastAvailableDateFrom` and folding it into the calendar's *own* `min`/`max` is what makes
+`isDateNonFocusable`, `isDateSelectable` and the cursor clamp inherit the constraint for free
+(`calendar-root.md` § Contiguous ranges).
+
+### An unbounded walk in the two run-finding helpers
+**Why not:** `firstSelectableDateFrom` would never terminate on an unbounded calendar whose
+`isDateDisabled` refuses every day, and `lastAvailableDateFrom` would walk forever when none is
+unavailable. The `searchSpan` window (default one month, React Aria's `visibleDuration`) is what makes
+both total; beyond it that side simply reads as unbounded and the configured bound is what remains.
+
+### The day-level `isDateOutOfRange` for year- and decade-view cells
+**Why not:** a year-view cell stands for a whole month, so testing its representative day disables all
+of January the moment `min` is Jan 15 — a period that is only *partly* in range becomes unreachable.
+`isMonthOutOfRange` / `isYearOutOfRange` are deliberately looser for that reason; the calendar state
+picks the flavor per view.

@@ -17,30 +17,7 @@ function withDefaults<Props extends object, Defaults extends Partial<Props>>(
   `props[key] ?? defaults[key]`. A `undefined` default value is meaningless; omit the key.
 - Returns `props` with each defaulted key made non-optional, reads still lazy and reactive.
 
-## Why not `merge({ ...defaults }, props)`
-
-SolidJS 2.0's `merge` resolves a key by **presence**, not by value. A later source that has
-the key *at all* wins — even when its value is `undefined`:
-
-```ts
-merge({ modal: true }, {})                  // { modal: true }   ✅ key absent
-merge({ modal: true }, { modal: undefined }) // { modal: undefined } ❌ key present
-```
-
-The second case is not exotic. It is what a consumer wrapper produces the moment it
-forwards an optional prop it wasn't given:
-
-```tsx
-function MyDialog(props: { modal?: boolean }) {
-  // `props.modal` is `undefined` unless the caller passed it — and `modal` is now a
-  // *present* key on Dialog.Root's props object.
-  return <Dialog.Root modal={props.modal}>…</Dialog.Root>;
-}
-```
-
-Under `merge`, `<MyDialog />` silently produced a **non-modal** dialog: no focus trap, no
-scroll lock, no `aria-modal`. The same bug turned `<Button type={props.type}>` into a
-form-submitting button. Both failed with no type error and no test failure.
+## Resolution
 
 `withDefaults` resolves with `??`, so only a present, non-nullish value overrides:
 
@@ -64,3 +41,37 @@ export const Button: Component<ButtonProps> = (props) => {
   // merged.type is `"submit" | "reset" | "button"` — never undefined.
 };
 ```
+
+## Rejected alternatives
+
+### `merge({ ...defaults }, props)` — the obvious way to spell a default
+**Why not:** SolidJS 2.0's `merge` resolves a key by **presence**, not by value, so a later source
+that has the key *at all* wins — even when its value is `undefined`:
+
+```ts
+merge({ modal: true }, {})                   // { modal: true }      ✅ key absent
+merge({ modal: true }, { modal: undefined }) // { modal: undefined } ❌ key present
+```
+
+The second case is not exotic. It is what a consumer wrapper produces the moment it forwards an
+optional prop it wasn't given:
+
+```tsx
+function MyDialog(props: { modal?: boolean }) {
+  // `props.modal` is `undefined` unless the caller passed it — and `modal` is now a
+  // *present* key on Dialog.Root's props object.
+  return <Dialog.Root modal={props.modal}>…</Dialog.Root>;
+}
+```
+
+So `<MyDialog />` silently produced a **non-modal** dialog: no focus trap, no scroll lock, no
+`aria-modal`. The same bug turned `<Button type={props.type}>` into a form-submitting button. Both
+failed with no type error and no test failure.
+**Revisit if:** SolidJS 2.0 stable makes `merge` skip an `undefined` value from a later source —
+at which point `withDefaults` becomes unnecessary and should be deleted. `solid-contract.test.ts`
+pins both halves of the present-`undefined` case and goes red when that changes.
+
+### `@solid-primitives/props`' `combineProps`
+**Why not:** it resolves by key presence too, not by `??`, so it reproduces the bug above — a
+wrapper forwarding an unset optional prop still beats the default. Recorded as *kept, not adopted*
+in `__internal__/solid-primitives-eval.md` § Tier A.

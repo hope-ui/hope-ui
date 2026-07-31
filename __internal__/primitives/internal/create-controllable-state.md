@@ -66,3 +66,22 @@ export const Root: Component<DialogRootProps> = (props) => {
 
 Note the `withDefaults` for `defaultOpen`: `merge` would let a wrapper forwarding
 `defaultOpen={props.defaultOpen}` (unset) beat the default. See `defaults.md`.
+
+## Rejected alternatives
+
+### An unboxed `createSignal<T>` holding the value directly
+
+**Why not:** SolidJS 2.0 overloads `createSignal`, and its third overload takes a
+`ComputeFunction<T>` — so a function-valued `T` is not stored, it is *invoked* as a memo. A generic
+kernel primitive holding the value bare would silently swallow every function a consumer put in it.
+Measured while reshaping the kernel (`e518779`), not recalled. See *Why the value is boxed* above.
+
+### `@solid-primitives/controlled-signal`'s `createControllableSignal`
+
+**Why not:** Its setter treats a function argument as an updater, so — unlike the boxed
+implementation here — it cannot store a function-valued `T` at all, and it buys that narrower
+behavior with a runtime dependency. Note the history: this was first recorded as rejected because
+the packaged dist "broke hydration" (`_hk` diverging server vs client). **That reason was wrong** —
+the dep was *externalized* by the SSR harness, so its own `solid-js` import escaped the server-build
+alias. Re-spiked in 2026-07 it round-trips cleanly once `@solid-primitives/*` is inlined. Full
+correction: `__internal__/solid-primitives-eval.md`.

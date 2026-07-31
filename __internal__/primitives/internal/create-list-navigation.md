@@ -73,3 +73,20 @@ with typeahead/selection handlers) via `composeEventHandlers`.
 
 Navigation only ever runs from keyboard events (client). The getters it calls on `focus` are
 SSR-safe reads; no effect or DOM access happens at module scope.
+
+## Rejected alternatives
+
+### `next()` followed by a read of `focus.activeIndex()`, instead of the peeks
+**Why not:** a SolidJS 2.0 signal write is not visible to a plain read until the next flush, so a
+component wiring Shift+ArrowDown that moves first and then reads `activeIndex()` gets the *pre-move*
+index and extends the selection to the wrong row. `peekNext`/`peekPrev` report the target without
+performing the move, which is also what lets a submenu or a grid decide to hand the arrow to a parent
+instead. The correct shape is spelled out in `create-list-selection.md` § *Range extension (Shift)*.
+
+### Letting PageUp/PageDown fall through to the native scroll
+**Why not:** the native page scroll moves the scrollport without changing the active index, so over a
+virtualized source in roving mode it scrolls the focused row out of the window; the row unmounts, the
+browser drops focus to `<body>`, and the container stops receiving keydowns — keyboard navigation dies
+with nothing to show for it. Page keys therefore `preventDefault` in **both** orientations, unlike the
+arrows, which prevent default only on the axis they act on so an off-axis arrow still scrolls the page.
+See `create-list-focus.md` § *Roving + virtualization: focus recovery*.

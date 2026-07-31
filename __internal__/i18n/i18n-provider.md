@@ -57,3 +57,18 @@ The locale/direction context is derived from React Spectrum
 note. The message resolver (`t`, catalog, `translate`/`messages` overlay) is hope-ui's own — see
 `messages.md` and `translate.md`. There is **no**
 `@solid-primitives/i18n` dependency; the catalog + resolver are in-house.
+
+## Rejected alternatives
+
+### An imperative `setLocale` on the context
+**Why not:** the `locale` prop is already reactive, so a setter would be a second writer for one
+value — precisely the Angular `I18nService`'s reactive-signal-plus-imperative-setter duality this
+module collapsed into a single prop (see the `I18nService` note above). `locale={lang()}` is the
+whole control surface.
+
+### A wrapper element carrying a locale-derived `dir`
+**Why not:** `useLocale().direction()` never returns "nothing", so writing it would stamp
+`dir="ltr"` on an `en-US` browser and override the `<div dir="rtl">` the tree was rendered into.
+The provider therefore renders no DOM at all, and mirroring `dir` onto the document root stays the
+app's job, in an effect beside the provider. Full reasoning:
+`__internal__/primitives/internal/create-text-direction-warning.md`.

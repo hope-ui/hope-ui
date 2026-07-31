@@ -48,3 +48,17 @@ the strategies, which import `periodContains` / `periodsOverlap` from this modul
 
 Ported verbatim from the Angular calendar's `utils/view.ts` (`cellPeriod` and the two period predicates
 are hope-ui's own — React Aria ships no year/decade view); framework-free.
+
+## Rejected alternatives
+
+### Paint predicates over a cell's representative date
+**Why not:** a year cell stands for a whole month and a decade cell for a whole year, so testing the
+date alone left January dark for a Jan 15 – Mar 10 range and handed February the range's start corner.
+That is the defect `cellPeriod` and the two period predicates were added to fix — see *Cell periods*
+above — and it is why the `SelectionStrategy` signature carries a `DateRange` rather than a
+`CalendarDate`.
+
+### A value import of `DateRange` from `selection.ts`
+**Why not:** `selection.ts` imports the three strategy singletons, and each of them imports
+`periodContains` / `periodsOverlap` from here — a runtime import closes that cycle. `import type` is
+erased, so the shared types can stay in the selection barrel with no module-ordering hazard.

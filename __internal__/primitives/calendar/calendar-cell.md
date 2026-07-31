@@ -132,3 +132,39 @@ put out of range, which — since a contiguous range narrows the bounds to the a
 routinely the unavailable day bounding that run, for as long as the range is in progress (see
 `calendar-root.md`). So a recipe must make the two readable **together** (struck *and* dimmed) rather
 than assume one excludes the other.
+
+## Rejected alternatives
+
+### `event.detail === 0` as the keyboard discriminator
+**Why not:** a screen reader's **virtual click** carries `detail === 0` exactly as `Enter` does, and
+React Aria routes that case down a deliberately different branch — select the date, but do **not**
+advance the cursor (`useCalendarCell.ts:307`). Gating the auto-advance on `detail` would have silently
+given AT users the sighted-keyboard behavior, and no sighted-keyboard test would have caught it. The
+episode is what the porting rule in `__internal__/reference-implementations.md` was written from.
+
+### An ad-hoc `onKeyDown` handler instead of `createPress`
+**Why not:** it re-derives a slice of a press state machine the kernel already ships — `createPress`
+already models `mouse | pen | touch | keyboard | virtual` — and it still cannot tell a virtual click
+from `Enter`, which is the one distinction the auto-advance turns on. Same porting rule: a narrower
+hand-rolled substitute is not a cheaper route to the same behavior, it is a different behavior.
+
+### React Aria's pre-select `!state.anchorDate` read
+**Why not:** RA decides the auto-advance by reading the anchor *before* selecting; here that answer is
+wrong twice over. `createCalendar` is one hook for all three selection modes where RA has a separate
+range state object, so "there was no anchor" is not the same as "a range began" (single/multiple, a
+refused day and a year/decade drill all clear the first bar). And re-reading `anchorDate()` *after*
+`activate` cannot work either: under solid-js 2.0's client build a signal write is invisible to a
+plain read until the next flush. Hence `activate` returns the fact itself.
+
+### The old click handler's unconditional `preventDefault()`
+**Why not:** a `<button type="button">` has no default click action to suppress, and
+`defaultPrevented` is `createPress`'s cancel channel — keeping the call would have cancelled every
+activation. The inert-cell guard it used to carry is now `createPress`'s `disabled`, which
+short-circuits every interaction including the click.
+
+### Band hooks on the `<button>` alone
+**Why not:** the registered day-state custom variants are **self-based** (`&:where([data-today])`), so
+a hook fires utilities only on the element carrying it — with the selection hooks on the trigger only,
+the `cell` slot could not paint the continuous band that spans cells, and the endpoints rendered with
+notches while a hover washed the band out. Hence `data-selected` + its two endpoints are mirrored onto
+the `<td>`, while the per-day hooks stay off it.

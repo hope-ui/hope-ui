@@ -75,3 +75,29 @@ function Dialog(props: { open: boolean }) {
   return <div>...</div>;
 }
 ```
+
+## Rejected alternatives
+
+### A module-scope ref count
+
+**Why not:** Nothing forces a consumer to have a single installed copy of `@hope-ui/primitives` —
+it is a plain `dependencies` entry, carried transitively by `@hope-ui/components`. Two copies means
+two counters each believing they own `document.body`, and the observable result is `overflow:
+hidden` restored while a dialog is still open, or never restored at all. It reproduces on nobody's
+machine, least of all in this repo's CI, where there is only ever one copy. See *Where the ref count
+lives, and why it matters* above.
+
+### `body.style.paddingRight` for the scrollbar compensation
+
+**Why not:** An RTL engine puts the viewport scrollbar on the **left**, so padding the right edge
+adds the gutter to the side that never lost one — opening any overlay shifts the page by exactly the
+width this code exists to absorb, doubling the shift instead of absorbing it. It shipped that way
+and was one of the two silent defects that motivated `pnpm check:rtl-safety` (`1795afa`); the CSSOM
+half of that scan exists because this line is the only way the defect was reachable.
+
+### `@solid-primitives/scroll`'s `createPreventScroll`
+
+**Why not:** Its cross-instance safety is unaudited, and cross-instance safety is the whole reason
+this primitive's state sits on `document.body` under a `Symbol.for` key. Adopting it would trade a
+pinned guarantee (`scroll-lock.browser.test.tsx`'s `?instance=2` import) for an unverified one.
+Recorded in `__internal__/solid-primitives-eval.md` § *Tier B*.

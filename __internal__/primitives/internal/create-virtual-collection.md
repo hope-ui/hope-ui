@@ -22,16 +22,14 @@ binding reconciles the two:
 it scrolls the target in, then focuses it once the row mounts. That deferred-focus plumbing is shared
 with activedescendant mode — see `create-list-focus.md`.
 
-## Why `@tanstack/virtual-core` (and why optional)
+## `@tanstack/virtual-core`, adopted as an optional peer
 
-`@tanstack/virtual-core` is framework-agnostic with no Solid version coupling, so we **adopt** it and
-write the Solid binding by hand — rather than `@tanstack/solid-virtual`, which is compiled for Solid
-1.x and may not clear the Solid-2.0-beta compile pipeline (the adopted-primitive hazard in
-`__internal__/solid-primitives-eval.md`). It went in as an **optional `peerDependency`**: a consumer who
-never virtualizes keeps a zero-dependency `@hope-ui/primitives` install; only those who call
-`createVirtualCollection` install the core. It picks `scrollToIndex(index, {align})` (the "bring an
-unmounted target into view" hook) and `measureElement` (variable row sizes) — both of which
-`@solid-primitives/virtual` lacks.
+The core is framework-agnostic with no Solid version coupling, so it is **adopted** and only the Solid
+binding is written by hand. It goes in as an **optional `peerDependency`**: a consumer who never
+virtualizes keeps a zero-dependency `@hope-ui/primitives` install; only those who call
+`createVirtualCollection` install the core. The two members it is picked for are
+`scrollToIndex(index, {align})` — the "bring an unmounted target into view" hook — and
+`measureElement`, for variable row sizes.
 
 ## API
 
@@ -106,3 +104,36 @@ and hands it to `measureElement`, and carries `data-index` so the measurer can i
 Client-only by nature: it measures the DOM. During SSR no effect runs and no scroll element
 resolves, so `items()` reports the full count with every `element` `undefined` and nothing throws.
 Hydration is not a concern for the virtualized path.
+
+## Rejected alternatives
+
+### A registry of mounted elements as the virtualized source
+**Why not:** a windowed list renders only the visible slice, so a mounted-element registry sees a
+fraction of the data — ArrowDown past the window, Home/End over all items, typeahead over offscreen
+labels, and `aria-setsize`/`aria-posinset` all break. The count-in/windowed-DOM-out shape is what
+reconciles the two; see *Why virtualization needs the seam* above.
+
+### `@tanstack/solid-virtual`
+**Why not:** it is compiled for Solid 1.x, so it may not clear the Solid-2.0-beta compile pipeline the
+rest of this package is built with — the adopted-dependency hazard in
+`__internal__/solid-primitives-eval.md`. The framework-agnostic core has no Solid version coupling at
+all, which leaves only the binding to own.
+**Revisit if:** a Solid-2.0 build of `@tanstack/solid-virtual` ships and clears the hydration
+round-trip.
+
+### `@solid-primitives/virtual`
+**Why not:** it exposes neither `scrollToIndex(index, { align })` nor `measureElement` — the two
+members this source is built on. Without the first, focus cannot reach a row outside the window at
+all; without the second, every row is stuck at its `estimateSize`.
+
+### `@tanstack/virtual-core` as a required dependency
+**Why not:** every consumer of `@hope-ui/primitives` would install a virtualizer whether or not
+anything they render virtualizes. As an optional peer, only a caller of `createVirtualCollection` pays
+for it — the same pattern `createFloating` later took for `@floating-ui/dom`.
+
+### A caller-supplied `VirtualItemData.id`
+**Why not:** virtual rows used to carry the `itemToValue` string as their id, and application data is
+not reliably legal, unique across two collections on a page, or whitespace-free — each failure breaks
+`aria-activedescendant` silently, for screen-reader users only. The field was removed rather than made
+optional, so a caller cannot reintroduce the hazard; ids come from
+[`createItemIds`](create-collection.md) instead.

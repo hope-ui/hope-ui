@@ -86,23 +86,30 @@ and `container.isConnected` (the calendar may be gone), and runs `untrack`ed —
 anchor read, because `createListFocus` moves DOM focus from inside its own effect, so `focusout` fires
 in that effect's tracking scope (the same reason `createCalendarCell`'s `onFocus` untracks).
 
-## Why not `createDismissable`
-
-`internal/create-dismissable.ts` was evaluated for the outside half and **rejected**. It fires on
-outside **pointerdown** with a single `onDismiss` covering both Escape and the pointer, where this part
-needs pointer**up**, a three-way split between committing, resetting and clearing, and the in-calendar
-`button` exemption. Reshaping it to fit would have made a dialog-shaped primitive carry a
-calendar-shaped policy; keeping them apart leaves `createDismissable` free to grow the layered dismiss
-stack Popover/Tooltip will want.
-
-React Aria's VoiceOver **virtual-click** guard (skipping a `pointerdown` of zero width/height) is also
-not ported: it exists because their cell activates through `usePress`, whose ordering the synthetic
-pointer sequence breaks. hope-ui's cell activates on `click`, and a virtual click lands on a day button
-*inside* the calendar — already exempt.
-
 ## SSR
 
 Nothing runs on the server: the ref is never set, so the effect returns before it reaches `window`, and
 `focusout` cannot fire. The returned props are plain getters. The same holds in the DOM-less `unit`
 test project, which is what lets `calendar-group.test.ts` cover the props surface there while
 `calendar-group.browser.test.tsx` owns every focus/pointer decision.
+
+## Rejected alternatives
+
+### `createDismissable` (`internal/create-dismissable.ts`)
+**Why not:** it fires on outside **pointerdown** with a single `onDismiss` covering both `Escape` and
+the pointer, where this part needs pointer**up**, a three-way split between committing, resetting and
+clearing, and the in-calendar `button` exemption. Reshaping it to fit would have made a dialog-shaped
+primitive carry a calendar-shaped policy; keeping them apart leaves `createDismissable` free to grow
+the layered dismiss stack Popover/Tooltip will want.
+
+### React Aria's VoiceOver virtual-click guard
+**Why not:** it skips a `pointerdown` of zero width/height because their cell activates through
+`usePress`, whose ordering the synthetic pointer sequence breaks. hope-ui's cell activates on `click`,
+and a virtual click lands on a day button *inside* the calendar — already exempt from the
+outside-pointer branch, so the guard would only re-exempt what is exempt.
+
+### React Aria's `relatedTarget` read on `focusout`
+**Why not:** React reuses the day cells across a month change while Solid's `<For>` rebuilds them, so
+paging destroys the focused day button and Chrome reports that blur with **no** `relatedTarget` —
+measured, it ended the range on every `PageDown`. See *`focusout` decides on the next task, not from
+`relatedTarget`* above.

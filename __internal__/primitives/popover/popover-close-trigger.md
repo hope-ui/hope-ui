@@ -34,3 +34,11 @@ an explicit affordance inside the popup, and is opt-in: nothing renders one auto
 ## SSR
 
 Handler composition only — no DOM access, no effects, no `isServer` branch.
+
+## Rejected alternatives
+
+### A `type="button"` and an accessible name defaulted on the hook
+**Why not:** both defaults already have an owner one layer up in `CloseButton`, so spelling them here
+gives one default two owners that can disagree — and the name is the localized `common.close` message,
+which would put an `@hope-ui/i18n` lookup inside a hook family that otherwise takes no locale. A headless
+consumer wiring this onto a bare `<button>` supplies both itself.

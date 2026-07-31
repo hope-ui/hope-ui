@@ -26,3 +26,8 @@ subtag** set (`ar`, `he`, `fa`, `ur`, …).
 
 Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). See the CLAUDE.md
 i18n provenance note.
+
+<!-- no-rejected-alternatives: the RTL tables and the script-first resolution order are React
+Spectrum's, ported rather than designed (the only deviation is two added script codes); whether a
+locale-derived direction may be written to the DOM as `dir` is decided in
+`__internal__/primitives/internal/create-text-direction-warning.md`. -->

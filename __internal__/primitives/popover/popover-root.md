@@ -293,3 +293,50 @@ renders `floatingStyles()`'s pre-positioned branch, a constant with no client-on
 The generated `popupId` is an SSR-stable `createUniqueId`, and the only one the root consumes — see
 the ordering section above, and `__internal__/testing.md` on how `_hk` keys and the SSR → hydrate
 round-trip are pinned.
+
+## Rejected alternatives
+
+### Routing Popover's overlay behavior through Dialog's modal machinery
+**Why not:** it ties a non-modal layer to Dialog's internals and makes every floating consumer pull in
+scroll-lock, pinch-zoom prevention and hide-outside it never uses — the anti-pattern `plan.md` names by
+name. Popover composes `createFloating` + `createDismissable` + `createPresence` + `createFocusRestore`
+directly instead, which is what makes it the roadmap's "compose, don't inherit from Dialog" proof.
+
+### Base UI's placement for the positioning options (on `Popover.Positioner`)
+**Why not:** `createFloating` has to be root-owned — `side()` is read by the Positioner *and* the
+Arrow, and `arrowElement` must reach its config memo — so a Positioner-owned call would need either a
+second context or a descendant writing an ancestor-owned signal, which Solid 2.0 throws
+`[REACTIVE_WRITE_IN_OWNED_SCOPE]` on. The *vocabulary* (`side`/`align`/`sideOffset` over floating-ui's
+single `placement` string) is still Base UI's. See *Positioning options live on the root* above.
+
+### `active: state.open` for `createFloating`
+**Why not:** `createFloating`'s config effect does `!active → setIsPositioned(false)`, so keying on
+`open` reverts `floatingStyles()` to its unpositioned, hidden branch the instant the popover closes —
+while the presence is still holding the content mounted for its exit transition, so the layer vanishes
+instead of animating out. See *`createFloating` gets `active: () => contentPresence.mounted()`* above.
+
+### Flipping `dismissOnFocusOutside`'s default inside `createDismissable`
+**Why not:** it would change Dialog's behavior and leave every modal layer — which traps focus, so the
+listener can never fire — carrying a dead document listener. The flip lives in Popover's own vocabulary
+instead, where the non-modal case that wants it actually is.
+
+### `Popover.Anchor` in `dismissExclusions`
+**Why not:** `exclude` matches with `element.contains(target)`, so exempting a wrapper a consumer may
+put around a card, a table row or a whole section turns that entire region into a dead zone where
+outside-click silently stops dismissing — and, since `exclude` governs the focus half too, focus
+landing on the anchor would count as focus still inside the widget, which it is not. See *Why a
+`Popover.Anchor` is deliberately not excluded* above.
+
+### A locale-derived `dir` written onto the layer
+**Why not:** `useLocale().direction` never reports "nothing" — with no provider it reports the
+*detected browser* direction — so a popover nobody configured would stamp `dir="ltr"` over the
+`dir="rtl"` it was rendered into and stop an ancestor's direction from cascading (`f308cfb`).
+react-aria writes one in exactly two files, both of which portal to `document.body`; that is a portal
+repair, and our portals inherit from the document root, so there is nothing to repair. See *Popover
+takes no locale, and writes no `dir`* above.
+
+### A hand-kept `omit` list on the component-layer `Popover.Root`
+**Why not:** the Root renders no element, so the list would subtract keys from props that are
+forwarded nowhere — dead weight that rots silently as `CreatePopoverOptions` grows. The only way to
+make one load-bearing is to give the Root a host element, which is the thing being avoided. See *The
+component-layer `Popover.Root` renders no element* above.

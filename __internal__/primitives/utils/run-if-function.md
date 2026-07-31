@@ -43,3 +43,18 @@ that can itself be a function (it would call the value instead of returning it).
 
 - [`render`](../render/render.md) — `RenderProp`, the same "content override is a function" rule for
   full-element polymorphism.
+
+## Rejected alternatives
+
+### A bare `JSX.Element` for themeable chrome content (no factory form)
+**Why not:** a preset value is one object shared by every instance, and a Solid `JSX.Element` is an
+already-constructed DOM node — so two simultaneously-rendered loading buttons would fight over one
+loader node, which *moves* rather than duplicating. See *Why a factory form exists* above.
+
+### `runIfFunction` as the kernel's reactive-option idiom (Vue's `toValue` mapping)
+**Why not:** it is only sound when `T` is not callable, and floating-ui's option surface is full of
+callables (`Derivable<T> = (state) => T` on `offset`/`flip`/`shift`/`size`, plus `Middleware.fn`),
+so a `sideOffset?: number | (() => number)` would be ambiguous against `offset((state) => …)`.
+Reactive options are object getters instead, across every primitive. Recorded as a deliberate
+divergence from the Vue→Solid mapping in `__internal__/reference-implementations.md` §
+`createFloating`.

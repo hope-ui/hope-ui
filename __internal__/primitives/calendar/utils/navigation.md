@@ -23,3 +23,9 @@ function resolveViewArrowMove(view, from, visibleMonth, direction, isRtl): Arrow
 
 Ported verbatim from the Angular calendar's `utils/navigation.ts`. In hope-ui the origin date comes
 from the roving `focusedDate` (single source of truth), so no `event.target` disambiguation is needed.
+
+<!-- no-rejected-alternatives: pure arrow math with one shape per view and nothing weighed against it;
+what is actually decided — intercepting only a period-crossing move and delegating every in-scope one
+to createGridNavigation, and taking the origin from the roving cursor rather than event.target — lives
+in calendar-grid.md, the only caller. -->
+

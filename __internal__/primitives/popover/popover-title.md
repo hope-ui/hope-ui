@@ -36,3 +36,12 @@ labels the content themselves keeps their value and the Title still registers. P
 `onSettled` never runs on the server, so nothing registers there and the server's popup carries no
 `aria-labelledby`. The `id` itself is `createUniqueId`, which is SSR-stable, so the title element's
 own markup is identical on both sides of the round-trip.
+
+## Rejected alternatives
+
+### Returning the raw `props`, with the `id` resolved as `props.id ?? generatedId` on the side
+**Why not:** `withDefaults` copies nothing — it exposes the default as a getter over a *new* object — so
+`props.id` still reads `undefined` for a consumer who set none. Returning `props` type-checks, passes a
+test that pins its own id, and ships a popup whose `aria-labelledby` names nothing: for a `role="dialog"`
+surface that is an axe `aria-dialog-name` violation, not a nicety. See *`withDefaults`, and the merged
+object is the one that ships* above.

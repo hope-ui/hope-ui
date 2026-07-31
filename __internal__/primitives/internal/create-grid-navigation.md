@@ -76,3 +76,11 @@ throwaway calendar harness in the browser test.
 
 Navigation runs from keyboard events only; the getters it reads on `focus` are SSR-safe. No effect or
 DOM access at module scope.
+
+<!-- no-rejected-alternatives: the 2D layer is Angular Aria's `private/grid` plus Astryx's
+`useGridFocus` month-flip callbacks, ported as specified with no competing shape recorded. The
+architecture bake-off that picked Angular Aria over react-aria's `selection`, Astryx, floating-ui-react
+and Angular CDK's `key-manager` belongs to create-list-focus.md, whose focus instance this drives; the
+calendar-side decisions these callbacks enable — intercepting only a period-crossing arrow, taking the
+origin from the roving cursor — belong to calendar-grid.md. -->
+

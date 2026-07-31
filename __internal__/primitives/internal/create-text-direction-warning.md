@@ -102,3 +102,38 @@ createTextDirectionWarning({
 
 createListNavigation({ focus, orientation, textDirection: direction });
 ```
+
+## Rejected alternatives
+
+### Writing the locale-derived direction onto the element as `dir`
+
+**Why not:** This is what shipped first, and it broke the cascade it was meant to serve.
+`useLocale().direction` never returns "nothing" — with no `I18nProvider` it reports the *detected
+browser* direction — so a `Calendar` or `Listbox` nobody had configured stamped `dir="ltr"` on
+itself and overrode the `<div dir="rtl">` it was rendered into, stopping an ancestor's direction
+from cascading at all (`f308cfb`). Both references draw the same line: Base UI's `DirectionProvider`
+and React Aria's `I18nProvider` render no DOM, and `useCalendarGrid` puts no `dir` in `gridProps`.
+The warning exists because that fix left the two channels able to disagree silently — see *Two
+channels, deliberately not joined* and *Why warn, then* above.
+
+### Saying nothing, and letting the mismatch be the app's problem
+
+**Why not:** It genuinely *is* the app's problem — and it is invisible. `<I18nProvider
+locale="ar-EG">` with no `dir` anywhere renders Arabic month names, Arabic-Indic numerals and
+reversed arrow keys over a grid still laid out left-to-right with Sunday on the left, with nothing
+failing anywhere. Silent RTL mis-paint is the failure mode this repo keeps paying for; it is why
+`pnpm check:rtl-safety` exists, and a lint rule cannot reach a mismatch that only exists at runtime.
+
+### Warning unconditionally, with no `active` gate
+
+**Why not:** A vertical listbox maps Up/Down, where reading direction changes nothing a user can
+perceive. Without the gate every app that merely hasn't set `dir` yet gets one warning per listbox
+for a mismatch with no consequence — and a dev warning that cries wolf is one developers filter out,
+taking the calendar's real one with it.
+
+### A `MutationObserver` over the ancestor chain, to catch a `dir` flip upstream
+
+**Why not:** Computed style is not reactive, so the only way to observe an ancestor's `dir` changing
+while the locale stays put is to watch every ancestor of every instance. That is a permanent
+per-instance observer to catch a case the realistic runtime flip — an app switching *locale* without
+updating the document — already covers through the effect's own dependencies.

@@ -59,3 +59,19 @@ export const Title: Component<DialogTitleProps> = (props) => {
   return renderElement({ as: "h2", render: merged.render, props: omit(merged, "render") });
 };
 ```
+
+## Rejected alternatives
+
+### A direct `context.setTitleId(props.id)` in the component body
+
+**Why not:** SolidJS 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` for a descendant writing an
+ancestor-owned signal from its own synchronous render body. The failure is worse than loud: the
+naive line looks right and passes a trivial isolated test, then throws in a real tree — see *Why
+this is a primitive and not a snippet* above.
+
+### Copy-pasting the `onSettled` defer into each part that needs it
+
+**Why not:** Every family with a `Title`/`Label`/`Description` part needs the same three lines, so
+the deferral gets re-derived — and subtly mis-derived — once per family, with the failure only
+surfacing in a real tree. One kernel primitive is also the single place the SSR fallback rule is
+written down (`Dialog.Root`'s eager `popupId`), which a per-part copy has nowhere to record.

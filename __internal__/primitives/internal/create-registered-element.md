@@ -61,3 +61,20 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
   return <Show when={presence.mounted()}>{/* … ref={setBackdropEl} … */}</Show>;
 };
 ```
+
+## Rejected alternatives
+
+### A direct `context.addModalTarget(element)` from the render body
+
+**Why not:** SolidJS 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` when a descendant writes a signal
+owned by an ancestor's reactive scope from its own synchronous render body — the same wall
+[`createRegisteredId`](create-registered-id.md) exists for. There is also nothing to write yet: a
+ref is populated after render, so the body reads `undefined`.
+
+### Reusing `createRegisteredId`'s `onSettled` deferral
+
+**Why not:** `onSettled` fires once. An element ref is replaced whenever the element remounts — a
+`Show` re-entering, a portal re-created — and a one-shot read would leave the ancestor holding a
+detached node it can never unregister, so `createHideOutside` would spare an element that is no
+longer in the page and `inert` the one that is. Hence `createEffect`, which re-runs per change and
+gets a cleanup to call `unregister` with. See the comparison table above.

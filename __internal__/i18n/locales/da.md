@@ -4,3 +4,6 @@ Built-in **Danish** catalog, selected when the active locale's primary subtag is
 list: `../messages.md`. Selection + fallback: `catalogs.md`.
 
 - `datesSelected` plural: singular only at `1` (`1 dato valgt` / `2 datoer valgt`).
+
+<!-- no-rejected-alternatives: catalog data, no contested shape — plurals as per-locale
+functions are decided in `../messages.md`, catalog selection and fallback in `../catalogs.md`. -->

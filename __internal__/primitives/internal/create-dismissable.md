@@ -235,3 +235,66 @@ function Popover(props: {
   );
 }
 ```
+
+## Rejected alternatives
+
+### `focusout` as the `dismissOnFocusOutside` trigger
+
+**Why not:** Its target is by definition still inside the container, so it would have to read
+`event.relatedTarget` — and `relatedTarget` is `null` exactly when the focused element is removed or
+disabled while focused. Read as "focus went outside", that dismisses a layer nobody left. `focusin`
+never fires on that path at all, so the case is excluded by the mechanism rather than by a special
+case, and both handlers can keep asking one shared `isOutside`. Measured against this repo's
+Chromium — the table in *`dismissOnFocusOutside` listens on `focusin`, not `focusout`* above is the
+measurement.
+
+### React Aria's element-scoped Escape (`useKeyboard` → `keyboardProps`)
+
+**Why not:** Upstream spreads keyboard props on the overlay element, so Escape only fires with focus
+inside it. Matching that means returning keyboard props from **every part hook in every family** — a
+change to the whole public surface — to buy behavior the topmost gate already provides. The
+practical difference is that this stack carries more weight than upstream's: with focus elsewhere,
+upstream's overlay hears nothing, while here the gate is the only thing deciding who answers.
+
+### React Aria's two-phase pointer guard (snapshot at `pointerdown`, dismiss at `click`)
+
+**Why not:** Upstream needs two phases because it *dismisses* at `click`, and `pointerdown` and
+`click` can have different targets. hope-ui dismisses at the start of the interaction, in the
+capture-phase `pointerdown` handler, so "topmost at the snapshot" and "topmost now" are the same
+instant and the second phase buys nothing.
+**Revisit if:** `solid-contract.browser.test.tsx` § *a signal write from one document listener cannot
+unhook the next one mid-dispatch* goes red — the equivalence rests on that guarantee, and without it
+the single-phase guard reads a stack that changed under it.
+
+### Base UI's asymmetric `bubbles` default (`escapeKey: false`, `outsidePress: true`)
+
+**Why not:** An outside press that bubbled makes a single click on a modal's backdrop close the
+modal *and* the layer above it — the exact breakage this stack was built to end. Both channels
+default to `false` here: one Escape, or one outside press, closes one layer. The option's name and
+shape are still Base UI's.
+
+### A module-scope layer stack
+
+**Why not:** Nothing forces a consumer to a single installed copy of `@hope-ui/primitives`, and two
+module-scope stacks each believe they own the topmost layer — one Escape closing a Dialog straight
+through the Popover above it, on some installs and not others. `Symbol.for("hope-ui.dismiss-stack")`
+resolves through the cross-realm global registry; pinned by a `?instance=2` import in
+`create-dismissable.browser.test.tsx`.
+
+### One merged overlay stack (`createOverlayStack`, roadmap #14)
+
+**Why not:** A `Dialog` with `dismissOnEscape: false` still participates in hide-outside and
+focus-scope ordering but must never win Escape, so the three registries have to be able to disagree
+— merged, that is a special case rather than a simplification. React Aria keeps `visibleOverlays`,
+`observerStack` and `focusScopeTree` apart and centralizes nothing. See *Three registries, not one*
+above; the roadmap row was retired rather than built.
+
+### Base UI's layer *tree* (`FloatingTree` / `FloatingNode`)
+
+**Why not:** Real ancestry costs `<FloatingTree>` + `<FloatingNode>` JSX wiring in a kernel that is
+hooks-only by design — `ModalBackdrop` is deliberately its one DOM-rendering component — and forces
+every overlay component to declare its node. A flat activation-order stack needs no consumer wiring
+and survives portals for free, because activation order does not depend on DOM ancestry.
+**Revisit if:** Menu lands — submenu chains make `getNodeChildren` load-bearing, and the tree
+composes with the flat stack rather than replacing it, exactly as floating-ui-react's own
+`useDismiss` uses both.

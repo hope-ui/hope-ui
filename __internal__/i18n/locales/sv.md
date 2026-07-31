@@ -5,3 +5,6 @@ list: `../messages.md`. Selection + fallback: `catalogs.md`.
 
 - The neuter noun *datum* is invariant across number, so `datesSelected` inflects only the participle:
   `1 datum valt` (neuter singular) / `2 datum valda` (plural).
+
+<!-- no-rejected-alternatives: catalog data, no contested shape — plurals as per-locale
+functions are decided in `../messages.md`, catalog selection and fallback in `../catalogs.md`. -->

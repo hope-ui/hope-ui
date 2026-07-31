@@ -99,3 +99,29 @@ listener effect **before** calling it. That order is load-bearing and documented
 All DOM access happens inside `createEffect`, gated on `active() && ref()` both being truthy.
 `createEffect` bodies never run during SSR, so this primitive needs no manual `isServer`
 guard.
+
+## Rejected alternatives
+
+### The activation block welded into `createFocusTrap`
+
+**Why not:** That is where it lived, in one effect with the `Tab`-cycling listeners, and it meant
+taking the focus you wanted forced you to take the cage you didn't. A non-modal layer — Popover,
+Tooltip, `<Dialog modal={false}>` — that wants focus moved into it and returned to the trigger had
+no primitive to ask, and the trap's own doc comment already named Popover as the blocked case
+(`85c816b`). The trap now composes this, forwarding all three options unchanged.
+
+### A tracked `initialFocus()` read
+
+**Why not:** It was a bare reactive read inside the effect callback, which trips
+`STRICT_READ_UNTRACKED` for any consumer passing a real accessor — and `mount()` fails a test on
+that diagnostic. It never surfaced because no test passed a signal-backed target. Tracking is also
+the wrong semantics: re-running the activation block on every reassignment of a signal-backed target
+steals focus back from wherever the user has since moved it. See *`initialFocus` is sampled, not
+tracked* above.
+
+### Inferring afterwards whether the `tabindex` was ours
+
+**Why not:** Checking for `tabindex="-1"` at cleanup time cannot distinguish the attribute this
+primitive wrote from one the consumer authored, so deactivating a layer would strip a consumer's own
+`tabindex` off their container. The flag is set at the moment of writing instead, so nothing can
+remove an attribute it does not own.

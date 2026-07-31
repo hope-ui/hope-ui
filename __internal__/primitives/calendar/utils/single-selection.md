@@ -17,9 +17,8 @@ singleSelection.highlightedRange(…)               // always null
 
 Capping both ends is deliberate. The band interior is derived as
 `isSelected && !isSelectionStart && !isSelectionEnd` (which is also how the preset's
-`data-selection-middle` variant computes it), so reporting *no* endpoints here would make every
-single-mode selection read as band interior and lose its endpoint paint. Reporting both keeps the
-derived middle empty in this mode.
+`data-selection-middle` variant computes it), so reporting *both* endpoints is what keeps that derived
+middle empty in this mode.
 
 `period` is what the cell stands for (`cellPeriod` — see `utils/view.md`): in year/decade view the
 month/year holding the selected day lights up, and in month view the degenerate `{date, date}` period
@@ -28,3 +27,12 @@ makes `isSelected` the same-day test it has always been.
 The `SelectionStrategy` interface + `CalendarValue`/`SelectionState` types, and the
 `selectionStrategyFor(mode)` / `firstDateOf(value)` helpers, live in the sibling `selection.ts` module
 (the strategies `import type` them from there). Ported verbatim from the Angular calendar.
+
+## Rejected alternatives
+
+### Reporting neither endpoint for a selected day
+**Why not:** it is the natural reading of "single mode has no band", and it silently loses the endpoint
+paint — with the middle derived as `isSelected && !isSelectionStart && !isSelectionEnd`, a selected day
+carrying no endpoint matches the preset's `data-selection-middle` variant and paints as band *interior*
+instead of a pill. Treating the day as a degenerate one-day band that caps both ends is what keeps the
+derived middle empty outside range mode.

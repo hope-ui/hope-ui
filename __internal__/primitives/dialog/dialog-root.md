@@ -99,3 +99,42 @@ Host-element-free and effect-gated: every `document` touch is inside a part hook
 which never runs during SSR. The generated `popupId` is an SSR-stable `createUniqueId`, and the one
 the root consumes — it fixes the trigger's hydration key (see `__internal__/testing.md` on how `_hk` keys
 and the SSR → hydrate round-trip are pinned).
+
+## Rejected alternatives
+
+### A monolithic `createDialog` owning every part's behavior
+**Why not:** the focus/dismiss/hide-outside/scroll effects and the id/element registrations would all
+be created in the root's scope, so each would tear down when the *root* unmounts rather than when the
+element it acts on does — the content's effect stack has to die with the content, and a title's id
+registration with the title. Decomposing into a root state hook plus one hook per part — React Aria's
+`useDialog`/`useOverlay*` split — is what gives each its own scope (`42cf513`).
+
+### `merge({ modal: true, defaultOpen: false }, options)` as the defaults mechanism
+**Why not:** `merge` resolves a key by *presence*, not value, so a wrapper forwarding an unset option
+(the key present, holding `undefined`) beats the default. `<Dialog.Root modal={props.modal}>` with
+`modal` unset silently produced a **non-modal** dialog — no focus trap, no scroll lock, no
+`aria-modal` — while a bare `<Dialog.Root>` was correct, and forwarding an optional prop from a
+wrapper is the most common thing a consumer does (`5674fae`). `withDefaults` resolves each key with
+`??`, so an explicit `false` still wins.
+**Revisit if:** `merge` ever adopts value semantics — `solid-contract.test.ts` pins the present
+behavior and goes red if 2.0 stable changes it.
+
+### The overlay presence, the content element ref and `role` left in the component layer
+**Why not:** all three are behavior and ARIA, and the rule is that the experience must be
+reproducible from the primitives alone — with them in the assembly layer, a headless consumer
+composing the part hooks gets no enter animation and no route to the APG `alertdialog` pattern.
+Moving them onto the state hook (`95cee52`) also moved `createDialog`'s test from the `unit` project
+to `browser`, and that is the correct direction: a test running in node is never a reason to keep
+behavior in the component layer (`plan.md`'s worked example).
+
+### A per-part presence for the Positioner, timed off its own element
+**Why not:** the Positioner has no transition of its own, so a self-timed presence reports exit-done
+immediately and cuts the content's exit animation short. Sharing `contentPresence` — timed off the
+content element — keeps the frame mounted exactly as long as the card it wraps.
+
+### `initialFocus` as a `createDialog` option
+**Why not:** the premise for putting it here, that the root is where it is available *before* the
+content mounts, is false: `createFocusTrap` reads the accessor lazily at focus time (after the mount),
+and a typical target lives inside the content anyway. It left the root owning an option nothing but
+the content's focus trap reads, against the root's own contract of not owning the focus stack
+(`b86e8cb`). Base UI places it on the popup part for the same reason.

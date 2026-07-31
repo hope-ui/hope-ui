@@ -9,3 +9,7 @@ subtag is `ar` (`ar`, `ar-EG`, `ar-SA`, …). Shape + key list: `../messages.md`
   `two` (2), `few` (`n % 100` = 3–10), `many` (`n % 100` = 11–99), `other` (everything else, e.g.
   100/101/102/200…). `zero`/`one`/`two` read as fixed phrases; `few`/`many`/`other` interpolate the
   count.
+
+<!-- no-rejected-alternatives: catalog data — the six CLDR cardinal categories are the
+Arabic rule itself, and expressing plurals as per-locale functions is decided in `../messages.md`;
+right-to-left resolution belongs to `../direction.md`. -->

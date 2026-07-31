@@ -77,3 +77,22 @@ const keys = createKeyboardHandler<HTMLUListElement>()
   .on("mod+a", (e) => { e.preventDefault(); selection.selectAll(); })
   .onText((char) => typeahead.search(char));
 ```
+
+## Rejected alternatives
+
+### Loose modifier matching (a binding that fires whatever else is held)
+**Why not:** it collapses the bindings a collection component needs to keep apart. `"ArrowDown"`
+would swallow `Shift+ArrowDown`, so range-extend never reaches its own handler, and `"a"` would
+swallow `mod+a`, so select-all types a letter instead. Exact matching is what keeps the three
+distinct — see *Combo syntax* above.
+
+### Splitting a combo on every `+`, and trimming the key segment
+**Why not:** the key can itself be `+` or a space, and both are real bindings — `" "` is the
+listbox/menu selection key. Splitting on every `+` makes `"+"` unbindable, and trimming the key
+segment erases `" "` into the separator, so the Space binding silently disappears. The parser splits
+on the **last** `+` only and never trims.
+
+### Requiring no modifiers at all for the `onText` typeahead fallback
+**Why not:** Shift produces every capital and Alt/AltGr every accented character, so a
+no-modifiers rule would drop both from typeahead. Only Ctrl and Meta are excluded, because those
+are chords rather than typing.

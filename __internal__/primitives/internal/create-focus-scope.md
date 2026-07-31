@@ -119,3 +119,40 @@ the focus *restore* algorithm that lives in the same file. hope-ui already has t
 (`createFocusRestore`), so what is left here is a flat array and a slice, sharing no expression with
 it. Credited in prose; **not** an attributed derivative, and it carries no `@license` header. See
 `__internal__/reference-implementations.md`.
+
+## Rejected alternatives
+
+### React Aria's `focusScopeTree` — a real tree of parent-linked nodes
+
+**Why not:** Upstream's `Tree`/`TreeNode` structure, its `fastMap`, its pre-order traversal
+generator and its `clone()` all exist to carry the focus *restore* algorithm that lives in the same
+file — `nodeToRestore` is a field on every node. hope-ui already has that half as
+[`createFocusRestore`](create-focus-restore.md), so porting the structure duplicates a solved
+problem and turns a flat array, an `indexOf` and a `slice` into an attributed derivative with an
+`@license` header. The verdict was settled against the diff, not the plan (`2a40b14`); what was
+taken is the *question* `useOverlay` asks through `isElementInChildOfActiveScope`, which is the
+bucket that owes nothing. See *Provenance* above.
+
+### One merged overlay stack (`createOverlayStack`, roadmap #14)
+
+**Why not:** The three registries answer different questions, and a `Dialog` with
+`dismissOnEscape: false` needs all three answers to disagree: it still participates in focus-scope
+and hide-outside ordering, and must never win Escape. Merged, that is expressible only as a special
+case inside the merged stack. React Aria keeps `focusScopeTree`, `observerStack` and
+`visibleOverlays` apart and centralizes nothing. The roadmap row was retired rather than built.
+
+### Extending the trap through the chain, so `Tab` is caged across registered scopes
+
+**Why not:** It would silently rewrite the non-modal contract. With focus inside a non-modal layer,
+`Tab` past its last focusable is *supposed* to leave the chain, let the trap underneath pull focus
+back, and let `closeOnFocusOutside` close the layer — *"Tab away closes it"*. Caging it means a
+non-modal Popover inside a Dialog can never be closed by tabbing away. A layer that wants the cage
+asks for [`createFocusTrap`](create-focus-trap.md), which registers a scope of its own.
+
+### A module-scope scope stack
+
+**Why not:** Nothing forces a consumer to a single installed copy of `@hope-ui/primitives`, and two
+module-scope stacks put a `Popover` from copy B outside every scope copy A knows about — so copy A's
+`Dialog` goes back to yanking focus out of it, on some installs and not others. `Symbol.for` resolves
+through the cross-realm global registry, so every copy reads the same slot. Pinned cross-instance by
+a `?instance=2` import rather than argued.

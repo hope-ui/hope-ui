@@ -6,3 +6,7 @@ Built-in **German** catalog, selected when the active locale's primary subtag is
 - `datesSelected` plural: singular only at `1` (`1 Datum`), plural otherwise (`2 Daten`).
 - Nav labels use the idiomatic pager pair *Zurück* / *Weiter* rather than literal *Vorheriger* /
   *Nächster*; an app can override any string via the `I18nProvider` `messages` config.
+
+<!-- no-rejected-alternatives: catalog data — wording is a translation call, and the
+question this file raises (whether `de-AT`/`de-CH` deserve their own catalogs rather than sharing
+one) is decided in `../catalogs.md`. -->

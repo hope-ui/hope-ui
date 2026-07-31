@@ -98,3 +98,39 @@ synchronously) and focuses the first *focusable* cell for that date once its ele
 (skipping the outgoing scope's trailing outside cell, which shares the date key transiently). This
 replaces the Angular `afterNextRender` nudge and is armed only by navigation, so the calendar never
 steals focus on mount.
+
+## Rejected alternatives
+
+### An `onPointerLeave` that clears the tentative band
+**Why not:** the band is derived from the roving cursor and belongs to the **anchor**, not to a hover,
+so clearing it when the pointer leaves the grid erases a band the user is still drawing — and erases
+it for the keyboard too, which never produced a `pointerleave` in the first place. It was the shipped
+behavior while the preview lived in its own `highlightEnd` signal; see *No `onPointerLeave`* above.
+
+### `Escape` consulting `commitBehavior`
+**Why not:** the default policy is `"select"`, so `Escape` would *complete* the tentative range at the
+cursor — the opposite of the explicit refusal it means. `commitBehavior` answers what happens when the
+user **walks away** (`calendar-group.md`); React Aria splits it the same way (`useCalendarGrid` →
+`setAnchorDate(null)`).
+
+### `Escape` consuming the key unconditionally
+**Why not:** with no range in progress there is nothing to cancel, and swallowing the key there stops
+it reaching the popover or dialog the calendar is rendered in. It is consumed (`preventDefault` +
+`stopPropagation`) **only** when there was an anchor — where stopping it is the point, since the same
+keypress must not also close the surface the user is still selecting in.
+
+### `Shift`+`Arrow` stepping past an unavailable day in a contiguous range
+**Why not:** a contiguous range would have to swallow every day it skipped over, committing days the
+calendar refuses to select. Skipping is sound only under `allowsNonContiguousRanges`, which is what
+`firstSelectableDateFrom` serves; otherwise the extension stops at the edge of the anchor's available
+run, which the narrowed bounds already report as unselectable.
+
+### An exposed weekday `<thead>`
+**Why not:** every day button's accessible name already leads with its weekday, so a column header in
+the accessibility tree makes a screen reader announce the weekday twice per cell. React Aria's
+`useCalendarGrid` hides it for the same reason.
+
+### Spreading `headerProps` onto a literal `<thead>`
+**Why not:** spreading *any* hook props object onto a literal host element allocates its subtree's
+`_hk` differently on client vs server — measured, all seven `<th>` came back unclaimed on hydrate.
+`headerProps` is a plain static object and still routes through `renderElement`.

@@ -78,3 +78,33 @@ trigger knowing whether its popup rendered, which is a portal concern, not a tri
 Attribute computation only — no DOM access, no effects, and no `isServer` branch. The `popupId` it
 names comes from `createPopover`'s `createUniqueId` fallback, which is SSR-stable and reserved before
 the presence and floating layers so the trigger's `_hk` hydration key does not shift.
+
+## Rejected alternatives
+
+### A toggling trigger without `createDismissable`'s `exclude`
+**Why not:** the capture-phase pointerdown dismisses and the trigger's own `click` reopens, so the
+popover can never be closed by the control that opened it. The toggle and `state.dismissExclusions` are
+one feature spelled in two files — see *It toggles, where Dialog's only ever opens* above.
+
+### A trigger that registers no element, as `createDialogTrigger` does
+**Why not:** Popover's trigger element is load-bearing twice: it is the default anchor, so without it
+`state.anchorElement()` is empty and `createFloating` has nothing to measure against, and it is the sole
+dismiss exclusion, so without it every pointerdown on the trigger dismisses in the capture phase.
+
+### `aria-haspopup="alertdialog"` when `role` is `"alertdialog"`
+**Why not:** ARIA defines no `alertdialog` token for `aria-haspopup` — the legal values are `menu`,
+`listbox`, `tree`, `grid`, `dialog`, `true`, `false` — so it would ship an invalid attribute value. The
+popup itself carries the real role.
+
+### `aria-controls` emitted unconditionally, as Base UI's `DialogTrigger` does
+**Why not:** the popup is mounted lazily, so a closed popover would carry an IDREF naming an element that
+is not in the DOM. Verified against axe-core 4.12: a dangling `aria-controls` reports
+`aria-valid-attr-value` (as `incomplete`) whether `aria-expanded` is `"true"` or `"false"`, and reports
+nothing once the attribute is removed.
+
+### An `isServer` branch for the `defaultOpen` + SSR + portaled-popup IDREF
+**Why not:** it puts a rendering-environment check inside a primitive to paper over a portal concern —
+what the fix actually needs is for the trigger to know whether its popup rendered, which the trigger
+cannot know. The case is recorded as a known limit instead, and the default (`defaultOpen: false`) emits
+no `aria-controls` at all.
+**Revisit if:** a portal-aware primitive can tell the trigger whether its popup rendered on the server.

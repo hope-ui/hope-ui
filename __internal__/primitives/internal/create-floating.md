@@ -413,3 +413,65 @@ Five consumer anti-patterns, each of which looks reasonable:
    (`popover-root.ts`), and the pin is *"keeps a closing layer positioned for every frame of its
    exit"* in `popover.browser.test.tsx` — which samples the positioner's computed style per frame
    and, reverted to `active: open`, reports every exit frame `hidden` with `transform: none`.
+
+## Rejected alternatives
+
+### `@floating-ui/react`'s `useFloating` as the structural port
+
+**Why not:** Its `useState`/`useLayoutEffect`/memoization machinery is re-render bookkeeping with no
+analogue in a fine-grained runtime, so porting it means reversing that out line by line and hoping
+nothing load-bearing was inside it. `@floating-ui/vue`'s `ref`/`computed`/`watch`/`onScopeDispose`
+maps to `createSignal`/`createMemo`/`createEffect`/`onCleanup` almost 1:1 and is the primary
+structural reference instead. Recorded in `__internal__/reference-implementations.md` §
+`createFloating`.
+
+### `@floating-ui/dom` as a required dependency
+
+**Why not:** A consumer who only ever opens a Dialog would carry the positioning engine for nothing;
+it went in as an **optional peer**, the same pattern as `@tanstack/virtual-core`. Note the honest
+limit, which `packages/primitives/README.md` states in full: "optional" is an npm/type-level claim,
+not a module-graph one — `internal/index.ts` statically imports the peer, so a consumer who skips the
+install fails at resolve time under a bundler that doesn't tree-shake.
+
+### Accessor-or-value options resolved through `runIfFunction`
+
+**Why not:** This was the recorded Vue→Solid mapping (`toValue` → `runIfFunction`) and it collides
+head-on with floating-ui itself. `runIfFunction` is only sound when `T` is not callable, and
+floating-ui's option surface is full of callables — `Derivable<T> = (state) => T` on
+`offset`/`flip`/`shift`/`size`, plus `Middleware.fn` — so `sideOffset?: number | (() => number)`
+cannot be told apart from `offset(state => …)`. Getters have no such ambiguity and are what the other
+eight primitives already use. See *Why getters and not accessor-or-value* above.
+
+### Threading `useLocale()` from `@hope-ui/i18n` into the positioning layer
+
+**Why not:** It creates a second, divergent source of truth for reading direction. An app that sets
+`dir="ltr"` on a subtree inside an Arabic-locale document would be *positioned* by the locale and
+*painted* by the `dir`. Direction is delegated to floating-ui's DOM platform instead
+(`getComputedStyle(floating).direction`) — the same element `@floating-ui/core` already calls
+`platform.isRTL` on, so a logical `side` and the alignment axis cannot disagree. See *RTL* above.
+
+### Base UI's mirror-the-input-vocabulary output (`getLogicalSide`)
+
+**Why not:** Base UI re-derives the resolved side back into whichever vocabulary the caller asked in,
+which is a footgun *here specifically*: hope-ui has a closed `RecipeRegistry` and a third-party preset
+conformance kit, so a recipe author selecting on `data-side` cannot know whether the consumer wrote
+`side="left"` or `side="inline-start"`. Output stays physical, always — where the layer landed after
+`flip` is geometry, and `getBoundingClientRect` is physical by definition. Input is still logical; see
+*Logical sides* above.
+
+### A `data-side-inline-start` / `-end` attribute pair
+
+**Why not:** They shipped as the CSS half of logical sides, with no consumer, and were deleted
+(`685f724`). Re-adding one under any name re-makes the same speculative bet, and a direction-relative
+value driving a physical property (`translate`, `transform-origin`, `inset` have no logical form) is
+exactly the silent RTL mis-paint `check:rtl-safety` exists to catch. A recipe needing the
+inline-relative hook writes `ltr:`/`rtl:`-scoped rules over `data-side-left`/`-right` — the sanctioned
+escape hatch, which passes both `check:rtl-safety` and `assertLogicalPropertyConformance`.
+
+### Applying the `size` middleware's measurements to the floating element
+
+**Why not:** Writing a `width`/`max-height` back onto the element from inside `apply` re-fires
+`elementResize`, which is floating-ui's classic ResizeObserver feedback loop. `trackSize` records the
+four numbers and writes nothing; the consumer spends them as custom properties, where the loop is at
+least theirs and converges. The same line this kernel already draws for the arrow, which returns
+measurements and lets CSS own the 45° rotation.

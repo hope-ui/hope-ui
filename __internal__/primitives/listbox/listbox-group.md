@@ -39,3 +39,22 @@ Pure reactive state; `aria-labelledby` resolves from the label id, which `create
 publishes via `createRegisteredId` (an `onSettled` write that never runs server-side). The
 server-rendered group therefore carries `aria-labelledby` only if the consumer set one directly;
 otherwise the linkage lands on the client after mount.
+
+## Rejected alternatives
+
+### `Listbox.Root` emitting the group wrapper itself
+
+**Why not:** the wrapper would stop being a consumer-written part, and `Group` / `GroupLabel` /
+`Separator` would lose the `render` prop and the `class` seam every other part has — a consumer
+could neither re-target the element nor style it through the recipe. Rendering the group from the
+per-entry callback costs nothing, because a row resolves its index through `indexOfValue` rather
+than from its place in the tree.
+
+### Grouping in virtual mode
+
+**Why not:** windowing measures a flat run of rows, so a group wrapper has no position in the
+window and `groupToItems` has nothing to flatten into one. Declaring `groupToItems` and
+`estimateSize` together is a dev warning, and `estimateSize` wins.
+
+**Revisit if:** a consumer needs a grouped list long enough to virtualize — grouped virtualization
+is deferred, not ruled out.

@@ -111,3 +111,30 @@ function Popup(props: { open: boolean; modal: boolean }) {
   return <div ref={setRef}>...</div>;
 }
 ```
+
+## Rejected alternatives
+
+### Restore living in `createFocusTrap`'s cleanup, behind a `returnFocus` option
+
+**Why not:** A non-modal `Dialog` never activates the trap, so it silently lost focus restore too
+and stranded keyboard focus on `<body>` after Escape — a WAI-ARIA APG violation that shipped, and
+whose fix took the `modal` prop from zero test coverage to nine (`e518779`). The only workarounds a
+future non-modal component had were enabling the whole trap to get the restore, or copy-pasting the
+restore logic — the cross-component coupling this kernel exists to avoid. See *Why this is separate
+from `createFocusTrap`* above.
+
+### A synchronous restore, without the microtask deferral
+
+**Why not:** Two independent failures, and neither needs a focus trap to be *wrong* — only to be
+present. On the deactivating re-run, Solid runs sibling cleanups in creation order, so this
+primitive's cleanup fires while `createFocusTrap`'s `focusin` listener is still attached:
+`.focus()` dispatches `focusin` synchronously and the still-live trap yanks focus straight back into
+its container. And `createHideOutside` still has `inert` on the trigger's ancestor, where `.focus()`
+silently does nothing at all. Both were measured against the installed `solid-js@2.0.0-beta` and are
+pinned in `../solid-contract.test.tsx`.
+
+### `@solid-primitives/focus`'s `createFocusTrap`
+
+**Why not:** It welds restore into the trap, which is exactly the shape above — adopting it
+reintroduces the APG bug for every non-modal layer. Recorded in
+`__internal__/solid-primitives-eval.md` § *Tier B*.

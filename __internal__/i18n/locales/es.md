@@ -5,3 +5,6 @@ Built-in **Spanish** catalog, selected when the active locale's primary subtag i
 
 - `datesSelected` plural: singular only at `1`, with feminine agreement (`1 fecha seleccionada` /
   `2 fechas seleccionadas`).
+
+<!-- no-rejected-alternatives: catalog data, no contested shape — plurals as per-locale
+functions are decided in `../messages.md`, catalog selection and fallback in `../catalogs.md`. -->

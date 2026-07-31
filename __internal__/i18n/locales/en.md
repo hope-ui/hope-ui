@@ -13,3 +13,8 @@ carry every key in the contract or it fails to compile.
 Add a locale by copying this file (e.g. `de.ts`), translating each value, registering it in
 `catalogs.ts`, and exporting it from the i18n barrel; the `I18nCatalog` type guarantees completeness.
 See `catalogs.md`.
+
+<!-- no-rejected-alternatives: catalog data, not a contested shape — the contract and the
+plural-as-function decision live in `../messages.md`, selection and the English fallback in
+`../catalogs.md`; the frozen values noted here are a constraint on edits, not an alternative that
+lost. -->

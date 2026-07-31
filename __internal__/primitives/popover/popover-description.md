@@ -20,3 +20,6 @@ in how they resolve an unset `id` would be a trap for whoever reads one and assu
 
 That mirroring is also the hazard: `register: state.setTitleId` in this file type-checks and passes
 every title assertion. `popover-description.browser.test.tsx` pins `state.descriptionId()` by name.
+
+<!-- no-rejected-alternatives: mirrors createPopoverTitle exactly; popover-title.md owns the contested id-resolution decision -->
+

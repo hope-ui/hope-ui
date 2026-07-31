@@ -249,3 +249,57 @@ emitted `0` on every row because nothing had registered yet.
 
 The virtual path is client-only (it measures the DOM) and does nothing meaningful server-side. See
 `__internal__/testing.md` for the SSR → hydrate round-trip the component layer pins.
+
+## Rejected alternatives
+
+### DOM-registered options (`createCollection`)
+
+**Why not:** a `createCollection` source *is* the mounted rows, so a listbox knows nothing about an
+option until it renders — which is exactly the state a closed Select is in. It reports an empty
+collection at the trigger, which loses closed-trigger typeahead, makes an `allowsEmptyCollection`
+open guard meaningless, and leaves the server-rendered `<select>` with only the selected option for
+autofill to match. It also forces `textValue` through `element.textContent`, readable only after
+mount. See *Options are data, never mounted elements* above.
+
+### Force-mounting the options so a DOM-registered source can see them
+
+**Why not:** tabbing through a form with ten Selects would mount ten option lists, none of which the
+user may ever open.
+
+### `items` optional, with the DOM-registered source as a fallback
+
+**Why not:** it keeps the old mode alive as a degraded path — a listbox authored that way silently
+loses closed-popup typeahead, autofill and the correct server-rendered tab stop, with no error and
+no type failure to say which mode it is in. One authoring mode instead; the break was cheap at
+v0.0.0 and unpublished, and expensive after.
+
+### `groupToLabel`, or a `{ label, items }` group shape
+
+**Why not:** it would make consumers restructure their data to fit a shape the kernel never reads.
+Flattening `items` into navigation order is the *only* thing grouping tells the kernel; the label is
+rendered by the consumer from its own key, and a kernel that also held it would own a string with no
+behavior attached to it. See *Grouping* above.
+
+### Roving focus as the only focus mode
+
+**Why not:** Select cannot be built on it — a collapsible Select/Combobox keeps DOM focus on its
+trigger/input, so the focus owner lives *outside* the list and no option is ever DOM-focused. Both
+modes are first-class and tested from day one for that reason, and `focus` / `navigation` /
+`typeahead` are exposed independently so an external owner can bind them without spreading
+`rootProps` — which binds them onto the list's own element, precisely what a Select must not do.
+
+### The typeahead kernel's default `toLowerCase().startsWith()` match
+
+**Why not:** typing `cafe` never matches `Café`, so accented labels are unreachable by keyboard for
+the readers most likely to have them. `Listbox.Root` passes a `createCollator({ usage: "search",
+sensitivity: "base" })` instead, which ignores diacritics and case. The sliced comparison's known
+normalization limitation is pinned rather than guarded — see
+[`createListTypeahead`](../internal/create-list-typeahead.md).
+
+### Writing the locale-derived direction to the DOM
+
+**Why not:** `useLocale().direction()` never returns "nothing" — with no provider it reports the
+*detected browser* direction — so a listbox nobody configured would stamp `dir="ltr"` on itself and
+override the `<div dir="rtl">` it was rendered into, stopping an ancestor's direction from
+cascading. Only the consumer's `dir` *prop* reaches the element; the locale drives the keymap and
+nothing else. See *Reading direction* above.

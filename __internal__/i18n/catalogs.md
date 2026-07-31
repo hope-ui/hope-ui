@@ -24,3 +24,11 @@ The resolver in `../../translate/translate.ts` calls `resolveCatalog(locale())`,
 
 `catalogs.test.ts` asserts every registered catalog has full key parity with English, and pins the
 `resolveCatalog` subtag/fallback behavior.
+
+## Rejected alternatives
+
+### Prefix matching on the locale string (`locale.startsWith("fr")`)
+**Why not:** a primary subtag is not a prefix. `frr` (North Frisian) starts with `fr` and would
+resolve to the French catalog, and the underscore form `sv_SE` would match no catalog at all.
+`resolveCatalog` lowercases and splits on `[-_]` instead; both cases are pinned by name in
+`catalogs.test.ts`.

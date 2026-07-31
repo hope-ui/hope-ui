@@ -17,3 +17,8 @@ function formatDecadeRange(visibleMonth, locale, timeZone): string;
   range separator + digits; a hand-typed literal won't byte-match).
 
 Ported verbatim from the Angular calendar's `utils/decade-view.ts`.
+
+<!-- no-rejected-alternatives: the adjacent-year cells reuse month view's decided outside-cell
+treatment wholesale, and the calendar-system question these formatters answer is owned by
+month-view.md, which `decade-view.ts` points at by name. -->
+

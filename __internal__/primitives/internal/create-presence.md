@@ -164,3 +164,41 @@ function Popup(props: { open: boolean }) {
 [data-presence="entered"] { opacity: 1; transition: opacity 150ms; }
 [data-presence="exiting"] { opacity: 0; transition: opacity 150ms; }
 ```
+
+## Rejected alternatives
+
+### A single `requestAnimationFrame` for the `entering` → `entered` flip
+
+**Why not:** The element is inserted *and* the rAF is scheduled in the same task, so a single rAF
+fires before that frame's first style recalc — the element's first-ever computed style is already
+`"entered"` and a CSS `transition` with no painted prior value never fires. The content appears
+instantly at its final state with the enter animation skipped. Base UI gets away with one rAF only
+because React commits and paints the starting frame in an earlier cycle; our Solid effect does not.
+See *Enter timing* above.
+**Revisit if:** the flip ever moves out of the effect that mounts the element, so mount and schedule
+no longer share a task.
+
+### A `createPresence` owned by the lazily-mounted overlay part
+
+**Why not:** `Dialog.Content` mounts only once open, so a presence created inside
+`createDialogContent` saw `present` already `true` on its first run and the first-run latch put it
+straight on `"entered"` — the card never passed through `"entering"` and the authored enter
+transition had no start value. The dialog appeared instantly, and no test failed (`95cee52`). One
+presence is created **eagerly on the root state** (`createDialog.contentPresence`) while still
+closed, and Content and Positioner share it; Backdrop keeps its own, also eager — the Ark UI split.
+
+### `data-status` as the attribute name
+
+**Why not:** It names neither whose status nor which status, and it squats the obvious name for a
+component that has a genuine domain status of its own — a field's validation state, an async-loading
+surface — which would then have to invent a worse one. It is public API consumers style off, so the
+name is fixed here for every overlay rather than picked per component (`b6324bf`).
+
+### `@solid-primitives/presence`
+
+**Why not:** It is timer-driven: the consumer passes a JS duration that has to mirror the CSS, so
+the two drift the moment a theme changes a transition and the element unmounts mid-animation. Ours
+reads the real computed duration, keeping the CSS the single source of truth. Its good ideas were
+ported rather than its implementation — the `transitioncancel`/`animationcancel` listeners, the
+duration-derived `setTimeout` backstop, `initialEnter`, and the item swap
+(`createPresenceItem`/`mountedItem`).

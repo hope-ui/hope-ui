@@ -27,3 +27,12 @@ the accessibility tree. It contributes nothing to the listbox's option set or to
 
 Pure attribute computation — no effects, no DOM reads — so it renders identically on the server and
 hydrates without incident.
+
+## Rejected alternatives
+
+### `role="separator"`
+
+**Why not:** a `separator` is not a valid child of a `listbox`, and a real one is reported as an item
+by some assistive tech — so a purely decorative divider would be announced as something the user can
+move to, in a widget whose item set is otherwise exactly the options. `role="presentation"` plus
+`aria-hidden="true"` removes it from the accessibility tree entirely.

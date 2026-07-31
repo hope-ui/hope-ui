@@ -21,3 +21,8 @@ Render `<button {...props}>…</button>` (the icon/label is the component's).
   previous period lying before `min`.
 - `aria-label` defaults to `messages.previousLabel` ("Previous"), overridable via the consumer's
   `aria-label`.
+
+<!-- no-rejected-alternatives: a thin onClick + disabled mirror of `prev()` / `isPrevDisabled()`; every
+paging and boundary decision it reflects (including why the button disables while a contiguous range
+is anchored) is argued in calendar-root.md -->
+

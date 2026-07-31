@@ -181,3 +181,33 @@ reach the DOM from their effect bodies alone, and effect bodies never run on the
 layer stack there anyway). `floatingStyles()` serves its pre-positioned branch — a constant with no client-only input —
 and `side()`/`align()` seed from the config, so `data-side`/`data-align` are identical on both sides
 of the hydration round-trip. The tree never branches on them, only CSS does.
+
+## Rejected alternatives
+
+### A kernel-free positioner, like Dialog's — placement resolved by a recipe variant
+**Why not:** a popover's position is runtime state: the consumer asks for `bottom`, `flip` may hand back
+`top`, and it changes again on scroll. No recipe can predict that, so a variant-only positioner paints
+the layer where it was authored rather than where it fits. See *Unlike Dialog's positioner, this one is
+not kernel-free* above.
+
+### Publishing `--anchor-width` and its three siblings behind an option
+**Why not:** a `width: var(--anchor-width)` whose flag nobody enabled is an invalid declaration the
+browser drops in silence — no error, no warning, a card that is merely the wrong size. Ark/Zag
+(`--reference-width`), Base UI (`--anchor-width`) and React Aria Components (`--trigger-width`) all
+publish theirs unconditionally for the same reason; the cost is one extra middleware reading rects per
+measurement pass.
+
+### A `0px` placeholder before the first measurement
+**Why not:** a real `0px` collapses whatever reads it, where an absent property invalidates only the one
+declaration referencing it — and emitting a placeholder would make the server render and the first client
+render differ, which is exactly what hydration compares.
+
+### Keying `createKeepVisible` on `open()`
+**Why not:** a layer animating out is still in the page, so it would go `aria-hidden` + `inert` mid-exit
+and the card would stop responding to the pointer before it had finished leaving.
+
+### Honouring a string `style` on the positioner
+**Why not:** a string has no merge seam, so honouring it drops the kernel's `position`/`left`/`top` and
+the layer paints at 0,0 on top of whatever is there. It is dropped instead, and behind a dev-only
+warning rather than silently, because a silently dropped style is how someone spends an afternoon on
+CSS that never applied. See *A string `style` is unsupported* above.

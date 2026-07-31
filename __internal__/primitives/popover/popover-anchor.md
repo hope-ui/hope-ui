@@ -59,3 +59,17 @@ the anchor's whole subtree into a dead zone for outside-click).
 registers there and the layer seeds as trigger-anchored. Nothing is visible in that window —
 `isPositioned()` is false and the layer is `visibility: hidden` — and this part renders no attribute
 of its own, so the server's bytes and the client's first render are identical.
+
+## Rejected alternatives
+
+### A register-only anchor — the `createRegisteredId` shape, with no `unregister`
+**Why not:** without the clear on unmount, `state.anchorElement()` keeps naming a **detached** element and
+an open layer strands wherever that element last was — measured in the test's red run at 64px off. An id
+is also known at render time where a ref is only known after it, so `createRegisteredId` cannot express
+this registration in the first place.
+
+### ARIA, a handler or a `data-*` of the anchor's own
+**Why not:** the anchor is a positioning reference, not a control, and a consumer may wrap it around a
+card, a table row or a whole section — any `aria-*` on it would describe that entire region to a screen
+reader as part of the widget. `popover-anchor.browser.test.tsx` asserts the element's *whole* attribute
+list so a later addition fails there rather than in a screen reader.

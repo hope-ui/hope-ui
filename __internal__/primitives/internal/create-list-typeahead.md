@@ -93,3 +93,22 @@ the matching rules and the sliced-comparison expression), per CLAUDE.md's attrib
 
 Typeahead runs only from keyboard events (client). It uses `setTimeout` for the buffer reset, cleaned
 up via `onCleanup`; nothing touches the DOM or a timer at module scope, so it is inert during SSR.
+
+## Rejected alternatives
+
+### `toLowerCase().startsWith()` as the listbox's matching rule
+**Why not:** it folds case but not diacritics, so a reader typing `cafe` never reaches an option
+labelled `Café` — and on a French or Spanish list that is most of the options. `Listbox.Root` passes a
+`createCollator({ usage: "search", sensitivity: "base" })` from `@hope-ui/i18n` instead, which folds
+both. The plain comparison survives only as the fallback when no `collator` is given, so a consumer
+outside a locale context still gets case-insensitive matching.
+
+### A Unicode-normalization guard around the sliced prefix
+**Why not:** the comparison here is the exact expression react-aria's `ListKeyboardDelegate` and
+`useFilter` use, and no upstream typeahead or filter carries such a guard — adding one would make
+hope-ui's matching quietly differ from the reference every other matching rule in this file is checked
+against. The one false negative it would fix (a query and a `textValue` that normalize differently, so
+the slice lands mid-grapheme) is **pinned by a test** instead, not silently tolerated: see *Collated
+matching — a known, accepted limitation* above.
+**Revisit if:** a normalization strategy is adopted across matching and filtering — then fix the
+primitive and drop the pin, rather than editing the test's expectation.

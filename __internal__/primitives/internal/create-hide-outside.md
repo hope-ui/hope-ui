@@ -228,3 +228,68 @@ function Positioner(props: { mounted: boolean }) {
   return <div ref={setRef}>...</div>;
 }
 ```
+
+## Rejected alternatives
+
+### `aria-modal="true"` on the popup, and nothing else
+
+**Why not:** It is the spec-blessed answer and it is what a modal `Dialog` shipped with — inert in
+name only (`e518779`). Long-standing VoiceOver/Safari gaps mean assistive technology still reaches
+the background, which is why React Aria ships `ariaHideOutside` and Base UI ships floating-ui's
+`markOthers` rather than relying on it.
+
+### `aria-hidden` alone (`@solid-primitives/interaction`'s `createHideOutside`)
+
+**Why not:** It removes outside content from the accessibility tree and leaves it **focusable and
+clickable** — `Tab` walks straight out of the popup into a background nobody can see. It also leaves
+axe reporting `aria-hidden-focus` as `incomplete` on a focusable background, which
+`expectNoA11yViolations` fails. See the table in *Why both attributes* above.
+
+### `inert` alone
+
+**Why not:** Measured against this repo's Chromium, `inert` does **not** take content out of the
+accessibility tree as far as ARIA tooling is concerned: a role-based query still finds an `inert`
+button, while it does not find an `aria-hidden` one. floating-ui reaches the same conclusion,
+exposing `inert` as a flag layered on `aria-hidden` rather than as a replacement.
+
+### Walking before `target` resolves, the way `spare` is allowed to
+
+**Why not:** A run with the popup missing from the spared set hides the popup *itself*; `inert` then
+blurs whatever `createFocusTrap` just focused inside it, and focus lands on `<body>` for good — the
+trap has no reason to fire again. `spare` can be incomplete on an early run harmlessly, because the
+next run spares what registered late; the target cannot. This was a real bug before it was a rule —
+see *`target` is gated on; `spare` is not* above.
+
+### A module-scope `WeakMap` for the per-element ref count
+
+**Why not:** Nothing forces a consumer to a single installed copy of `@hope-ui/primitives`, and two
+copies keep two independent counts that un-hide each other's elements — leaving background content
+`inert` after every layer has closed, or reachable while one is open. `Symbol.for` resolves through
+the cross-realm global symbol registry, so every copy reads the same slot on the same element. The
+layer stack lives there for the same reason; both are pinned by a `?instance=2` import.
+
+### `spare` alone, without `keepVisible` or the top-layer marker
+
+**Why not:** `spare` is static and per-layer, so it cannot say *"spare this in whichever layer is
+currently on top"*. A `Popover` opened inside a `Dialog` portals to `document.body` after the
+dialog's observer started, gets marked `aria-hidden` + `inert`, and then paints perfectly while
+being absent from the accessibility tree and transparent to hit testing — no click reaches a word of
+it, and every test stays green (`d649183`). The two mechanisms that do reach it cover opposite
+orderings, which is why both ship; see *Sparing a layer that opens later* above.
+
+### Leaving every layer's `MutationObserver` connected
+
+**Why not:** `keepVisible` registers into the *topmost* layer only, so a still-observing outer layer
+hides the very element the inner one just agreed to spare — no registration could survive a nesting
+at all. Worth recording precisely because the predicted justification was different and wrong: the
+plan argued that double-marking would strand content `inert` after the inner layer closed, which the
+per-element ref count already prevents. The measurable reason is the registration one.
+
+### One merged overlay stack (`createOverlayStack`, roadmap #14)
+
+**Why not:** This stack answers "who observes, and who is spared";
+[`createDismissable`](./create-dismissable.md)'s answers "who wins a dismissal";
+[`createFocusScope`](./create-focus-scope.md)'s answers "did focus land in me or above me". A
+`Dialog` with `dismissOnEscape: false` needs those answers to disagree — it participates in
+hide-outside ordering and must never win Escape — so merging them makes that a special case inside
+the merged stack. React Aria keeps its three apart for the same reason.

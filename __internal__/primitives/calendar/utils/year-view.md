@@ -17,3 +17,9 @@ function formatYear(date, locale, timeZone): string;
 - `formatYear` — the year-view heading label ("2026"), localized digits.
 
 Ported verbatim from the Angular calendar's `utils/year-view.ts`.
+
+<!-- no-rejected-alternatives: the 4x3 grid geometry follows the view's column count with nothing
+contested left to decide; the one judgement call these formatters make — labelling months in the
+date's own calendar system rather than the locale's default — is argued in month-view.md, which
+`year-view.ts` defers to by name. -->
+

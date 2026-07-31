@@ -143,3 +143,38 @@ const focus = createListFocus({ source: collection, element: containerRef });
   {/* each option: tabindex={focus.getItemTabIndex(item)} id={item.id} */}
 </ul>
 ```
+
+## Rejected alternatives
+
+The `roving` / `activedescendant` split is **not** one of these — both modes ship, and picking between
+them is the consumer's call. See *The two focus modes* above.
+
+### react-aria's `selection`, Astryx, floating-ui-react, Angular CDK's `key-manager`
+**Why not:** all four were evaluated as the navigation architecture and Angular Aria's signal-based
+`private/behaviors/` won, because Angular signals ≈ Solid signals: its decomposition — one `list-focus`
+owning the active item and the roving/activedescendant switch, with navigation, selection and typeahead
+each *injecting* that one instance — ports almost 1:1 into `createX` + split-`createEffect`, which none
+of the others do. They are still used for what they are good at: react-aria's `selection` is the
+edge-case checklist, and Astryx's `useGridFocus` supplied the calendar month-flip. Full writeup:
+`__internal__/reference-implementations.md` § *Why Angular Aria won the architecture bake-off*.
+
+### Deriving the active highlight from the active index alone
+**Why not:** the active index is written only by arrows, pointer and click — never by focus entering or
+leaving — so the highlight lingered after focus left the list, and nothing painted when focus entered on
+the roving tab stop. Hence `isFocused`: a paint gate that records focus without ever moving it
+(react-aria's `manager.isFocused`, zag's `focused`), with the highlight computed one layer up as
+`isActive(item) && isFocused()` so `isActive` keeps meaning "is the active item".
+
+### Scrolling only rows whose `element()` has not resolved, in both modes
+**Why not:** that guard is right for roving and wrong for activedescendant, which moves no DOM focus at
+all — a *mounted but clipped* option then sits offscreen while `aria-activedescendant` names it to a
+screen reader, with every test green. It is precisely the failure a Select would have shipped. The
+scroll is scoped by focus mode instead; see *Scrolling the active row into view* above.
+
+### One unconditional `scrollIndexIntoView` on every focus move
+**Why not:** the opposite over-correction. In roving mode the deferred native `.focus()` *is* the
+scroll, computed from the real scrollport; asking the source as well lands a second, coarser scroll on
+top of it one frame later — measured at 6px of the active row clipped in the 10k-row story, the
+virtualizer aligning against the border box (288px) while the port excludes the 1px borders and the 4px
+padding (286px). Both automated gates stayed green through that regression; the Storybook pass is what
+caught it.

@@ -38,21 +38,6 @@ It reads eight things off `state` and takes no other configuration: `indexed.ite
 write-back). Nothing about the field is a separate prop, so a component that renders it cannot
 configure it inconsistently with the widget it belongs to.
 
-## Why a real `<select>` and not `<input type="hidden">`
-
-| | `<input type="hidden">` | clipped `<select>` |
-| --- | --- | --- |
-| Submits the value | yes | yes |
-| Browser autofill | no — nothing to match against | **yes**, against the `<option>`s |
-| `required` blocks submission | **no** — a hidden input is *barred from constraint validation*, so `required` is silently ignored | **yes** (`valueMissing`) |
-| `disabled` removes it from submission | needs a hand-written conditional | native |
-| Mobile form navigation | no | native |
-
-Autofill is what makes the data-driven item source load-bearing rather than an implementation
-detail: the browser matches the user's stored value against `<option>`s that must *exist*, including
-in the server render, before anyone has opened a popup. A DOM-registered collection could never
-provide that (see [`createDataCollection`](../internal/create-data-collection.md)).
-
 ## Rendering rules, each with a browser behind it
 
 - **Clipped, never `display: none` or `hidden`.** Safari skips a `display: none` `<select>` for
@@ -155,3 +140,63 @@ client-side selection sync is an effect too.
 
 `Listbox`'s round-trip covers it end to end: `listbox.ssr.test.tsx`'s byte snapshot contains the
 whole `<select>`, and `listbox.browser.test.tsx` hydrates that exact markup.
+
+## Rejected alternatives
+
+### `<input type="hidden">` per selected value
+
+**Why not:** a hidden input is *barred from constraint validation*, so `required` on it is silently
+ignored — which is exactly what `Listbox.Root` shipped before this primitive existed, and why
+`createListbox`'s `required` option was dead plumbing for its whole life. Autofill, `disabled`
+reflection and form reset go with it:
+
+| | `<input type="hidden">` | clipped `<select>` |
+| --- | --- | --- |
+| Submits the value | yes | yes |
+| Browser autofill | no — nothing to match against | **yes**, against the `<option>`s |
+| `required` blocks submission | **no** — barred from constraint validation | **yes** (`valueMissing`) |
+| `disabled` removes it from submission | needs a hand-written conditional | native |
+| Mobile form navigation | no | native |
+
+Autofill is what makes the data-driven item source load-bearing rather than an implementation
+detail: the browser matches the user's stored value against `<option>`s that must *exist*, including
+in the server render, before anyone has opened a popup. A DOM-registered collection could never
+provide that (see [`createDataCollection`](../internal/create-data-collection.md)).
+
+### `type="hidden"` on the >300-option fallback inputs
+
+**Why not:** the same constraint-validation bar. The fallback exists to keep `required` working past
+the point where a `<select>` stops paying for itself, so an input the browser refuses to validate
+would defeat the branch it lives in. `type="text"` behind `display: none` validates normally.
+
+### `display: none` (or `hidden`) on the `<select>`
+
+**Why not:** Safari skips a `display: none` `<select>` for autofill entirely — the one thing a real
+`<select>` is here to provide. The clip technique keeps it rendered and matchable; see *Rendering
+rules, each with a browser behind it* above.
+
+### `<select value={…}>`, React Aria's channel
+
+**Why not:** a `value` attribute on `<select>` is inert HTML, so the server render would carry no
+selection at all and a `FormData` read before hydration would submit nothing. `selected` per option
+is the only channel a server render has — see *The selection travels on `<option selected>`* above
+for why the client is then synced from an effect instead.
+
+### Placeholder, options and fallback as three sibling blocks inside `<select>`
+
+**Why not:** it crashes in any non-hydratable client compile — a plain Vite app, and Storybook.
+`babel-preset-solid` omits closing tags there, so the HTML parser's *"in select"* insertion mode
+nests the dynamic-child comment placeholders inside the never-closed static `<option>` and the
+generated `nextSibling` walk hits `null`. No Vitest project in this repo compiles that way, so
+nothing automated can see it. See *The `<select>` has exactly one child expression, deliberately*
+above and [`solid-2.0-notes.md`](../../solid-2.0-notes.md).
+
+**Revisit if:** `babel-preset-solid` stops omitting closing tags in the non-hydratable compile — the
+sibling form reads more directly and would be the better shape.
+
+### Rendering the field unconditionally, as React Aria does
+
+**Why not:** a field with no `name` is never submitted and gives autofill nothing to match on, so
+every listbox in the app would carry an `aria-hidden`, focusable `<select>` — and, past the cutoff,
+hidden inputs — in exchange for nothing. React Aria's Select always has a field identity; a
+`Listbox` does not.

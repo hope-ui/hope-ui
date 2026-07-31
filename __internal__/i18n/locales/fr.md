@@ -10,3 +10,7 @@ fall back to `MESSAGES_EN`.
 - **Plural rule:** French treats `count <= 1` as singular (so both `0` and `1` stay singular), unlike
   English's singular-only-at-`1`. That is why `calendar.datesSelected` is a per-locale function rather
   than a shared template.
+
+<!-- no-rejected-alternatives: catalog data — the argued choice this file illustrates,
+per-locale plural *functions* rather than one shared template, belongs to `../messages.md`; catalog
+selection and fallback belong to `../catalogs.md`. -->

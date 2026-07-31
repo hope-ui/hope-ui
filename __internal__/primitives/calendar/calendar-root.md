@@ -440,3 +440,69 @@ that carries it — is hope-ui's own. The seam is explicitly unstable (`CLAUDE.m
   during SSR and in the Node `unit` project (which runs the client build without a DOM).
 
 Ported from the Angular calendar's `CalendarContext` (419 LOC) + its root directive.
+
+## Rejected alternatives
+
+### `@solid-primitives/date` as the date substrate
+**Why not:** it is `Date`-based and mutable, where every pure util in `utils/` needs the immutable,
+date-only, calendar-system-aware `CalendarDate` that `@internationalized/date` provides (React Aria's
+own substrate, which is what let those utils port verbatim). As a `node_modules` reactive primitive it
+would also carry the transform-boundary hydration hazard for no benefit. Verdict recorded in
+`__internal__/solid-primitives-eval.md`.
+
+### An in-repo `createLiveRegion` primitive
+**Why not:** `@solid-primitives/a11y`'s `createAnnounce` already is one — effect-only (no render-body
+signal or memo), `isServer`-guarded, appending its live regions to `document.body` outside the
+component tree — and it exports the `AnnouncePoliteness` polite/assertive split that was the whole of
+what the roadmap row asked for. It cleared the calendar hydration round-trip byte-for-byte, so roadmap
+#2 is retired in place rather than built.
+
+### A per-instance `messages` prop (the `CalendarMessages` dictionary)
+**Why not:** it existed only to keep `@solid-primitives/i18n`'s **memoizing** `translator` out of the
+calendar's render path — a compute-form signal there is the transform-boundary hydration hazard this
+repo tracks. Once `@hope-ui/i18n`'s `t()` landed (a plain function reading the locale accessor per
+call, never a `createMemo`), the dictionary was a second per-instance copy of a catalog the provider
+already owns, and translating one calendar said nothing about the next. Parts call
+`state.t("calendar.*")` instead.
+
+### Writing the resolved, locale-derived reading direction to the DOM
+**Why not:** `useLocale().direction()` never reports "nothing" — with no provider it reports the
+*detected browser* direction — so a calendar nobody had configured stamped `dir="ltr"` on itself and
+overrode the `dir="rtl"` it was rendered into, stopping an ancestor's direction from cascading at all.
+This shipped and was reverted; only the consumer's `dir` **prop** is written now. Both references draw
+the same line (`useCalendarGrid` puts no `dir` in `gridProps`) — see *Reading direction* above, and
+`__internal__/primitives/internal/create-text-direction-warning.md` for the dev warning that covers
+the under-declared-app case instead.
+
+### A commit-time guard for contiguous ranges
+**Why not:** it stops the *second click* from committing across an unavailable day but leaves the
+arrows free to cross one, so the tentative band previews a range with a hole punched in it — the paint
+guard cuts those days out, which makes the hole visible rather than preventing it. Narrowing the
+calendar's own `min`/`max` around the anchor instead means every downstream predicate (`isCellDisabled`
+→ `isDateNonFocusable`, `isDateSelectable`, the cursor clamp) inherits the constraint for free. See
+*Contiguous ranges* above.
+
+### React Aria's `previousAvailableDate` back-off in `activate`
+**Why not:** it turns the refusal of an out-of-range or unavailable day into a silent selection of a
+*neighbouring* day. Only the anchored-run narrowing is clamped away here; with no anchored run the
+date passes through untouched and activating a day the calendar refuses stays an outright refusal.
+
+### Narrowing the bounds on `anchorDate` alone
+**Why not:** nothing clears `anchorDate` when `selectionMode` changes, so a stale anchor would keep the
+bounds clamped for good — inert cells and dead `prev`/`next` in a mode that has no ranges at all. The
+narrowing is gated on `mode() === "range"`.
+
+### The degenerate `{date, date}` write on the first activate
+**Why not:** a controlled consumer then holds a value its owner was never told about, for the whole
+duration of a range selection. It was kept for a while because it gave the anchor its solid pill under
+the tentative band; the band now derives that from `highlightedRange`'s one-day phase, and dropping the
+write collapsed `valueBeforeAnchor`, `clearAnchor`'s restore, `clearSelection`'s `lastEmitted` dance
+and `formValues`' mid-selection guard along with it. See *`value` is written on exactly one
+transition* above.
+
+### `availableRange` as a plain accessor
+**Why not:** `min`/`max` are read twice per cell per predicate, and each read walks up to a month of
+days through the consumer's `isDateDisabled` — tens of thousands of callbacks per pointer move once
+unavailable days are sparse. It is the one `createMemo` among these accessors, at the measured price of
+shifting every `_hk` in the SSR tree by one (hence the re-recorded inline snapshot). Its neighbours
+`highlightedRange` and `formValues` do no such walking and stay plain, hydration-neutral accessors.

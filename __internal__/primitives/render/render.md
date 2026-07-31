@@ -25,26 +25,6 @@ function renderElement<Props extends object, El extends Element = Element>(optio
 - `ref` — an optional component-internal ref setter, merged with any `ref` the consumer put
   on `props`.
 
-## `render` is a function, never an element
-
-An earlier version accepted `JSX.Element | ((props) => JSX.Element)`. The element form was
-a trap: by the time a Solid JSX element reaches `renderElement` it is an already-constructed
-DOM node. There is no `cloneElement`, and no way to inject props into it after the fact — so
-the element branch could only *discard* every computed prop.
-
-```tsx
-// Used to type-check, render, and produce a button with no onClick, no aria-expanded,
-// and no aria-controls. The dialog never opened. No error anywhere.
-<Dialog.Trigger render={<MyButton />} />
-```
-
-Requiring a function makes the prop flow visible at the call site, and makes the broken
-version unrepresentable:
-
-```tsx
-<Dialog.Trigger render={(props) => <MyButton {...props} />} />
-```
-
 ## Ref merging
 
 `renderElement` owns it. Pass the component's internal ref setter as `ref`; any consumer
@@ -65,11 +45,9 @@ consumer `ref` into a **single function ref**, and inside that callback delegate
 falsy-skip to `@solidjs/web`'s `applyRef` (`applyRef([internalRef, consumerRef], element)`) — so
 an absent consumer ref, or a consumer ref that is itself an array, costs nothing.
 
-Exposing the merge as one function (rather than handing the raw array `[internalRef, consumerRef]`
-to whatever `render` returns) is what makes it work with **any** render target. A host element's
-compiler flattens an array ref for you, but a consumer *component* that reads `props.ref` itself —
-like TanStack Router's `Link`, which does `if (typeof r === "function") r(el)` — silently drops a
-non-function ref. A single function satisfies that near-universal guard.
+Exposing the merge as **one function** is what makes it work with any render target — a host
+element, a component honouring a plain function ref, and a component that composes refs itself.
+See *Handing the render target the raw ref array* below for the shape this replaced.
 
 The consumer's `ref` is read *inside* the merged callback, not eagerly in the component body, so
 the read lands in the render target's ref-handling effect (an eager read would be an untracked prop
@@ -99,3 +77,55 @@ renderElement({
   render: (p) => <a href="#" {...(p as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} />,
 });
 ```
+
+## Rejected alternatives
+
+### `RenderProp` accepting an already-built `JSX.Element`
+**Why not:** the first version typed it `JSX.Element | ((props) => JSX.Element)`, and the element
+branch could only ever *discard* every computed prop — by the time a Solid JSX element reaches
+`renderElement` it is an already-constructed DOM node, and there is no `cloneElement` to inject
+props into it after the fact.
+
+```tsx
+// Used to type-check, render, and produce a button with no onClick, no aria-expanded,
+// and no aria-controls. The dialog never opened. No error anywhere.
+<Dialog.Trigger render={<MyButton />} />
+```
+
+Requiring a function makes the prop flow visible at the call site, and the broken version
+unrepresentable:
+
+```tsx
+<Dialog.Trigger render={(props) => <MyButton {...props} />} />
+```
+
+### Handing the render target the raw ref array `[internalRef, consumerRef]`
+**Why not:** only host elements honour it, because their compiler flattens an array ref through
+`applyRef`. A consumer *component* that reads `props.ref` itself and guards
+`if (typeof r === "function") r(el)` — TanStack Router's `Link`, and most libraries — drops a
+non-function ref silently, so both refs die and `render` cannot wrap arbitrary components. Pinned by
+*"merges refs onto a component that only honours function refs (TanStack `Link` shape)"*.
+
+### A `mergeRefs` utility (hand-rolled, or `@solid-primitives/refs`)
+**Why not:** `@solidjs/web`'s `applyRef` already flattens ref arrays and skips falsy entries (pinned
+in `solid-contract.browser.test.tsx`, whose header names this as the reason no `mergeRefs` helper
+is needed), so the whole merge is one callback inside `renderElement` — and a per-component copy
+(Dialog carried one until `renderElement` took ownership) puts the single-function-ref rule above
+in as many places as there are parts.
+**Revisit if:** `renderElement`'s prop merge grows enough to adopt `@solid-primitives/props`'
+`combineProps` — `mergeRefs` is recorded as a future consideration alongside it in
+`__internal__/solid-primitives-eval.md`.
+
+### `Polymorphic<T>` / `PolymorphicProps<T>` generic `as`-prop machinery
+**Why not:** typing one props interface as simultaneously correct for arbitrary target elements
+means threading a generic type parameter through every component, which is a known type-DX pain
+point the moment a consumer wraps those components in their own polymorphic layer —
+`__internal__/plan.md` lists it among the failure modes this architecture exists to prevent. The
+price paid instead is an explicit assertion at cross-element `render` boundaries; see *Known
+limitation: cross-element `render` typing* above.
+
+### A port of Base UI's `useRender` implementation
+**Why not:** its memoization and `forwardRef` machinery is React re-render bookkeeping with no
+counterpart here — Solid components run once, and refs merge without a forwarding dance. Only the
+*idea* (one shared hook owning render-prop composition) is taken; the React implementation would be
+carried in and immediately reversed out.

@@ -192,3 +192,39 @@ focus-scope stack on a server), while `createRegisteredId` uses `onSettled`,
 which never runs on the server. So nothing here needs an `isServer` branch. Because
 `createRegisteredId` does not run server-side, a consumer `id` is not registered during SSR; the
 server-visible value is `createPopover`'s generated `popupId` fallback.
+
+## Rejected alternatives
+
+### A `createPresence` created inside this hook
+**Why not:** this part mounts lazily, only once open, so its own presence would see `present` already
+`true` on its first run and latch straight to `entered` — the popover would have no enter animation at
+all. The root creates one eagerly while `open` is still `false`, and both this part and the Positioner
+reflect it. See *Reflects the shared presence; does not create one* above.
+
+### Keying `createAutoFocus` on `open` alone
+**Why not:** until the first measurement lands the layer sits inside a `visibility: hidden` subtree, and
+such an element is not focusable — `.focus()` is a silent no-op, so focus stays on the trigger for good,
+because the effect's dependencies never change again. Verified against the installed Chromium. See
+*Autofocus is gated on `isPositioned`, not on `open` alone* above.
+
+### Base UI's `opacity: 0` pre-positioning, which would need no autofocus gate
+**Why not:** an `opacity: 0` layer stays hit-testable, so an unmeasured card would swallow clicks meant
+for the page beneath it. The kernel hides the pre-positioned layer with `visibility` instead
+([`create-floating.md`](../internal/create-floating.md)), which is why the gate lives in this part rather
+than in the positioning layer.
+
+### Registering the focus scope after `createAutoFocus`
+**Why not:** the `focusin` that `.focus()` dispatches synchronously reaches an enclosing modal's focus
+trap while the trap still knows nothing about this layer, so the trap yanks focus back to its own first
+focusable and `closeOnFocusOutside` reads that as focus leaving — measured as a popover that closed about
+3ms after it opened, with no error anywhere. See *The effect stack, in creation order* above.
+
+### `aria-modal="false"` on the popup
+**Why not:** the attribute describes a dialog that *chose* not to be modal right now, so it advertises to
+assistive technology a modality this layer can never have — it never traps focus, locks scroll, hides the
+page or blocks the pointer. Absence describes one that never was.
+
+### Computed `aria-labelledby`/`aria-describedby` that overwrite the consumer's
+**Why not:** `merge` gives the last source precedence and treats a getter returning `undefined` as a real
+value, so a bare `get "aria-labelledby"()` erases a consumer's own value whenever no Title is mounted —
+leaving a `role="dialog"` surface with no accessible name, which is an axe `aria-dialog-name` violation.

@@ -121,3 +121,42 @@ Element registration runs in an effect, which never runs server-side, so `elemen
 for every row during SSR. Everything else is a pure data read and **does** render: the row's `id`, its
 `aria-selected`, its `aria-disabled` and its `tabindex` are all correct in the server HTML, because the
 source knows the whole option set without the DOM. Hydration then wires the behavior on the client.
+
+## Rejected alternatives
+
+### `value`, `textValue` and `disabled` as props on the row
+
+**Why not:** the row would re-declare what the root already knows, and only from the moment it
+mounts — so a closed popup or an offscreen virtual row has no text for typeahead to match against
+and no disabled state for navigation to skip. All three come from `Listbox.Root`'s `itemToValue` /
+`itemToLabel` / `isItemDisabled`, which answer before any row exists.
+
+### A consumer-settable `id`
+
+**Why not:** the row's `id` is the `aria-activedescendant` IDREF, generated per row by the source
+(`createItemIds`). A consumer's own id breaks that reference silently — nothing throws, nothing
+fails a test, and only screen-reader users see the result. Every *other* native attribute is
+forwarded.
+
+### Clearing the row's slot by index (`unregisterElement(index)`)
+
+**Why not:** `<For>` keys by identity, so a reorder moves rows and every moved row re-registers in
+sequence; a row clearing its old index cannot tell that another row already claimed it, because a
+signal write is not visible to a plain read until the next flush. Measured on a four-row reverse:
+`del(0) set(3) del(1) set(2) del(2) set(1) del(3) set(0)` left two positions with no `element()` at
+all — no error, just rows `aria-activedescendant` can never point at and scroll-into-view can never
+reach. The teardown addresses the *element*; see *Registration* above.
+
+### `createRegisteredElement` for the row's element registration
+
+**Why not:** its `register` callback runs in an effect *body*, and in data mode the row's index is a
+memo read there — an untracked read of a reactive value, i.e. `[STRICT_READ_UNTRACKED]`, which
+`mount()` fails the test on. Tracking the index alongside the ref in the effect's `compute` is also
+what makes a row that changes position re-register under its new index.
+
+### Scrolling the active row into view on every activation
+
+**Why not:** on `onPointerMove` the row is already under the cursor, so scrolling to it slides the
+list and hands the highlight to whatever ends up beneath the pointer. That one path passes
+`{ scroll: false }`; click and focus keep the default, where `"nearest"` is a no-op for a row that
+is already visible.

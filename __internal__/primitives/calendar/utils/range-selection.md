@@ -54,3 +54,30 @@ only the anchor and that endpoint, and `highlightedRange` returns `null` when no
 nothing is committed, or when the anchor is set but the endpoint is missing.
 
 Ranges are always ordered (`start <= end`). Ported verbatim from the Angular calendar.
+
+## Rejected alternatives
+
+### Two coexisting bands (a committed range plus a separate tentative one)
+**Why not:** two bands need two attribute vocabularies — `data-range-*` alongside
+`data-highlighted{,-start,-end}` — and a cell carrying a "start" answers nothing about *which* band it
+starts, so the preset had to cascade both. Collapsing to React Aria's single `highlightedRange` (one
+field, two phases) leaves one vocabulary and one derived middle; the accepted cost is the one named in
+*The one-band model* above — a range being dragged hides the previously committed one, exactly as RA
+does.
+
+### Writing `value` on the anchoring first activate (a degenerate `{ date, date }` range)
+**Why not:** a controlled consumer then holds a one-day range its owner was never told about, for the
+whole duration of the selection. It also forced a `valueBeforeAnchor` snapshot, a restore inside
+`clearAnchor`, a `lastEmitted` dance in `clearSelection` and a mid-selection guard in `formValues` —
+all of which collapsed once the write moved to the completing activate. The affordance it provided
+(the first click visibly doing *something* from the keyboard) is now `focusNearestAvailableDate`'s
+cursor advance instead.
+
+### An independent hover signal for the moving endpoint (`highlightEnd`)
+**Why not:** one endpoint too many, and it produced four defects at once — the keyboard previewed
+nothing (arrowing from an anchor left `highlightedRange()` null), a hover that predated the anchor
+froze a band that actively lied about what the next click would commit, `pointerleave` erased a band
+the anchor still owned, and hovering an outside-month or unavailable day previewed a range the matching
+click refuses. Deriving the band from the roving cursor makes hover and keyboard one code path that
+cannot disagree, at React Aria's accepted side effect: while anchored, hovering moves the roving tab
+stop.

@@ -103,3 +103,21 @@ navigation target and pass it explicitly:
 
 Pure reactive state; the only effect is the follow-focus one, which never runs server-side. Safe to
 create during SSR — `value()` reports the default until the client takes over.
+
+## Rejected alternatives
+
+### `compareWith` / `compareByIdOrReference` (the Angular-idiom equality default)
+**Why not:** it compares two values directly, so it cannot be fed by the `itemToValue` a consumer has
+*already* declared for the selection identity and for the string a form submits — `createListbox` would
+carry one rule for equality and a second for its value model, free to disagree. Base UI's
+`itemToValue` + `isItemEqualToValue` express both from one mapping, and the swap landed while this
+primitive still had no consumer, so it cost no migration. `compareByIdOrReference` survives for
+[`createListExpansion`](create-list-expansion.md), which has no value model.
+
+### Expressing `setValue` item-wise (`deselectAll()`, then N × `select(item)`)
+**Why not:** a SolidJS 2.0 signal write is not visible to a plain read until the next flush, so every
+`select()` in the sequence reads the pre-write value and only the last one survives. A native control
+hands back an arbitrary set in a single gesture — `HiddenSelect`'s `<select>` changing under autofill,
+and its form-reset restore — so that set has to land in **one** write. Every other mutator stays
+item-wise, which is what keeps selection and focus talking about the same rows; see *`setValue` — the
+one mutation that isn't item-wise* above.

@@ -157,3 +157,45 @@ Attribute and style computation only — no DOM access, no effects. Before the f
 `arrow()` is `undefined`, so the server emits `left`/`top` absent, the pin on `top`, and
 `data-uncentered=""`; the client's first render computes the same, which is what hydration compares.
 `data-side`/`data-align` seed from the config exactly as the Positioner's do.
+
+## Rejected alternatives
+
+### Gating the arrow element on `state.floating.arrow()`
+**Why not:** no element means no `arrowElement` in `createFloating`'s config, so the `arrow` middleware
+never runs and `arrow()` stays `undefined` forever. A genuine deadlock, not a slow start: with the gate
+applied in the test harness, every `vi.waitFor` on `arrow()` ran to its full timeout. See *Render the
+element unconditionally* above.
+
+### Emitting the pin edge as `data-side`
+**Why not:** both values are legal `Side`s, so nothing fails — the card and its arrow simply style off
+opposite vocabularies, and one variant can no longer dress both coherently. The pin edge stays in the
+inline style, off `arrow().side`.
+
+### A measured arrow size — a `size` option on the hook, or reading the property back
+**Why not:** reading it back costs an effect, a resize observer and a re-render to arrive at a number CSS
+already has, and an option moves a value the recipe owns into JS as a second source of truth. The pin
+stays a CSS string over `--popover-arrow-size`, with an `8px` fallback for a headless consumer.
+
+### `--hope-popover-arrow-size` — the property's original name
+**Why not:** `check:recipe-purity` rejects any bracketed arbitrary value naming `--hope-`, so
+`[--hope-popover-arrow-size:0.5rem]` in the `arrow` slot is a purity violation. No preset recipe could
+have set the property at all, and "the size stays owned by the recipe" would have meant every preset
+hard-coding a box size that must happen to match the fallback.
+
+### Baking the border compensation into `PIN_OFFSET`
+**Why not:** a `- 1px` term hard-codes one preset's border width for every headless consumer, including
+those drawing no border at all, whose arrow would then sit a hairline off the popup's edge. The kernel
+keeps the border-agnostic pin and the layer that authors the border cancels it. See *The pin offset is a
+CSS string, never a measured number* above.
+
+### Logical border utilities (`border-s`/`border-e`) on the bordered arrow
+**Why not:** which two edges of a 45°-rotated square face outward follows from the rotation and from
+`data-side`, which reports *measured* geometry — identically in `ltr` and `rtl`. A pair that mirrored
+under `dir="rtl"` would break the adjacency invariant and paint a chevron pointing back into the card,
+and nothing automated would catch it (the browser test project compiles no Tailwind). Both halves of the
+RTL gate exempt `data-side-*`-scoped utilities for exactly this case (`MEASURED_SIDE_SCOPED`).
+
+### `shadow-md` (a `box-shadow`) for the card's elevation
+**Why not:** a `box-shadow` paints in the card's own background layer, beneath its positioned
+descendants, so the arrow covers it and casts none of its own. `drop-shadow-md` derives from the rendered
+subtree's alpha and traces the card ∪ arrow silhouette instead.

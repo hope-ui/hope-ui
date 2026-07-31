@@ -152,3 +152,37 @@ function Dialog(props: { open: boolean }) {
   );
 }
 ```
+
+## Rejected alternatives
+
+### `container.contains(target)` as the `focusin` handler's outside test
+
+**Why not:** A `Popover` opened inside a modal `Dialog` portals its card to `<body>`, so `contains`
+is `false` for everything in it. This listener then reads autofocus landing in the popover as focus
+escaping and pulls it back to the dialog's first focusable — and the popover's `closeOnFocusOutside`
+reads *that* as focus leaving and closes the layer. Measured at roughly three milliseconds, with no
+error anywhere; the `InsideADialog` story hid it behind `closeOnFocusOutside={false}` until
+[`createFocusScope`](create-focus-scope.md) landed (`2a40b14`). See *A trap is not the outermost
+thing in the page* above.
+
+### One combined focus-scope primitive (React Aria's `FocusScope`, `@solid-primitives/focus`)
+
+**Why not:** Both bundle contain + restore + autofocus into one unit, and every welding of two of
+those three has cost this repo a bug. Restore inside the trap stranded a non-modal Dialog's focus on
+`<body>` after Escape (`create-focus-restore.md`); autofocus inside the trap left Popover with no way
+to move focus in without the cage (`create-auto-focus.md`). Splitting also lets the trap re-query
+focusables live per `Tab`, so it needs no `MutationObserver` the way
+`@solid-primitives/focus/createFocusTrap` does. The trap composes the three it needs, in an order
+that is itself load-bearing.
+
+### A container `ref` closed over as a plain `let`
+
+**Why not:** When the container lives behind a `<Show>` gated on the same signal `active` derives
+from, a `let` reads `undefined` on the activating edge and is never re-read — `active`, the only
+other dependency, does not change again — so the trap never arms. The primitive tracks `ref()` in
+its `compute` function instead, which only works for a real `createSignal` accessor. This is the
+kernel-wide rule ([`createAutoFocus`](create-auto-focus.md),
+[`createDismissable`](create-dismissable.md), [`createFocusScope`](create-focus-scope.md) and
+[`createRegisteredElement`](create-registered-element.md) all point here): the symptom is silence,
+and a primitive's own isolated tests, which render the container unconditionally, never catch it
+(`e4fd91b`).

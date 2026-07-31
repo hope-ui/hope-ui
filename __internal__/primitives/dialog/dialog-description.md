@@ -13,3 +13,7 @@ Mirrors [`createDialogTitle`](dialog-title.md): resolves `props.id` to a generat
 `createUniqueId` when unset and registers it on the popup's `aria-describedby` via
 `createRegisteredId`. **Call from the description's own owner scope.** Returns the element `props`
 (carrying the resolved `id`).
+
+<!-- no-rejected-alternatives: mirrors createDialogTitle exactly; dialog-title.md owns the contested
+id-resolution decision, and create-registered-id.md the deferred ancestor-signal write -->
+

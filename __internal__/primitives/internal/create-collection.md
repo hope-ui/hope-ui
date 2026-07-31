@@ -128,3 +128,32 @@ function Option(props: { value: string }) {
   );
 }
 ```
+
+## Rejected alternatives
+
+### `createRegisteredElement` alone as the item source
+**Why not:** it publishes a descendant's element upward but returns no collection and promises no
+order — registration order is `createEffect`-creation order, so an `<Show>`-gated option that mounts
+ahead of its siblings registers ahead of them, and both `ArrowDown` and a screen reader would then
+follow registration order rather than rendered order. Sorting by `compareDocumentPosition` is the one
+thing this primitive adds; see *Why this is a primitive* above.
+
+### Retiring a row's element by the index it registered under
+**Why not:** measured on a four-row reverse. `<For>` keys by identity, so a reorder *moves* rows and
+each moved row re-registers in sequence — `del(0) set(3) del(1) set(2) del(2) set(1) del(3) set(0)` —
+and a teardown addressed by index deletes a slot another row has already claimed, which it cannot see
+because a signal write is not visible to a plain read until the next flush. Two positions were left
+with **no `element()` at all**: no error, no failing type, just rows `aria-activedescendant` can never
+point at and scroll-into-view can never reach. See *Registration is by index; retirement is by
+element* above.
+
+### A `scrollIndexIntoView` on `createCollection`
+**Why not:** `roadmap.md` still lists one as a Select blocker, but the gap it names is the
+activedescendant one, which the data-driven sources close. `createCollection`'s one remaining consumer
+is Calendar's roving grid, where the deferred native `.focus()` already scrolls — and in roving mode
+asking the source *as well* lands a second, coarser scroll on top of the browser's exact one one frame
+later (measured at 6px of the active row clipped in the virtualized listbox, the source aligning
+against the border box while the port excludes the border and the padding). See `create-list-focus.md`
+§ *Scrolling the active row into view*.
+**Revisit if:** a mounted, non-virtualized collection ever drives an activedescendant widget — nothing
+would then move DOM focus, and this source would owe the reveal itself.

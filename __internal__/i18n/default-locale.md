@@ -60,3 +60,33 @@ function createDefaultLocale(): { locale: () => string; direction: () => Directi
 
 Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). See the CLAUDE.md
 i18n provenance note.
+
+## Rejected alternatives
+
+### Reading the detected locale at module load (the original React Spectrum shape)
+**Why not:** hydration reuses the server's DOM rather than re-deriving it, so a client reporting its
+own locale during the pass leaves markup contradicting its own state — no console warning, no
+replaced node. It shipped that way once: a prerendered `en-US` calendar hydrated by a `fr-FR`
+visitor had every cell one day out of step with the model, so clicking "20" selected the 21st. See
+*SSR / hydration* above for the gate that replaced it.
+
+### Seeding `en-US` unconditionally and adopting the detected locale in `onSettled`
+**Why not:** the shape this file carried before the gate. With no hydration pass there is no
+server markup to match, so a client-only app rendered an `en-US` placeholder and replaced it a tick
+later — a flash and a re-render bought for a mismatch that could not occur. Gating on
+`sharedConfig.hydrating` narrows the placeholder to exactly the window that needs it.
+
+### A plain snapshot in the registry, fanned out to per-consumer signals
+**Why not:** also the pre-gate shape — `createDefaultLocale` allocated a signal, a memo, an
+`onSettled` and a teardown *per consumer*, and `updateLocale` walked a listener set to notify them.
+That made it need a reactive owner, so the module-scope no-provider context default could not read
+it and ran a second, ungated code path instead. Holding the locale as a signal in the registry lets
+every consumer read it directly: one write on `languagechange` notifies all of them, and the
+listener needs no reference counting to decide when to detach.
+
+### Importing `sharedConfig` from `@solidjs/web`
+**Why not:** `@solidjs/web` re-exports it in its *types* but not in its runtime bundle, so the
+import type-checks and then fails at load. `solid-js` is the only specifier that resolves in both
+builds. The flag is an undocumented Solid internal either way (1.x spelled it
+`sharedConfig.context`), which is why it is pinned by a characterization test in
+`solid-contract.browser.test.tsx`.

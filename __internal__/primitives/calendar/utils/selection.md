@@ -64,3 +64,17 @@ change is sanctioned churn, not an accident.
 The three strategy singletons live beside this module (`single-selection.ts`, `range-selection.ts`,
 `multiple-selection.ts`) and `import type` the contract from here. Ported verbatim from the Angular
 calendar.
+
+## Rejected alternatives
+
+### A standalone `types.ts` for the shared selection types
+**Why not:** a type-only module is still a source file to `pnpm check:coverage-parity`, which would
+then demand its own test *and* usage doc for a file with no runtime behavior. Keeping the types in this
+barrel costs nothing instead: the strategies `import type` them from here, and a type import is erased,
+so this module can import the strategy singletons back without a runtime cycle.
+
+### `select` returning a full `SelectionState`
+**Why not:** it would let a strategy write the calendar's roving cursor, which is the calendar's to
+move — the cursor is an *input* to the pure predicates, not an output of a transition. `SelectionResult`
+is `Pick<SelectionState, "value" | "anchor">` precisely so that an `endpoint` write is unrepresentable
+rather than merely discouraged.

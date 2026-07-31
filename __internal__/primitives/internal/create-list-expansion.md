@@ -56,3 +56,13 @@ Disabled items (`isExpandable` false) refuse `expand`, and `expandAll` skips the
 
 Pure reactive state, no effects and no DOM access. `expandedValues()` reflects `defaultValue`
 during SSR, so server markup can render the initially-open panels and hydrate cleanly.
+
+## Rejected alternatives
+
+### Injecting one `createListFocus`, the shape every sibling behavior takes
+**Why not:** expansion is orthogonal to focus — a Tree node moves focus with the arrow keys
+(navigation) and opens or closes with Right/Left or Enter (expansion), independently — so routing
+expansion through the focus instance would tie an item's open state to whether it is the active one.
+It reads only `value` and `disabled` off the items it is given, so any `ItemSource`'s items work and a
+widget with no active item at all (a Disclosure) needs no focus manager to hold expansion state.
+`plan.md` still describes this primitive as injecting one; the implementation is the record.

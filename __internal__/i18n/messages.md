@@ -57,3 +57,19 @@ Resolution (overlay → catalog → key) lives in `translate.ts`; see `translate
 `messages.test.ts` (unit) covers the shared `interpolate`. Each catalog is tested beside its file:
 `locales/en.test.ts` (frozen English values + English plural rule) and `locales/fr.test.ts` (en/fr
 **key parity** + French values + the `count <= 1` plural rule).
+
+## Rejected alternatives
+
+### One shared plural template across locales
+**Why not:** no single template spans the rules the shipped catalogs need — English is singular only
+at `1`, French treats `count <= 1` as singular, Polish has three forms and Arabic the full six CLDR
+cardinal categories. Count-bearing entries are per-locale functions instead; see *Plurals are
+functions* above, and `locales/pl.md` / `locales/ar.md` for the two widest rules.
+
+### Per-component message-override props (the calendar's `CalendarMessages` dictionary)
+**Why not:** the pre-port shape, and the reason this contract exists. Strings were English-only
+defaults overridden per instance, so localizing hope-ui meant handing a translated dictionary to
+every component that rendered one, and no locale ever selected between them — zero-config
+localization was impossible. The dictionary existed only so the calendar could keep the memoizing
+`@solid-primitives/i18n` translator out of its render path; `t("calendar.*")` replaced both in one
+change (`6b070d1`).
