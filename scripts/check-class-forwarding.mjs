@@ -36,27 +36,15 @@
 // The named escape hatch is a `class-forwarding-ok: <reason>` comment on the offending line, or
 // anywhere in the comment block directly above the getter — for an element that genuinely has no
 // consumer (`CalendarCell` is built by `Calendar.Grid` from a model, never written in JSX).
+//
+// The rule's own logic lives in `lib/class-forwarding.mjs` — this file is an executable that walks
+// the repo and exits, so the rule had to move out of it to be testable on its own.
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { blankNonCode, lineAt } from "./lib/source-projection.mjs";
+import { classForwardingViolations } from "./lib/class-forwarding.mjs";
 
 const SCAN_ROOT = "packages/components/src";
-const EXEMPTION = "class-forwarding-ok:";
-
-/** A `get class()` getter body — single-expression in this codebase, so it holds no nested brace. */
-const CLASS_GETTER = /get\s+class\s*\([^)]*\)[^{]*\{([^}]*)\}/g;
-/** A slot call with an empty argument list: `ctx.slots.icon()` / `slots.root()`. */
-const SLOT_CALL_WITHOUT_CLASS = /\bslots\.([A-Za-z_]\w*)\(\s*\)/g;
-/**
- * An `omit(…)` call, matched on the CODE projection so a comment describing one is not a call. The
- * argument list is then re-read from the original source at the same offsets: the projection blanks
- * string *interiors*, so `"class"` is invisible in it — the very reason this check reads both.
- */
-const OMIT_CALL = /\bomit\s*\(([^)]*)\)/g;
-const CLASS_ARGUMENT = /["']class["']/;
-/** Any read of the consumer's class, however it is spelled (`props.class`, `merged.class`). */
-const READS_CONSUMER_CLASS = /\b(?:props|merged)\.class\b/;
 
 const violations = [];
 
@@ -70,81 +58,10 @@ function walk(directory) {
   });
 }
 
-/**
- * Exempt when the marker is on the offending line itself, or anywhere in the comment block directly
- * above `blockStartLine` — the getter the call sits in. Walking the comment block (rather than a
- * fixed one-line lookback) is what lets the reason be written at the length it needs, which for these
- * is a sentence about why the element has no consumer.
- */
-function isExempt(sourceLines, lineNumber, blockStartLine = lineNumber) {
-  if ((sourceLines[lineNumber - 1] ?? "").includes(EXEMPTION)) {
-    return true;
-  }
-  for (let line = blockStartLine - 1; line >= 1; line--) {
-    const text = (sourceLines[line - 1] ?? "").trim();
-    if (!text.startsWith("//") && !text.startsWith("*") && !text.startsWith("/*")) {
-      return false;
-    }
-    if (text.includes(EXEMPTION)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function checkFile(path) {
-  const source = readFileSync(path, "utf8");
-  const sourceLines = source.split("\n");
-  // Comments and strings become blanks, so this header — which spells out the forbidden call — and
-  // any doc comment naming it cannot trip the check.
-  const code = blankNonCode(source);
-
-  CLASS_GETTER.lastIndex = 0;
-  for (const getter of code.matchAll(CLASS_GETTER)) {
-    const body = getter[1];
-    const bodyOffset = getter.index + getter[0].indexOf(body);
-    const getterLine = lineAt(code, getter.index);
-    SLOT_CALL_WITHOUT_CLASS.lastIndex = 0;
-    for (const call of body.matchAll(SLOT_CALL_WITHOUT_CLASS)) {
-      const line = lineAt(code, bodyOffset + call.index);
-      if (isExempt(sourceLines, line, getterLine)) {
-        continue;
-      }
-      violations.push(
-        `${path}:${line} — \`slots.${call[1]}()\` in a \`get class()\` drops the consumer's ` +
-          `class; pass it: \`slots.${call[1]}(props.class)\``,
-      );
-    }
-  }
-
-  // The other half of the same failure, and the one no getter reveals: a part that removes `class`
-  // from what it forwards and then never puts it back. `omit` is how a part hands the rest to a
-  // primitive hook, so dropping the key there with no matching read means the class reaches neither
-  // the hook nor the element — and the part may render no `get class()` at all (`Dialog.Trigger`
-  // carries no recipe slot), which is exactly the case the getter rule above cannot see.
-  if (READS_CONSUMER_CLASS.test(code)) {
-    return;
-  }
-  OMIT_CALL.lastIndex = 0;
-  for (const omitCall of code.matchAll(OMIT_CALL)) {
-    const argumentsStart = omitCall.index + omitCall[0].indexOf(omitCall[1]);
-    const originalArguments = source.slice(argumentsStart, argumentsStart + omitCall[1].length);
-    if (!CLASS_ARGUMENT.test(originalArguments)) {
-      continue;
-    }
-    const line = lineAt(code, omitCall.index);
-    if (isExempt(sourceLines, line)) {
-      continue;
-    }
-    violations.push(
-      `${path}:${line} — omits "class" from the forwarded props but never reads ` +
-        "`props.class`/`merged.class`, so the consumer's class reaches nothing",
-    );
-  }
-}
-
 for (const path of walk(SCAN_ROOT)) {
-  checkFile(path);
+  for (const violation of classForwardingViolations(readFileSync(path, "utf8"))) {
+    violations.push(`${path}:${violation.line} — ${violation.message}`);
+  }
 }
 
 if (violations.length > 0) {

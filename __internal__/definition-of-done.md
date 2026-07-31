@@ -241,11 +241,12 @@ of `blankNonCode`), so a doc can *show* the heading or the hatch in an example w
 satisfying the rule — as this file and `CLAUDE.md` both do.
 
 The rule lives in `scripts/lib/rejected-alternatives.mjs`, not in the check script, and is pinned by
-`scripts/lib/__tests__/rejected-alternatives.test.mjs`. It is the one check script carrying a test,
-because it is the one whose regressions are **silent**: every loophole here — a stub section, an
-entry with no consequence, a one-word hatch, a heading shown inside a fence — leaves a doc that
-reads as though it records its history while recording nothing. `check-class-forwarding` and
-`check-rtl-safety` fail loudly when they break; this one would just stop asking.
+`scripts/lib/__tests__/rejected-alternatives.test.mjs` — as is every other rule enforced on this
+page. All four checks are structured that way (executable walks; `scripts/lib/` decides) and all
+four carry tests, because what they guard fails **silently**: a stub section reads as recorded
+history while recording nothing, a physical `pr-8` mis-paints for every RTL reader, a dropped
+`class` type-checks and passes the suite. If the *checker* regresses, nothing says so. How to write
+one: `__internal__/testing.md` § *Testing a check script*.
 
 The check is keyed off the **doc tree**, not off `REQUIRES_DOC`. A `packages/primitives/src/internal/`
 file is doc-*exempt* (item 2's exception) — but the docs written there anyway are the longest and

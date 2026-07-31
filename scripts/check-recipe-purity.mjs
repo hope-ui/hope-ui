@@ -18,9 +18,12 @@
 // comments (incl. this file's own doc examples and a recipe's header comment mentioning `color-mix`),
 // and regex literals are blanked first, leaving offsets intact for line-accurate reporting. Both
 // projections live in `scripts/lib/source-projection.mjs`.
+//
+// The pattern table and the per-file scan live in `scripts/lib/recipe-purity.mjs` so they can be
+// tested without running this walk; what stays here is the filesystem half.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { lineAt, stringInteriors } from "./lib/source-projection.mjs";
+import { recipePurityViolations } from "./lib/recipe-purity.mjs";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
 // Per the redesign spec, purity is a rule about the concrete preset recipes only.
@@ -60,32 +63,6 @@ function isRecipeSourceFile(path) {
   return SOURCE_EXTENSIONS.has(ext);
 }
 
-// The forbidden shapes, each a global regex over the string-literal projection. `opacity-0` and
-// `opacity-100` (full transparent / opaque) are legitimate layout, so the magic-opacity pattern only
-// matches 1–99; the `opacity-*` *tokens* (`opacity-disabled`) never match — they have no digits.
-const PATTERNS = [
-  {
-    label: "color-mix()",
-    re: /color-mix\s*\(/g,
-    hint: "author the derived color as a token in theme.css (the scrim/focus-halo precedent)",
-  },
-  {
-    label: "arbitrary value referencing --hope-* or color-mix",
-    re: /\[[^\]]*(?:--hope-|color-mix)[^\]]*\]/g,
-    hint: "reference a finished token utility instead of an arbitrary value",
-  },
-  {
-    label: "alpha modifier on a color utility",
-    re: /\b(?:bg|text|border|ring|outline|fill|stroke|shadow|decoration|accent|caret|divide|from|via|to)-[\w-]+\/\d{1,3}\b/g,
-    hint: "author the translucent color as its own token (e.g. focus-halo) — do not mix it in the recipe",
-  },
-  {
-    label: "magic opacity utility",
-    re: /\bopacity-(?:[1-9]|[1-9]\d)\b/g,
-    hint: "use an opacity-* token (opacity-disabled / opacity-loading); opacity-0 and opacity-100 are allowed",
-  },
-];
-
 let recipeFiles;
 try {
   recipeFiles = walk(scanRoot).filter(isRecipeSourceFile);
@@ -98,16 +75,9 @@ try {
 const violations = [];
 
 for (const file of recipeFiles) {
-  const source = readFileSync(file, "utf8");
-  const classText = stringInteriors(source);
   const relPath = relative(repoRoot, file);
-
-  for (const { label, re, hint } of PATTERNS) {
-    re.lastIndex = 0;
-    for (const match of classText.matchAll(re)) {
-      const line = lineAt(classText, match.index);
-      violations.push(`${relPath}:${line} — ${label}: "${match[0]}" — ${hint}`);
-    }
+  for (const { line, message } of recipePurityViolations(readFileSync(file, "utf8"))) {
+    violations.push(`${relPath}:${line} — ${message}`);
   }
 }
 

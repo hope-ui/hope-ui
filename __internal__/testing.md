@@ -22,10 +22,40 @@ Foo.browser.test.ts(x)  → browser
 
 The `unit` project also picks up `scripts/**/*.test.mjs` — the check scripts' own tests, which need
 no solid, no DOM and no aliases, so they want exactly what `unit` already is rather than a fourth
-project. A check script is an executable that walks the repo and exits, so the rule under test has
-to live in `scripts/lib/` to be importable: `lib/rejected-alternatives.mjs` is the worked example,
-alongside the older `lib/source-projection.mjs`. Note that the Definition of Done does **not** reach
-`scripts/` — a check script is tested when its failure mode is silent acceptance, not by rule.
+project.
+
+## Testing a check script
+
+A check script is an executable: it walks the repo, prints, and calls `process.exit`. Importing one
+to reach a single function runs the whole check, so **the rule moves into `scripts/lib/` and the
+executable keeps only the walk, the path prefixing and the exit.** Every rule now lives that way:
+
+| Rule | Executable |
+|---|---|
+| `lib/rejected-alternatives.mjs` | `check-coverage-parity.mjs` |
+| `lib/class-forwarding.mjs` | `check-class-forwarding.mjs` |
+| `lib/recipe-purity.mjs` | `check-recipe-purity.mjs` |
+| `lib/rtl-safety.mjs` | `check-rtl-safety.mjs` |
+| `lib/source-projection.mjs` | all four (the shared tokenizer) |
+
+An extracted rule is a **pure function over source text** returning
+`Array<{ line: number, message: string }>` — no I/O, no module-scope accumulator, no `console`. The
+structured return is what lets a test assert on line numbers; formatting stays in the executable.
+
+Two rules for writing these tests, both learned the hard way:
+
+- **Weight the cases toward the escape hatches, the near-misses that must stay legal, and the
+  projections.** A checker that gets *stricter* breaks the build for correct code, which is as much
+  a regression as one that goes quiet. Every one of these scripts names its own forbidden patterns
+  in its header, so "the pattern appears in a comment and is not reported" is a real case, not a
+  contrived one.
+- **Verify by mutation, not by passing.** Break the rule 4–6 ways and confirm each break fails at
+  least one test. A mutation that survives is a hole — three of the four suites found one that way,
+  including a `splitVariants` bracket-depth case that no end-to-end test reached.
+
+The Definition of Done does **not** reach `scripts/`. These carry tests because their failure mode
+is *silent acceptance*: a physical `pr-8` mis-paints for every RTL reader while the suite stays
+green, and if the checker itself regresses nothing says so.
 
 ## Why the split is by *module resolution*, not by taste
 

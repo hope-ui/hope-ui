@@ -35,23 +35,28 @@ describe("@hope-ui/presets/hope", () => {
   // *resolved* recipe (reaching third-party presets and compound variants), the script scans source
   // (reaching component class literals, stories and CSSOM writes). Same "read the other artifact as
   // a string" move as the token checks above. The guard lives here, not in `@hope-ui/theming`'s own
-  // tests, because reading the script off disk is a repo-layout dependency and the contract layer
+  // tests, because reading the rule off disk is a repo-layout dependency and the contract layer
   // stays agnostic of where it is checked out.
-  const rtlSafetyScript = () =>
-    readFileSync(new URL("../../../../../scripts/check-rtl-safety.mjs", import.meta.url), "utf8");
+  //
+  // Points at `scripts/lib/rtl-safety.mjs`, not the `check-rtl-safety.mjs` executable: the tables
+  // moved there when the rule was extracted to be unit-testable. Read as text on purpose — the
+  // point is to diff two independently-authored copies of the rule set, so importing it would
+  // defeat the check by making both halves the same object.
+  const rtlSafetyRule = () =>
+    readFileSync(new URL("../../../../../scripts/lib/rtl-safety.mjs", import.meta.url), "utf8");
 
-  it("keeps the RTL rule table in sync between the conformance kit and check-rtl-safety.mjs", () => {
+  it("keeps the RTL rule table in sync between the conformance kit and lib/rtl-safety.mjs", () => {
     // Asserted per field rather than as one literal so a reformat can't fail this for a reason that
     // has nothing to do with the rule set.
-    const script = rtlSafetyScript();
+    const script = rtlSafetyRule();
     for (const { test, physical, logical } of PHYSICAL_UTILITIES) {
-      expect(script, `check-rtl-safety.mjs is missing the ${physical} pattern`).toContain(
+      expect(script, `lib/rtl-safety.mjs is missing the ${physical} pattern`).toContain(
         test.source,
       );
-      expect(script, `check-rtl-safety.mjs is missing the ${physical} rule`).toContain(
+      expect(script, `lib/rtl-safety.mjs is missing the ${physical} rule`).toContain(
         `physical: "${physical}"`,
       );
-      expect(script, `check-rtl-safety.mjs is missing the ${logical} replacement`).toContain(
+      expect(script, `lib/rtl-safety.mjs is missing the ${logical} replacement`).toContain(
         `logical: "${logical}"`,
       );
     }
@@ -63,11 +68,11 @@ describe("@hope-ui/presets/hope", () => {
     // on identical source — or worse, lets a genuine physical class through on the axis nobody
     // rechecked. The rule table has been compared since day one; these two had not been, which is
     // how `MEASURED_SIDE_SCOPED` could have landed in one half only.
-    const script = rtlSafetyScript();
-    expect(script, "check-rtl-safety.mjs is missing the rtl:/ltr: exemption").toContain(
+    const script = rtlSafetyRule();
+    expect(script, "lib/rtl-safety.mjs is missing the rtl:/ltr: exemption").toContain(
       DIRECTION_SCOPED.source,
     );
-    expect(script, "check-rtl-safety.mjs is missing the data-side-* exemption").toContain(
+    expect(script, "lib/rtl-safety.mjs is missing the data-side-* exemption").toContain(
       MEASURED_SIDE_SCOPED.source,
     );
   });
