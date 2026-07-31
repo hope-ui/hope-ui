@@ -122,7 +122,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Rating | Forms | 4/5 | roving + half-step | |
 | NumberInput | Forms | 4/5 | `createNumberState`*, `createTextInput`* | |
 | PinInput / OTP | Forms | 3/5 | `createPinInputState`* | multi-field focus/paste |
-| TagsInput | Forms | 2/5 | `createTagsState`*, `createTextInput`* | |
+| TagsInput | Forms | 2/5 | `createTagsState`*, `createTextInput` ✅ | **Promoted — it is the missing half of multi-select, not just another form control.** A `selectionMode="multiple"` Combobox has no way to show what it holds once the popup closes: its input is the query, so the field is cleared after each pick and the list's ticks are the only report. A removable chip row is what fixes that, and `createTextInput` shipping with Combobox leaves only `createTagsState` (#11) in the way. See §3 |
 | Menubar | Navigation | 3/5 | `createFloating`* + collection | application menubar |
 | ScrollArea | Utility | 3/5 | `createElementSize`* | custom scrollbars |
 | Splitter / Resizable | Utility | 3/5 | `createDragState`*, `createElementSize`* | resizable panes |
@@ -133,7 +133,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 |---|---|---|---|---|
 | Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes (virtual is **flat-only** — see §3), native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21). **Missing `ItemText`** — see §3 |
 | Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select. **No virtual mode yet** — §3 says close it the way Listbox did |
-| Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer. Inherits Select's **no virtual mode** — §3, and the filter is what makes closing it urgent |
+| Combobox ✅ | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput` ✅ + `createAnnounce` | styled API landed (18 compound parts + `combobox` recipe): input focus owner, the collator-backed filter seam (`contains`/`startsWith`/predicate/`false`), commit-revert, and `Status`'s result-count announcer. Deliberately **no native form submission** (`name`/`form`/`required` are `Omit`-ted — the kernel holds the *filtered* set, so a hidden field would drop options as you type). Inherits Select's **no virtual mode** — §3, and the filter is what makes closing it urgent. **`selectionMode="multiple"` is shipped but half-blind** until `TagsInput` lands — §3 |
 | Autocomplete | Collections | 2/5 | Combobox, minus selection state | **not a rename of Combobox** — free-text value, list is suggestions. See #21 |
 | Menu / DropdownMenu | Overlays | 5/5 | `createCollection` + `createFloating`* + `createHoverIntent`* + submenus | |
 | ContextMenu | Overlays | 2/5 | Menu variant (pointer-anchored) | |
@@ -185,9 +185,9 @@ stable reference and the ordering claim holds within the original survey.
 | 6 | `createStepsState` · `createPaginationState` | small state machines | Steps, Pagination | T1 |
 | 7 | `createFloating` ✅ | `@floating-ui/dom` wrapper: placement, flip/shift, arrow, autoUpdate, opt-in `size` | Tooltip, Popover, HoverCard, Menu, Select, Combobox, NavigationMenu, DatePicker | T2 |
 | 8 | `createHoverIntent` | hover open/close intent + submenu safe-triangle | Menu, HoverCard, Tooltip *(port Astryx `useMenuHover`)* | T2 |
-| 9 | `createTextInput` | controlled value + composition/selection handling | Input, Textarea, Combobox, TagsInput, NumberInput | T2 |
+| 9 | `createTextInput` ✅ | Controlled value + the two things a hand-rolled `onInput` gets wrong: **IME composition** (no DOM write between `compositionstart`/`compositionend`, so a half-typed CJK word survives) and **caret preservation** (captured on `input`, reapplied after the write). The DOM value is owned by a reconcile effect rather than a live `value={…}` binding — that is what makes both suppressions possible. `onBeforeInput` is left unconsumed as the one real cancel channel, since the native `input` event is not cancelable. Shipped with `Combobox.Input`; [`create-text-input.md`](primitives/internal/create-text-input.md) | Input, Textarea, Combobox ✅, TagsInput, NumberInput | T2 |
 | 10 | `createNumberState` | parse / format / clamp / step (Intl) | NumberInput, Slider | T2 |
-| 11 | `createPinInputState` · `createTagsState` | field-specific interaction state | PinInput, TagsInput | T2 |
+| 11 | `createPinInputState` · `createTagsState` | field-specific interaction state. **`createTagsState` is the last thing between here and a visible multi-select** (§3): the tag list, add/remove, `Backspace` on an empty field removing the last tag, paste-splitting, `max`/duplicate policy. Roving focus across the chips is already covered by `createListNavigation` | PinInput, TagsInput | T2 |
 | 12 | `createDragState` | pointer drag / resize / swipe | Slider thumb, Splitter, Toast swipe, ScrollArea | T3 |
 | 13 | `createFileUploadState` | file selection, drag-drop, accept/size validation | FileUpload | T3 |
 | 14 | ~~`createOverlayStack`~~ | **Retired in place — never build this.** Nesting is shipped as **three separate registries**: #18 (dismissal order), #19 (`aria-hidden`/`inert`), #20 (focus containment). Merging them would be a bug, not a simplification: a Dialog with `dismissOnEscape: false` still participates in hide-outside *and* focus-scope ordering but must never win Escape. react-aria keeps its three apart for the same reason and centralizes nothing — [`reference-implementations.md`](reference-implementations.md) §1. The number is kept so cross-references stay valid | — see #18/#19/#20 | — |
@@ -426,6 +426,56 @@ that happen to overlap. Menu, CommandPalette and TreeView all land on the same r
 gets more expensive to reconcile after those ship than before, which is why this sits here rather than
 in a component's own backlog.
 
+### A multiple Combobox cannot show what it holds — `TagsInput` is the missing half
+
+**Found while shipping Combobox, and it is a gap in the *component set*, not a bug in Combobox.**
+
+`selectionMode="multiple"` works: the kernel adapts scalar⇄array, `onChange` reports every pick, the
+popup stays open across picks, and each chosen row carries `aria-selected` plus a
+`Combobox.ItemIndicator` tick. What it cannot do is **tell you what is selected once the popup
+closes.**
+
+The reason is structural rather than an oversight. A Combobox's input holds the **query**, not the
+value — that is what makes it a combobox rather than a Select. In single mode the two can share the
+field, because committing writes the chosen label into it. In multiple mode there is no one label to
+write, so `Combobox.Root` clears the field after each pick and the ticks in the list become the only
+report there is. Close the popup and the widget renders an empty box that is, as far as a user can
+see, empty.
+
+Neither fallback is acceptable:
+
+- **Joining the labels into the input** (`"Apple, Kiwi"`) makes the value untypeable — the next
+  keystroke either destroys the selection or filters on a string nobody typed — and gives no way to
+  remove one item without retyping the rest.
+- **A `Select.Value`-style summary part** ("2 selected") is what Select does and is right *there*,
+  because a Select's trigger is not an editable field. Putting one beside a live input means two
+  competing displays of the same state, and it still offers no per-item removal.
+
+**The answer is the part that is already on the roadmap and has never been prioritised: `TagsInput`
+(T2, Forms).** A row of removable chips in front of the text field is the shape every reference
+solves this with — react-aria's `TagGroup` + `ComboBox`, Ark/Zag's `TagsInput`, Base UI's chips — and
+it is what makes the selection *visible, removable and keyboard-reachable* while the field stays a
+plain query input.
+
+**What it needs, and what it does not:**
+
+- `createTextInput` (#9) — **shipped**, and this is now its second consumer after `Combobox.Input`.
+  Not a blocker any more.
+- `createTagsState` (#11) — the remaining primitive: the tag list, add/remove, `Backspace` on an
+  empty field removing the last tag, paste-splitting, and `max`/duplicate policy.
+- Roving focus across the chips — **already in the kernel** (`createListNavigation` /
+  `createListFocus`), so this is wiring, not new behaviour.
+- **No new combobox kernel work.** The chips are a sibling of the control, not a part of the popup;
+  `createCombobox` already exposes everything the chip row needs (`state.list.value()`,
+  `selection.deselect`). The integration is a *component* that composes `TagsInput` and `Combobox`,
+  which is the same "compose, don't inherit" line Popover-vs-Dialog draws.
+
+**Sequencing.** `TagsInput` is worth building standalone first — it is a real form control on its own
+(email recipients, keyword entry) and it is where `createTagsState` gets its DoD. The multi-select
+Combobox integration follows, and only then is `selectionMode="multiple"` a shape worth putting in
+front of users. Until it lands, the docs should keep steering multi-select toward `Listbox` (which
+shows every row and every tick, always) rather than toward a closed Combobox that reveals nothing.
+
 ---
 
 ## Suggested first moves
@@ -447,8 +497,16 @@ Not prescriptive, but the natural sequence given what's now landed:
    Roving mode has been hiding this: a native `.focus()` scrolls on its own. Activedescendant mode —
    which is what Select and Combobox use — moves no DOM focus, so an offscreen highlighted option
    stays offscreen, with every test green.
-5. **The combobox kernel (#21)**, then **Select**, then **Combobox**. Steps 3–4 are the only hard
-   blockers for Select; 5 is what stops Select and Combobox growing two keyboard/ARIA
-   implementations that drift.
+5. ~~**The combobox kernel (#21)**, then **Select**, then **Combobox**~~ — **done.** All three
+   shipped, and neither component grew a keymap of its own: `Select.Trigger` and `Combobox.Input` are
+   the same ARIA pattern on a `<button>` and an `<input>`. `createTextInput` (#9) landed with the
+   latter.
+6. **`createTagsState` (#11), then `TagsInput`** — the first thing Combobox left unfinished rather
+   than the next thing on the list. `selectionMode="multiple"` ships today with **no way to show what
+   it holds once the popup closes**, because a combobox's input is the query and not the value; a
+   removable chip row is what closes that, and `createTextInput` shipping means `createTagsState` is
+   the only piece missing. Full reasoning in §3. Worth building standalone first — it is a real form
+   control on its own, and it is where `createTagsState` earns its DoD — with the multi-select
+   Combobox integration following as a component that *composes* the two.
 
 From there the T1/T2 backlog can be parallelized.
