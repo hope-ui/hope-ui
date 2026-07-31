@@ -1,14 +1,6 @@
 import { Combobox } from "@hope-ui/components/combobox";
 import { For } from "solid-js";
-import {
-  FRUITS,
-  type Fruit,
-  FruitControl,
-  FruitPopup,
-  itemToLabel,
-  itemToValue,
-  Stage,
-} from "./data";
+import { FRUITS, type Fruit, FruitControl, FruitPopup, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "Filtering". The same eight fruits behind three different `filter` props, side by
 // side — type the same query into each and watch them disagree:
@@ -33,25 +25,23 @@ const FILTERS = [
 
 export function ComboboxFilterModesDemo() {
   return (
-    <Stage>
-      <div class="flex flex-wrap items-start justify-center gap-6">
-        <For each={FILTERS}>
-          {(mode) => (
-            <div class="flex flex-col gap-2">
-              <code class="text-foreground-muted text-xs">{mode.label}</code>
-              <Combobox.Root
-                items={FRUITS}
-                itemToValue={itemToValue}
-                itemToLabel={itemToLabel}
-                filter={mode.filter}
-              >
-                <FruitControl label={`Choose a fruit (${mode.label})`} placeholder={mode.hint} />
-                <FruitPopup />
-              </Combobox.Root>
-            </div>
-          )}
-        </For>
-      </div>
-    </Stage>
+    <div class="flex flex-col items-start justify-center gap-6">
+      <For each={FILTERS}>
+        {(mode) => (
+          <div class="flex flex-col gap-2">
+            <code class="text-foreground-muted text-xs">{mode.label}</code>
+            <Combobox.Root
+              items={FRUITS}
+              itemToValue={itemToValue}
+              itemToLabel={itemToLabel}
+              filter={mode.filter}
+            >
+              <FruitControl label={`Choose a fruit (${mode.label})`} placeholder={mode.hint} />
+              <FruitPopup />
+            </Combobox.Root>
+          </div>
+        )}
+      </For>
+    </div>
   );
 }

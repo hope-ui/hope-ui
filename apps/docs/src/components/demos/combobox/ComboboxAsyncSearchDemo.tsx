@@ -1,14 +1,6 @@
 import { Combobox } from "@hope-ui/components/combobox";
 import { createSignal, onCleanup } from "solid-js";
-import {
-  FRUITS,
-  type Fruit,
-  FruitControl,
-  FruitItem,
-  itemToLabel,
-  itemToValue,
-  Stage,
-} from "./data";
+import { FRUITS, type Fruit, FruitControl, FruitItem, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "Async search". `filter={false}` turns the built-in narrowing off entirely: `items`
 // is passed through untouched, so the rows on screen are exactly the ones you handed back. The search
@@ -38,7 +30,11 @@ export function ComboboxAsyncSearchDemo() {
   };
 
   return (
-    <Stage>
+    <div class="flex flex-col gap-4">
+      <output class="text-foreground-muted text-sm">
+        {pending() ? "fetching…" : `${results().length} result(s) from the “server”`}
+      </output>
+
       <Combobox.Root
         items={results()}
         itemToValue={itemToValue}
@@ -57,10 +53,6 @@ export function ComboboxAsyncSearchDemo() {
           </Combobox.Positioner>
         </Combobox.Portal>
       </Combobox.Root>
-
-      <output class="text-foreground-muted text-sm">
-        {pending() ? "fetching…" : `${results().length} result(s) from the “server”`}
-      </output>
-    </Stage>
+    </div>
   );
 }

@@ -2,7 +2,7 @@ import { Combobox } from "@hope-ui/components/combobox";
 import type { JSX } from "@solidjs/web";
 
 // Shared fixtures for the Combobox demos. The dataset is deliberately accented: `Açaí` and `Café au
-// lait melon` are what make the folding claim demonstrable rather than asserted — typing their
+// lait` are what make the folding claim demonstrable rather than asserted — typing their
 // plain-ASCII spelling (`acai`, `cafe`) matches them, which `toLowerCase().includes()` never would.
 
 export interface Fruit {
@@ -19,7 +19,7 @@ export const FRUITS: Fruit[] = [
   { id: 5, name: "Elderberry", disabled: true },
   { id: 6, name: "Fig" },
   { id: 7, name: "Açaí" },
-  { id: 8, name: "Café au lait melon" },
+  { id: 8, name: "Café au lait" },
 ];
 
 export const itemToValue = (fruit: Fruit) => String(fruit.id);

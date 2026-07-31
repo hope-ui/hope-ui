@@ -63,8 +63,23 @@ describe("hope listbox recipe", () => {
   it("pins the item indicator in the trailing gutter", () => {
     const indicator = listboxRecipe({}).itemIndicator();
     expect(indicator).toContain("absolute");
-    expect(indicator).toContain("end-2");
+    expect(indicator).toContain("end-1");
     expect(indicator).toContain("[&_svg]:size-4");
+  });
+
+  it("scales the row glyphs with the size, in step with the row", () => {
+    // A row's leading icon and the selected-row check share one glyph box per size — the same scale
+    // `select.ts` and `combobox.ts` use, since these are the same rows.
+    const expected: Record<ListboxSize, string> = {
+      sm: "[&_svg]:size-3.5",
+      md: "[&_svg]:size-4",
+      lg: "[&_svg]:size-4.5",
+    };
+    for (const size of SIZES) {
+      const parts = listboxRecipe({ size });
+      expect(parts.item(), `${size} row`).toContain(expected[size]);
+      expect(parts.itemIndicator(), `${size} indicator`).toContain(expected[size]);
+    }
   });
 
   it("mutes the group label and divides sections with the subtle hairline", () => {
@@ -82,23 +97,29 @@ describe("hope listbox recipe", () => {
     // sm: tighter row + narrower panel.
     const sm = listboxRecipe({ size: "sm" });
     expect(sm.item()).toContain("text-xs");
-    expect(sm.item()).toContain("py-0.5");
-    expect(sm.item()).toContain("gap-1");
+    expect(sm.item()).toContain("gap-1 ");
+    expect(sm.item()).toContain("rounded-sm");
     expect(sm.root()).toContain("min-w-32");
 
     // lg: roomier row + wider panel.
     const lg = listboxRecipe({ size: "lg" });
     expect(lg.item()).toContain("text-base");
-    expect(lg.item()).toContain("py-1.5");
     expect(lg.item()).toContain("gap-2");
+    expect(lg.item()).toContain("rounded-md");
     expect(lg.root()).toContain("min-w-40");
+
+    // The block padding is the one row value that does NOT move: the type scale and the glyph box
+    // carry the density (see the recipe header).
+    for (const size of SIZES) {
+      expect(listboxRecipe({ size }).item(), `${size} row`).toContain("py-1.5");
+    }
   });
 
   it("defaults to the md size when no size is passed", () => {
     const parts = listboxRecipe({});
     expect(parts.item()).toContain("text-sm"); // md
-    expect(parts.item()).toContain("py-1"); // md
     expect(parts.item()).toContain("gap-1.5"); // md
+    expect(parts.item()).toContain("[&_svg]:size-4"); // md
     expect(parts.root()).toContain("min-w-36"); // md
     // Only the md density is applied — no sm/lg endpoints leak in.
     expect(parts.item()).not.toContain("text-xs");

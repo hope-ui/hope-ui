@@ -8,7 +8,6 @@ import {
   FruitItem,
   itemToLabel,
   itemToValue,
-  Stage,
 } from "./data";
 
 // Live demo for "Groups and separators". `items` holds the **group entries** and `groupToItems`
@@ -22,36 +21,34 @@ import {
 // surviving group's rows changed, because `<For>` reuses a group whose identity did not change.
 export function ComboboxGroupedDemo() {
   return (
-    <Stage>
-      <Combobox.Root
-        items={BASKETS}
-        groupToItems={(basket: Basket) => basket.fruits}
-        itemToValue={itemToValue}
-        itemToLabel={itemToLabel}
-      >
-        <FruitControl label="Choose a fruit" placeholder="Try “berry”…" />
-        <Combobox.Portal>
-          <Combobox.Positioner>
-            <Combobox.Content>
-              <Combobox.List>
-                {(basket: Basket, index, fruits: Accessor<Fruit[]>) => (
-                  <>
-                    <Show when={index() > 0}>
-                      <Combobox.Separator />
-                    </Show>
-                    <Combobox.Group>
-                      <Combobox.GroupLabel>{basket.kind}</Combobox.GroupLabel>
-                      <For each={fruits()}>{(fruit) => <FruitItem fruit={fruit} />}</For>
-                    </Combobox.Group>
-                  </>
-                )}
-              </Combobox.List>
-              <Combobox.Empty>No fruit matches that.</Combobox.Empty>
-              <Combobox.Status />
-            </Combobox.Content>
-          </Combobox.Positioner>
-        </Combobox.Portal>
-      </Combobox.Root>
-    </Stage>
+    <Combobox.Root
+      items={BASKETS}
+      groupToItems={(basket: Basket) => basket.fruits}
+      itemToValue={itemToValue}
+      itemToLabel={itemToLabel}
+    >
+      <FruitControl label="Choose a fruit" placeholder="Try “berry”…" />
+      <Combobox.Portal>
+        <Combobox.Positioner>
+          <Combobox.Content>
+            <Combobox.List>
+              {(basket: Basket, index, fruits: Accessor<Fruit[]>) => (
+                <>
+                  <Show when={index() > 0}>
+                    <Combobox.Separator />
+                  </Show>
+                  <Combobox.Group>
+                    <Combobox.GroupLabel>{basket.kind}</Combobox.GroupLabel>
+                    <For each={fruits()}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+                  </Combobox.Group>
+                </>
+              )}
+            </Combobox.List>
+            <Combobox.Empty>No fruit matches that.</Combobox.Empty>
+            <Combobox.Status />
+          </Combobox.Content>
+        </Combobox.Positioner>
+      </Combobox.Portal>
+    </Combobox.Root>
   );
 }

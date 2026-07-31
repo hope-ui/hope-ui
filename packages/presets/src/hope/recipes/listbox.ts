@@ -27,22 +27,30 @@
  * Every color is a finished `--hope-*` token: `bg-active`/`text-on-active` (the highlight),
  * `bg-subtle` (the separator hairline), `text-foreground`/`text-foreground-muted` (content + muted
  * label), `opacity-disabled` (the disabled dim — an opacity *token*, not a magic number). The recipe
- * computes no color — no `color-mix`, no alpha modifier, no magic opacity. `[&_svg]:size-4` is a raw
+ * computes no color — no `color-mix`, no alpha modifier, no magic opacity. `[&_svg]:size-*` is a raw
  * Tailwind utility (unpoliced). Every class is a literal string so the consumer's `@source` scan can
  * see it.
  *
  * ── RTL ─────────────────────────────────────────────────────────────────────────────────────────
- * Every inset here is logical (`pe-8`, `end-2`, `ps-*`), never physical (`pr-8`, `right-2`, `pl-*`):
+ * Every inset here is logical (`pe-8`, `end-1`, `ps-*`), never physical (`pr-8`, `right-1`, `pl-*`):
  * the indicator gutter is reserved on the side the text *ends*, so it mirrors with the locale
  * instead of leaving the glyph on top of the label in `rtl`. Enforced by `pnpm check:rtl-safety`.
  *
  * ── Single axis: `size` (density) ───────────────────────────────────────────────────────────────
- * Every density value (the row's text / vertical padding / leading padding / gap, and the panel's
- * min width) lives *only* in the `size` variants — `sm`, `md`, and `lg` each carry their full,
- * self-contained set. The base slots carry **no** density class, so a size is applied additively and
- * nothing depends on tailwind-merge stripping a competing base class. The trailing `pe-8` (indicator
- * clearance) and `end-2` indicator placement are size-independent chrome and stay in the base — the
- * glyph box does not change — so only density moves.
+ * Every density value lives *only* in the `size` variants — `sm`, `md`, and `lg` each carry their
+ * full, self-contained set: the row's text / leading padding / gap / corner radius / glyph box, the
+ * indicator's inset and glyph box, and the panel's min width. The base slots carry **no** density
+ * class, so a size is applied additively and nothing depends on tailwind-merge stripping a competing
+ * base class. Only the trailing `pe-8` (indicator clearance) is size-independent chrome and stays in
+ * the base: the gutter is wide enough for the largest glyph at every size, so a row's text never
+ * shifts when the size changes for a reason other than density.
+ *
+ * The row's *vertical* padding is deliberately constant (`py-1.5`): the text size already drives the
+ * row's height, and a second, size-varying term made `sm` rows read as cramped next to their `sm`
+ * control. Density moves through the type scale and the glyph box, not through the block padding.
+ *
+ * These values mirror `select.ts` class for class — same rows, so they must look identical. Select
+ * is the visual source of truth; a change here without the matching one there is the bug.
  */
 
 // The Listbox recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this theme
@@ -65,13 +73,14 @@ export const listboxRecipe = tv({
     root: "text-foreground overflow-y-auto outline-none",
     // An `role="option"` row. `relative` anchors the absolute `itemIndicator`; `pe-8` reserves the
     // trailing glyph gutter. Highlight is `data-active:` ONLY (see the header note) — no `hover:` /
-    // bare `:focus` background. `data-disabled:` dims and drops pointer events. `[&_svg]:size-4`
-    // sizes a leading icon a consumer drops in. Text / vertical + leading padding / gap are density
-    // values and live per `size`, not here.
-    item: "relative flex cursor-default items-center rounded-md pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:size-4",
+    // bare `:focus` background. `data-disabled:` dims and drops pointer events. Text / leading
+    // padding / gap / radius, and the box a consumer's leading icon gets (`[&_svg]:size-*`), are
+    // density values and live per `size`, not here.
+    item: "relative flex cursor-default items-center pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled",
     // The chosen-row check glyph's placement — pinned in the reserved `pe-8` gutter. Rendered by the
-    // component only when the row is selected; its color inherits the row's text color.
-    itemIndicator: "absolute end-2 flex items-center justify-center [&_svg]:size-4",
+    // component only when the row is selected; its color inherits the row's text color. Its inset and
+    // glyph box scale with the row, so both live per `size`.
+    itemIndicator: "absolute flex items-center justify-center",
     // A `role="group"` section wrapper — a little vertical rhythm around each labelled section; no
     // horizontal inset, so grouped rows stay aligned with ungrouped ones.
     group: "not-last:pb-1",
@@ -81,22 +90,26 @@ export const listboxRecipe = tv({
     separator: "my-1 h-px bg-subtle pointer-events-none",
   },
   variants: {
-    // `size` owns the full density set — row text / vertical + leading padding / gap, and the panel's
-    // min width. Each size is self-contained (the base carries no competing density class), so a size
-    // applies additively and nothing relies on tailwind-merge resolution. The `pe-8` indicator gutter
-    // and the `end-2` glyph placement are size-independent chrome (in the base) — only density moves.
+    // `size` owns the full density set — row text / leading padding / gap / radius / glyph box, the
+    // indicator's inset and glyph box, and the panel's min width. Each size is self-contained (the
+    // base carries no competing density class), so a size applies additively and nothing relies on
+    // tailwind-merge resolution. Only the `pe-8` indicator gutter is size-independent chrome (in the
+    // base). Values mirror `select.ts` exactly — see the header note.
     size: {
       sm: {
         root: "min-w-32",
-        item: "gap-1 py-0.5 ps-1 text-xs",
+        item: "text-xs gap-1 py-1.5 ps-1.5 rounded-sm [&_svg]:size-3.5",
+        itemIndicator: "end-1 [&_svg]:size-3.5",
       },
       md: {
         root: "min-w-36",
-        item: "gap-1.5 py-1 ps-1.5 text-sm",
+        item: "text-sm gap-1.5 py-1.5 ps-1.5 rounded-md [&_svg]:size-4",
+        itemIndicator: "end-1 [&_svg]:size-4",
       },
       lg: {
         root: "min-w-40",
-        item: "gap-2 py-1.5 ps-2 text-base",
+        item: "text-base gap-2 py-1.5 ps-1.5 rounded-md [&_svg]:size-4.5",
+        itemIndicator: "end-1 [&_svg]:size-4.5",
       },
     },
   },

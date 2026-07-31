@@ -39,10 +39,12 @@ describe("hope select recipe", () => {
     const trigger = selectRecipe({}).trigger();
     expect(trigger).toContain("bg-surface-raised");
     expect(trigger).toContain("border-subtle");
-    expect(trigger).toContain("rounded-md");
-    // The wash is guarded against the press so the two never fight.
-    expect(trigger).toContain("hover:not-data-pressed:bg-surface-raised-hovered");
-    expect(trigger).toContain("data-pressed:bg-surface-raised-pressed");
+    // The same corner Combobox's shell and this widget's own popup card take.
+    expect(trigger).toContain("rounded-lg");
+    // Deliberately unwashed: the trigger's states are the focus ring and the open popup, not a
+    // background change under the cursor.
+    expect(trigger).not.toContain("bg-surface-raised-hovered");
+    expect(trigger).not.toContain("bg-surface-raised-pressed");
     // The same indicator every hope control uses — a finished halo token, never an alpha modifier.
     expect(trigger).toContain("focus-visible:border-focus");
     expect(trigger).toContain("focus-visible:ring-focus-halo");
@@ -121,31 +123,51 @@ describe("hope select recipe", () => {
     expect(item).toContain("relative");
     // Logical, so the indicator gutter mirrors with the locale.
     expect(item).toContain("pe-8");
-    expect(selectRecipe({}).itemIndicator()).toContain("end-2");
+    expect(selectRecipe({}).itemIndicator()).toContain("end-1");
   });
 
   it("scales the control and the rows together, each size self-contained", () => {
     const sm = selectRecipe({ size: "sm" });
-    expect(sm.trigger()).toContain("h-8");
+    expect(sm.trigger()).toContain("h-7");
     expect(sm.trigger()).toContain("text-xs");
     expect(sm.item()).toContain("text-xs");
-    expect(sm.item()).toContain("py-0.5");
+    expect(sm.item()).toContain("gap-1 ");
+    expect(sm.item()).toContain("rounded-sm");
 
     const lg = selectRecipe({ size: "lg" });
-    expect(lg.trigger()).toContain("h-10");
+    expect(lg.trigger()).toContain("h-9");
     expect(lg.trigger()).toContain("text-base");
     expect(lg.item()).toContain("text-base");
-    expect(lg.item()).toContain("py-1.5");
+    expect(lg.item()).toContain("gap-2");
+    expect(lg.item()).toContain("rounded-md");
+  });
+
+  it("scales the chevron and the row glyphs with the size, in step", () => {
+    // A row's leading icon and the selected-row check share the row's glyph box, and the chevron
+    // rides the same scale — one size means one glyph size across both surfaces.
+    const expected: Record<SelectSize, string> = {
+      sm: "[&_svg]:size-3.5",
+      md: "[&_svg]:size-4",
+      lg: "[&_svg]:size-4.5",
+    };
+    for (const size of SIZES) {
+      const parts = selectRecipe({ size });
+      expect(parts.icon(), `${size} chevron`).toContain(expected[size]);
+      expect(parts.item(), `${size} row`).toContain(expected[size]);
+      expect(parts.itemIndicator(), `${size} indicator`).toContain(expected[size]);
+    }
+    // Size-independent chrome stays in the base, so nothing competes with the per-size box.
+    expect(selectRecipe({}).icon()).not.toContain("size-4.5");
   });
 
   it("defaults to the md size when no size is passed", () => {
     const parts = selectRecipe({});
-    expect(parts.trigger()).toContain("h-9");
+    expect(parts.trigger()).toContain("h-8");
     expect(parts.trigger()).toContain("text-sm");
     expect(parts.item()).toContain("text-sm");
     // Only the md density is applied — no sm/lg endpoints leak in.
-    expect(parts.trigger()).not.toContain("h-8");
-    expect(parts.trigger()).not.toContain("h-10");
+    expect(parts.trigger()).not.toContain("h-7");
+    expect(parts.trigger()).not.toContain("h-9");
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {

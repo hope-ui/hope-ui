@@ -1,15 +1,7 @@
 import { Button } from "@hope-ui/components/button";
 import { Combobox } from "@hope-ui/components/combobox";
 import { createSignal } from "solid-js";
-import {
-  FRUITS,
-  type Fruit,
-  FruitControl,
-  FruitPopup,
-  itemToLabel,
-  itemToValue,
-  Stage,
-} from "./data";
+import { FRUITS, type Fruit, FruitControl, FruitPopup, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "Controlled value". A Combobox has **two** values, and this drives both: the
 // selection (`value` + `onChange`, a scalar in single mode — the item itself, never `[item]`, with
@@ -23,7 +15,7 @@ export function ComboboxControlledDemo() {
   const [text, setText] = createSignal(FRUITS[2].name);
 
   return (
-    <Stage>
+    <div class="flex flex-col gap-2">
       <div class="flex flex-wrap items-center justify-center gap-3">
         <Combobox.Root
           items={FRUITS}
@@ -55,6 +47,6 @@ export function ComboboxControlledDemo() {
         selection: <code>{fruit() === null ? "null" : `"${itemToLabel(fruit() as Fruit)}"`}</code> ·
         text: <code>{`"${text()}"`}</code>
       </output>
-    </Stage>
+    </div>
   );
 }

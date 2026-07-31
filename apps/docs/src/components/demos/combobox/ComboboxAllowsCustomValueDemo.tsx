@@ -1,6 +1,6 @@
 import { Combobox } from "@hope-ui/components/combobox";
 import { createSignal } from "solid-js";
-import { FRUITS, FruitControl, FruitPopup, itemToLabel, itemToValue, Stage } from "./data";
+import { FRUITS, FruitControl, FruitPopup, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "Custom values". Type something no option matches — `Tomato` — then press Tab or
 // click away.
@@ -13,41 +13,39 @@ export function ComboboxAllowsCustomValueDemo() {
   const [strictText, setStrictText] = createSignal("");
 
   return (
-    <Stage>
-      <div class="flex flex-wrap items-start justify-center gap-6">
-        <div class="flex flex-col gap-2">
-          <code class="text-foreground-muted text-xs">allowsCustomValue</code>
-          <Combobox.Root
-            items={FRUITS}
-            itemToValue={itemToValue}
-            itemToLabel={itemToLabel}
-            allowsCustomValue
-            onInputValueChange={setText}
-          >
-            <FruitControl label="Choose or invent a fruit" placeholder="Anything goes…" />
-            <FruitPopup />
-          </Combobox.Root>
-          <output class="text-foreground-muted text-sm">
-            text: <code>{text() || "—"}</code>
-          </output>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <code class="text-foreground-muted text-xs">default (reverts)</code>
-          <Combobox.Root
-            items={FRUITS}
-            itemToValue={itemToValue}
-            itemToLabel={itemToLabel}
-            onInputValueChange={setStrictText}
-          >
-            <FruitControl label="Choose a fruit" placeholder="Options only…" />
-            <FruitPopup />
-          </Combobox.Root>
-          <output class="text-foreground-muted text-sm">
-            text: <code>{strictText() || "—"}</code>
-          </output>
-        </div>
+    <div class="flex flex-wrap items-start justify-center gap-6">
+      <div class="flex flex-col gap-2">
+        <code class="text-foreground-muted text-xs">allowsCustomValue</code>
+        <Combobox.Root
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          allowsCustomValue
+          onInputValueChange={setText}
+        >
+          <FruitControl label="Choose or invent a fruit" placeholder="Anything goes…" />
+          <FruitPopup />
+        </Combobox.Root>
+        <output class="text-foreground-muted text-sm">
+          text: <code>{text() || "—"}</code>
+        </output>
       </div>
-    </Stage>
+
+      <div class="flex flex-col gap-2">
+        <code class="text-foreground-muted text-xs">default (reverts)</code>
+        <Combobox.Root
+          items={FRUITS}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          onInputValueChange={setStrictText}
+        >
+          <FruitControl label="Choose a fruit" placeholder="Options only…" />
+          <FruitPopup />
+        </Combobox.Root>
+        <output class="text-foreground-muted text-sm">
+          text: <code>{strictText() || "—"}</code>
+        </output>
+      </div>
+    </div>
   );
 }

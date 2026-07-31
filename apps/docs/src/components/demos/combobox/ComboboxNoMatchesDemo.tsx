@@ -1,13 +1,5 @@
 import { Combobox } from "@hope-ui/components/combobox";
-import {
-  FRUITS,
-  type Fruit,
-  FruitControl,
-  FruitItem,
-  itemToLabel,
-  itemToValue,
-  Stage,
-} from "./data";
+import { FRUITS, type Fruit, FruitControl, FruitItem, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "Nothing matched". Type `zzz`: the popup stays **open** on `Combobox.Empty` instead
 // of closing, which is why `Combobox.Root` flips the kernel's `allowsEmptyCollection` default to
@@ -19,19 +11,17 @@ import {
 // contain options and groups, so a message in there would be counted as one.
 export function ComboboxNoMatchesDemo() {
   return (
-    <Stage>
-      <Combobox.Root items={FRUITS} itemToValue={itemToValue} itemToLabel={itemToLabel}>
-        <FruitControl label="Choose a fruit" placeholder="Try “zzz”…" />
-        <Combobox.Portal>
-          <Combobox.Positioner>
-            <Combobox.Content>
-              <Combobox.List>{(fruit: Fruit) => <FruitItem fruit={fruit} />}</Combobox.List>
-              <Combobox.Empty>No fruit matches that.</Combobox.Empty>
-              <Combobox.Status />
-            </Combobox.Content>
-          </Combobox.Positioner>
-        </Combobox.Portal>
-      </Combobox.Root>
-    </Stage>
+    <Combobox.Root items={FRUITS} itemToValue={itemToValue} itemToLabel={itemToLabel}>
+      <FruitControl label="Choose a fruit" placeholder="Try “zzz”…" />
+      <Combobox.Portal>
+        <Combobox.Positioner>
+          <Combobox.Content>
+            <Combobox.List>{(fruit: Fruit) => <FruitItem fruit={fruit} />}</Combobox.List>
+            <Combobox.Empty>No fruit matches that.</Combobox.Empty>
+            <Combobox.Status />
+          </Combobox.Content>
+        </Combobox.Positioner>
+      </Combobox.Portal>
+    </Combobox.Root>
   );
 }

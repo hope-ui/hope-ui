@@ -20,24 +20,29 @@
  * - `input` is deliberately chrome-free: `border-0`, `bg-transparent`, `outline-none`. A height, a
  *   border or a background here would fight the control's, and the resulting double box is the exact
  *   defect this split exists to avoid.
- * - `trigger` is the chevron's hit area and nothing else — no border, no background. `clear` is the
- *   one control-half slot with no Select counterpart: a Select always holds a value once chosen,
- *   while a Combobox's text is erasable.
+ * - `trigger` and `clear` are the two buttons in the end gutter — square hit areas with their own
+ *   wash and radius, but no border and no background of their own. `clear` is the one with no Select
+ *   counterpart: a Select always holds a value once chosen, while a Combobox's text is erasable.
  *
  * **Neither button gets a focus ring**, and that is not an omission: `createComboboxToggle` and
  * `createComboboxClear` both set `tabindex="-1"`, because the input is the widget's single tab stop.
  * A `focus-visible:` rule on either would be a promise the keyboard can never keep — the whole
  * control-half focus story is the shell's one `focus-within:` ring.
  *
- * `control` carries no hover/press wash, unlike Select's trigger: it is a `<div>`, not a button —
- * the kernel writes `data-pressed` on the chevron button only — and a text field's affordance is the
- * caret, not a wash. It also sets no `select-none`, which would reach the input's own text.
+ * The two buttons are styled **identically** — same square box, same wash, same per-size height,
+ * radius and glyph. They share one gutter, so a difference between them reads as a difference in
+ * kind rather than in purpose, and the wash is what tells a pointer user which of the two it is over.
+ *
+ * `control` itself carries no wash — like Select's trigger, and for a reason of its own on top: it is
+ * a `<div>`, not a button (the kernel writes `data-pressed` on the buttons), and a text field's
+ * affordance is the caret. It also sets no `select-none`, which would reach the input's own text.
  *
  * ── The popup half is Select's, class for class ─────────────────────────────────────────────────
  * `positioner` / `content` / `list` / `item` / `itemIndicator` / `group` / `groupLabel` /
- * `separator` mirror `select.ts` (which in turn mirrors `listbox.ts`). Combobox does not *compose*
- * Select, so this is a deliberate parallel rather than reuse — but the two must look identical,
- * since they are the same rows on the same card.
+ * `separator` mirror `select.ts` (which in turn mirrors `listbox.ts`) — down to the per-size row
+ * density and glyph box. Combobox does not *compose* Select, so this is a deliberate parallel rather
+ * than reuse — but the two must look identical, since they are the same rows on the same card.
+ * **Select is the visual source of truth**: a change made here alone is the bug.
  *
  * What Combobox adds is the pair `select.ts` documents as belonging here: `empty` (the no-results
  * message) and `status` (the `role="status"` result count). A `role="listbox"` may only contain
@@ -74,7 +79,7 @@
  * Every class is a literal string so the consumer's `@source` scan can see it.
  *
  * ── RTL ─────────────────────────────────────────────────────────────────────────────────────────
- * Every inset is logical (`ps-*`, `pe-8`, `end-2`, `px-*`, `text-start`) — the indicator gutter is
+ * Every inset is logical (`ps-*`, `pe-*`, `end-1`, `text-start`) — the indicator gutter is
  * reserved on the side the text *ends*, so it mirrors with the locale. The two physical utilities
  * are the enter-slide and the scale origin on `content`, both scoped to `data-side-*`: that reports
  * where the layer LANDED after `flip`, which is measured geometry rather than reading direction, so
@@ -95,7 +100,7 @@ export const comboboxRecipe = tv({
     // gap / min width are density values and live per `size`, not here.
     control: [
       "relative inline-flex items-center",
-      "rounded-md border border-subtle bg-surface-raised text-foreground",
+      "rounded-lg border border-subtle bg-surface-raised text-foreground",
       "transition-[background-color,border-color,box-shadow] duration-150 ease-out",
       // The shared focus indicator every hope control uses — the border takes the focus color and
       // the halo is the finished translucent token, never an alpha modifier over `focus`.
@@ -108,33 +113,40 @@ export const comboboxRecipe = tv({
     // a background or a ring here would draw a second one inside it. `min-w-0` + `flex-1` is what
     // lets it shrink inside the flex row instead of pushing the buttons out. The empty state is the
     // native `placeholder:` pseudo-element, which is why there is no placeholder slot.
+    //
+    // Height is the one metric it does take, and it takes the *control's* (per `size`): a bare line
+    // box would leave a dead strip above and below the text where a click lands on the shell instead
+    // of the field, and a click there must put the caret in the input.
     input: [
       "min-w-0 flex-1 cursor-text border-0 bg-transparent outline-none",
       "text-foreground placeholder:text-foreground-subtle",
     ],
-    // The reset button (Combobox's text is erasable, unlike a Select's chosen value). It is the one
-    // control-half slot with a wash — guarded against the pressed state so the two never fight,
-    // exactly as CloseButton spells it — since it is the only pointer target here that *changes* the
-    // value rather than opening the popup. Its glyph is a touch smaller than the chevron's: of the
-    // two affordances in the gutter, this is the secondary one.
+    // The reset button (Combobox's text is erasable, unlike a Select's chosen value) — the only
+    // pointer target here that *changes* the value rather than opening the popup. `aspect-square`
+    // over the per-size height is what makes it a square tap target without a second width class to
+    // keep in step; the wash is guarded against the pressed state so the two never fight, exactly as
+    // CloseButton spells it. Height / radius / glyph box are density values and live per `size`.
     //
     // NO focus ring, for the same reason the chevron has none: `createComboboxClear` gives it
     // `tabindex="-1"`, because the input is the widget's single tab stop. A `focus-visible:` rule
     // here would be a promise the keyboard can never keep.
     clear: [
-      "inline-flex shrink-0 items-center justify-center rounded-sm outline-none",
+      "aspect-square inline-flex shrink-0 items-center justify-center outline-none",
       "text-foreground-muted transition-[background-color,color] duration-150 ease-out",
       "hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
-      "[&_svg]:size-3.5",
     ],
-    // The chevron button — the glyph's hit area and nothing else: the control draws the border, the
-    // background and the ring. `cursor-default` because it opens a listbox rather than navigating,
-    // and no wash, so the gutter's two buttons don't both light up under one cursor sweep.
-    trigger:
-      "inline-flex shrink-0 cursor-default items-center justify-center rounded-sm select-none outline-none text-foreground-muted",
+    // The chevron button — the glyph's hit area, drawn as `clear`'s twin: same square box, same wash,
+    // same per-size height / radius / glyph box. The two sit side by side in one gutter, so a button
+    // that lit up differently from its neighbour would read as a different kind of control. The
+    // control still draws the border, the background and the ring; neither button draws its own.
+    trigger: [
+      "aspect-square inline-flex shrink-0 items-center justify-center select-none outline-none",
+      "text-foreground-muted transition-[background-color,color] duration-150 ease-out",
+      "hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
+    ],
     // The chevron's box. `pointer-events-none` so the glyph is never the pointer target over the
-    // button. Size-independent chrome, so it stays here.
-    icon: "pointer-events-none inline-flex shrink-0 items-center justify-center text-foreground-muted [&_svg]:size-4",
+    // button. The glyph box itself is a density value and lives per `size`.
+    icon: "pointer-events-none inline-flex shrink-0 items-center justify-center text-foreground-muted",
     // The measured layer. Stacking + the anchor-matched width, and NOTHING positional: the kernel
     // writes `position`/`left`/`top`/`transform` (and the pre-measurement `visibility: hidden`) as an
     // inline style, which a class here would fight.
@@ -179,49 +191,69 @@ export const comboboxRecipe = tv({
     // A hairline divider between sections; it never takes the pointer.
     separator: "my-1 h-px bg-subtle pointer-events-none",
     // An `role="option"` row. `relative` anchors the absolute `itemIndicator`; `pe-8` reserves the
-    // trailing glyph gutter. Highlight is `data-active:` ONLY (header note). Text / padding / gap are
-    // density values and live per `size`.
-    item: "relative flex cursor-default items-center rounded-md pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:size-4",
+    // trailing glyph gutter. Highlight is `data-active:` ONLY (header note). Text / padding / gap /
+    // radius / glyph box are density values and live per `size`.
+    item: "relative flex cursor-default items-center pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled",
     // The row's label. `min-w-0` + `flex-1` is what lets `truncate` engage inside the flex row —
     // without it the text would push the indicator out instead of ellipsizing.
     itemText: "min-w-0 flex-1 truncate",
     // The chosen-row check glyph — pinned in the reserved `pe-8` gutter, inheriting the row's color.
-    itemIndicator: "absolute end-2 flex items-center justify-center [&_svg]:size-4",
+    // Its inset and glyph box scale with the row, so both live per `size`.
+    itemIndicator: "absolute flex items-center justify-center",
   },
   variants: {
     // `size` owns the full density set on BOTH surfaces — the control's height/padding/gap and its
-    // min width, the input's text, the popup's matching min width and padding, the row's
-    // text/padding/gap, and the two card-level messages. Each size is self-contained (no base carries
-    // a competing density class), so a size applies additively and nothing relies on tailwind-merge
-    // resolution. The control and the positioner take the SAME `min-w-*`, so a narrow control and its
-    // popup never disagree.
+    // min width, the input's height and text, both gutter buttons' height/radius/glyph box, the
+    // popup's matching min width and padding, the row's text/padding/gap/radius/glyph box, the
+    // indicator's inset and glyph box, and the two card-level messages. Each size is self-contained
+    // (no base carries a competing density class), so a size applies additively and nothing relies on
+    // tailwind-merge resolution. The control and the positioner take the SAME `min-w-*`, so a narrow
+    // control and its popup never disagree.
+    //
+    // The control's height matches Select's trigger and the popup half matches Select's rows — the
+    // two widgets sit side by side in a form. The end gutter is `pe-1` rather than Select's `pe-2`
+    // because what sits in it is a *button* whose own wash needs room to read as a box, not a bare
+    // chevron; the button is one size step under the control (`h-5`/`h-6`/`h-7` inside
+    // `h-7`/`h-8`/`h-9`), which is what leaves that room symmetric.
     size: {
       sm: {
-        control: "h-8 gap-1.5 px-2 min-w-32",
-        input: "text-xs",
+        control: "h-7 gap-0.5 ps-2.5 pe-1 min-w-32",
+        input: "h-7 text-xs",
+        clear: "h-5 rounded-sm [&_svg]:size-3.5",
+        trigger: "h-5 rounded-sm",
+        icon: "[&_svg]:size-3.5",
         positioner: "min-w-32",
         list: "p-1",
         empty: "px-2 py-4 text-xs",
         status: "px-2 py-1 text-xs",
-        item: "gap-1 py-0.5 ps-1 text-xs",
+        item: "text-xs gap-1 py-1.5 ps-1.5 rounded-sm [&_svg]:size-3.5",
+        itemIndicator: "end-1 [&_svg]:size-3.5",
       },
       md: {
-        control: "h-9 gap-2 px-2.5 min-w-36",
-        input: "text-sm",
+        control: "h-8 gap-1 ps-2.5 pe-1 min-w-36",
+        input: "h-8 text-sm",
+        clear: "h-6 rounded-md [&_svg]:size-4",
+        trigger: "h-6 rounded-md",
+        icon: "[&_svg]:size-4",
         positioner: "min-w-36",
         list: "p-1",
         empty: "px-3 py-6 text-sm",
         status: "px-3 py-1.5 text-xs",
-        item: "gap-1.5 py-1 ps-1.5 text-sm",
+        item: "text-sm gap-1.5 py-1.5 ps-1.5 rounded-md [&_svg]:size-4",
+        itemIndicator: "end-1 [&_svg]:size-4",
       },
       lg: {
-        control: "h-10 gap-2 px-3 min-w-40",
-        input: "text-base",
+        control: "h-9 gap-1 ps-2.5 pe-1 min-w-40",
+        input: "h-9 text-base",
+        clear: "h-7 rounded-md [&_svg]:size-4.5",
+        trigger: "h-7 rounded-md",
+        icon: "[&_svg]:size-4.5",
         positioner: "min-w-40",
-        list: "p-1.5",
+        list: "p-1",
         empty: "px-3 py-8 text-base",
         status: "px-3 py-2 text-sm",
-        item: "gap-2 py-1.5 ps-2 text-base",
+        item: "text-base gap-2 py-1.5 ps-1.5 rounded-md [&_svg]:size-4.5",
+        itemIndicator: "end-1 [&_svg]:size-4.5",
       },
     },
   },

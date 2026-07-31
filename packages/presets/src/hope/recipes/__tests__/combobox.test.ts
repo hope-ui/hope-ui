@@ -53,7 +53,7 @@ describe("hope combobox recipe", () => {
     const control = comboboxRecipe({}).control();
     expect(control).toContain("bg-surface-raised");
     expect(control).toContain("border-subtle");
-    expect(control).toContain("rounded-md");
+    expect(control).toContain("rounded-lg");
     expect(control).toContain("relative");
     expect(control).toContain("inline-flex");
     // The widget dims as one — the component writes `data-disabled` here, not on each descendant.
@@ -77,26 +77,47 @@ describe("hope combobox recipe", () => {
     expect(input).toContain("flex-1");
     // The empty state is the native pseudo-element, which is why there is no placeholder slot.
     expect(input).toContain("placeholder:text-foreground-subtle");
-    // The control owns the box; a height, a border color or a ring here would fight it.
-    expect(input).not.toMatch(/(?:^|\s)h-\d/);
+    // The control owns the *box*: a border color, a background or a ring here would draw a second
+    // one inside it. The height is the one metric the input does take, and it takes the control's
+    // own — the field's caret target spans the shell instead of a shorter line box inside it.
     expect(input).not.toContain("border-subtle");
+    expect(input).not.toContain("bg-surface");
     expect(input).not.toContain("ring-");
   });
 
-  it("gives the clear button a wash and the chevron trigger none", () => {
-    const clear = comboboxRecipe({}).clear();
-    // Guarded against the press so the two never fight — CloseButton's shape.
-    expect(clear).toContain("hover:not-data-pressed:bg-surface-raised-hovered");
-    expect(clear).toContain("data-pressed:bg-surface-raised-pressed");
-    expect(clear).toContain("shrink-0");
-    expect(clear).toContain("rounded-sm");
+  it("draws the two gutter buttons identically — same box, same wash", () => {
+    // They share one gutter, so a difference between them would read as a difference in kind. The
+    // wash is guarded against the press so the two states never fight — CloseButton's shape.
+    for (const slot of ["clear", "trigger"] as const) {
+      const cls = comboboxRecipe({})[slot]();
+      expect(cls, slot).toContain("hover:not-data-pressed:bg-surface-raised-hovered");
+      expect(cls, slot).toContain("data-pressed:bg-surface-raised-pressed");
+      expect(cls, slot).toContain("aspect-square");
+      expect(cls, slot).toContain("shrink-0");
+      expect(cls, slot).toContain("text-foreground-muted");
+      // Neither draws its own box — the control owns the border and the background.
+      expect(cls, slot).not.toContain("border");
+    }
 
-    const trigger = comboboxRecipe({}).trigger();
-    // Purely the chevron's hit area: the control draws the border and the background.
-    expect(trigger).not.toContain("bg-");
-    expect(trigger).not.toContain("border");
-    expect(trigger).toContain("cursor-default");
-    expect(trigger).toContain("text-foreground-muted");
+    // Same square metrics at every size, or the pair stops looking like a pair.
+    for (const size of SIZES) {
+      const parts = comboboxRecipe({ size });
+      const height = /(?:^|\s)(h-\d+)/.exec(parts.clear())?.[1];
+      const radius = /(?:^|\s)(rounded-\w+)/.exec(parts.clear())?.[1];
+      expect(height, `no h-* on the ${size} clear button`).toBeDefined();
+      expect(parts.trigger(), `${size} trigger height`).toContain(height);
+      expect(parts.trigger(), `${size} trigger radius`).toContain(radius);
+    }
+  });
+
+  it("keeps each gutter button one size step under the control it sits in", () => {
+    // `aspect-square` over the height is what makes the button square without a second width class
+    // to keep in step; sizing it under the control is what leaves an even margin inside `pe-1`.
+    const controlHeights: Record<ComboboxSize, number> = { sm: 7, md: 8, lg: 9 };
+    for (const size of SIZES) {
+      const button = /(?:^|\s)h-(\d+)/.exec(comboboxRecipe({ size }).clear())?.[1];
+      expect(Number(button), `${size} gutter button`).toBeLessThan(controlHeights[size]);
+    }
   });
 
   it("rings neither gutter button — both are tabindex=-1, so the shell's ring is the whole story", () => {
@@ -188,31 +209,64 @@ describe("hope combobox recipe", () => {
     expect(item).toContain("relative");
     // Logical, so the indicator gutter mirrors with the locale.
     expect(item).toContain("pe-8");
-    expect(comboboxRecipe({}).itemIndicator()).toContain("end-2");
+    expect(comboboxRecipe({}).itemIndicator()).toContain("end-1");
   });
 
   it("scales the control and the rows together, each size self-contained", () => {
     const sm = comboboxRecipe({ size: "sm" });
-    expect(sm.control()).toContain("h-8");
+    expect(sm.control()).toContain("h-7");
     expect(sm.input()).toContain("text-xs");
     expect(sm.item()).toContain("text-xs");
-    expect(sm.item()).toContain("py-0.5");
+    expect(sm.item()).toContain("rounded-sm");
 
     const lg = comboboxRecipe({ size: "lg" });
-    expect(lg.control()).toContain("h-10");
+    expect(lg.control()).toContain("h-9");
     expect(lg.input()).toContain("text-base");
     expect(lg.item()).toContain("text-base");
-    expect(lg.item()).toContain("py-1.5");
+    expect(lg.item()).toContain("rounded-md");
+  });
+
+  it("matches Select's control metrics, so the two sit level in a form", () => {
+    // Combobox's shell and Select's trigger are the same control at the same size — a height that
+    // drifts here shows up as two misaligned boxes in one row of a form.
+    const heights: Record<ComboboxSize, string> = { sm: "h-7", md: "h-8", lg: "h-9" };
+    for (const size of SIZES) {
+      const parts = comboboxRecipe({ size });
+      expect(parts.control(), `${size} control height`).toContain(heights[size]);
+      // The input fills the shell rather than sitting inside it on its own line box, so the caret
+      // and the text are centred against the same box the gutter buttons are.
+      expect(parts.input(), `${size} input height`).toContain(heights[size]);
+      // Logical, and tighter on the end: what sits there is a button with its own wash, not a bare
+      // glyph, so it needs less room than Select's chevron.
+      expect(parts.control(), `${size} control gutter`).toContain("ps-2.5 pe-1");
+    }
+  });
+
+  it("scales every glyph in the widget with the size, in step", () => {
+    // One glyph scale across both surfaces: the chevron, the clear ✕, a row's leading icon and the
+    // selected-row check all read as the same size at a given density.
+    const expected: Record<ComboboxSize, string> = {
+      sm: "[&_svg]:size-3.5",
+      md: "[&_svg]:size-4",
+      lg: "[&_svg]:size-4.5",
+    };
+    for (const size of SIZES) {
+      const parts = comboboxRecipe({ size });
+      expect(parts.icon(), `${size} chevron`).toContain(expected[size]);
+      expect(parts.clear(), `${size} clear`).toContain(expected[size]);
+      expect(parts.item(), `${size} row`).toContain(expected[size]);
+      expect(parts.itemIndicator(), `${size} indicator`).toContain(expected[size]);
+    }
   });
 
   it("defaults to the md size when no size is passed", () => {
     const parts = comboboxRecipe({});
-    expect(parts.control()).toContain("h-9");
+    expect(parts.control()).toContain("h-8");
     expect(parts.input()).toContain("text-sm");
     expect(parts.item()).toContain("text-sm");
     // Only the md density is applied — no sm/lg endpoints leak in.
-    expect(parts.control()).not.toContain("h-8");
-    expect(parts.control()).not.toContain("h-10");
+    expect(parts.control()).not.toContain("h-7");
+    expect(parts.control()).not.toContain("h-9");
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {

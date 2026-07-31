@@ -1,14 +1,6 @@
 import { Combobox } from "@hope-ui/components/combobox";
 import { createSignal } from "solid-js";
-import {
-  FRUITS,
-  type Fruit,
-  FruitControl,
-  FruitPopup,
-  itemToLabel,
-  itemToValue,
-  Stage,
-} from "./data";
+import { FRUITS, type Fruit, FruitControl, FruitPopup, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "Selection modes": `selectionMode="multiple"` makes the value an **array**, and the
 // popup stays open while you tick rows (`shouldCloseOnSelect` defaults to `selectionMode !==
@@ -22,7 +14,7 @@ export function ComboboxMultipleDemo() {
   const [fruits, setFruits] = createSignal<Fruit[]>([FRUITS[0], FRUITS[3]]);
 
   return (
-    <Stage>
+    <div class="flex flex-col gap-2">
       <Combobox.Root
         items={FRUITS}
         selectionMode="multiple"
@@ -38,6 +30,6 @@ export function ComboboxMultipleDemo() {
       <output class="text-foreground-muted text-sm">
         picked: <code>{fruits().map(itemToLabel).join(", ") || "none"}</code>
       </output>
-    </Stage>
+    </div>
   );
 }

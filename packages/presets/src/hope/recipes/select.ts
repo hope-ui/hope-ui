@@ -10,9 +10,11 @@
  *
  * ── The row half is Listbox's, deliberately ─────────────────────────────────────────────────────
  * `item` / `itemIndicator` / `group` / `groupLabel` / `separator` mirror `listbox.ts` class for
- * class. Select does not *compose* the Listbox component (its Root owns its own `createListbox`, and
- * its recipe is standalone-first with no popup chrome), so this is a deliberate parallel rather than
- * reuse — but the two must look identical, since they are the same rows.
+ * class — and `combobox.ts` mirrors both. Select does not *compose* the Listbox component (its Root
+ * owns its own `createListbox`, and its recipe is standalone-first with no popup chrome), so this is
+ * a deliberate parallel rather than reuse — but the three must look identical, since they are the
+ * same rows. **This file is the visual source of truth**: a row change lands here first, then in
+ * `listbox.ts` and `combobox.ts` in the same commit.
  *
  * What Select adds on top is exactly the chrome `listbox.ts` leaves out and documents as belonging
  * here: the elevated surface, the border, the shadow, the rounded corners and the panel padding.
@@ -40,15 +42,15 @@
  * instead of pushing the card past the cap.
  *
  * ── Recipe purity ───────────────────────────────────────────────────────────────────────────────
- * Every color is a finished `--hope-*` token: `bg-surface-raised` + its `-hovered`/`-pressed` twins
- * (the control), `border-subtle` (the hairlines), `bg-surface-overlay` (the card), `bg-active`/
- * `text-on-active` (the highlight), `focus`/`focus-halo` (the ring), `text-foreground`/
- * `-muted`/`-subtle` (content, group labels, the placeholder), `opacity-disabled` (the disabled dim
- * — an opacity *token*, not a magic number). No `color-mix`, no alpha modifier, no magic opacity.
- * Every class is a literal string so the consumer's `@source` scan can see it.
+ * Every color is a finished `--hope-*` token: `bg-surface-raised` (the control), `border-subtle`
+ * (the hairlines), `bg-surface-overlay` (the card), `bg-active`/`text-on-active` (the highlight),
+ * `focus`/`focus-halo` (the ring), `text-foreground`/`-muted`/`-subtle` (content, group labels, the
+ * placeholder), `opacity-disabled` (the disabled dim — an opacity *token*, not a magic number). No
+ * `color-mix`, no alpha modifier, no magic opacity. Every class is a literal string so the
+ * consumer's `@source` scan can see it.
  *
  * ── RTL ─────────────────────────────────────────────────────────────────────────────────────────
- * Every inset is logical (`ps-*`, `pe-8`, `end-2`, `px-*`, `text-start`) — the indicator gutter is
+ * Every inset is logical (`ps-*`, `pe-*`, `end-1`, `text-start`) — the indicator gutter is
  * reserved on the side the text *ends*, so it mirrors with the locale. The two physical utilities
  * are the enter-slide and the scale origin on `content`, both scoped to `data-side-*`: that reports
  * where the layer LANDED after `flip`, which is measured geometry rather than reading direction, so
@@ -69,11 +71,8 @@ export const selectRecipe = tv({
     // values and live per `size`, not here.
     trigger: [
       "relative inline-flex items-center justify-between select-none cursor-default",
-      "rounded-md border border-subtle bg-surface-raised text-foreground outline-none",
+      "rounded-lg border border-subtle bg-surface-raised text-foreground outline-none",
       "transition-[background-color,border-color,box-shadow] duration-150 ease-out",
-      // Guarded against the pressed state so the wash never fights the press color — CloseButton's
-      // shape. `createButton` (composed by `createComboboxTrigger`) emits both `data-*` hooks.
-      "hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
       // The shared focus indicator every hope control uses: the border takes the focus color and the
       // halo is the finished translucent token, never an alpha modifier over `focus`.
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo",
@@ -85,8 +84,8 @@ export const selectRecipe = tv({
     // why there is no `placeholder` slot.
     value: "min-w-0 flex-1 truncate text-start data-placeholder:text-foreground-subtle",
     // The chevron's box. `pointer-events-none` so the glyph is never the pointer target over the
-    // button. The glyph box is size-independent chrome and stays here.
-    icon: "pointer-events-none inline-flex shrink-0 items-center justify-center text-foreground-muted [&_svg]:size-4",
+    // button. The glyph box itself is a density value and lives per `size`.
+    icon: "pointer-events-none inline-flex shrink-0 items-center justify-center text-foreground-muted",
     // The measured layer. Stacking + the anchor-matched width, and NOTHING positional: the kernel
     // writes `position`/`left`/`top`/`transform` (and the pre-measurement `visibility: hidden`) as an
     // inline style, which a class here would fight.
@@ -123,38 +122,49 @@ export const selectRecipe = tv({
     // A hairline divider between sections; it never takes the pointer.
     separator: "my-1 h-px bg-subtle pointer-events-none",
     // An `role="option"` row. `relative` anchors the absolute `itemIndicator`; `pe-8` reserves the
-    // trailing glyph gutter. Highlight is `data-active:` ONLY (header note). Text / padding / gap are
-    // density values and live per `size`.
-    item: "relative flex cursor-default items-center rounded-md pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:size-4",
+    // trailing glyph gutter. Highlight is `data-active:` ONLY (header note). Text / padding / gap /
+    // radius / glyph box are density values and live per `size`.
+    item: "relative flex cursor-default items-center pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled",
     // The row's label. Same `min-w-0` + `flex-1` reason as `value`: truncate needs a shrinkable box.
     itemText: "min-w-0 flex-1 truncate",
     // The chosen-row check glyph — pinned in the reserved `pe-8` gutter, inheriting the row's color.
-    itemIndicator: "absolute end-2 flex items-center justify-center [&_svg]:size-4",
+    // Its inset and glyph box scale with the row, so both live per `size`.
+    itemIndicator: "absolute flex items-center justify-center",
   },
   variants: {
-    // `size` owns the full density set on BOTH surfaces — the control's height/padding/text/gap and
-    // its min width, the popup's matching min width and padding, and the row's text/padding/gap. Each
-    // size is self-contained (no base carries a competing density class), so a size applies additively
-    // and nothing relies on tailwind-merge resolution. The trigger and the positioner take the SAME
+    // `size` owns the full density set on BOTH surfaces — the control's height/padding/text/gap, its
+    // min width and its chevron glyph box, the popup's matching min width and padding, the row's
+    // text/padding/gap/radius/glyph box, and the indicator's inset and glyph box. Each size is
+    // self-contained (no base carries a competing density class), so a size applies additively and
+    // nothing relies on tailwind-merge resolution. The trigger and the positioner take the SAME
     // `min-w-*`, so a narrow trigger and its popup never disagree.
+    //
+    // The row's *vertical* padding is deliberately constant (`py-1.5`) — the type scale and the glyph
+    // box carry the density, and a second size-varying term made `sm` rows read as cramped.
     size: {
       sm: {
-        trigger: "h-8 gap-1.5 px-2 text-xs min-w-32",
+        trigger: "h-7 gap-1.5 ps-2.5 pe-2 text-xs min-w-32",
+        icon: "[&_svg]:size-3.5",
         positioner: "min-w-32",
         list: "p-1",
-        item: "gap-1 py-0.5 ps-1 text-xs",
+        item: "text-xs gap-1 py-1.5 ps-1.5 rounded-sm [&_svg]:size-3.5",
+        itemIndicator: "end-1 [&_svg]:size-3.5",
       },
       md: {
-        trigger: "h-9 gap-2 px-2.5 text-sm min-w-36",
+        trigger: "h-8 gap-2 ps-2.5 pe-2 text-sm min-w-36",
+        icon: "[&_svg]:size-4",
         positioner: "min-w-36",
         list: "p-1",
-        item: "gap-1.5 py-1 ps-1.5 text-sm",
+        item: "text-sm gap-1.5 py-1.5 ps-1.5 rounded-md [&_svg]:size-4",
+        itemIndicator: "end-1 [&_svg]:size-4",
       },
       lg: {
-        trigger: "h-10 gap-2 px-3 text-base min-w-40",
+        trigger: "h-9 gap-2 ps-2.5 pe-2 text-base min-w-40",
+        icon: "[&_svg]:size-4.5",
         positioner: "min-w-40",
-        list: "p-1.5",
-        item: "gap-2 py-1.5 ps-2 text-base",
+        list: "p-1",
+        item: "text-base gap-2 py-1.5 ps-1.5 rounded-md [&_svg]:size-4.5",
+        itemIndicator: "end-1 [&_svg]:size-4.5",
       },
     },
   },

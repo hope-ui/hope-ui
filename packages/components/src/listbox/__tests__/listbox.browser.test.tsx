@@ -810,8 +810,8 @@ describe("Listbox hydration", () => {
  *
  * These are Tailwind v4's own declarations for the utilities under test, plus the two positioning
  * ones the indicator's placement depends on (without them the glyph is a static inline element and
- * `end-2` means nothing). Asserting **both** directions is what keeps this honest: a regression to
- * `pr-8`/`pl-1.5`/`right-2` finds no matching rule at all, both directions collapse onto the same
+ * `end-1` means nothing). Asserting **both** directions is what keeps this honest: a regression to
+ * `pr-8`/`pl-1.5`/`right-1` finds no matching rule at all, both directions collapse onto the same
  * geometry, and the assertions fail rather than quietly passing.
  */
 function injectLogicalUtilities(): () => void {
@@ -821,7 +821,7 @@ function injectLogicalUtilities(): () => void {
     .absolute { position: absolute; }
     .pe-8 { padding-inline-end: 2rem; }
     .ps-1\\.5 { padding-inline-start: 0.375rem; }
-    .end-2 { inset-inline-end: 0.5rem; }
+    .end-1 { inset-inline-end: 0.25rem; }
   `;
   document.head.appendChild(style);
   return () => style.remove();
@@ -865,7 +865,7 @@ describe("Listbox — RTL", () => {
     expect(style.paddingLeft).toBe("32px");
     expect(style.paddingRight).toBe("6px");
 
-    // `end-2` puts the check glyph inside that gutter, i.e. against the row's visual left edge.
+    // `end-1` puts the check glyph inside that gutter, i.e. against the row's visual left edge.
     const glyph = indicator.getBoundingClientRect();
     expect(glyph.left - rows.left).toBeLessThan(rows.right - glyph.right);
 

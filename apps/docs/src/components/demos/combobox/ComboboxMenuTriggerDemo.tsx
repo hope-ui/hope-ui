@@ -1,6 +1,6 @@
 import { Combobox } from "@hope-ui/components/combobox";
 import { For } from "solid-js";
-import { FRUITS, FruitControl, FruitPopup, itemToLabel, itemToValue, Stage } from "./data";
+import { FRUITS, FruitControl, FruitPopup, itemToLabel, itemToValue } from "./data";
 
 // Live demo for "What opens the popup". `menuTrigger` decides what opens it *on its own* — and only
 // that. The chevron and the arrow keys open all three, always, which is what keeps `"manual"` usable
@@ -13,25 +13,23 @@ const TRIGGERS = ["input", "focus", "manual"] as const;
 
 export function ComboboxMenuTriggerDemo() {
   return (
-    <Stage>
-      <div class="flex flex-wrap items-start justify-center gap-6">
-        <For each={TRIGGERS}>
-          {(trigger) => (
-            <div class="flex flex-col gap-2">
-              <code class="text-foreground-muted text-xs">menuTrigger="{trigger}"</code>
-              <Combobox.Root
-                items={FRUITS}
-                itemToValue={itemToValue}
-                itemToLabel={itemToLabel}
-                menuTrigger={trigger}
-              >
-                <FruitControl label={`Choose a fruit (${trigger})`} placeholder={trigger} />
-                <FruitPopup />
-              </Combobox.Root>
-            </div>
-          )}
-        </For>
-      </div>
-    </Stage>
+    <div class="flex flex-col items-start justify-center gap-6">
+      <For each={TRIGGERS}>
+        {(trigger) => (
+          <div class="flex flex-col gap-2">
+            <code class="text-foreground-muted text-xs">menuTrigger="{trigger}"</code>
+            <Combobox.Root
+              items={FRUITS}
+              itemToValue={itemToValue}
+              itemToLabel={itemToLabel}
+              menuTrigger={trigger}
+            >
+              <FruitControl label={`Choose a fruit (${trigger})`} placeholder={trigger} />
+              <FruitPopup />
+            </Combobox.Root>
+          </div>
+        )}
+      </For>
+    </div>
   );
 }
