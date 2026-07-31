@@ -131,7 +131,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
-| Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes, native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21). **Missing `ItemText`** — see §3 |
+| Listbox ✅ | Collections | core | `createDataCollection` / `createVirtualCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), **data** and virtual modes (virtual is **flat-only** — see §3), native-form submission through the shared `HiddenSelect` (a real clipped `<select>`: autofill, working `required`, form reset). Underlies Select/Combobox via the combobox kernel (#21). **Missing `ItemText`** — see §3 |
 | Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select. **No virtual mode yet** — §3 says close it the way Listbox did |
 | Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer. Inherits Select's **no virtual mode** — §3, and the filter is what makes closing it urgent |
 | Autocomplete | Collections | 2/5 | Combobox, minus selection state | **not a rename of Combobox** — free-text value, list is suggestions. See #21 |
@@ -322,8 +322,9 @@ moved down a level because Select's iteration lives on `List` rather than `Root`
 **What it costs, stated plainly.** One sentence back on the public API: *provide exactly one of `item`
 / `index`*. Decision 6 removed that sentence, and `components/decisions.md` § Select records the
 removal as the return on making grouping a plain nested `<For>` — which it is, and which survives,
-because grouping and windowing never combine (`groupToItems` + `estimateSize` is already a dev error
-in `createListbox`). The two props are disjoint by mode, not competing on the same list.
+because grouping and windowing do not combine today: `groupToItems` + `estimateSize` is a dev error in
+`createListbox`. The two props are disjoint by mode, not competing on the same list. **That separation
+is a current constraint, not a law** — see the next entry, which is about lifting it.
 
 **Why it will be asked for.** A Select over a few hundred options needs nothing. The pressure comes
 from Combobox, where a filter over several thousand rows is the ordinary shape (a country / currency /
@@ -332,6 +333,59 @@ SKU picker) and mounting the unfiltered set is the visible cost.
 **Also update, when this lands:** `components/decisions.md` § Select — its "A `Select.Item index` prop,
 so virtual mode works" entry is superseded by this one and should say so rather than sit there
 contradicting it.
+
+### Virtualized groups — the blocker is ours, not the virtualizer's
+
+**Grouped and windowed do not combine, in any of the three.** `createListbox` dev-errors on
+`groupToItems` + `estimateSize` ("windowing measures a flat run of rows"), `estimateSize` wins and the
+groups are silently ignored. So `Listbox` virtualizes **flat lists only**, and Select/Combobox do not
+virtualize at all yet (previous entry).
+
+**TanStack Virtual is not the reason.** The installed `@tanstack/virtual-core@3.17.4` ships
+`rangeExtractor`, which is the documented hook for sticky section headers. The standard recipe is to
+**flatten headers into the index space** — 0 = "Citrus" header, 1 = Orange, 2 = Lemon, 3 = "Berries"
+header, 4 = Strawberry, … — with each index resolving to a header or an option and `rangeExtractor`
+pinning the active header while its section scrolls. This is a well-trodden pattern, not an exotic one.
+
+**Two layers of blocker, both ours:**
+1. *Shallow.* `createVirtualCollection` exposes a flat `count` + `getItemData(index)` and never passes
+   `rangeExtractor` through. Unwritten code, nothing more.
+2. *Real.* hope-ui deliberately keeps the group **label** out of the collection. There is no
+   `groupToLabel`; the consumer renders the label from their own key, and the kernel counts only
+   **options**. That is exactly what makes grouping a plain nested `<For>` and what stops a
+   `{ label, items }` shape being imposed on whatever the consumer's API returns. But windowing needs
+   **every on-screen row in the index space, headers included**, or the sizer's total height and every
+   row offset are wrong.
+
+**So the question is what "the collection" contains.** Three shapes, in increasing order of honesty
+and cost:
+
+1. **`groupToLabel`, required only in grouped-virtual mode.** The narrowest fix: an optional accessor
+   that becomes mandatory when `groupToItems` *and* `estimateSize` are both set. The flattened order
+   grows header entries, `createListFocus`/navigation/typeahead/selection learn to skip a non-option
+   row, and `Listbox.Root` / `Select.List` render a header from the label at a header index. Costs a
+   second flattening shape, a "non-option row" concept the rest of the kernel never needs, and a prop
+   whose requiredness depends on two *other* props — a conditional contract that is awkward to type
+   and worse to document.
+2. **Headers as collection entries, always.** Stop treating group labels as consumer chrome and make
+   them first-class rows in every mode. Uniform, and it reduces `rangeExtractor` to a passthrough.
+   Costs the thing the current design bought — `groupToItems` imposes no shape on the consumer's data
+   today, and this would (a label per group becomes owed) — and it is a breaking change to Listbox's
+   shipped grouped API.
+3. **A collection-model rewrite.** One collection abstraction with a **typed row union**
+   (`option | header | separator`), levels, and a single flattened index space every mode shares —
+   data, virtual, grouped, and eventually the hierarchy #15 `createTreeCollection` wants. React Aria
+   and Zag both converged here. The largest cost, and the only option that does not leave a second
+   flattening shape behind for someone to trip over later.
+
+**Decide it once, at the collection layer — not per component.** All three collection components read
+the same source, `Menu` and `CommandPalette` are queued behind them, and #15 TreeView wants the same
+row-kinds concept for a different reason. Three separate answers is the outcome to avoid.
+
+**Revisit trigger:** the first real ask for a grouped picker over more rows than the DOM wants — a
+country picker grouped by continent, a SKU picker grouped by category. Until then, flat-virtual plus
+non-virtual-grouped covers the catalog, and option 3 gets cheaper the sooner it is chosen and more
+expensive the more components ship against the current shape.
 
 ### One row vocabulary across every collection component — `Listbox` is missing `ItemText`
 
