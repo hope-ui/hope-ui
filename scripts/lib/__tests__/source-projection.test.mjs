@@ -228,10 +228,19 @@ describe("strings", () => {
     expect(stringInteriors(source)).toContain(String.raw`a\\`);
   });
 
-  it("blanks an unterminated string to end of file without overrunning it", () => {
+  it("does not treat an unterminated quote at end of file as a string", () => {
+    // Same rule as the newline case, and for consistency with it: a `'`/`"` that never closes is
+    // not a JS string, so it is left as an ordinary character rather than blanking what follows.
+    // Only reachable in a truncated or invalid file — what matters is that it cannot swallow.
     const source = 'const s = "abc';
-    expect(blankNonCode(source)).toBe('const s = "   ');
-    expect(stringInteriors(source)).toBe("           abc");
+    expect(blankNonCode(source)).toBe(source);
+    expect(stringInteriors(source)).toBe("              ");
+  });
+
+  it("blanks an unterminated TEMPLATE to end of file — a template may legally span lines", () => {
+    const source = "const s = `abc\ndef";
+    expect(blankNonCode(source)).toBe("const s = `   \n   ");
+    expect(stringInteriors(source)).toBe("           abc\ndef");
   });
 
   it("keeps a multi-line template's contents as string on every line", () => {
@@ -352,24 +361,75 @@ describe("lineAt", () => {
 // subject under test — the tokenizer's handling of an interpolation — not an interpolation someone
 // meant to write in a template literal.
 describe("known limits of a tokenizer with no parser", () => {
-  it("does not recognise a regex after a keyword — `previous` only tracks punctuation", () => {
-    // KNOWN LIMIT. `previous` is the last non-whitespace *character*, so after `return` it is `n`,
-    // which is not in the operator set. The `/` is read as division, then the `'` opens a string
-    // that runs to the next quote — swallowing real code on this line and the ones after it.
+  it("recognises a regex after each keyword that can precede one", () => {
+    // Regression: `previous` is a single character, so after `return` it was `n` — not in the
+    // operator set — and the `/` read as division. The `'` inside the regex then opened a string
+    // that ran to the next quote, blanking this line and every line after it in both projections.
     const source = `function f(x) { return /['"]/.test(x); }\nconst after = "kept";`;
     const code = blankNonCode(source);
-    expect(code).toContain("return /['");
-    expect(code).not.toContain(".test(x)");
-    expect(code).not.toContain("const after");
-    // And the mirror image: the string projection hands back real code as if it were a class string.
-    expect(stringInteriors(source)).toContain("]/.test(x); }");
+    expect(code).toContain(".test(x); }");
+    expect(code).toContain("const after");
+    expect(code).not.toContain("['\"]"); // the pattern itself is still blanked
+    expect(stringInteriors(source)).toContain("kept");
+
+    for (const keyword of ["typeof", "case", "in", "of", "throw", "await", "yield", "void"]) {
+      const line = `x = a ${keyword} /['"]/;\nconst after = 1;`;
+      expect(blankNonCode(line), keyword).toContain("const after");
+    }
   });
 
-  it("treats JSX text as code, so an apostrophe in it opens a string", () => {
-    // KNOWN LIMIT, same root cause: `don't` in JSX text is not inside any JS literal.
+  it("does not mistake division for a regex after an identifier or a number", () => {
+    // The other direction of the same call, and why the check is a keyword SET rather than
+    // "any preceding word": `foo1 / 2` and `total / count` are division.
+    for (const expression of ["const r = total / count;", "const r = foo1 / 2;"]) {
+      expect(blankNonCode(expression)).toBe(expression);
+    }
+  });
+
+  it("does not let an apostrophe in JSX text open a string", () => {
+    // Regression, same root cause and the one that was live in the repo: `don't` in JSX prose is
+    // inside no JS literal, and a `'` with no closing quote before the newline is not a string —
+    // JS forbids a raw newline in one. Two apps/docs demos silently blanked their own tails.
     const source = "const el = <p>don't</p>;\nconst after = 2;";
-    expect(blankNonCode(source)).toBe("const el = <p>don'      \n                ");
-    expect(stringInteriors(source)).toContain("t</p>;");
+    expect(blankNonCode(source)).toBe(source);
+    expect(stringInteriors(source)).not.toContain("t</p>;");
+  });
+
+  it("does not let an apostrophe reach a matching quote on a LATER line", () => {
+    // The actual shipped failure, and the case the newline guard exists for. With a matching quote
+    // further down the file, the `-1`-at-EOF fallback never fires — the scan simply runs to it and
+    // blanks everything between. `apps/docs/.../PopoverSizesDemo.tsx` lost its last 16 lines this
+    // way, and `check:rtl-safety` reported a pass over a real physical CSSOM write in the gap.
+    // The later `'` in `'1px'` is what makes this the runaway case rather than the EOF one: without
+    // the newline guard the scan simply runs to it, blanking both intervening lines.
+    const source = [
+      "const el = <p>the card's max width</p>;",
+      "const cssomWrite = () => { el.style.paddingRight = '1px'; };",
+      "const alsoCode = 1;",
+    ].join("\n");
+    const code = blankNonCode(source);
+    expect(code).toContain("el.style.paddingRight");
+    expect(code.split("\n")[2]).toBe("const alsoCode = 1;");
+    // The genuine string on line 2 is still blanked as one.
+    expect(code).not.toContain("1px");
+  });
+
+  it("bounds a mis-lexed quote to its own line", () => {
+    // The blast-radius guarantee, which matters more than being right about any single quote:
+    // whatever the tokenizer gets wrong, the next line is intact. Here the second `'` closes the
+    // first, mis-blanking the middle of line 1 — and nothing beyond it.
+    const source = "const el = <p>don't say 'hi'</p>;\nconst after = 2;";
+    const lines = blankNonCode(source).split("\n");
+    expect(lines[1]).toBe("const after = 2;");
+  });
+
+  it("still lets a template literal span lines", () => {
+    const source = "const t = `line one\nline two`;\nconst after = 3;";
+    const code = blankNonCode(source);
+    expect(code).not.toContain("line one");
+    expect(code).not.toContain("line two");
+    expect(code).toContain("const after = 3;");
+    expect(stringInteriors(source)).toContain("line two");
   });
 
   it("treats a template's `${...}` interpolation as string interior, not as code", () => {

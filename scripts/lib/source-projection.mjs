@@ -21,6 +21,73 @@ const KEEP_CODE = "code";
 const KEEP_STRINGS = "strings";
 
 /**
+ * Words after which a `/` opens a regex literal rather than dividing. The single-character
+ * `previous` cannot tell these from an identifier, and guessing division is the dangerous
+ * direction: a regex read as division exposes whatever quote or slash it contains.
+ */
+const REGEX_PRECEDING_KEYWORDS = new Set([
+  "return",
+  "typeof",
+  "instanceof",
+  "in",
+  "of",
+  "new",
+  "delete",
+  "void",
+  "throw",
+  "case",
+  "do",
+  "else",
+  "yield",
+  "await",
+]);
+
+/**
+ * The bare word immediately before `index`, or `""` when the preceding token is not one — an
+ * operator, a digit-terminated identifier (`foo1 / 2` is division), or nothing.
+ *
+ * @param {string} source @param {number} index
+ */
+function precedingWord(source, index) {
+  let i = index - 1;
+  while (i >= 0 && /\s/.test(source[i])) {
+    i--;
+  }
+  if (i < 0 || !/[A-Za-z_$]/.test(source[i])) {
+    return "";
+  }
+  const end = i + 1;
+  while (i >= 0 && /[\w$]/.test(source[i])) {
+    i--;
+  }
+  return source.slice(i + 1, end);
+}
+
+/**
+ * The offset of the quote closing the literal opened at `open`, or `-1` when there isn't one.
+ *
+ * A `'` or `"` literal that reaches a newline unclosed is not a string at all — JS forbids a raw
+ * newline inside one — so the search stops there. A backslash escapes the next character, which
+ * covers both `\'` and the (legal, archaic) escaped-newline line continuation. Template literals
+ * may span lines and so are only ended by their own backtick.
+ *
+ * @param {string} source @param {number} open @param {string} quote
+ */
+function closingQuote(source, open, quote) {
+  for (let i = open + 1; i < source.length; i++) {
+    const char = source[i];
+    if (char === "\\") {
+      i++;
+    } else if (char === quote) {
+      return i;
+    } else if (char === "\n" && quote !== "`") {
+      return -1;
+    }
+  }
+  return quote === "`" ? source.length : -1;
+}
+
+/**
  * One pass of the shared tokenizer. `keep` selects which class survives; everything else is
  * replaced with a space, newlines excepted.
  *
@@ -81,18 +148,23 @@ function project(source, keep) {
     }
 
     if (char === '"' || char === "'" || char === "`") {
-      let i = index + 1;
-      while (i < source.length) {
-        if (source[i] === "\\") {
-          i += 2;
-        } else if (source[i] === char) {
-          break;
-        } else {
-          i++;
-        }
+      const close = closingQuote(source, index, char);
+      // No closing quote before the line ended, so this was never a string: only a template literal
+      // may span lines. It is an apostrophe in JSX prose (`<p>don't</p>`) or inside a regex the
+      // regex branch below declined to take. Treat it as an ordinary code character.
+      //
+      // This is the blast-radius fix, and it matters more than being right about any single quote.
+      // Scanning on to the next matching quote — possibly at end of file — silently blanked the
+      // REST OF THE FILE in both projections, so every check that reads them simply stopped
+      // reporting and looked like a pass. Two live files did exactly that. Bounded to a line, the
+      // worst a mis-lex can now do is miss one.
+      if (close === -1) {
+        previous = char;
+        index++;
+        continue;
       }
-      literal(index + 1, Math.min(i, source.length));
-      index = Math.min(i + 1, source.length);
+      literal(index + 1, close);
+      index = close + 1;
       previous = char;
       continue;
     }
@@ -100,7 +172,16 @@ function project(source, keep) {
     // A `/` starting an expression is a regex literal; after a value it is division. Either way it
     // is code — the string projection drops it, the code projection blanks only its contents so a
     // pattern inside the regex can't be mistaken for a real call.
-    if (char === "/" && (previous === "" || "(,=:[!&|?{};+-*%~^".includes(previous))) {
+    //
+    // `previous` is a single character, which is why the preceding *word* is consulted too:
+    // `return /['"]/.test(x)` ends in `n`, so the `/` read as division and the `'` then opened a
+    // string. Same for `typeof`, `case`, `in`, `of` and the rest of REGEX_PRECEDING_KEYWORDS.
+    if (
+      char === "/" &&
+      (previous === "" ||
+        "(,=:[!&|?{};+-*%~^".includes(previous) ||
+        REGEX_PRECEDING_KEYWORDS.has(precedingWord(source, index)))
+    ) {
       let i = index + 1;
       let inClass = false;
       while (i < source.length) {
