@@ -47,9 +47,8 @@ const FRUITS: Fruit[] = [
   { id: 4, name: "Date" },
   { id: 5, name: "Elderberry", disabled: true },
   { id: 6, name: "Fig" },
-  // Accented, so typing its plain-ASCII prefix ("acai") in the external-focus-owner story below
-  // exercises the collator-backed typeahead this step added — `toLowerCase().startsWith()` alone
-  // could never match this.
+  // Accented on purpose: typing the plain-ASCII "acai" must still match it. A
+  // `toLowerCase().startsWith()` typeahead never could — it takes a locale-aware collator.
   { id: 7, name: "Açaí" },
 ];
 
@@ -294,9 +293,9 @@ export const FocusModes: Story = {
  * whole premise of the combobox kernel.
  *
  * It is written against `@hope-ui/primitives/listbox` rather than `Listbox.Root`, because `Root`
- * binds `rootProps` (the container `tabindex`, its own `onKeyDown`, its own `aria-activedescendant`)
- * onto its own element — exactly what a Select must *not* do. The recipe classes are read straight
- * off `useSlots`, so the look is the real one. `Select` is the component layer for this shape.
+ * binds the container `tabindex`, keyboard handler and `aria-activedescendant` onto its own element —
+ * exactly what a Select must *not* do. The recipe classes are still the real ones. `Select` is the
+ * component layer for this shape.
  *
  * Two things to try: arrow past the bottom of the panel (the active row scrolls itself into view —
  * nothing moves DOM focus, so the list would otherwise leave it offscreen), and type `f` to jump to
@@ -332,9 +331,9 @@ function SelectShape(): JSX.Element {
     onChange: setValue,
   });
 
-  // `createListbox`'s selection keymap is local to `rootProps`, which a Select never spreads — so an
-  // external owner rebuilds it from `selection.selectActive()`. Three lines here; the combobox kernel
-  // owns it for real (and adds Space, Escape, and open/close).
+  // The selection keymap normally rides on the list element's props, which a Select never spreads —
+  // so an external focus owner rebuilds it. Three lines here; a real combobox primitive would own it
+  // and add Space, Escape and open/close.
   const selectKeys = createKeyboardHandler<HTMLInputElement>().on("Enter", (event) => {
     event.preventDefault();
     state.selection.selectActive();

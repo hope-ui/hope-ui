@@ -8,8 +8,8 @@ export interface DialogBackdropProps extends JSX.HTMLAttributes<HTMLDivElement> 
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 
-// The decorative scrim. `class` is omitted from what the primitive hook receives, then re-set here to
-// the recipe's `backdrop` slot merged with any consumer `class` (which wins via tailwind-merge).
+// The visible scrim, and optional — the layer that actually blocks the pointer is rendered by
+// `Dialog.Portal` whether or not this part is used.
 export const Backdrop: Component<DialogBackdropProps> = (props) => {
   const ctx = useDialogContext();
   const backdrop = createDialogBackdrop(ctx.state, omit(props, "render", "class"));

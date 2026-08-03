@@ -1,13 +1,15 @@
 /**
  * The message resolver — how a component looks up a user-facing string for the current locale.
  *
- * The built-in catalogs (`./locales/`, selected by {@link resolveCatalog}) are the guaranteed
- * floor; the app's own pipeline (via {@link I18nTranslateOverride}) is an **overlay** consulted first,
- * falling through to the built-in when it has no entry for a key. The returned {@link TranslateFn} reads
- * the `locale`
- * accessor on every call, so it is reactive inside JSX **and** returns the current value for imperative
- * callers (e.g. the live-region announcer). It is a plain function — never a `createMemo` — so it never
- * participates in a hydration key (see `__internal__/solid-primitives-eval.md`).
+ * The built-in catalogs (`./locales/`, selected by {@link resolveCatalog}) are the guaranteed floor;
+ * an app's own pipeline ({@link I18nTranslateOverride}) is an overlay consulted first, falling through
+ * to the built-in whenever it has no entry for a key.
+ *
+ * The returned {@link TranslateFn} reads the `locale` accessor on every call, so it is reactive inside
+ * JSX *and* returns the current value to an imperative caller such as a live-region announcer. It is
+ * deliberately a plain function rather than a `createMemo`: memos take part in Solid's hydration
+ * bookkeeping, so making this one would tie message resolution to hydration keys. See
+ * `__internal__/solid-primitives-eval.md`.
  */
 import type { Accessor } from "solid-js";
 import { resolveCatalog } from "./catalogs";
@@ -48,10 +50,11 @@ export type TranslateFn = <K extends I18nMessageKey>(
 
 /**
  * Build a {@link TranslateFn} bound to a reactive `locale` and an optional message `config`. Resolution
- * order (first non-null wins): app `translate` fn → per-key `messages` override → built-in catalog
- * (by locale, via {@link resolveCatalog}, with `MESSAGES_EN` fallback) → the key itself (dev-warned
- * once). The warn-dedup `Set` is per-instance (not module scope), so it never becomes cross-realm
- * shared state.
+ * order, first non-null winning: app `translate` fn → per-key `messages` override → built-in catalog
+ * for the locale, falling back to English → the key itself, warned once in dev.
+ *
+ * The warn-dedup `Set` is per instance rather than module scope, so two installed copies of this
+ * package never end up sharing it.
  */
 export function createTranslate(
   locale: Accessor<string>,
@@ -105,8 +108,9 @@ function lookupEntry(
 }
 
 function warnMissing(key: string, warned: Set<string>): string {
-  // `import.meta.env.DEV` is defined by the consumer's Vite (and vitest); cast locally so this package
-  // needn't pull `vite/client` — and the whole asset-module surface — into `compilerOptions.types`.
+  // `import.meta.env.DEV` comes from the consumer's Vite (and from vitest). Cast locally rather than
+  // adding `vite/client` to this package's `compilerOptions.types`, which would also pull in its
+  // asset-module declarations.
   const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV;
   if (isDev && !warned.has(key)) {
     warned.add(key);

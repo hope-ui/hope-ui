@@ -6,16 +6,15 @@ import { renderToStringAsync } from "@solidjs/web";
 import { Calendar } from "../index";
 
 // `calendar.ssr-entry.tsx`'s tree **minus the `I18nProvider`** — zero-config i18n, the shape an app
-// gets when it never mounts one. Paired with `calendar-detected-locale.ssr-entry.tsx` (a provider with
-// no `locale` prop), the two entries differ in nothing but locale plumbing, so the browser tests over
-// them measure that plumbing rather than the calendar.
+// gets when it never mounts one. Paired with `calendar-detected-locale.ssr-entry.tsx` (a provider
+// with no `locale` prop): the two differ in nothing but locale plumbing.
 //
 // What makes this worth a fixture: the server has no `navigator`, so it renders `en-US`
 // (Sunday-first), and a visitor on a Monday-first locale would hydrate a grid whose model starts the
 // week a day earlier than the markup. January 2020 spans 35 cells under either first-day-of-week, so
-// hydration reuses every node and warns about nothing — the disagreement would be *silent*, visible
-// only as a calendar that selects the neighbouring day. `readDetectedLocale`'s hydration gate is what
-// prevents it, and this round-trip is what proves the gate works end to end.
+// hydration would adopt every node and warn about nothing — the disagreement is *silent*, visible
+// only as a calendar that selects the neighbouring day. A gate holds locale detection back until
+// hydration has finished, and this round-trip is what proves it works end to end.
 
 export function Tree(): JSX.Element {
   return (

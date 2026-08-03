@@ -18,9 +18,9 @@ import type { CalendarValue } from "../utils/selection";
 /**
  * A range calendar with two things beside it: a focusable button (pressing it takes focus out of the
  * calendar) and an inert area that refuses focus on mousedown (pressing it leaves focus where it is).
- * The two exercise the abandonment policy's two halves separately — `focusout` and outside `pointerup`
- * — which a single "click outside" cannot, because whichever fires first resolves the range and the
- * other then finds nothing to do.
+ * That split is what lets the abandonment policy's two halves — `focusout` and outside `pointerup` —
+ * be tested separately. A single "click outside" cannot: whichever half fires first resolves the
+ * range, and the other then finds nothing to do.
  */
 function CalendarHarness(props: {
   options?: CreateCalendarOptions;
@@ -107,8 +107,7 @@ async function anchorAndAim(container: HTMLElement, state: CreateCalendarReturn)
   dayButton(container, "2026-01-10").focus();
   await userEvent.keyboard("{Enter}");
   await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
-  // A keyboard anchor auto-advances the cursor one day (React Aria's `focusNearestAvailableDate`), so
-  // the aim starts from the 11th, not the 10th.
+  // A keyboard anchor auto-advances the cursor one day, so the aim starts from the 11th, not the 10th.
   await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-11"));
   await userEvent.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}");
   await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-14"));
@@ -124,7 +123,7 @@ describe("createCalendarGroup — a range abandoned mid-selection", () => {
     await anchorAndAim(container, state);
 
     // The inert target declines focus, so the calendar still holds it when the press is released —
-    // React Aria's `isFocusWithin` case, and the only one the pointer half decides on its own.
+    // the only case the pointer half of the policy decides on its own.
     await userEvent.click(testId(container, "outside-inert"));
 
     await vi.waitFor(() => expect(state.anchorDate()).toBeNull());
@@ -192,9 +191,10 @@ describe("createCalendarGroup — a range abandoned mid-selection", () => {
   });
 
   it("keeps the range in progress when the keyboard pages the month", async () => {
-    // Every cell is rebuilt, so the focused day button is destroyed under the user: a `focusout` with
-    // no `relatedTarget` fires from a node already out of the document, and the grid's deferred nudge
-    // then focuses the replacement. Committing on that would end the range on every PageDown.
+    // Paging rebuilds every cell, so the focused day button is destroyed under the user: a `focusout`
+    // with no `relatedTarget` fires from a node already out of the document, and the grid's deferred
+    // nudge then focuses the replacement. Treating that as walking away ends the range on every
+    // PageDown — which is exactly the bug the deferred `focusout` decision exists to prevent.
     const onValueChange = vi.fn();
     const { container, state, dispose } = await mountCalendar({ onValueChange });
     await anchorAndAim(container, state);

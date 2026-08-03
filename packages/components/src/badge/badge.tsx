@@ -11,20 +11,18 @@ import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, children, merge, omit, Show } from "solid-js";
 
-// The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
-// consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
-// so consumers can still import it from the component's subpath.
+// Re-exported so consumers get the variant vocabulary from the component's own subpath, without
+// importing `@hope-ui/theming` directly.
 export type { BadgeColorScheme, BadgeShape, BadgeSize, BadgeVariant };
 
-// The role selector is `colorScheme`, **not** `color`: a `color` prop would shadow the native HTML
-// `color` attribute. With the rename, native `color` is left untouched and forwarded through `...rest`.
+// The role selector is named `colorScheme`, not `color`, so it does not shadow the native HTML
+// `color` attribute — which stays untouched and is forwarded like any other native attribute.
 type BadgeElementProps = JSX.HTMLAttributes<HTMLSpanElement>;
 
-// `BadgeProps` = the native `<span>` props **plus** the themeable surface (`BadgeThemeableProps`:
-// the recipe variants, owned by `@hope-ui/theming`) **plus** the per-instance-only props below.
-// Extending `BadgeThemeableProps` (rather than re-declaring the variants) keeps the two in lockstep
-// by construction. Badge is a static label, so — unlike Button — there is no behavior surface (no
-// `disabled`/`loading`/`nativeButton`), just content and styling channels.
+// The native `<span>` props **plus** the themeable variants **plus** the per-instance props below.
+// Extending the themeable props rather than re-declaring the variants keeps the two in lockstep by
+// construction. Badge is a static label, so unlike Button it has no behavior surface at all — no
+// `disabled`, no `loading` — just content and styling.
 export interface BadgeProps extends BadgeElementProps, BadgeThemeableProps {
   /**
    * Renders as a different element/component while keeping Badge's computed props (e.g. an `<a>` for
@@ -39,9 +37,9 @@ export interface BadgeProps extends BadgeElementProps, BadgeThemeableProps {
   class?: string;
   /**
    * Per-instance class overrides, keyed by slot (`root`, `label`, `startDecorator`, `endDecorator`,
-   * `dot`). Folded in after the recipe base and the preset's global `slotClasses`, before `class`
-   * (root only) — so a later utility wins a Tailwind conflict. Use literal class strings so the
-   * consumer's Tailwind scanner can see them.
+   * `dot`). Applied after the recipe base and the preset's global `slotClasses`, and before `class`
+   * — the later utility wins a Tailwind conflict. Write them as literal class strings, or the
+   * consumer's Tailwind scanner will not see them.
    */
   slotClasses?: SlotClasses<"badge">;
   /** The badge label. */
@@ -49,9 +47,9 @@ export interface BadgeProps extends BadgeElementProps, BadgeThemeableProps {
 }
 
 export const Badge: Component<BadgeProps> = (props) => {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`
-  // (never `merge`, which resolves by key *presence*). See `useDefaults`' doc in @hope-ui/theming.
+  // Precedence: instance prop ?? the preset's `defaultProps` ?? the builtins below, each key
+  // resolved with `??`. Never Solid's `merge`, which resolves by key *presence* and so lets an
+  // explicitly-`undefined` prop beat the default.
   const merged = useDefaults({
     recipe: "badge",
     props,
@@ -64,10 +62,9 @@ export const Badge: Component<BadgeProps> = (props) => {
     },
   });
 
-  // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
-  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The variant
-  // props are read lazily on every slot-fn call, so a variant change flows through. Badge is static,
-  // so the variant props are the whole styling input.
+  // One class function per slot, each folding in the whole override chain: recipe base → preset
+  // `slotClasses` → instance `slotClasses` → `class` (root only). The variants are read lazily on
+  // every call, so changing one flows straight through.
   const slots = useSlots({
     recipe: "badge",
     variantsProps: () => ({
@@ -95,25 +92,21 @@ export const Badge: Component<BadgeProps> = (props) => {
     "children",
   );
 
-  // Each of these slots is read in a `<Show>`'s `when` gate AND in its body below, so the raw prop
-  // would be read **more than once** — the operative `children()` trigger. A consumer's
-  // `startDecorator={<Icon/>}` compiles to a lazy getter that runs `createComponent` on every read;
-  // `children` resolves each slot once and memoizes it, so both read sites share one node. That also
-  // fixes hydration: the *gate* read is the hazard — a raw-prop `when={x != null}` builds and
-  // discards a component whose hydration key the client and server place differently (an upstream
-  // `@solidjs/web` beta asymmetry — see `__internal__/solid-2.0-notes.md`), so the body node mis-hydrates.
-  // Gating on the **resolved** accessor (`when={startDecorator() != null}`) removes that phantom
-  // build; the single resolved component is created in the ambient owner like a direct child. (A
-  // single read inside a `<Show>` would need nothing — it is the `when`+body pair that does.) Unlike
-  // Button, Badge's label is `<Show>`-gated too, so it gets the same treatment as the decorators.
+  // Each of these is read twice below — once in a `<Show>`'s `when` gate, once in its body — and a
+  // JSX-valued prop compiles to a lazy getter that runs `createComponent` on *every* read. Resolving
+  // each once with `children()` means both read sites share one node instead of building two.
+  //
+  // The gate read is also a hydration hazard: `when={merged.startDecorator != null}` builds a
+  // component and throws it away, which shifts where the client thinks the next node is relative to
+  // the server HTML. Gating on the resolved accessor removes that phantom build. Note Badge gates
+  // its label too, unlike Button, so the label needs the same treatment.
   const startDecorator = children(() => merged.startDecorator);
   const label = children(() => merged.children);
   const endDecorator = children(() => merged.endDecorator);
 
-  // Only the root goes through `renderElement` (it owns `render`/`as` polymorphism + ref merging).
-  // The internal parts are always plain spans, so they're written as literal elements. The role dot
-  // is rendered only for the `dot` variant and leads the content; the label/decorators are `<Show>`-
-  // gated so an empty part contributes no node (keeping the tree minimal and hydration-stable).
+  // Only the root goes through `renderElement`, which is what implements the `render` prop and merges
+  // refs. The inner parts are always plain spans, so they are written as literal elements, and each
+  // is gated so an empty slot contributes no node at all.
   const content = (
     <>
       <Show when={merged.variant === "dot"}>
@@ -139,12 +132,11 @@ export const Badge: Component<BadgeProps> = (props) => {
 
   const elementProps = merge(rest, {
     get class(): string {
-      // `useSlots` already folded the override chain into the root slot fn — recipe base → preset
-      // `slotClasses` → instance `slotClasses` → `class` — with the final tailwind-merge inside the
-      // recipe's `{ class }` seam, so a later utility wins a conflict without a separate `cn`.
+      // The consumer's class is passed *into* the slot function, never concatenated after it: only
+      // then does tailwind-merge see both strings and let the consumer's utility win a conflict.
       return slots.root(merged.class);
     },
-    // The root's own slot marker; parts use the `badge-<part>` convention (a component-prefixed slot).
+    // The root's own marker; the inner parts use the `badge-<part>` convention.
     "data-slot": "badge",
     children: content,
   });

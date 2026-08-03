@@ -82,8 +82,8 @@ describe("createComboboxTrigger", () => {
     expect(activeLabel(container)).toBe("Banana");
     expect(document.activeElement).toBe(trigger);
 
-    // Options carry `tabindex="-1"`, which still makes them click-focusable — so a click that moved
-    // focus would break the pattern silently. `createComboboxList` prevents the mousedown default.
+    // Options carry `tabindex="-1"`, which still leaves them *click*-focusable — so a click that
+    // moved focus would break the pattern silently. `createComboboxList` cancels the mousedown.
     await userEvent.click(nth(optionsOf(container), 2));
     expect(document.activeElement).toBe(trigger);
     expect(optionsOf(container).every((option) => option !== document.activeElement)).toBe(true);
@@ -92,8 +92,8 @@ describe("createComboboxTrigger", () => {
 
   it("paints the highlight only while the widget holds focus", async () => {
     // Non-modal, and with focus-out dismissal off: modality would make the outside button `inert`
-    // (so `.focus()` is a silent no-op), and the default focus-out dismissal would unmount the
-    // options — either way the assertion below would pass for the wrong reason.
+    // (so `.focus()` becomes a silent no-op), and focus-out dismissal would unmount the options —
+    // either way the assertion below would pass for the wrong reason.
     const { container, dispose } = mountHarness({
       options: { modal: false, closeOnFocusOutside: false },
       withOutsideButton: true,
@@ -101,8 +101,9 @@ describe("createComboboxTrigger", () => {
     await openWithKeyboard(container, "{ArrowDown}");
     await vi.waitFor(() => expect(highlightedLabels(container)).toEqual(["Apple"]));
 
-    // `data-active` is "active *and* the widget is focused" — the paint gate the trigger drives,
-    // since it is the only element the widget's focus ever lands on.
+    // `data-active` means "highlighted *and* the widget is focused", and the trigger is the only
+    // element the widget's focus ever lands on — so it is the only thing that can report the second
+    // half.
     (container.querySelector('[data-testid="outside"]') as HTMLButtonElement).focus();
     await nextFrame();
     expect(highlightedLabels(container)).toEqual([]);
@@ -145,12 +146,12 @@ describe("createComboboxTrigger", () => {
   });
 
   it("selects with Enter — and the synthesized click does NOT reopen what it just closed", async () => {
-    // On a native <button> the browser turns Enter into a `click`, which would re-enter the toggle.
-    // `preventDefault()` in the keymap is what stops it; without it this test flaps open again.
+    // On a native `<button>` the browser turns Enter into a `click`, which would re-enter the toggle.
+    // Cancelling it in the keymap is what stops that; without it this test flaps open again.
     const { container, state, dispose } = mountHarness();
     await openWithKeyboard(container, "{Enter}");
-    // The entry effect is gated on the first measurement, so an arrow pressed before it lands would
-    // be overwritten by the strategy it applies.
+    // The highlight-placing effect is gated on the first measurement, so an arrow pressed before it
+    // lands would be overwritten by the entry strategy that effect applies.
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     expect(activeLabel(container)).toBe("Apple");
 
@@ -190,7 +191,7 @@ describe("createComboboxTrigger", () => {
     await vi.waitFor(() => expect(contentOf(container)).toBeNull());
     expect(document.activeElement).toBe(triggerOf(container));
 
-    // Closed, Escape is not consumed — a Select inside a Dialog must not swallow the Dialog's key.
+    // Escape is not consumed while closed — a Select inside a Dialog must not swallow its key.
     onKeyDown.mockClear();
     await userEvent.keyboard("{Escape}");
     const event = onKeyDown.mock.calls[0]?.[0] as KeyboardEvent;
@@ -218,10 +219,10 @@ describe("createComboboxTrigger", () => {
     );
     const trigger = triggerOf(withValue.container);
     const ids = (trigger.getAttribute("aria-labelledby") as string).split(" ");
-    // Value first — react-aria's ordering, so the selection is announced before the field's label.
+    // Value first, so a screen reader announces the selection before the field's label…
     expect(nth(ids, 0)).toBe(valuePartOf(withValue.container)?.id);
-    // …and the trigger names itself, because `aria-labelledby` outranks `aria-label` in the accname
-    // algorithm and the consumer's label would otherwise simply vanish.
+    // …and the trigger names *itself* too, because `aria-labelledby` outranks `aria-label` in the
+    // accessible-name algorithm and the consumer's label would otherwise silently vanish.
     expect(nth(ids, 1)).toBe(trigger.id);
     withValue.dispose();
 
@@ -274,7 +275,7 @@ describe("createComboboxTrigger", () => {
     expect(onKeyDown).toHaveBeenCalled();
     expect(contentOf(container)).toBeNull();
 
-    // …and the attributes the kernel does not consume land on the element.
+    // …and the attributes the hook does not consume land on the element.
     expect(triggerOf(container).getAttribute("title")).toBe("kept");
     expect(triggerOf(container).getAttribute("lang")).toBe("fr");
     dispose();
@@ -286,12 +287,12 @@ describe("createComboboxTrigger", () => {
       triggerProps: { nativeButton: false },
     });
     const trigger = triggerOf(nonNative.container);
-    // `createButton` would say `role="button"`; this element *is* the combobox, whatever it renders as.
+    // `createButton` would say `role="button"`; this element *is* the combobox, whatever tag it is.
     expect(trigger.getAttribute("role")).toBe("combobox");
     expect(trigger.getAttribute("tabindex")).toBe("0");
     expect(trigger.hasAttribute("type")).toBe(false);
 
-    // …and the keymap still reaches it: `createButton` composes the same chain either way.
+    // …and the keymap still reaches it: `createButton` composes the same chain on any element.
     trigger.focus();
     await userEvent.keyboard("{ArrowDown}");
     await vi.waitFor(() => expect(contentOf(nonNative.container)).toBeTruthy());
@@ -311,10 +312,10 @@ describe("createComboboxTrigger", () => {
     const open = mountHarness({ options: { defaultOpen: true } });
     await vi.waitFor(() => expect(open.state().floating.isPositioned()).toBe(true));
     await expectNoA11yViolations(open.container, {
-      // Undecidable by construction: axe returns `aria-valid-attr-value` as *incomplete* for any
-      // element carrying both `aria-haspopup` and `aria-controls`, without ever resolving the IDREF
-      // (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check). The closed assertion above
-      // runs strict, and "aria-controls names the popup only while open" pins the IDREF itself.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The closed assertion above runs strict, and the
+      // "aria-controls names the popup only while open" test pins the IDREF itself.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     open.dispose();

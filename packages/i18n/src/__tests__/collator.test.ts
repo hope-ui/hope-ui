@@ -4,9 +4,8 @@ import { createCollator } from "../collator";
 import { I18nProvider } from "../i18n-provider";
 
 /**
- * Calls a context-providing component directly (no JSX/DOM needed — `unit` is Node with no
- * `document`) and forces its lazy `children` accessor to evaluate, exactly like
- * `create-component-context.test.ts` does for `createComponentContext`'s Provider.
+ * Runs `children` under an `I18nProvider` without any DOM: these tests run in Node, so the provider is
+ * called directly as a function and its lazy `children` accessor forced to evaluate.
  */
 function renderWithLocale(locale: string | (() => string), children: () => void): void {
   const props =
@@ -38,10 +37,9 @@ describe("createCollator", () => {
         const collator = createCollator({ usage: "search", sensitivity: "base" });
         const query = "cafe";
         const target = "Café";
-        // The collator considers the accented, differently-cased target a match for the plain
-        // query...
+        // The collator treats the accented, differently-cased target as a match for the plain query…
         expect(collator().compare(target.slice(0, query.length), query)).toBe(0);
-        // ...which is exactly what `toLowerCase().startsWith()` cannot do — it only folds case.
+        // …which is what naive case-folding cannot do, and why a collator is used at all.
         expect(target.toLowerCase().startsWith(query)).toBe(false);
       });
       dispose();
@@ -52,8 +50,8 @@ describe("createCollator", () => {
     const [locale, setLocale] = createSignal("en-US");
     let collator!: () => Intl.Collator;
     let dispose!: () => void;
-    // `setLocale` below must run *outside* this synchronous callback — writing an ancestor-owned
-    // signal from within it throws `REACTIVE_WRITE_IN_OWNED_SCOPE`.
+    // `setLocale` has to run *outside* this callback: Solid throws REACTIVE_WRITE_IN_OWNED_SCOPE if a
+    // signal owned by an enclosing scope is written from inside a scope it owns.
     createRoot((d) => {
       dispose = d;
       renderWithLocale(locale, () => {
@@ -64,7 +62,7 @@ describe("createCollator", () => {
     const first = collator();
     expect(first.resolvedOptions().locale.startsWith("en")).toBe(true);
 
-    // The client build defers a plain signal write until the next flush.
+    // A signal write is not visible to a plain read until the next flush, so wrap it in one.
     flush(() => setLocale("fr-FR"));
     const second = collator();
     expect(second.resolvedOptions().locale.startsWith("fr")).toBe(true);

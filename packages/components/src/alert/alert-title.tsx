@@ -13,8 +13,9 @@ export const Title: Component<AlertTitleProps> = (props) => {
   const generatedId = createUniqueId();
   const id = (): string => (typeof props.id === "string" ? props.id : generatedId);
 
-  // Publish the id so `Alert.Root` can point `aria-labelledby` at it. `createRegisteredId` defers the
-  // write past the synchronous render body (`onSettled`) so it never trips `REACTIVE_WRITE_IN_OWNED_SCOPE`.
+  // Publish the id so `Alert.Root` can point `aria-labelledby` at it. The write is deferred past the
+  // render pass: writing a signal owned by an ancestor from inside a descendant's synchronous render
+  // body throws `REACTIVE_WRITE_IN_OWNED_SCOPE`.
   createRegisteredId({ id, register: ctx.registerTitleId });
 
   const rest = omit(props, "render", "class");

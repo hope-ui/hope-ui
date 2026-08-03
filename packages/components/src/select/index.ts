@@ -1,9 +1,6 @@
-// The `Select` compound component — a styled, themeable layer over the `createCombobox` kernel (the
-// half it shares with the future `Combobox`) plus `createListboxItem`/`Group`/`GroupLabel`/`Separator`
-// reused unchanged. Each part lives in its own `select-<part>.tsx` file (a shared `select-context.ts`
-// carries the three contexts that distribute the kernel state, the recipe slot fns and the two default
-// glyphs); this barrel is the one place the namespace object is assembled — the component's single
-// subpath export. Mirrors `src/dialog/` and `src/popover/`.
+// The `Select` compound component: a styled, themeable layer over the headless `createCombobox`
+// behavior hook (the half it shares with `Combobox`). Each part lives in its own `select-<part>.tsx`
+// file and this barrel is the one place the namespace object is assembled.
 import { Content } from "./select-content";
 import { Group } from "./select-group";
 import { GroupLabel } from "./select-group-label";

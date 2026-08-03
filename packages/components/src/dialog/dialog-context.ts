@@ -3,19 +3,15 @@ import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { DialogSlot, SlotClassAccessor } from "@hope-ui/theming";
 
 /**
- * The value every Dialog part reads. **Composition, not inheritance**: it *holds* the primitive
- * state as `state` (open/modal/role/ids/spared registry, the content-element ref, and the shared
- * `contentPresence`) rather than extending `CreateDialogReturn`, so the styling layer never
- * masquerades as the primitive return. A part passes `ctx.state` into its `createDialogX(state, …)`
- * hook, and reads recipe classes off `ctx.slots`. All a11y/behavior (including `role`) lives on
- * `ctx.state`; the component layer contributes only `slots`.
+ * What every Dialog part reads. It *holds* the headless state rather than extending it, so the
+ * styling layer can never be mistaken for the hook's own return value: a part passes `ctx.state`
+ * into its `createDialogX(state, …)` hook for behavior, and reads `ctx.slots` for classes.
  */
 export interface DialogContextValue {
-  /** The primitive dialog state — open/modal/role/ids/spared registry, the content-element ref, and
-   * the shared overlay `contentPresence`. Passed straight into each part's `createDialogX(state, …)`. */
+  /** Open/modal/role, the generated ids, the content element, and the shared enter/exit state. */
   state: CreateDialogReturn;
-  /** One ready-to-call class fn per Dialog slot, resolved once on `Root` and shared here. Each takes
-   * the part's own `class`, folded in last through the recipe's tailwind-merge seam. */
+  /** One ready-to-call class function per slot, resolved once on `Root`. Each takes the part's own
+   * `class` and folds it in last, so a consumer utility wins a Tailwind conflict. */
   slots: Record<DialogSlot, SlotClassAccessor>;
 }
 

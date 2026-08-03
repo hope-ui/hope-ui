@@ -12,9 +12,9 @@ import {
 } from "./combobox-harness";
 
 // `createComboboxClear` empties the field and hands focus back to the input. It shares the chevron's
-// two structural rules — outside the tab order, never takes focus — and carries none of its ARIA:
-// clearing is not opening, and `aria-expanded`/`aria-controls` here would claim this button owns the
-// listbox when the input already does.
+// two structural rules — outside the tab order, never takes focus — and none of its ARIA: clearing
+// is not opening, so `aria-expanded`/`aria-controls` here would claim this button owns the listbox
+// when the input already does.
 
 function mountClear(tree: () => ReturnType<typeof ComboboxInputHarness>) {
   const mounted = mount(tree);
@@ -71,7 +71,8 @@ describe("createComboboxClear", () => {
 
     await userEvent.click(clearOf(container) as HTMLElement);
     await vi.waitFor(() => expect(input.value).toBe(""));
-    // The harness's `onClear` empties both halves — the policy the kernel deliberately does not own.
+    // The harness's `onClear` empties both text and selection — the policy `createComboboxClear`
+    // deliberately does not own.
     await userEvent.click(toggleOf(container));
     await vi.waitFor(() => expect(listOf(container)).not.toBeNull());
     expect(selectedLabels(container)).toEqual([]);
@@ -86,8 +87,8 @@ describe("createComboboxClear", () => {
 
     input.focus();
     await userEvent.click(clearOf(container) as HTMLElement);
-    // A blur here would fire the input's blur-commit, which — with nothing highlighted and custom
-    // values off — puts back the very text the user asked to remove.
+    // A blur here fires the input's blur-commit, which — with nothing highlighted and custom values
+    // off — puts back the very text the user asked to remove.
     expect(onBlur).not.toHaveBeenCalled();
     expect(document.activeElement).toBe(input);
   });

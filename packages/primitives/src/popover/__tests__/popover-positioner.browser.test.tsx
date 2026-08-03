@@ -10,10 +10,9 @@ import {
   createPopover,
 } from "../popover-root";
 
-// Geometry is pinned in px and never derived from content — font metrics differ between the local
-// Chromium and CI's headless shell, which also runs with a real ~15px scrollbar gutter. Assertions
-// are rect *relationships* with a 1px tolerance, the convention `create-floating.browser.test.tsx`
-// states.
+// Geometry is pinned in px and never derived from content: font metrics differ between the local
+// Chromium and CI's headless shell, which also runs with a real ~15px scrollbar gutter. So the
+// assertions compare rect *relationships* with a 1px tolerance.
 const SIDE_OFFSET = 8;
 const CONTENT_WIDTH = 120;
 const CONTENT_HEIGHT = 60;
@@ -51,9 +50,8 @@ function Harness(props: HarnessProps) {
       </button>
       <Show when={positioner.mounted()}>
         <div data-testid="positioner" {...positioner.props} ref={positioner.setRef}>
-          {/* The content stands in for `Popover.Content`, which Phase 5 ships alongside; this file
-          only needs a fixed-size box carrying an accessible name, because `role="dialog"` without
-          one is an axe `aria-dialog-name` violation. */}
+          {/* Stands in for `Popover.Content`. This file only needs a fixed-size box with an
+          accessible name — `role="dialog"` without one is an axe `aria-dialog-name` violation. */}
           <div
             data-testid="content"
             role="dialog"
@@ -109,7 +107,7 @@ describe("createPopoverPositioner", () => {
 
     const open = mountHarness({ options: OPEN_OPTIONS });
     expect(open.container.querySelector('[data-testid="positioner"]')).toBeTruthy();
-    // The *shared* presence, not one of its own — the same object `createPopoverContent` reflects.
+    // The *shared* presence, not one of its own — the same object `createPopoverContent` reads.
     expect(open.state().contentPresence.mounted()).toBe(true);
     open.dispose();
   });
@@ -162,8 +160,8 @@ describe("createPopoverPositioner", () => {
     const { container, state, dispose } = mountHarness({ options: OPEN_OPTIONS });
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
 
-    // `trackSize` is measurement-only by contract: the kernel hands CSS the numbers and writes no
-    // `width`/`max-height` of its own. Writing them here is what would close `size`'s feedback loop.
+    // Measurement only, by contract: the numbers are handed to CSS and no `width`/`max-height` is
+    // written back. Writing them here is exactly what would close the ResizeObserver feedback loop.
     const positioner = elementOf(container, "positioner");
     expect(positioner.style.width).toBe("");
     expect(positioner.style.maxHeight).toBe("");
@@ -174,8 +172,8 @@ describe("createPopoverPositioner", () => {
   it("merges a consumer style object over the kernel's, so a conflicting key wins", async () => {
     const { container, state, dispose } = mountHarness({
       options: OPEN_OPTIONS,
-      // The documented escape valve for `create-floating.md`'s consumer anti-pattern #4: kernel
-      // first, consumer last. `z-index` is additive; `position` conflicts with the kernel's own.
+      // Ours first, consumer last, so a consumer can override pre-positioned behavior. `z-index` is
+      // additive; `position` conflicts with the one the positioning layer writes.
       positionerProps: { style: { "z-index": 60, position: "fixed" } },
     });
     const positioner = elementOf(container, "positioner");
@@ -183,16 +181,16 @@ describe("createPopoverPositioner", () => {
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     expect(positioner.style.zIndex).toBe("60");
     expect(positioner.style.position).toBe("fixed");
-    // …and the rest of the kernel's object survived the merge rather than being replaced by it —
-    // including the measured custom properties, which a recipe's `w-(--anchor-width)` depends on.
+    // …and the rest of our style object survived the merge rather than being replaced by it,
+    // including the measured custom properties a `w-(--anchor-width)` depends on.
     expect(positioner.style.transform).toContain("translate(");
     expect(positioner.style.getPropertyValue("--anchor-width")).not.toBe("");
     dispose();
   });
 
   it("warns in dev on a string style rather than dropping it silently", async () => {
-    // `mount` intercepts console.warn to fail on Solid diagnostics, so spy+mock before mounting
-    // (the shape `create-button`'s mismatch-warning test uses).
+    // `mount` intercepts `console.warn` to fail the test on Solid diagnostics, so the spy has to be
+    // installed *before* mounting.
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { container, dispose } = mountHarness({
       options: OPEN_OPTIONS,
@@ -202,7 +200,7 @@ describe("createPopoverPositioner", () => {
     await vi.waitFor(() =>
       expect(consoleWarn).toHaveBeenCalledWith(expect.stringContaining("string `style`")),
     );
-    // A string has no merge seam, and the kernel's positioning has to win or the layer paints at 0,0.
+    // A string `style` cannot be merged into, and our positioning has to win or it paints at 0,0.
     expect(elementOf(container, "positioner").style.zIndex).toBe("");
     dispose();
     consoleWarn.mockRestore();
@@ -224,16 +222,16 @@ describe("createPopoverPositioner", () => {
   it("resolves side='inline-end' against dir=rtl on the positioner, and reports a PHYSICAL side", async () => {
     const { container, state, dispose } = mountHarness({
       options: { ...OPEN_OPTIONS, side: "inline-end" },
-      // `dir` reaches the positioner as an ordinary forwarded native attribute — Popover writes no
-      // locale-derived `dir` of its own. `createFloating` reads
-      // `getComputedStyle(floating).direction`, the same call floating-ui's `platform.isRTL` makes.
+      // `dir` reaches the positioner as an ordinary forwarded attribute — Popover writes no
+      // locale-derived `dir` of its own. The direction the layer resolves against is read straight
+      // off the floating element's computed style, so there is only ever one source for it.
       positionerProps: { dir: "rtl" },
     });
 
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
 
     // The attribute alone would pass even if the layer painted on the wrong side, so the rect is
-    // asserted too: inline-end under rtl is physical `left`.
+    // asserted too: inline-end under `rtl` is physical `left`.
     expect(elementOf(container, "positioner").getAttribute("data-side")).toBe("left");
     const trigger = elementOf(container, "trigger").getBoundingClientRect();
     const positioner = elementOf(container, "positioner").getBoundingClientRect();

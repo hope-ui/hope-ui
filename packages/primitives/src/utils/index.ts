@@ -1,6 +1,4 @@
-// The `utils/` barrel: the non-`createX` composition helpers, exported as the single subpath
-// `@hope-ui/primitives/utils`. Subfolders have no barrel of their own — only the top-level
-// `src/` folders do.
+// Published as the subpath `@hope-ui/primitives/utils`.
 export { type WithDefaults, withDefaults } from "./defaults";
 export { compareByIdOrReference, type ValueComparator } from "./equality";
 export { composeEventHandlers, type EventHandlerEvent } from "./events";

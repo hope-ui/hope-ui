@@ -7,10 +7,11 @@ export interface CreateListboxSeparatorReturn {
 }
 
 /**
- * The separator part: a purely visual divider between groups of options. It is
- * `role="presentation"` + `aria-hidden`, **not** `role="separator"` — a `separator` is not a valid
- * child of a `listbox`, and a real separator would also be reported as an item by some assistive
- * tech. Takes props (not `state`); it holds no listbox behavior.
+ * The separator part: a purely visual divider between groups of options. `role="presentation"` +
+ * `aria-hidden`, **not** `role="separator"` — a `separator` is not a valid child of a `listbox`, and
+ * some assistive technology would announce it as one of the options.
+ *
+ * Takes props, not `state`: it holds no listbox behavior of its own.
  */
 export function createListboxSeparator(
   props: JSX.HTMLAttributes<HTMLElement> = {},

@@ -3,10 +3,10 @@ import { multipleSelection } from "./multiple-selection";
 import { rangeSelection } from "./range-selection";
 import { singleSelection } from "./single-selection";
 
-// The shared selection types live here (the barrel) rather than a standalone `types.ts`: the strategy
-// files `import type` them from `./index`, which is erased at runtime, so there is no import cycle even
-// though this file also imports the strategy singletons. This keeps the type surface in one place
-// without a type-only source file (which the coverage-parity guard would require its own test + doc for).
+// The shared selection types live in this barrel rather than a standalone `types.ts`. The strategy
+// files `import type` them from here, and a type-only import is erased at build time, so there is no
+// runtime cycle even though this file also imports the strategy singletons. A real `types.ts` would
+// owe its own test + doc under `pnpm check:coverage-parity`.
 
 /** The three selection modes (the `selectionMode` prop on `<Calendar>`). */
 export type CalendarSelectionMode = "single" | "range" | "multiple";
@@ -70,9 +70,8 @@ export interface SelectOptions {
  *
  * There is deliberately **no** "middle" predicate, and the vocabulary is "selection", not "range":
  * range mode paints exactly **one** band — tentative while anchored, committed when idle — so a
- * consumer derives the middle as `isSelected && !isSelectionStart && !isSelectionEnd`. This is React
- * Aria's model (`react-aria-components`' `data-selected`/`data-selection-start`/`data-selection-end`,
- * with the middle derived in CSS); see `__internal__/primitives/calendar/utils/range-selection.md`.
+ * consumer derives the middle as `isSelected && !isSelectionStart && !isSelectionEnd`. Why one band
+ * rather than two: `__internal__/primitives/calendar/utils/range-selection.md` § The one-band model.
  */
 export interface SelectionStrategy {
   readonly mode: CalendarSelectionMode;

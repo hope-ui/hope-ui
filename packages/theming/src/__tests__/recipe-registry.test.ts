@@ -12,10 +12,8 @@ import type { PopoverRecipeVariants, PopoverSlot } from "../recipes/popover";
 import type { SelectRecipeVariants, SelectSlot } from "../recipes/select";
 import type { SlotClassFn } from "../slot-recipe";
 
-// The registry declares each hope-authored component's recipe contract directly (no module
-// augmentation), so a conforming theme provides every recipe named in it — here, `alert`, `badge`,
-// `button`, `calendar`, `closeButton`, `combobox`, `dialog`, `listbox`, `popover`, and `select`.
-// This is a compile-time assignability check (verified by `pnpm typecheck`).
+// A conforming theme must provide every recipe the registry names. This is a compile-time
+// assignability check — `pnpm typecheck` is what runs it, not the test runner.
 const _theme = {
   alert: (props?: AlertRecipeVariants): Record<AlertSlot, SlotClassFn> => ({
     root: () => `alert alert--${props?.variant ?? "default"}`,

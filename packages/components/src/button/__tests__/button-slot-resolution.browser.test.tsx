@@ -6,16 +6,14 @@ import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { Button } from "../button";
 
-// Regression: every Button slot whose content can be a **component** is resolved once via `children()`
-// in the body, and every read site uses the memoized accessor — never the raw prop. A JSX-element
-// prop compiles to a lazy getter that runs `createComponent` on *every* read, so a prop read in more
-// than one place within a single render would construct the component multiple times and discard the
-// extras. `loadingText` is the sharp case: it is read three ways in one render — the loader-placement
-// decision, the label gate, and the label render — so a raw `merged.loadingText` at each site would
-// build it three times. These tests count real constructions; re-introducing a raw read pushes the
-// count above 1 and fails here. (A component slot is still legitimately re-created when it unmounts
-// and remounts — e.g. `loadingText` across a loading on/off/on cycle — which is Solid's normal
-// conditional-render model and not what this guards.) See button.tsx's slot-resolution comment.
+// Regression: a JSX-valued prop compiles to a lazy getter that runs `createComponent` on *every*
+// read, so a prop read from several places in one render builds the component several times and
+// throws the extras away. Button resolves each such prop once with `children()` and reads only the
+// memoized accessor. `loadingText` is the sharp case — three reads in a single render (the loader
+// placement decision, the label gate, the label itself). These tests count real constructions, so
+// re-introducing a raw read pushes the count above one and fails here.
+//
+// Re-creation on unmount/remount is normal conditional rendering, not what this guards.
 
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
@@ -29,8 +27,8 @@ describe("Button slot resolution — single creation", () => {
       return <svg data-testid="lt-marker" />;
     };
 
-    // `loading` is true from mount, so this one render exercises all three loadingText reads at once
-    // (placement + gate + render). One memoized resolution → one construction (was three pre-fix).
+    // `loading` is true from mount, so a single render hits all three read sites at once. Before the
+    // fix this constructed the marker three times.
     const { dispose } = mount(() => (
       <Themed>
         <Button loading loadingText={<Marker />}>
@@ -51,8 +49,8 @@ describe("Button slot resolution — single creation", () => {
     };
     const [loading, setLoading] = createSignal(false);
 
-    // The label stays mounted the whole time (no loadingText, so the label branch always wins), so a
-    // memoized resolution is reused across toggles rather than rebuilt on each `isLoading()` re-run.
+    // With no `loadingText`, the label branch always wins, so the label never unmounts — the
+    // memoized node must be reused across toggles rather than rebuilt each time `loading` flips.
     const { dispose } = mount(() => (
       <Themed>
         <Button loading={loading()}>

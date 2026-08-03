@@ -7,11 +7,12 @@ import { renderToStringAsync } from "@solidjs/web";
 import { Calendar } from "../index";
 
 // `calendar.ssr-entry.tsx`'s tree with the `I18nProvider` present but **no `locale` prop** — the
-// "wrap it and let it detect the browser" advice. This is the SSR-seeded path: the provider renders
-// `en-US` on the server *and* on the hydrating client, then adopts the detected locale in `onSettled`.
-// Paired with `calendar-eager-locale.ssr-entry.tsx` (no provider at all), these two entries measure
-// what wrapping actually buys on a visitor whose browser is not `en-US`, which is what the i18n doc
-// page's guidance rests on.
+// "wrap it and let it detect the browser" advice. The provider renders `en-US` on the server *and* on
+// the hydrating client, then adopts the detected locale once hydration has finished.
+//
+// Paired with `calendar-no-provider.ssr-entry.tsx`, which drops the provider entirely: the two differ
+// in nothing but locale plumbing, so the browser tests over them measure that plumbing rather than
+// the calendar.
 
 export function Tree(): JSX.Element {
   return (

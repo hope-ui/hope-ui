@@ -407,8 +407,8 @@ describe("createHideOutside", () => {
   });
 
   it("keeps the still-open layer observing when layers close out of order", async () => {
-    // React Aria's splice branch: the layer that leaves is not the one on top, so nothing is
-    // popped and nothing is restarted — whoever is topmost is already observing.
+    // The layer that leaves is not the one on top, so it is spliced out of the middle of the
+    // stack: nothing is popped and nothing restarts, because whoever is topmost already observes.
     const [outer, setOuter] = createSignal(false);
     const [inner, setInner] = createSignal(false);
     const { container, dispose } = mount(() => <NestedHarness outer={outer} inner={inner} />);

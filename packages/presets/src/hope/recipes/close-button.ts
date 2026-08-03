@@ -1,34 +1,29 @@
 /*
  * @hope-ui/presets/hope — CloseButton slot recipe.
  *
- * The `tailwind-variants` slot recipe the `@hope-ui/components` `CloseButton` reads through
- * `useRecipe("closeButton")`. CloseButton is an **always-icon-only** button that ships a built-in X
- * and self-labels; its defining trait is that it is **surface-adaptive, never colored** — it has no
- * `variant` / `colorScheme` axis, only `size`.
- *
- * ── Why every class is a literal string ─────────────────────────────────────────────────────────
- * The consumer's Tailwind build discovers which utilities to generate by scanning this file
- * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
- * per-size utilities are written out (`SIZE`), not built from `size-${n}` template strings.
+ * A *slot recipe*: `tv` (tailwind-variants) maps variant props to one class string per named part
+ * ("slot"), and `@hope-ui/components`' CloseButton reads it through `useRecipe("closeButton")`.
+ * CloseButton is an **always-icon-only** button shipping a built-in X, and its defining trait is that
+ * it is **surface-adaptive, never colored**: no `variant`/`colorScheme` axis, only `size`.
  *
  * ── currentColor, not a role token ──────────────────────────────────────────────────────────────
- * The glyph sets **no** text-color class, so it inherits `currentColor` from the surface it sits on.
- * The hover/press wash is the shared, surface-family `surface-adaptive-*` token — a *finished* token
- * derived from `currentColor` in hope's `theme.css` (`--hope-surface-adaptive-hovered/-pressed` →
- * `bg-surface-adaptive-*` via `_base/_theme-map.css`). So a close button reads correctly on solid /
- * soft / light / dark surfaces with zero configuration, and the recipe still computes no color: no
- * `color-mix`, no alpha modifier, no magic opacity (the recipe-purity rule — `pnpm check:recipe-purity`).
- * Focus is the shared `focus-halo` ring, same as Button — not a bespoke close ring. Interaction
- * *triggers* are Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/`data-disabled`
- * variants (emitted by the `createButton` primitive).
+ * The glyph sets **no** text-color class, so it inherits `currentColor` from whatever surface it sits
+ * on, and the hover/press wash is the shared `surface-adaptive-*` token — itself *finished*, derived
+ * from `currentColor` once in hope's `theme.css`. So a close button reads correctly on solid, soft,
+ * light and dark surfaces with zero configuration while this recipe still computes no color of its own
+ * (no `color-mix`, no alpha modifier, no magic opacity — recipe purity, enforced by `pnpm
+ * check:recipe-purity`). Focus is the shared `focus-halo` ring, not a bespoke close ring. Interaction
+ * *triggers* are Tailwind's own `hover:`/`focus-visible:` plus the `data-pressed`/`data-disabled`
+ * attributes the `createButton` primitive emits.
+ *
+ * Every class is a literal string, because the consumer's Tailwind build only emits utilities it can
+ * find by scanning this file (`@source "./recipes"`) — a `size-${n}` template is invisible to it.
  */
 
 import type { CloseButtonSize } from "@hope-ui/theming";
-// The CloseButton recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this
-// theme implements it. `hopeRecipes` (in `./index`) checks it against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
 
-/** Per-size box metrics on `root` + glyph sizing on the `icon` slot — literal so the scan emits them. */
+/** Per-size box metrics on `root`, plus glyph sizing on the `icon` slot. */
 const SIZE: Record<CloseButtonSize, { root: string; icon: string }> = {
   sm: { root: "size-6 rounded-md", icon: "[&_svg]:size-4" },
   md: { root: "size-7 rounded-md", icon: "[&_svg]:size-4.5" },
@@ -44,18 +39,17 @@ export const closeButtonRecipe = tv({
     root: [
       "relative inline-flex shrink-0 items-center justify-center select-none outline-none",
       "transition-[background-color,box-shadow] duration-150 ease-out",
-      // Surface-adaptive wash — guarded against the pressed state so it never fights the press color.
-      // Both are finished currentColor-derived tokens (never an alpha modifier — recipe-purity).
+      // The wash is guarded against the pressed state so the two never fight.
       "hover:not-data-pressed:bg-surface-adaptive-hovered data-pressed:bg-surface-adaptive-pressed",
-      // Focus ring is the shared `focus-halo` — the same indicator every focusable control uses.
       "focus-visible:ring-3 focus-visible:ring-focus-halo",
-      // Dim-only disabled axis (mirrors Button): `createButton` emits `data-disabled` for both native
-      // (`:disabled`) and non-native (`aria-disabled`) buttons. No color swap — just neutralise chrome
-      // and dim via the finished `opacity-disabled` token, never a magic `opacity-90`.
+      // Dim-only disabled axis, mirroring Button: `createButton` emits `data-disabled` for both native
+      // (`:disabled`) and non-native (`aria-disabled`) buttons. No color swap — just neutralised chrome
+      // and a finished `opacity-disabled` token, never a magic `opacity-90`.
       "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:opacity-disabled",
     ],
-    // The host `<span>` wrapping the glyph (keeps the hydration-keyed `<button>`'s first child a host
-    // element). `pointer-events-none` so the glyph never becomes the pointer target over the button.
+    // A host `<span>` wrapping the glyph, so the hydration-keyed `<button>`'s first child is a host
+    // element rather than a component. `pointer-events-none` keeps the glyph from becoming the pointer
+    // target over its own button.
     icon: "pointer-events-none inline-flex items-center justify-center",
   },
   variants: {

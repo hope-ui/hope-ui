@@ -9,10 +9,10 @@ import { page, userEvent } from "vitest/browser";
 import { Popover, type PopoverRootProps } from "../index";
 import { Tree } from "./popover.ssr-entry";
 
-// Every tree here sits under a `<ThemeProvider>` fed the `hope` preset: `Popover.Root` reads a
-// recipe, and `Popover.CloseTrigger` renders a recipe-styled `CloseButton`. It is a zero-DOM
-// provider (its token values live in CSS), so it changes nothing the assertions look at — except
-// `_hk` keys, which is why the hydration tree carries it identically.
+// Popover reads a theme recipe, so every tree here needs a provider. It renders no DOM of its own
+// (hope's token values live in CSS), so it changes nothing the assertions look at — except the
+// hydration keys Solid assigns by walking the component tree, which is why the hydration tree below
+// must carry it too.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -64,24 +64,23 @@ const CLAMPED_TRIGGER_STYLE: JSX.CSSProperties = {
 };
 
 /**
- * **The browser project loads no compiled Tailwind**, so every recipe class here is an inert string:
- * an unstyled positioner is a block `<div>` as wide as the viewport, which makes `flip`'s cross-axis
- * check fire and silently rewrites `data-align` to `end`. These two give the layer and its arrow a
- * real box so the measured assertions mean what they say — and they ride the kernel-first/
- * consumer-last `style` merge, which is the documented way a consumer overrides a positioned layer.
+ * **This test project compiles no Tailwind**, so every recipe class is an inert string here. An
+ * unstyled positioner is a block `<div>` as wide as the viewport, which makes floating-ui's `flip`
+ * middleware fire on the cross axis and silently rewrite `data-align` to `end`. These two give the
+ * layer and its arrow a real box so the measured assertions mean what they say — riding the
+ * positioning-first / consumer-last `style` merge, the documented consumer override.
  */
 const POSITIONER_STYLE: JSX.CSSProperties = { width: "200px" };
 const ARROW_STYLE: JSX.CSSProperties = { width: "8px", height: "8px" };
 
 /**
- * The exit transition, for the same reason and by the same means as the two above.
+ * The exit transition, inline for the same reason as the two above: hope's `content` slot authors
+ * `duration-150`, and that class is inert here.
  *
- * hope's `content` slot authors `transition-[opacity,scale,translate] duration-150`, and **that is
- * the only thing that gives a closing popover an exit at all**: `createPresence` reads the computed
- * duration off this element and unmounts immediately when it is `0`. With no compiled Tailwind here
- * that class computes to exactly that — measured, the layer is gone by the first frame after the
- * close and `data-presence="exiting"` is never observable. So the R9 exit assertion below would hold
- * over an empty set. This is the recipe's duration, spelled where `getComputedStyle` can read it.
+ * It is load-bearing, not decoration. The mount/unmount animation state reads the element's
+ * *computed* transition duration and unmounts immediately when it is `0` — so without this the layer
+ * is gone by the first frame after a close, `data-presence="exiting"` is never observable, and the
+ * exit assertion below would quantify over an empty set.
  */
 const TRANSITIONED_CONTENT_STYLE: JSX.CSSProperties = { transition: "opacity 150ms ease-out" };
 
@@ -106,10 +105,10 @@ interface PopoverDemoProps {
 }
 
 // The canonical consumer tree — the same shape as the ssr-entry's, plus the knobs the behavior tests
-// need. `Popover.Title` is not decoration: a `role="dialog"` surface with no accessible name is an
-// axe `aria-dialog-name` violation. The Title/Description sit inside a `Popover.Header`, which is how
-// the labelling assertions below double as the pin that a title registers its id with the content
-// wherever it is nested — the header is layout, not a link in the ARIA chain.
+// need. `Popover.Title` is not decoration: a `role="dialog"` surface with no accessible name fails
+// the axe check every test here runs. Title/Description sit inside a `Popover.Header` so the
+// labelling assertions double as proof that a title registers its id with the content from any
+// nesting depth — the header is layout, not a link in the ARIA chain.
 const PopoverDemo: Component<PopoverDemoProps> = (props) => (
   <Themed>
     <Popover.Root
@@ -159,10 +158,9 @@ const partOf = (slot: string) =>
 const triggerLocator = () => page.getByRole("button", { name: "Open popover" });
 
 /**
- * The component-layer stand-in for `floating.isPositioned()`: `floatingStyles()` is the
- * `visibility: hidden` pre-positioned branch until the first measurement lands, after which the key
- * is absent from the style object entirely and a real `translate()` appears. Axe and every geometry
- * assertion must wait for it — before it, they would inspect the layer parked at 0,0.
+ * Waits for the first measurement to land. Until it does, the layer is parked at 0,0 under
+ * `visibility: hidden`; afterwards that key is gone from the style object and a real `translate()`
+ * appears. Axe and every geometry assertion must wait, or they inspect the unpositioned layer.
  */
 async function waitForPositioned(): Promise<HTMLElement> {
   let positioner: HTMLElement | null = null;
@@ -176,10 +174,9 @@ async function waitForPositioned(): Promise<HTMLElement> {
 }
 
 /**
- * Axe returns `aria-valid-attr-value` as *incomplete* for **any** element carrying both
- * `aria-haspopup` and `aria-controls`, without ever resolving the IDREF
- * (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check) — undecidable by construction,
- * not a markup problem. The IDREF itself is pinned below, and in `popover-trigger.browser.test.tsx`.
+ * Axe reports `aria-valid-attr-value` as *incomplete* for **any** element carrying both
+ * `aria-haspopup` and `aria-controls`, bailing out before it resolves the id reference at all —
+ * undecidable by construction, not a markup problem. The reference itself is asserted directly below.
  */
 const AXE_OPTIONS = { allowIncomplete: ["aria-valid-attr-value"] };
 
@@ -190,9 +187,9 @@ describe("Popover — open/close behavior", () => {
     await userEvent.click(triggerLocator());
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
-    // The whole point of the Phase 3 `exclude` work: without the trigger in `dismissExclusions`, the
-    // capture-phase pointerdown dismisses and the trigger's own click reopens, so an open popover
-    // could never be closed by the control that opened it.
+    // Without the trigger excluded from outside-click dismissal, the capture-phase pointerdown
+    // dismisses and the trigger's own click reopens — an open popover could never be closed by the
+    // control that opened it.
     await userEvent.click(triggerLocator());
     await vi.waitFor(() => expect(page.getByRole("dialog").query()).toBeNull());
 
@@ -366,7 +363,7 @@ describe("Popover — positioning", () => {
     await waitForPositioned();
     await vi.waitFor(() => {
       const arrow = partOf("arrow");
-      // The measured offset the middleware wrote — proof the arrow's ref reached the config memo.
+      // An offset written at all is proof the arrow's element reached floating-ui's config.
       expect(arrow?.style.left).not.toBe("");
       expect(arrow?.hasAttribute("data-uncentered")).toBe(false);
     });
@@ -387,10 +384,10 @@ describe("Popover — positioning", () => {
   });
 
   it("publishes --anchor-width as real, spendable CSS — a layer sized from it matches the trigger", async () => {
-    // The end-to-end claim, asserted through the consumer `style` seam rather than the recipe:
-    // **this project compiles no Tailwind**, so `w-(--anchor-width)` is an inert string here (see
-    // POSITIONER_STYLE). Spending the property directly is what proves it resolves to a usable
-    // length — a malformed or missing value leaves the declaration invalid and the width unchanged.
+    // Asserted through the consumer `style` prop rather than the recipe, because this project
+    // compiles no Tailwind (see POSITIONER_STYLE). Spending the custom property directly is what
+    // proves it holds a usable length: a malformed or missing value leaves the declaration invalid
+    // and the width unchanged.
     const { dispose } = mount(() => (
       <PopoverDemo
         defaultOpen
@@ -410,9 +407,9 @@ describe("Popover — positioning", () => {
     const { dispose } = mount(() => <PopoverDemo defaultOpen matchAnchorWidth />);
 
     await waitForPositioned();
-    // The recipe wiring reaching the DOM. The absence of `max-w-*` is the load-bearing half: a card
-    // capped at its size would stay narrower than a wide anchor, and the compound variants exist so
-    // that cap is never emitted rather than emitted-then-overridden.
+    // The *absence* of `max-w-*` is the load-bearing half: a card capped at its `size` would stay
+    // narrower than a wide anchor. The recipe drops the cap when `matchAnchorWidth` is on rather than
+    // emitting it and overriding it afterwards.
     expect(partOf("positioner")?.className).toContain("w-(--anchor-width)");
     expect(partOf("positioner")?.className).not.toContain("w-max");
     expect(partOf("content")?.className).not.toMatch(/\bmax-w-/);
@@ -421,9 +418,9 @@ describe("Popover — positioning", () => {
   });
 });
 
-// Every one of these asserts the attribute **on the element**, never on the props type: all three
-// shipped bugs in this family (Calendar.Root, Listbox.ItemIndicator, five Alert parts) type-checked,
-// passed their own suites, and shipped docs promising the opposite.
+// Asserted **on the element**, never on the props type. Every shipped bug of this kind in this repo
+// type-checked, passed its own suite, and shipped docs promising the opposite — a prop that is
+// declared but silently dropped before it reaches the DOM breaks nothing a compiler can see.
 describe("Popover — every part forwards its DOM props to the element", () => {
   it("forwards id/style/data-*/aria-*/ref and composes handlers on every part", async () => {
     const seen: string[] = [];
@@ -551,9 +548,10 @@ describe("Popover — every part forwards its DOM props to the element", () => {
   });
 });
 
-// A `render` target can fail two ways, both silent: the computed props stop reaching the element
-// (the ARIA and the keymap ride on them), or the internal ref is dropped — which disables whatever
-// that ref powers with no error at all. So each case asserts *behavior*, not the tag.
+// A `render` target (this library's polymorphism prop — the consumer supplies the element) can fail
+// two ways, both silent: the computed props stop reaching the element, taking the ARIA and the
+// keyboard handling with them, or the internal ref is dropped, disabling whatever it powers with no
+// error at all. So each case below asserts *behavior*, never just the tag.
 const renderTriggerAsButton: NonNullable<Parameters<typeof Popover.Trigger>[0]["render"]> = (p) => (
   <button {...p} data-testid="custom-trigger" />
 );
@@ -612,12 +610,12 @@ describe("Popover — render re-targets every part without dropping props or ref
       </Themed>
     ));
 
-    // The Positioner's ref is what `createFloating` measures and moves: a target that drops it
-    // leaves the layer parked at 0,0 forever. Waiting for a real `translate()` proves it survived.
+    // The Positioner's ref is what floating-ui measures and moves: a target that drops it leaves the
+    // layer parked at 0,0 forever. Waiting for a real `translate()` proves it survived.
     const positioner = await waitForPositioned();
     expect(positioner.dataset.testid).toBe("custom-positioner");
 
-    // The Arrow's ref is what enables the `arrow` middleware at all — no ref, no measurement, ever.
+    // The Arrow's ref is what enables floating-ui's `arrow` middleware — no ref, no measurement.
     await vi.waitFor(() => {
       expect(page.getByTestId("custom-arrow").query()?.getAttribute("style")).toContain("left");
     });
@@ -653,8 +651,8 @@ describe("Popover — render re-targets every part without dropping props or ref
     await userEvent.keyboard("{Escape}");
     await vi.waitFor(() => expect(page.getByTestId("custom-content").query()).toBeNull());
 
-    // And the Trigger's ref is its registration as the dismiss exclusion + default anchor — so the
-    // re-targeted trigger still toggles rather than dismissing-then-reopening.
+    // The Trigger's ref registers it as the default anchor and as the one element outside-click
+    // dismissal ignores — so a re-targeted trigger still toggles instead of dismissing-then-reopening.
     await userEvent.click(page.getByTestId("custom-trigger"));
     await expect.element(page.getByTestId("custom-content")).toBeInTheDocument();
     await userEvent.click(page.getByTestId("custom-trigger"));
@@ -692,11 +690,11 @@ const SAMPLED_FRAMES = 15;
 /**
  * Runs `act()` and records the positioner's **computed** style once per animation frame from there.
  *
- * `act` is a synchronous `.click()` and the loop is registered in the same task on purpose:
- * `userEvent.click()` costs a CDP round-trip of its own, so the frames this is here to inspect —
- * the ones between the state change and the layer settling — would already be behind us by the time
- * it resolved. Reading the *computed* style rather than `element.style` is the other half: it is
- * what the recipe's classes would show up in if the `positioner` slot ever grew a positional one.
+ * `act` must be a synchronous `.click()`, registered in the same task as the loop: `userEvent.click()`
+ * costs a round-trip to the browser, so the frames this exists to inspect — between the state change
+ * and the layer settling — would already be behind us by the time it resolved. Reading the *computed*
+ * style rather than `element.style` is deliberate too: it is where a recipe class would show up if
+ * the `positioner` slot ever grew a positional one.
  */
 function sampleFrames(act: () => void, frameCount = SAMPLED_FRAMES): Promise<PresenceFrame[]> {
   const samples: PresenceFrame[] = [];
@@ -715,17 +713,16 @@ function sampleFrames(act: () => void, frameCount = SAMPLED_FRAMES): Promise<Pre
 }
 
 /**
- * **R9** — `createPresence`'s clock meeting the kernel's pre-positioned `visibility: hidden`, the
- * pair `create-floating.md` reasons about and nothing had ever observed. Both run over the same
- * element: `floatingStyles()` parks an unmeasured layer at `{ left: 0, top: 0, visibility: "hidden" }`
- * and lifts that in the same memo read that writes the `translate()`, while presence walks
- * `entering → entered → exiting → exited` on its own rAF schedule. So these sample the frames instead
- * of arguing about them.
+ * Two independent clocks run over the same element, and these tests sample the actual frames rather
+ * than reason about the interleaving:
  *
- * R9's third half — hydrate closed, then open, and it still positions (`create-floating.md`'s
- * consumer anti-pattern #2, "no tree branch on `side()`") — is *"leaves the hydrated trigger
- * interactive, and mounts the portal client-side"* below, which hydrates closed, opens and waits for
- * a real measurement. It is not repeated here.
+ * - **Positioning** parks an unmeasured layer at `{ left: 0, top: 0, visibility: "hidden" }` and
+ *   lifts that hiding in the *same* read that writes the real `translate()`.
+ * - **The enter/exit animation state** walks `entering → entered → exiting → exited` on its own
+ *   `requestAnimationFrame` schedule.
+ *
+ * A third case — hydrate closed, then open, and it still positions — lives in "leaves the hydrated
+ * trigger interactive, and mounts the portal client-side" below, and is not repeated here.
  */
 describe("Popover — R9: presence over the kernel's pre-positioned visibility", () => {
   it("never paints an unmeasured layer, and is positioned before presence reports `entered`", async () => {
@@ -734,9 +731,9 @@ describe("Popover — R9: presence over the kernel's pre-positioned visibility",
 
     const frames = await sampleFrames(() => trigger.click());
 
-    // R9's enter half. `visibility` and the `translate()` are lifted by one memo read, so a frame
-    // that is visible with no transform is the layer painted at 0,0 — on top of the document's
-    // top-left corner, for as long as the measurement takes.
+    // `visibility` and the `translate()` are lifted together, so a frame that is visible with no
+    // transform means the layer was painted at 0,0 — over the document's top-left corner, for as long
+    // as the measurement took.
     const paintedUnmeasured = frames.find(
       (frame) => frame.visibility === "visible" && frame.transform === "none",
     );
@@ -745,19 +742,18 @@ describe("Popover — R9: presence over the kernel's pre-positioned visibility",
       `painted before measuring: ${JSON.stringify(frames)}`,
     ).toBeUndefined();
 
-    // The race R9a names, settled by measurement rather than by argument: `computePosition` resolves
-    // on the microtask queue *inside* the task that mounted the layer, while `entering → entered`
-    // costs two rAFs (`create-presence.ts:112-115`). So positioning is already in by the first
-    // sampled frame, and there is an `entering` frame that is genuinely visible for a transition to
-    // animate from.
+    // Which clock wins, measured rather than argued: floating-ui's `computePosition` resolves on the
+    // microtask queue *inside* the task that mounted the layer, while `entering → entered` costs two
+    // animation frames. So the layer is positioned by the first sampled frame, and there is still an
+    // `entering` frame that is genuinely visible for a CSS transition to animate from.
     const enteringVisible = frames.filter(
       (frame) => frame.presence === "entering" && frame.visibility === "visible",
     );
     expect(enteringVisible.length, JSON.stringify(frames)).toBeGreaterThan(0);
 
-    // Consumer anti-pattern #4: the `positioner` slot carries `z-50 w-max` and nothing positional, so
-    // the only `transform` on this element is the kernel's — a real translation, not the identity
-    // matrix a layer stuck at 0,0 would compute to.
+    // The `positioner` slot carries nothing positional, so the only `transform` on this element is
+    // the one floating-ui wrote — a real translation, not the identity matrix a layer stuck at 0,0
+    // would compute to.
     const settled = frames[frames.length - 1];
     expect(settled?.presence).toBe("entered");
     expect(settled?.transform).toMatch(/^matrix\(/);
@@ -776,19 +772,19 @@ describe("Popover — R9: presence over the kernel's pre-positioned visibility",
     const frames = await sampleFrames(() => trigger.click());
     const exiting = frames.filter((frame) => frame.presence === "exiting");
 
-    // Not a smoke check — the assertion below quantifies over this set, and an empty one passes it
-    // while proving nothing. It is empty whenever the card has no authored exit duration, which is
-    // the default in this project. See `TRANSITIONED_CONTENT_STYLE`.
+    // Not a smoke check: the loop below quantifies over this set, and an empty set passes it while
+    // proving nothing. It is empty whenever the card has no authored exit duration — the default in
+    // this project. See `TRANSITIONED_CONTENT_STYLE`.
     expect(
       exiting.length,
       `no exiting frame to inspect: ${JSON.stringify(frames)}`,
     ).toBeGreaterThan(0);
 
-    // Correction #2, and the sharper half of R9: `createPopover` passes `createFloating` an
-    // `active: () => contentPresence.mounted()`. Keyed on `open` instead, effect (2) would
-    // `setIsPositioned(false)` the instant the popover closed — `floatingStyles()` reverting to the
-    // hidden 0,0 branch while presence still holds the card mounted, so it would vanish rather than
-    // animate out. Every exiting frame staying visible *and* translated is what says it didn't.
+    // Positioning stays active for as long as the element is *mounted*, not for as long as the
+    // popover is *open*. Keyed on `open`, it would drop back to the hidden 0,0 state the instant the
+    // popover closed — while the exit animation still held the card mounted — so the card would
+    // vanish rather than animate out. Every exiting frame staying visible *and* translated is what
+    // says it didn't.
     for (const frame of exiting) {
       expect(frame.visibility, `exit frame went hidden: ${JSON.stringify(frames)}`).toBe("visible");
       expect(frame.transform, `exit frame lost its position: ${JSON.stringify(frames)}`).toMatch(
@@ -800,11 +796,12 @@ describe("Popover — R9: presence over the kernel's pre-positioned visibility",
   });
 });
 
-// `Tree` is the same tree `popover.ssr.test.tsx` inline-snapshots and the bridge renders server-side,
-// so the hydration input and the client tree cannot structurally diverge — which matters because
-// `_hk` keys are a path through the component tree: a component inserted before `Popover.Trigger`,
-// even one rendering nothing, would shift the trigger's key. `hydrateFixture` proves hydration was
-// silent and reused every server node.
+// `Tree` is the same tree `popover.ssr.test.tsx` snapshots and the fixture bridge renders on the
+// server, so the hydration input and the client tree cannot structurally diverge. That matters
+// because Solid pairs server and client nodes by a key it derives from each node's *path through the
+// component tree*: inserting any component before `Popover.Trigger`, even one that renders nothing,
+// shifts the trigger's key and breaks the match. `hydrateFixture` fails if hydration warned or
+// re-created a node instead of adopting the server's.
 describe("Popover — hydration", () => {
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
@@ -819,10 +816,9 @@ describe("Popover — hydration", () => {
 
     await userEvent.click(page.getByRole("button", { name: "Open popover" }));
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
-    // Hydrated closed, then opened — and it still positions. **This is R9's hydration half** (and
-    // `create-floating.md`'s consumer anti-pattern #2): the tree never branches on `side()`/`align()`,
-    // only CSS keyed on `data-side` does, so there is no server/client structural difference for the
-    // client's first measurement to land on. Deliberately not repeated in the R9 sampler block above.
+    // Hydrated closed, then opened — and it still positions. Nothing in the tree branches on the
+    // resolved `side`/`align`; only CSS keyed on `data-side` reacts to them. So the client's first
+    // measurement cannot introduce a structural difference from the server render.
     await waitForPositioned();
 
     dispose();

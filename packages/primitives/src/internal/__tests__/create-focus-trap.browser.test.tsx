@@ -95,14 +95,14 @@ describe("createFocusTrap", () => {
 });
 
 /**
- * A second harness rather than props on the first: the five tests above are the gate proving the
- * focus-scope registry changed nothing for a lone trap, so the tree they run against stays
- * byte-identical.
+ * A separate harness, not extra props on the first — do not merge them. The tests above are the
+ * gate proving the focus-scope registry changed nothing for a lone trap, which only holds while
+ * their tree is untouched.
  *
- * The layer above is a **sibling** container, not a descendant — that is the shape the registry
+ * The layer above is a **sibling** container, not a descendant: that is the shape the registry
  * exists for, a `Popover` portaled out of the `Dialog` it was opened in. A nested one would be
- * covered by `container.contains` and prove nothing. The trap is always active and the scope above
- * is what toggles, so the two answers can be compared against one unchanging trap.
+ * covered by `container.contains` and prove nothing. The trap stays active and only the scope above
+ * toggles, so both answers are measured against one unchanging trap.
  */
 function TrapUnderALayer(props: { aboveActive?: boolean }) {
   const [containerRef, setContainerRef] = createSignal<HTMLDivElement>();

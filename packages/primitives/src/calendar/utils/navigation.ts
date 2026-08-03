@@ -41,11 +41,10 @@ export interface ArrowMove {
 }
 
 /**
- * Month-view arrow move. Because the month grid's cells are consecutive days, one cell-step equals one
- * day-step, so `focusedDate.add({ days })` reproduces the grid's roving move — and `!isSameMonth`
- * detects every cross, including a step onto a *visible* leading/trailing outside cell (which the grid
- * can't focus once `softDisabled=false`). Pure. (Retained for the month-only specs; the calendar grid
- * calls {@link resolveViewArrowMove}.)
+ * Month-view arrow move. The month grid's cells are consecutive days, so one cell-step is one day-step
+ * and `focusedDate.add({ days })` reproduces the grid's own move — while `!isSameMonth` catches every
+ * cross, including a step onto a *visible* leading/trailing filler cell, which the grid refuses to
+ * focus. Pure. (Kept for the month-only specs; the calendar grid calls {@link resolveViewArrowMove}.)
  */
 export function resolveArrowMove(
   focusedDate: CalendarDate,

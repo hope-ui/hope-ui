@@ -20,7 +20,6 @@
 
 /*
  * Locale + reading-direction context, re-expressed over Solid's context and accessors.
- * Replaces the Angular calendar's `I18nService` (locale) + `Directionality`.
  */
 
 import type { JSX } from "@solidjs/web";
@@ -49,10 +48,10 @@ export interface I18nProviderProps extends I18nMessagesConfig {
 }
 
 /**
- * Context default (no `I18nProvider` mounted): the detected browser locale, resolving messages against
- * the built-in catalog for it. Safe to server-render — `readDetectedLocale` reports the server's
- * `en-US`/`ltr` for as long as a hydration pass is in flight, then flips — so zero-config works under
- * SSR as well as on the client. Mount a provider to *choose* the locale, not to make it correct.
+ * What descendants see with no `I18nProvider` mounted: the detected browser locale, with messages
+ * resolved from the built-in catalog for it. Safe to server-render, because `readDetectedLocale`
+ * reports the server's `en-US`/`ltr` for as long as a hydration pass is in flight and only then flips.
+ * So a provider is how you *choose* a locale — not what makes the locale correct.
  */
 const I18nContext = createContext<I18nContextValue>({
   locale: () => readDetectedLocale().locale,
@@ -64,13 +63,12 @@ const I18nContext = createContext<I18nContextValue>({
 });
 
 /**
- * Provides the locale + reading direction + message resolver (`t`) to descendant components (calendar,
- * dialog, and any future locale-aware component). With no `locale` prop it tracks the browser locale
- * via `createDefaultLocale` — the same hydration-gated accessor the context default reads, so mounting
- * a provider without a `locale` changes nothing about correctness; with a `locale` prop it derives
- * direction from it and detection is bypassed entirely (the fully deterministic form under SSR).
- * `translate`/`messages` overlay the built-in catalog (see `translate.ts`). In SolidJS 2.0
- * `createContext` returns the Provider directly.
+ * Provides the locale, reading direction and message resolver (`t`) to descendant components.
+ *
+ * With no `locale` prop it tracks the browser locale through the same hydration-gated accessor the
+ * context default uses, so mounting a bare provider changes nothing about correctness. Passing
+ * `locale` derives the direction from it and skips detection altogether — the fully deterministic
+ * form, and the one to use under SSR. `translate`/`messages` overlay the built-in catalog.
  */
 export function I18nProvider(props: I18nProviderProps): JSX.Element {
   const defaultLocale = createDefaultLocale();

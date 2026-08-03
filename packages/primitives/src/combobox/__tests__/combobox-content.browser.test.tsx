@@ -12,8 +12,9 @@ import {
   triggerOf,
 } from "./combobox-harness";
 
-// The trigger is part of every tree here on purpose: the spared/excluded element that lets a
-// *toggling* trigger coexist with modality is wired in this hook, and only observable against one.
+// Every tree here includes the trigger on purpose. `createComboboxContent` is what exempts it from
+// dismissal and from `inert`, and that exemption — the reason a *toggling* trigger can coexist with
+// modality at all — is only observable against a real trigger.
 
 function mountHarness(props: Partial<ComboboxHarnessProps<string>> = {}) {
   let state!: CreateComboboxReturn<string, SelectionMode>;
@@ -99,8 +100,8 @@ describe("createComboboxContent", () => {
   });
 
   it("keeps focus on the trigger, so opening never dismisses itself", async () => {
-    // The focus-out listener is armed by default, and the trigger is `exclude`d — so the click that
-    // opens the popup (and focuses the trigger) cannot read as focus landing outside.
+    // The focus-out listener is armed by default, and the trigger is excluded from it — so the click
+    // that opens the popup (and focuses the trigger) cannot read as focus landing outside.
     const { container, state, dispose } = mountHarness();
     expect(state().closeOnFocusOutside()).toBe(true);
 
@@ -112,9 +113,9 @@ describe("createComboboxContent", () => {
   });
 
   it("closes when the trigger is clicked while open, and STAYS closed — modality included", async () => {
-    // The whole reason the trigger is both spared and excluded. Without the `exclude` the
-    // capture-phase pointerdown dismisses and the trigger's own `click` reopens; without the `spare`
-    // the trigger is `inert` by the time the second click arrives and never receives it at all.
+    // The whole reason the trigger is exempted from both mechanisms. Without the dismissal exclusion
+    // the capture-phase pointerdown dismisses and the trigger's own `click` reopens; without the
+    // `inert` exemption the trigger is inert by the time the second click arrives and never gets it.
     const { container, state, dispose } = mountHarness();
 
     await userEvent.click(page.getByTestId("trigger"));
@@ -145,7 +146,8 @@ describe("createComboboxContent", () => {
     expect(outside.getAttribute("aria-hidden")).toBe("true");
     expect(outside.hasAttribute("inert")).toBe(true);
     expect(document.body.style.overflow).toBe("hidden");
-    // …and the popup itself is never inert, which is what a run before the target resolved would do.
+    // The popup must never be inert itself. It would be if hide-outside ran before the popup element
+    // resolved, and the cost is focus stranded on `<body>` permanently.
     expect(contentOf(container)?.hasAttribute("inert")).toBe(false);
 
     await userEvent.click(page.getByTestId("trigger"));
@@ -195,8 +197,10 @@ describe("createComboboxContent", () => {
     const { container, state, dispose } = mountHarness({ options: { defaultOpen: true } });
     await waitForPositioned(state);
     await expectNoA11yViolations(container, {
-      // Undecidable by construction: axe returns `aria-valid-attr-value` as *incomplete* for any
-      // element carrying both `aria-haspopup` and `aria-controls`, without resolving the IDREF.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `combobox-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

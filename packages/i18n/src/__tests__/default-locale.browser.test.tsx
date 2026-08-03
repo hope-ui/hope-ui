@@ -6,11 +6,10 @@ import { createDefaultLocale } from "../default-locale";
  * The hydration gate, exercised against a real `navigator` and a real `hydrate()` pass — the only
  * place where "detected locale" and "what the server rendered" actually differ.
  *
- * Why it matters: hydration reuses the server's DOM rather than re-deriving it. A client that reports
- * its own locale *during* the pass produces markup that silently contradicts its own state — no
- * console warning, no replaced node, just a component quietly working from different data than the
- * text on screen. `@hope-ui/components`' calendar round-trip covers the full end-to-end consequence;
- * this covers the mechanism.
+ * Why it matters: hydration reuses the server's DOM instead of re-deriving it, so a client reporting
+ * its own locale *during* the pass ends up with markup contradicting its own state — no warning, no
+ * replaced node, just a component working from different data than the text on screen. The calendar's
+ * round-trip test covers the end-to-end consequence; this covers the mechanism.
  */
 function withBrowserLocale(locale: string): () => void {
   const languageDescriptor = Object.getOwnPropertyDescriptor(

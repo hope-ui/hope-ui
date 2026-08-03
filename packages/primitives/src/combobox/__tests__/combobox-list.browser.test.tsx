@@ -106,8 +106,8 @@ describe("createComboboxList", () => {
   });
 
   it("SCROLLS a mounted-but-clipped option into view when the highlight reaches it", async () => {
-    // The failure roving focus has been hiding all along: in activedescendant mode nothing moves DOM
-    // focus, so nothing brings the row on-screen unless the source is asked to.
+    // Nothing moves DOM focus in activedescendant mode, so nothing scrolls a clipped row into view
+    // unless the option source is asked to explicitly. Moving focus per option would have hidden it.
     const { container, state, dispose } = await openHarness({ listProps: { style: CLIPPED_LIST } });
     const list = listOf(container) as HTMLElement;
     expect(list.scrollHeight).toBeGreaterThan(list.clientHeight);
@@ -188,7 +188,7 @@ describe("createComboboxList", () => {
     // The list, not the content and not the trigger, is what `scrollIndexIntoView` scrolls.
     await userEvent.click(page.getByTestId("trigger"));
     await vi.waitFor(() => expect(contentOf(container)).toBeNull());
-    // Reopening re-registers, so the second session scrolls too.
+    // Reopening re-registers the scroll container, so a second session scrolls too.
     await userEvent.click(page.getByTestId("trigger"));
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     triggerOf(container).focus();
@@ -200,8 +200,10 @@ describe("createComboboxList", () => {
   it("has no accessibility violations while open", async () => {
     const { container, dispose } = await openHarness();
     await expectNoA11yViolations(container, {
-      // Undecidable by construction: axe returns `aria-valid-attr-value` as *incomplete* for any
-      // element carrying both `aria-haspopup` and `aria-controls`, without resolving the IDREF.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `combobox-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

@@ -2,9 +2,9 @@ import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Tree } from "./popover.ssr-entry";
 
-// `Tree` (from `popover.ssr-entry.tsx`) is the single source of truth for the round-trip tree:
-// `popover.browser.test.tsx` hydrates the very same render. Hydration keys are allocated by walking
-// the tree, so sharing one definition keeps the two halves structurally identical by construction.
+// `Tree` (from `popover.ssr-entry.tsx`) is shared with `popover.browser.test.tsx`, which hydrates
+// this exact render. Solid allocates hydration keys by walking the tree, so sharing one definition
+// keeps the two halves structurally identical by construction.
 
 describe("Popover SSR", () => {
   it("resolves renderToStringAsync without throwing while closed", async () => {
@@ -13,9 +13,9 @@ describe("Popover SSR", () => {
   });
 
   it("resolves renderToStringAsync without throwing while defaultOpen", async () => {
-    // The critical case: @solidjs/web's Portal throws server-side, so an open popover (whose
-    // Positioner/Content would otherwise portal into document.body) must not crash the render.
-    // `Popover.Portal`'s `isServer` guard is what makes this pass — and `createFloating` must not
+    // The critical case: @solidjs/web's Portal throws server-side, so an open popover — whose
+    // Positioner/Content would otherwise portal into `document.body` — must not crash the render.
+    // `Popover.Portal`'s server guard is what makes this pass, and the positioning layer must not
     // reach for the DOM on the server either.
     const html = await renderToStringAsync(() => <Tree defaultOpen />);
     expect(typeof html).toBe("string");
@@ -28,10 +28,8 @@ describe("Popover SSR", () => {
   });
 
   it("omits aria-controls from the closed trigger, so the server HTML has no dangling IDREF", async () => {
-    // `Popover.Portal` never renders server-side, so there is no popup element for a closed (or even
-    // a `defaultOpen`) popover's `aria-controls` to point at in the SSR output. Shared with Dialog;
-    // the open-server case is documented in `popover-trigger.md` rather than papered over with an
-    // `isServer` import inside a primitive.
+    // `Popover.Portal` never renders on the server, so there is no popup element for `aria-controls`
+    // to point at — and an id reference to an element that does not exist is invalid ARIA.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).not.toMatch(/aria-controls/);
   });
@@ -42,16 +40,14 @@ describe("Popover SSR", () => {
   });
 
   it("matches its server output byte for byte", async () => {
-    // The byte-exact half of the hydration round-trip, and only the `ssr` project can produce it:
-    // the one place `solid-js` *and* `@solidjs/web` both resolve to their server builds, which is
-    // what makes `_hk` — the hydration key `popover.browser.test.tsx` hydrates against — real.
-    // Byte-for-byte on purpose: `hydrate()`'s `gatherHydratable()` matches on `_hk`, so "contains
-    // the right text" is not enough.
+    // Byte-for-byte on purpose: hydration matches server nodes on the `_hk` attribute below (the
+    // per-node hydration key), so "contains the right text" would not catch a shifted key. Only the
+    // `ssr` test project can produce these bytes — it is the one place both `solid-js` and
+    // `@solidjs/web` resolve to their server builds, which is what makes `_hk` appear at all.
     //
-    // An **inline** snapshot, not a committed `.html` file, so a hydration subject adds zero
-    // committed fixture files at any scale. The hydration-fixture bridge renders this same `<Tree />`
-    // fresh into the `browser` project (see `vitest-hydration-bridge.ts`), so the snapshot below and
-    // what the browser test hydrates cannot drift. Regenerate with `pnpm exec vitest run --project=ssr -u`.
+    // An **inline** snapshot rather than a committed `.html` file, so a hydration subject costs zero
+    // fixture files. The browser test hydrates a fresh render of this same `<Tree />`, so the two
+    // cannot drift. Regenerate with `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
       `"<button _hk=00h010 type="button" aria-haspopup="dialog" aria-expanded="false" >Open popover</button>"`,

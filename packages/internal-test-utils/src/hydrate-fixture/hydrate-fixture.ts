@@ -11,11 +11,11 @@ export interface HydrateFixtureOptions {
   /**
    * Whether every server node must survive as the **same object** (default `true`).
    *
-   * Set `false` only for a tree that legitimately re-renders part of itself the instant hydration
-   * settles, where node replacement is the feature under test rather than a fallback. The one case
-   * today is `I18nProvider` with no `locale`: it deliberately renders the server's `en-US` and then
-   * adopts the visitor's locale, which rebuilds every locale-derived node. The console-silence and
-   * element-count checks still run — they are what still separates a re-render from a fallback.
+   * Set `false` only for a tree that legitimately re-renders part of itself the moment hydration
+   * settles, where replacing nodes is the feature under test rather than a failure. The one case today
+   * is `I18nProvider` with no `locale`: it deliberately renders the server's `en-US`, then adopts the
+   * visitor's locale, rebuilding every locale-derived node. The console-silence and element-count
+   * checks still run, and are what still tells a re-render apart from a fallback.
    */
   expectNodeReuse?: boolean;
 }
@@ -25,39 +25,32 @@ interface HydrationGlobals {
 }
 
 /**
- * `hydrate()` reads `globalThis._$HY` unconditionally. A real app gets it from
- * `generateHydrationScript()`, which is a no-op (`voidFn`) in `@solidjs/web`'s client build
- * — so a browser test has to supply it. Only three fields are read on this path: `.done`,
- * `.completed` and `.events`. `.r` is the *resource/asset* registry consulted by
- * `sharedConfig.load`; the element registry `getNextElement()` looks in is built separately by
- * `gatherHydratable()`, which scans the container for `[_hk]` attributes. An empty `.r` is
- * therefore correct, not a bug.
+ * `hydrate()` reads `globalThis._$HY` unconditionally. A real app gets it from the hydration script
+ * Solid's *server* build emits, which is a no-op in the client build — so a browser test must supply
+ * it. Only `.done`, `.completed` and `.events` are read on this path. `.r` is the resource/asset
+ * registry, unrelated to element matching: Solid finds server nodes by scanning the container for
+ * their `_hk` hydration-key attributes. So an empty `.r` here is correct, not an oversight.
  */
 function bootstrapHydration(): () => void {
   const globals = globalThis as HydrationGlobals;
   globals._$HY = { events: [], completed: new WeakSet(), r: {} };
   return () => {
-    // Drained before the global goes: `runHydrationEvents()` — which `babel-preset-solid` emits for
-    // any top-level template element carrying a **delegated** event (`onInput`, `onClick`, …) —
-    // queues a microtask that replays the queue and then writes `_$HY.events = null`. A test that
-    // hydrates and disposes synchronously runs that microtask *after* this teardown, and the write
-    // would throw on an `undefined` global. Clearing the queue first makes it return early, which
-    // is also exactly where Solid itself leaves things once the queue is drained. `_$HY` still goes
-    // away, so nothing leaks into the next test.
+    // Drain the event queue before removing the global. Any top-level element with a delegated event
+    // handler (`onClick`, `onInput`, …) makes Solid queue a microtask that replays the queue and then
+    // writes `_$HY.events = null`. A test that hydrates and disposes synchronously runs that microtask
+    // *after* this teardown, where the write would throw on an undefined global. Clearing the queue
+    // first makes it return early instead — the same state Solid leaves once it has drained.
     sharedConfig.events = null;
     globals._$HY = undefined;
   };
 }
 
 /**
- * Captures every `console.error`/`console.warn` call so the caller can assert hydration was
- * silent — a SolidJS hydration mismatch surfaces as a console message (and a would-be
- * reactivity diagnostic is a superset), so "zero output" is the check.
+ * Captures every `console.error`/`console.warn` call so the caller can assert hydration was silent. A
+ * SolidJS hydration mismatch surfaces only as a console message, so "zero output" is the whole check.
  *
- * Stores and restores the console functions **unbound**, the way `mount.ts` does: taking
- * `console.error.bind(console)` and restoring that would leave a different function object
- * than the one removed, so an install/restore cycle would leak a wrapper — and a later
- * `vi.spyOn(console, ...)` would be looking at the wrong function.
+ * Stores and restores the console functions **unbound**, for the same reason `mount.ts` does: binding
+ * would restore a different function object than the one taken, leaking a wrapper per cycle.
  */
 function recordConsole(): { restore: () => string[] } {
   const original = { error: console.error, warn: console.warn };
@@ -79,23 +72,22 @@ function recordConsole(): { restore: () => string[] } {
 }
 
 /**
- * Hydrates `serverHtml` (genuine server output) with `ui` (the structurally identical client
- * tree) in a real browser, and asserts the full hydration contract — a silent fallback to a
- * client render otherwise looks identical to success (see __internal__/testing.md):
+ * Hydrates `serverHtml` (genuine server output) with `ui` (the structurally identical client tree) in
+ * a real browser, and asserts the full hydration contract. Without these checks a silent fallback to a
+ * plain client render is indistinguishable from success (see `__internal__/testing.md`):
  *
- *  1. hydration logs no `console.error`/`console.warn` (mismatch warnings land there);
- *  2. no element is added or dropped (a fallback duplicates or replaces nodes);
- *  3. every server-rendered element is reused as the **same object**, in document order.
+ *  1. hydration logged no `console.error`/`console.warn` — where mismatch warnings land;
+ *  2. no element was added or dropped — a fallback duplicates or replaces nodes;
+ *  3. every server-rendered element was reused as the **same object**, in document order.
  *
- * The whole-tree reuse check generalizes and strictly strengthens a per-selector
- * `toBe(serverNode)` / `toHaveLength(1)`. `querySelectorAll("*")` returns only elements, so
- * Solid's internal hydration comment markers can't produce a false positive.
+ * Check 3 over the whole tree strictly strengthens a per-selector `toBe(serverNode)`.
+ * `querySelectorAll("*")` returns only elements, so Solid's hydration comment markers cannot cause a
+ * false positive.
  *
- * Returns `{ container, dispose }` so the caller can drive interaction or run
- * `expectNoA11yViolations` against the hydrated tree. `dispose()` unmounts, removes the
- * container and clears the `_$HY` bootstrap. Browser-project only — it needs a real DOM and
- * the client hydrate build; there is no server render here (the client build's
- * `renderToStringAsync` returns `undefined`), which is why `serverHtml` is passed in.
+ * Returns `{ container, dispose }` so the caller can drive interaction or run a11y checks against the
+ * hydrated tree; `dispose()` unmounts, removes the container and clears the hydration bootstrap.
+ * Browser-project only: it needs a real DOM and the client build, which cannot server-render — hence
+ * `serverHtml` being passed in rather than produced here.
  */
 export function hydrateFixture(
   serverHtml: string,

@@ -41,10 +41,11 @@ export function buildMonthCells(
   firstDayOfWeek?: FirstDayOfWeek,
 ): CalendarCellModel[][] {
   const first = startOfWeek(startOfMonth(visibleMonth), locale, firstDayOfWeek);
-  // Only the rows the month spans (4 for a week-aligned 28-day Feb, 6 for a 31-day month starting late).
+  // Only the rows the month spans: 4 for a week-aligned 28-day February, 6 for a 31-day month that
+  // starts late in the week.
   const weeks = getWeeksInMonth(visibleMonth, locale, firstDayOfWeek);
-  // Localize the day number to the locale's numbering system (Western 1-31 for en-US, Arabic-Indic
-  // for ar-EG, …) so the cells match the Intl-formatted heading. One formatter, reused for all cells.
+  // Localize the day number to the locale's numbering system (Western 1-31 for en-US, Arabic-Indic for
+  // ar-EG, …) so the cells match the Intl-formatted heading. One formatter, reused for every cell.
   const dayFormatter = new Intl.NumberFormat(locale);
   const rows: CalendarCellModel[][] = [];
   for (let week = 0; week < weeks; week++) {
@@ -106,10 +107,10 @@ export function getWeekdays(
 /**
  * Full localized day name for a cell's `aria-label` ("Thursday, January 1, 2026").
  *
- * The `calendar` is derived from the date's own calendar system (`date.calendar.identifier`), not left
- * to the locale's default — so an Islamic/Japanese/Buddhist `CalendarDate` reads out its own month/
- * year/era (matching the grid's day numbers), and a Gregorian date over a non-Gregorian-default locale
- * (e.g. `fa-IR`) still reads Gregorian. React-Aria style; a no-op for the common Gregorian case.
+ * The `calendar` option comes from the date's own calendar system (`date.calendar.identifier`) rather
+ * than the locale's default. So an Islamic/Japanese/Buddhist `CalendarDate` is read out in its own
+ * months, years and eras — matching the day numbers in the grid — and a Gregorian date under a locale
+ * whose default is not Gregorian (`fa-IR`) still reads Gregorian. A no-op for the common case.
  */
 export function formatFullDate(date: CalendarDate, locale: string, timeZone: string): string {
   return new Intl.DateTimeFormat(locale, {

@@ -12,10 +12,10 @@ import {
   selectedLabels,
 } from "./combobox-harness";
 
-// `createComboboxInput` is Combobox's focus owner: the same `role="combobox"` + popup ARIA
-// `createComboboxTrigger` puts on Select's `<button>`, on an `<input>` — without `createButton`,
-// without typeahead, and with a keymap that differs on every row where a text field and a button
-// disagree. Those rows are what this file pins.
+// `createComboboxInput` is Combobox's focus owner: the same `role="combobox"` and popup ARIA
+// `createComboboxTrigger` puts on Select's `<button>`, on an `<input>` — no button behavior, no
+// typeahead, and a keymap that differs on every row where a text field and a button disagree. Those
+// rows are what this file pins.
 
 function mountInput(tree: () => ReturnType<typeof ComboboxInputHarness>) {
   const mounted = mount(tree);
@@ -44,8 +44,7 @@ describe("createComboboxInput — ARIA", () => {
     expect(input.getAttribute("aria-expanded")).toBe("false");
     expect(input.type).toBe("text");
     // ARIA 1.2 gives `role="combobox"` an implicit `aria-haspopup="listbox"`, so repeating it is
-    // noise — react-aria's `useComboBox` omits it for the same reason. The chevron `<button>` has no
-    // such implication and carries an explicit one.
+    // noise. The chevron `<button>` implies nothing and carries an explicit one.
     expect(input.hasAttribute("aria-haspopup")).toBe(false);
 
     await expectNoA11yViolations(container);
@@ -139,8 +138,8 @@ describe("createComboboxInput — the keymap", () => {
     input.focus();
     await userEvent.keyboard("b n");
     // On the button trigger `b` starts a typeahead buffer and Space opens the popup. Here both type:
-    // the input *is* the search affordance, and a second buffer racing the one the user can see is
-    // the bug this prevents (react-aria spells it `disallowTypeAhead: true`).
+    // the input *is* the search affordance, and a hidden second buffer racing the visible one is the
+    // bug this prevents.
     expect(input.value).toBe("b n");
     expect(activeLabelForInput(container)).toBeUndefined();
   });
@@ -153,8 +152,7 @@ describe("createComboboxInput — the keymap", () => {
     input.setSelectionRange(6, 6);
     const home = new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true });
     input.dispatchEvent(home);
-    // Not consumed: jump-to-start has to keep working in a field the user is editing. React-aria
-    // chains its collection handlers behind `state.isOpen &&` for exactly this.
+    // Not consumed while closed: jump-to-start has to keep working in a field the user is editing.
     expect(home.defaultPrevented).toBe(false);
     expect(input.getAttribute("aria-expanded")).toBe("false");
   });
@@ -203,8 +201,8 @@ describe("createComboboxInput — the keymap", () => {
     input.focus();
     const closed = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
     input.dispatchEvent(closed);
-    // A closed combobox in a form must still submit it. (The button trigger must always
-    // `preventDefault()` Enter, because a native `<button>` synthesizes a `click` from it.)
+    // A closed combobox in a form must still submit it. (The button trigger must always cancel
+    // Enter instead, because a native `<button>` synthesizes a `click` from it.)
     expect(closed.defaultPrevented).toBe(false);
     expect(commit).not.toHaveBeenCalled();
 
@@ -279,7 +277,7 @@ describe("createComboboxInput — the keymap", () => {
     input.focus();
     await userEvent.keyboard("{ArrowDown}");
     await nextFrame();
-    // Consumer first in every chain, so their `preventDefault()` cancels the kernel's behavior.
+    // Consumer first in every chain, so their `preventDefault()` cancels the hook's own behavior.
     expect(input.getAttribute("aria-expanded")).toBe("false");
   });
 });
@@ -312,8 +310,9 @@ describe("createComboboxInput — the text seam", () => {
       data: "x",
     });
     input.dispatchEvent(before);
-    // The native `input` event is not cancelable, so `preventDefault()` there does nothing. This is
-    // deliberately never consumed by the kernel, so it forwards and can stop the change.
+    // `beforeinput` is the only cancelable channel here — the native `input` event is not, so
+    // `preventDefault()` on it does nothing. The hook never consumes `onBeforeInput`, precisely so a
+    // consumer can forward one and stop the change.
     expect(before.defaultPrevented).toBe(true);
   });
 

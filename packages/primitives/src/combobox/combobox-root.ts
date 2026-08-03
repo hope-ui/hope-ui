@@ -26,57 +26,39 @@ import { type CreateListboxOptions, type CreateListboxReturn, createListbox } fr
 import { withDefaults } from "../utils";
 
 /**
- * The shared state kernel of the **APG 1.2 combobox pattern** — `role="combobox"` on a focus owner
- * that keeps DOM focus, `aria-expanded`/`aria-controls` pointing at a `role="listbox"` popup, and
- * `aria-activedescendant` naming the active option. It is the one call at the root of the tree, it
- * renders **no JSX and no host element**, and it is what stops Select and Combobox growing two
- * keyboard/ARIA implementations that drift apart.
+ * Shared state for the WAI-ARIA combobox pattern, used by both Select and Combobox: `role="combobox"`
+ * on the one element that keeps DOM focus, `aria-expanded`/`aria-controls` naming the `role="listbox"`
+ * popup, and `aria-activedescendant` naming the highlighted option (the ARIA way to move a highlight
+ * without moving real focus). Renders no JSX and no host element; the sibling `createCombobox*` hooks
+ * take this state plus their own props and own the rest. An option is `createListboxItem(state.list,
+ * …)` — there is no `combobox-item.ts`.
  *
- * The per-part hooks (`createComboboxTrigger`, `createComboboxValue`, `createComboboxPositioner`,
- * `createComboboxContent`, `createComboboxList`) each take this state plus their own props and own
- * the rest — their effects, their id/element registration, and their consumer-prop precedence.
- * Options are `createListboxItem(state.list, …)` unchanged; there is no `combobox-item.ts`.
+ * **It owns no text value, and therefore no filtering.** No `inputValue`, no filtered collection, no
+ * commit/revert. That seam belongs to Combobox, which has a real input value to pull it.
  *
- * ## It owns no text value — the absence of filtering is the design
+ * **The listbox is created here, eagerly.** The popup mounts only while open, so a `createListbox`
+ * created inside it would leave the trigger with no navigation, no typeahead (type-to-jump matching)
+ * and no active option to read *while closed* — which is exactly when closed-trigger typeahead runs.
+ * This works only because the option set is data (`items`), not mounted elements, which is also what
+ * makes `allowsEmptyCollection` a question that can be answered before opening.
  *
- * There is no `inputValue`, no filtered-vs-original collection, no `commit`/`revert`, and **no
- * filtering of any kind**. Someone opening this folder expecting them will not find them, and that
- * is deliberate: the filter seam belongs to Combobox, must be pulled by a real input value, and
- * cannot be guessed at from Select's side. Base UI built the same kernel one layer *up*, around an
- * input value, and its `SelectRoot` (757 lines) consequently cannot import it — the exact outcome
- * this scoping avoids. See `__internal__/roadmap.md` § "The combobox kernel".
- *
- * ## Why the listbox is created eagerly here
- *
- * The popup mounts lazily — nothing renders until open, so tabbing a form with ten Selects mounts
- * zero option lists. A `createListbox` created inside the popup would therefore leave the trigger
- * with no `navigation`, no `typeahead` and no `focus.activeDescendant()` to read *while closed*,
- * which is exactly the state closed-trigger typeahead lives in. Created here, the option set exists
- * from the first render because it is **data** (`items`), not mounted elements. Same argument as
- * Popover's root-owned `createPresence`, and it is why `allowsEmptyCollection` can mean anything at
- * all.
- *
- * ## Modality is two mechanisms, not four
- *
- * `modal` (default `true`) gates `createHideOutside` + `createScrollLock`, both created by
- * `createComboboxContent`. There is deliberately **no focus trap and no `ModalBackdrop`**: focus
- * never leaves the trigger in activedescendant mode, so there is nothing to trap, and a backdrop
- * would cover the trigger — making it unclickable and breaking toggle-to-close. React Aria's Select
- * composes exactly this pair (`usePreventScroll` + `ariaHideOutside`).
+ * **Modality here is two mechanisms, not the usual four.** `modal` gates `createHideOutside` +
+ * `createScrollLock` (both created by `createComboboxContent`). There is deliberately no focus trap —
+ * focus never leaves the trigger — and no backdrop, which would cover the trigger and break
+ * toggle-to-close.
  *
  * Call it **once**, inside a reactive owner scope (a component body, or a `createRoot`).
+ * Full rationale: `__internal__/primitives/combobox/combobox-root.md`.
  */
 
 /** Where the highlight lands when the popup opens. See {@link CreateComboboxReturn.focusStrategy}. */
 export type ComboboxFocusStrategy = "first" | "last" | "selected";
 
 /**
- * The selection value as a **consumer** sees it, discriminated by `selectionMode`: an array in
- * `"multiple"`, a scalar (or `null`) otherwise. A single Select must not hand back `[apple]`.
- *
- * `createListbox` keeps its low-level `V[]` contract untouched — the adaptation happens in this
- * kernel, so Select and Combobox stay pure pass-throughs and both inherit it. React Aria spells the
- * same idea the same way (`useSelect<T, M extends SelectionMode = 'single'>`).
+ * The selection as a **consumer** sees it, discriminated by `selectionMode`: an array in
+ * `"multiple"`, a scalar (or `null`) otherwise — a single Select must not hand back `[apple]`.
+ * `createListbox` underneath keeps its plain `V[]`; the adaptation happens here once, so Select and
+ * Combobox both inherit it without either converting.
  */
 export type SelectionValue<V, M extends SelectionMode> = M extends "multiple" ? V[] : V | null;
 
@@ -107,22 +89,19 @@ export interface CreateComboboxOptions<V = unknown, M extends SelectionMode = "s
 
   /**
    * Whether the popup may open with no options in it. Default `false` — a listbox with nothing to
-   * choose from is a dead end, and this guard is only *meaningful* because the option set is data
-   * and therefore countable while closed. Combobox sets it once it has a filter that can empty the
-   * list and an `Empty` part to say so.
+   * choose from is a dead end. Only answerable before opening because the option set is data;
+   * Combobox turns it on once it has a filter that can empty the list and an `Empty` part to say so.
    */
   allowsEmptyCollection?: boolean;
   /**
-   * Whether choosing an option closes the popup. Defaults to `selectionMode !== "multiple"` —
-   * picking one value is finished business, ticking several is not. Applied by wrapping the
-   * selection's `onChange`, so it covers *every* path that selects (Enter, Space, a click on an
-   * option) without each of them repeating it.
+   * Whether choosing an option closes the popup. Defaults to `selectionMode !== "multiple"`.
+   * Applied by wrapping the selection's `onChange`, so every path that selects (Enter, Space, a
+   * click on an option) obeys it without repeating the check.
    */
   shouldCloseOnSelect?: boolean;
   /**
    * Whether the open popup hides the rest of the page from assistive technology (`aria-hidden` +
-   * `inert`) and locks body scroll. Default `true`; Combobox passes `false`. See this hook's doc for
-   * why modality here is two mechanisms rather than four.
+   * `inert`) and locks body scroll. Default `true`; Combobox passes `false`.
    */
   modal?: boolean;
 
@@ -186,8 +165,7 @@ export interface CreateComboboxReturn<V = unknown, M extends SelectionMode = "si
 
   /**
    * The listbox state, created eagerly over the data source in `"activedescendant"` focus mode.
-   * Parts read `list.focus` / `list.selection` / `list.navigation` / `list.typeahead` from here, and
-   * an option is `createListboxItem(state.list, …)` unchanged.
+   * Parts read `list.focus` / `list.selection` / `list.navigation` / `list.typeahead` from here.
    */
   list: CreateListboxReturn<V>;
   /** The selection in the consumer's shape — scalar in single mode, an array in multiple. */
@@ -236,15 +214,14 @@ export interface CreateComboboxReturn<V = unknown, M extends SelectionMode = "si
    *  `setRef`. */
   setTriggerElement: (element: HTMLElement | undefined) => void;
   /**
-   * The widget's **outer box**, when it is larger than the focus owner. Optional: with none, the
+   * The widget's **outer box**, when it is larger than the focus owner. Optional: with none the
    * focus owner plays both parts, which is right for Select — its trigger *is* the whole control.
    *
-   * Combobox's focus owner is an `<input>` sitting inside a bordered shell alongside a chevron and a
-   * clear button, and that difference breaks two things if it goes unregistered. The popup would be
-   * measured against the input and land narrower than the field it belongs to; and the two gutter
-   * buttons would sit outside `sparedElements`, so a pointerdown on the chevron would dismiss in the
-   * capture phase and its own `click` would reopen — the popup could never be closed by the control
-   * that opened it. `Combobox.Control` registers itself here.
+   * Combobox's focus owner is an `<input>` inside a bordered shell alongside a chevron and a clear
+   * button, and leaving that shell unregistered breaks two things: the popup gets measured against
+   * the bare input and lands narrower than the field, and the two gutter buttons fall outside
+   * `sparedElements` — so a pointerdown on the chevron dismisses and its own `click` reopens, making
+   * the popup impossible to close from the control that opened it. `Combobox.Control` registers here.
    */
   anchorElement: Accessor<HTMLElement | undefined>;
   /** Register the outer box. Wired to `Combobox.Control`'s `ref`. */
@@ -265,14 +242,14 @@ export interface CreateComboboxReturn<V = unknown, M extends SelectionMode = "si
 
   /**
    * Everything that counts as "the control" rather than "outside" — the registered anchor and the
-   * focus owner. One array serving two mechanisms that are really one requirement. It is
-   * `createDismissable`'s `exclude` (or a pointerdown on the control dismisses in the capture phase
-   * and its own `click` reopens, so the popup can never be closed by the control that opened it)
-   * **and** `createHideOutside`'s `spare` (or the control goes `inert`, losing focus, the pointer,
-   * and the same toggle).
+   * focus owner. One array, two mechanisms, one requirement: it is `createDismissable`'s `exclude`
+   * (else a pointerdown on the control dismisses and its own `click` reopens, so the popup can never
+   * be closed by the control that opened it) **and** `createHideOutside`'s `spare` (else the control
+   * itself goes `inert` — unfocusable, unclickable — and the same toggle breaks).
    */
   sparedElements: Accessor<HTMLElement[]>;
-  /** The **shared** popup presence for `Content` + `Positioner`. Gate their render on `mounted()`. */
+  /** The **shared** presence (mount/enter/exit lifecycle) for `Content` + `Positioner`. Gate their
+   *  render on `mounted()`. */
   contentPresence: PresenceState;
   /** The positioning layer, anchored to the trigger, with `trackSize` on. */
   floating: CreateFloatingReturn;
@@ -281,14 +258,14 @@ export interface CreateComboboxReturn<V = unknown, M extends SelectionMode = "si
 export function createCombobox<V = unknown, M extends SelectionMode = "single", G = V>(
   options: CreateComboboxOptions<V, M, G>,
 ): CreateComboboxReturn<V, M> {
-  // `withDefaults`, not `merge({ modal: true }, options)`: `merge` resolves by key *presence*, so a
-  // wrapper forwarding an unset `modal`/`defaultOpen` (the key present with value `undefined`) would
-  // silently beat the default. See `withDefaults`' doc.
+  // `withDefaults`, never `merge({ modal: true }, options)`: Solid 2.0's `merge` resolves a key by
+  // *presence*, so a wrapper forwarding an unset `modal` (key present, value `undefined`) would beat
+  // the default. `withDefaults` resolves with `??`.
   //
-  // `selectionMode` and `shouldCloseOnSelect` are absent on purpose. The first cannot be defaulted
-  // here without casting a literal to the generic `M`; the second's default is *derived* from it.
-  // The positioning options are absent for Popover's reason — `createFloating` applies its own `??`
-  // defaults, and the visual ones belong to the component layer where a preset can theme them.
+  // `selectionMode` and `shouldCloseOnSelect` are absent on purpose — the first cannot be defaulted
+  // without casting a literal to the generic `M`, and the second's default derives from it. The
+  // positioning options are absent because `createFloating` applies its own, and the *visual* ones
+  // belong to the component layer where a preset can theme them.
   const merged = withDefaults(options, {
     defaultOpen: false,
     allowsEmptyCollection: false,
@@ -311,9 +288,9 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
 
   const [focusStrategy, setFocusStrategy] = createSignal<ComboboxFocusStrategy>("selected");
 
-  // The trigger is rendered eagerly and its id feeds two IDREFs (the list's `aria-labelledby`, and
-  // the trigger's own when a consumer names it with `aria-label`), so it needs a server-visible
-  // generated fallback. `createRegisteredId` never runs during SSR.
+  // The trigger renders eagerly and its id feeds two IDREFs (the list's `aria-labelledby`, and the
+  // trigger's own when a consumer names it with `aria-label`), so it needs a fallback that exists on
+  // the server too — `createRegisteredId` runs in an effect and never fires during SSR.
   const generatedTriggerId = createUniqueId();
   const [customTriggerId, setTriggerId] = createSignal<string | undefined>();
   const triggerId = () => customTriggerId() ?? generatedTriggerId;
@@ -325,12 +302,9 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
   const [positionerElement, setPositionerElement] = createSignal<HTMLElement>();
   const [contentElement, setContentElement] = createSignal<HTMLElement>();
 
-  // ─── The scalar ⇄ array adapter ────────────────────────────────────────────────────────────────
-  // Both directions live here, beside the `onChange` wrap, so `createListbox` keeps its low-level
-  // `V[]` contract and neither component layer has to know the difference.
   const toValueArray = (value: SelectionValue<V, M> | undefined): V[] | undefined => {
     // `=== undefined`, not `??`: `null` is the single-mode "nothing selected" *controlled* value,
-    // and `createControllableState` reads `undefined` as "uncontrolled".
+    // and `createControllableState` reads only `undefined` as "uncontrolled".
     if (value === undefined) {
       return undefined;
     }
@@ -342,10 +316,10 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
   const fromValueArray = (values: V[]): SelectionValue<V, M> =>
     (selectionMode() === "multiple" ? values : (values[0] ?? null)) as SelectionValue<V, M>;
 
-  // Every selection path funnels through here — Enter, Space, and an option's own click — so
+  // Every selection path funnels through here — Enter, Space, an option's own click — so
   // close-on-select is spelled once instead of at each key. `createControllableState` notifies on
-  // every request, including re-selecting the value that is already selected, which is what makes
-  // re-picking the current option close the popup.
+  // every request, including re-selecting the value already selected, which is what makes re-picking
+  // the current option still close the popup.
   const handleSelectionChange = (values: V[]) => {
     merged.onChange?.(fromValueArray(values));
     if (shouldCloseOnSelect()) {
@@ -353,10 +327,9 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     }
   };
 
-  // The `onMatch` seam is the whole reason closed-trigger typeahead works: with the popup shut there
-  // is no row to highlight, so a match **selects** outright — native `<select>` behavior, and what
-  // the data-driven source exists for. Multiple mode keeps highlighting instead: toggling a value
-  // per keystroke would make a repeated letter select and immediately deselect.
+  // Typeahead (type-to-jump) with the popup shut has no row to highlight, so a match **selects**
+  // outright — what a native `<select>` does. Multiple mode keeps highlighting instead: toggling a
+  // value per keystroke would make a repeated letter select and immediately deselect it.
   const handleTypeaheadMatch = (index: number) => {
     if (open() || selectionMode() !== "single") {
       list.focus.focusIndex(index);
@@ -368,20 +341,18 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     }
   };
 
-  // `merge(options, …)` rather than a hand-written getter per forwarded key: `CreateComboboxOptions`
-  // *is* `CreateListboxOptions` minus the keys overridden below, so re-listing the rest would be a
-  // second copy that silently stops forwarding whatever `createListbox` gains next. The extra
+  // `merge(options, …)` rather than a getter per forwarded key: `CreateComboboxOptions` *is*
+  // `CreateListboxOptions` minus the keys re-shaped below, so re-listing the rest would be a second
+  // copy that silently stops forwarding whatever `createListbox` gains next. The extra
   // open/modal/positioning keys ride along unread, as they would through any props object.
   //
-  // The four re-shaped keys are `omit`-ed rather than merely shadowed: `merge` types an overlapping
-  // key as the *union* of both sources, so a consumer's scalar `value` would leak into a `V[]` slot.
-  // That list mirrors this hook's `Omit<…>` exactly and — unlike a forwarding list — cannot rot,
-  // because it names what this kernel re-shapes, not what the listbox happens to accept.
+  // The four re-shaped keys are `omit`-ed rather than just shadowed: `merge` types an overlapping key
+  // as the *union* of both sources, so a consumer's scalar `value` would leak into a `V[]` slot.
   const listOptions: CreateListboxOptions<V, G> = merge(
     omit(options, "value", "defaultValue", "onChange", "selectionMode"),
     {
-      // Forced, and therefore omitted from the options: the focus owner is the trigger, which keeps
-      // DOM focus and points `aria-activedescendant` at the active option.
+      // Forced, hence not an option: the trigger keeps DOM focus and points `aria-activedescendant`
+      // at the active option, rather than focus moving onto the options themselves.
       focusMode: "activedescendant" as const,
       get selectionMode() {
         return selectionMode();
@@ -405,8 +376,8 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     if (next === open()) {
       return;
     }
-    // Only meaningful because the options are data: a DOM-registered source is *always* empty before
-    // opening, so this guard could never have been written against one.
+    // Answerable only because the options are data: a source registered from mounted DOM elements is
+    // *always* empty before opening, so this guard could never have been written against one.
     if (next && !allowsEmptyCollection() && list.focus.items().length === 0) {
       return;
     }
@@ -414,9 +385,9 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
   };
 
   // A memo, so the array's identity only changes when one of the two elements does. Both are listed
-  // even when the focus owner is a descendant of the anchor: overlap is harmless to `exclude` and
-  // `spare`, and a tree that registers no anchor (Select, or a Combobox whose `Control` is
-  // re-targeted to something that drops the ref) must not silently lose the focus owner.
+  // even when the focus owner is a descendant of the anchor: the overlap is harmless, and a tree that
+  // registers no anchor (Select, or a Combobox whose `Control` was re-targeted to something that
+  // drops the ref) must not silently lose the focus owner from the set.
   const sparedElements = createMemo<HTMLElement[]>(() => {
     const spared: HTMLElement[] = [];
     const anchor = anchorElement();
@@ -430,23 +401,25 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     return spared;
   });
 
-  // Eager (created while `open` is `false`) so opening drives `entering → entered` rather than
-  // latching straight to `entered` — the lazily-mounted-content trap `popover-root.md` documents.
+  // Created here while `open` is still `false`, so its first run observes the closed state and the
+  // open drives `entering → entered`. Created inside the lazily-mounted content instead, it would
+  // see `present` already `true` on its first run and latch straight to `entered`, skipping the
+  // enter animation. See `__internal__/primitives/popover/popover-root.md`.
   const contentPresence = createPresence({ present: open, ref: contentElement });
 
   const floating = createFloating({
-    // `mounted()`, NOT `open`: keyed on `open`, `createFloating` would revert `floatingStyles()` to
-    // its hidden, unpositioned branch the instant the popup closes — while the presence is still
-    // holding it mounted for its exit transition.
+    // `mounted()`, NOT `open`: keyed on `open`, `createFloating` reverts `floatingStyles()` to its
+    // hidden, unpositioned branch the instant the popup closes — while the presence is still holding
+    // it mounted for its exit transition, so the popup would vanish instead of animating out.
     active: () => contentPresence.mounted(),
     // The outer box when one is registered, else the focus owner. See `anchorElement`: measuring a
     // Combobox against its bare `<input>` lands the popup narrower than the shell around it.
     anchor: () => anchorElement() ?? triggerElement(),
     floating: positionerElement,
-    // Unconditional, as on Popover: `createComboboxPositioner` publishes `--anchor-width` /
+    // Unconditional rather than an option: `createComboboxPositioner` publishes `--anchor-width` /
     // `--available-height` on every combobox, so a recipe's `w-(--anchor-width)` always resolves.
-    // Behind a flag those properties would be absent by default and the declaration reading them
-    // would be silently dropped by the browser.
+    // Behind a flag they would be absent by default, and the browser silently drops a declaration
+    // whose `var()` does not resolve.
     trackSize: true,
     get side() {
       return merged.side;
@@ -483,19 +456,18 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
     },
   });
 
-  // ─── The entry effect ──────────────────────────────────────────────────────────────────────────
-  // `isPositioned` is the load-bearing gate, the same one `createAutoFocus` needs in
-  // `popover-content.ts`: until the first measurement lands, `floatingStyles()` is the pre-positioned
-  // `visibility: hidden` branch, and scrolling a row into view inside a hidden subtree measures
-  // nothing. `focusStrategy` is tracked in the deps rather than read in the callback — deps is the
-  // tracking scope, and it also means "set the strategy, then open" settles into a single run.
+  // Places the highlight when the popup opens. `isPositioned` is the load-bearing gate (the same one
+  // `createAutoFocus` needs in `popover-content.ts`): until the first measurement lands,
+  // `floatingStyles()` is a `visibility: hidden` branch, and scrolling a row into view inside a
+  // hidden subtree measures nothing. `focusStrategy` sits in the dependency list rather than being
+  // read in the callback, so "set the strategy, then open" settles into one run.
   //
   // No collection-length gate is needed: the options are data, so they exist before the popup does.
   createEffect(
     () => [open(), floating.isPositioned(), focusStrategy()] as const,
     ([isOpen, isPositioned, strategy]) =>
-      // Imperative placement driven by the open transition — every read below is a current-value
-      // lookup, never a dependency, and `[STRICT_READ_UNTRACKED]` is what an unwrapped one costs.
+      // Every read below is a current-value lookup, not a dependency. Solid 2.0 throws
+      // `[STRICT_READ_UNTRACKED]` for an unwrapped tracked read here, so the block is `untrack`ed.
       untrack(() => {
         if (!isOpen) {
           // Drop the highlight on close, so reopening applies its own strategy instead of flashing
@@ -506,8 +478,8 @@ export function createCombobox<V = unknown, M extends SelectionMode = "single", 
         if (!isPositioned) {
           return;
         }
-        // Each of these scrolls the row it lands on into view on its own: in activedescendant mode
-        // nothing moves DOM focus, so `createListFocus` asks the source for **every** move.
+        // Each of these also scrolls the row it lands on into view: nothing moves DOM focus in
+        // activedescendant mode, so the source is asked explicitly on **every** move.
         if (strategy === "selected") {
           list.focus.focusEntry();
         } else if (strategy === "first") {

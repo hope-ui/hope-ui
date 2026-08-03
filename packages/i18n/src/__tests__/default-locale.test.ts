@@ -10,8 +10,8 @@ describe("getDefaultLocale", () => {
   });
 
   it("falls back to en-US/ltr off-browser (no navigator)", () => {
-    // The `unit` project is `environment: "node"`, so `navigator` is absent — the deterministic
-    // server-safe default, which is exactly what the SSR path renders.
+    // These tests run in Node, so there is no `navigator` — the same conditions as a server render,
+    // and the same deterministic default it produces.
     const { locale, direction } = getDefaultLocale();
     expect(locale).toBe("en-US");
     expect(direction).toBe("ltr");
@@ -20,19 +20,19 @@ describe("getDefaultLocale", () => {
 
 describe("createDefaultLocale", () => {
   it("reports the detected locale with no hydration pass in flight", () => {
-    // Detection is gated on hydration, not deferred unconditionally: outside a hydration pass the
-    // first read is already the real locale, so a client-only app never renders an `en-US`
-    // placeholder it has to replace. (Off-browser here, so "detected" *is* en-US — the gate itself is
-    // exercised against a real `navigator` in `default-locale.browser.test.ts`.)
+    // Detection is gated on hydration, not deferred unconditionally: with no pass in flight the very
+    // first read is already the real locale, so a client-only app never renders a placeholder it then
+    // has to replace. Here that locale happens to be en-US anyway, since there is no `navigator`; the
+    // gate is exercised against a real one in `default-locale.browser.test.tsx`.
     const { locale, direction } = createDefaultLocale();
     expect(locale()).toBe("en-US");
     expect(direction()).toBe("ltr");
   });
 
   it("needs no reactive owner", () => {
-    // It reads the shared registry rather than creating per-consumer state, so it is safe to call
-    // from anywhere — including the module-scope context default in `i18n-provider.tsx`, which has no
-    // owner to create a signal in.
+    // It reads the shared registry instead of creating per-consumer state, so it can be called from
+    // anywhere — including the context default in `i18n-provider.tsx`, which runs at module scope
+    // where there is no owner to create a signal in.
     expect(() => createDefaultLocale().locale()).not.toThrow();
   });
 });

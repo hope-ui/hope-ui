@@ -96,14 +96,14 @@ describe("createCalendarCell", () => {
     jan20.click();
 
     await vi.waitFor(() => expect((selected as CalendarDate)?.toString()).toBe("2026-01-20"));
-    // The paint hook is on the button (where the recipe's `cellTrigger` reads it); the ARIA selection
-    // state stays on the `<td role="gridcell">`.
+    // The paint hook is on the button, where the recipe's `cellTrigger` slot reads it; the ARIA
+    // selection state stays on the `<td role="gridcell">`.
     await vi.waitFor(() => expect(jan20.getAttribute("data-selected")).toBe(""));
     const cell = jan20.closest("td") as HTMLElement;
     expect(cell.getAttribute("aria-selected")).toBe("true");
-    // The `<td>` carries `data-selected` too — required for the CSS-derived band interior
-    // (`[data-selected]:not([data-selection-start]):not([data-selection-end])`), and what React Aria
-    // emits. A single selection caps both ends of its own one-day band, so it is never that interior.
+    // The `<td>` needs `data-selected` too — it is what the CSS-derived band interior
+    // (`[data-selected]:not([data-selection-start]):not([data-selection-end])`) keys off. A single
+    // selection caps both ends of its own one-day band, so it is never that interior.
     expect(cell.getAttribute("data-selected")).toBe("");
     expect(cell.getAttribute("data-selection-start")).toBe("");
     expect(cell.getAttribute("data-selection-end")).toBe("");
@@ -113,12 +113,12 @@ describe("createCalendarCell", () => {
   it("mirrors the band hooks onto the <td> so the band can span cells", async () => {
     const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
     dayButton(container, "2026-01-10").click();
-    // The anchor write must flush before the second click reads it (Solid 2.0 flush timing — real
-    // clicks are separated by flushes; two synchronous ones in a test are not).
+    // Wait for the anchor write to flush before the second click reads it. Real clicks are separated
+    // by flushes; two synchronous ones in a test are not.
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
     dayButton(container, "2026-01-14").click();
-    // The band paints on the cell (spanning columns). There is no middle attribute — the interior is
-    // "selected, and neither endpoint", which is what the preset's `data-selection-middle` variant derives.
+    // The band paints on the cell, so it can span columns. There is no middle attribute — the interior
+    // is "selected, and neither endpoint", which is what the preset derives in CSS.
     await vi.waitFor(() => {
       const midCell = dayButton(container, "2026-01-12").closest("td") as HTMLElement;
       expect(midCell.getAttribute("data-selected")).toBe("");
@@ -144,8 +144,8 @@ describe("createCalendarCell", () => {
     await vi.waitFor(() =>
       expect(cellOf("2026-01-14").getAttribute("data-selection-end")).toBe(""),
     );
-    // The anchor opens the band; the hovered day closes it. Both hooks reach the <td> (where the band
-    // is painted) and the button (where a recipe may cap the trigger).
+    // The anchor opens the band; the hovered day closes it. Both hooks have to reach the <td>, which
+    // paints the band, and the button, which a recipe may cap separately.
     expect(cellOf("2026-01-10").getAttribute("data-selection-start")).toBe("");
     expect(dayButton(container, "2026-01-10").getAttribute("data-selection-start")).toBe("");
     expect(dayButton(container, "2026-01-14").getAttribute("data-selection-end")).toBe("");
@@ -203,9 +203,8 @@ describe("createCalendarCell", () => {
   });
 
   it("drops the non-selectable days inside a committed range out of the paint", async () => {
-    // A range committed while it was legal, then narrowed by `max` and holed by `isDateDisabled` —
-    // the audit's own scenario. The band must break around both, rather than claiming a selection the
-    // matching click would refuse.
+    // A range committed while it was legal, then narrowed by `max` and holed by `isDateDisabled`. The
+    // band has to break around both rather than claim a selection the matching click would refuse.
     const { container, dispose } = await mountCalendar({
       selectionMode: "range",
       defaultValue: { start: new CalendarDate(2026, 1, 10), end: new CalendarDate(2026, 1, 20) },
@@ -217,7 +216,7 @@ describe("createCalendarCell", () => {
       const cell = button.closest("td") as HTMLElement;
       return {
         ariaSelected: cell.getAttribute("aria-selected"),
-        // The band interior, derived the way the preset's `data-selection-middle` variant derives it.
+        // Derived exactly as the preset's `data-selection-middle` variant derives it in CSS.
         isInterior:
           cell.getAttribute("data-selected") !== null &&
           cell.getAttribute("data-selection-start") === null &&
@@ -256,8 +255,8 @@ describe("createCalendarCell", () => {
   });
 
   it("exposes a full, view-aware aria-label with a Today suffix", async () => {
-    // Seed today via defaultFocusedValue → today check is against the calendar's timeZone `today()`,
-    // so assert the base label shape rather than today (which depends on the run date).
+    // Only the base label shape is asserted: whether any cell is "today" depends on the date the suite
+    // runs on, so pinning the suffix would make this test expire.
     const { container, dispose } = await mountCalendar();
     const label = dayButton(container, "2026-01-15").getAttribute("aria-label");
     expect(label).toContain("January 15, 2026");
@@ -273,7 +272,7 @@ describe("createCalendarCell", () => {
     // Jan 5 is before min → non-focusable/inert.
     const jan5 = dayButton(container, "2026-01-05");
     jan5.click();
-    // Give any (incorrect) selection a chance to fire.
+    // Wait long enough that an incorrect selection would have fired by now.
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(changed).toBe(false);
     dispose();
@@ -285,11 +284,10 @@ describe("createCalendarCell", () => {
     });
     const jan20 = dayButton(container, "2026-01-20");
     expect(jan20.getAttribute("aria-disabled")).toBe("true");
-    // Painted `data-unavailable` (strike-through), NOT `data-disabled` — an unavailable day stays
-    // interactive (focusable, hover-previewable), distinct from an inert out-of-range day.
+    // `data-unavailable`, NOT `data-disabled` — an unavailable day stays focusable and
+    // hover-previewable, unlike an inert out-of-range one.
     expect(jan20.getAttribute("data-unavailable")).toBe("");
     expect(jan20.getAttribute("data-disabled")).toBeNull();
-    // Focusable (unlike inert days): focusing it works and does not throw.
     jan20.focus();
     await expect.element(jan20).toHaveFocus();
     dispose();
@@ -318,8 +316,8 @@ describe("createCalendarCell", () => {
         button.getAttribute("aria-disabled"),
       ];
     };
-    // React Aria's `!isSelectable`, mirrored on both elements: out-of-range, outside-month, and
-    // unavailable all report it — a selectable day reports nothing.
+    // Mirrored on both elements: out-of-range, outside-month and unavailable all report it, while a
+    // selectable day reports nothing at all.
     expect(ariaDisabledPair("2026-01-05")).toEqual(["true", "true"]); // before min
     expect(ariaDisabledPair("2025-12-30")).toEqual(["true", "true"]); // outside the visible month
     expect(ariaDisabledPair("2026-01-20")).toEqual(["true", "true"]); // unavailable
@@ -407,12 +405,12 @@ describe("createCalendarCell", () => {
 });
 
 /**
- * React Aria's range auto-advance (`useCalendarCell` + `focusNearestAvailableDate`): anchoring a range
- * from the **keyboard** steps the cursor one day on, so the band reads as "range in progress" rather
- * than a committed single date. The pointer gets that signal from hover instead, so it must not move.
+ * Anchoring a range from the **keyboard** steps the cursor one day on, so the band reads as "range in
+ * progress" rather than a committed single date. The pointer gets that signal from hover instead, so
+ * it must not move.
  *
- * The gate is `createPress`'s `pointerType`, which is exactly why the press engine is here — the click
- * event alone cannot separate Enter from a screen reader's virtual click.
+ * The gate is `createPress`'s `pointerType`, which is the whole reason the press engine is here: a
+ * click event alone cannot separate Enter from a screen reader's virtual click.
  */
 describe("createCalendarCell — keyboard range auto-advance", () => {
   const cellOf = (container: HTMLElement, iso: string) =>
@@ -437,7 +435,7 @@ describe("createCalendarCell — keyboard range auto-advance", () => {
     dayButton(container, "2026-01-15").click();
 
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
-    await new Promise((resolve) => setTimeout(resolve, 20)); // let any (incorrect) advance settle
+    await new Promise((resolve) => setTimeout(resolve, 20)); // an incorrect advance would land by now
     expect(state.focusedDate().toString()).toBe("2026-01-15");
     expect(cellOf(container, "2026-01-16").getAttribute("data-selected")).toBeNull();
     dispose();
@@ -469,16 +467,16 @@ describe("createCalendarCell — keyboard range auto-advance", () => {
 
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
     await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-14"));
-    // Stepping backwards makes the anchor the range's *end* — `order()` normalizes it, so the band is
-    // still painted the right way round.
+    // Stepping backwards makes the anchor the range's *end*, which the strategy's `order()` normalizes
+    // so the band still paints the right way round.
     expect(cellOf(container, "2026-01-14").getAttribute("data-selection-start")).toBe("");
     expect(cellOf(container, "2026-01-15").getAttribute("data-selection-end")).toBe("");
     dispose();
   });
 
   it("stays put when neither neighbour is selectable", async () => {
-    // A one-day available island: the anchored run narrows `min`/`max` to the 15th alone, so +1 and −1
-    // are both out of range and the cursor has nowhere to go.
+    // A one-day island of availability: the anchored run narrows `min`/`max` to the 15th alone, so +1
+    // and −1 are both out of range and the cursor has nowhere to advance to.
     const { container, state, dispose } = await mountCalendar({
       selectionMode: "range",
       isDateDisabled: (date) => date.day === 14 || date.day === 16,

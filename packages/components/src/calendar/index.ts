@@ -13,8 +13,8 @@ export type { CalendarPrevButtonProps } from "./calendar-prev-button";
 export type { CalendarRootProps, CalendarSize } from "./calendar-root";
 
 /**
- * The Calendar compound component. `Root` calls `createCalendar` for the shared state + resolves the
- * recipe; the chrome parts (`Header`/`PrevButton`/`Heading`/`NextButton`) and `Grid` read it off
- * context. Requires a `<ThemeProvider>` ancestor (fed a preset), like every styled component.
+ * The Calendar compound component — a styled, themeable layer over the headless `createCalendar` hook
+ * family in `@hope-ui/primitives`. `Root` owns the shared state and the resolved theme recipe; every
+ * other part reads them off context. Requires a `<ThemeProvider>` ancestor fed a preset.
  */
 export const Calendar = { Root, Header, PrevButton, NextButton, Heading, Grid };

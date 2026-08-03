@@ -14,10 +14,9 @@ export interface ComboboxSeparatorProps extends ComboboxSeparatorElementProps {
 }
 
 /**
- * A purely visual hairline divider between sections. `createListboxSeparator` — reused unchanged,
- * props only — owns `role="presentation"` + `aria-hidden` (**not** `role="separator"`, which is an
- * invalid `listbox` child, and which some assistive tech would report as an item); this layer adds
- * the recipe `separator` slot + `data-slot`.
+ * A purely visual hairline divider between sections. It carries `role="presentation"` + `aria-hidden`
+ * rather than `role="separator"`, which is an invalid `listbox` child and which some assistive tech
+ * would announce as one of the options.
  */
 export const Separator: Component<ComboboxSeparatorProps> = (props) => {
   const ctx = useComboboxContext();

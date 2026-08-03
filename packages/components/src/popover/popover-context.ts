@@ -3,20 +3,18 @@ import type { CreatePopoverReturn } from "@hope-ui/primitives/popover";
 import type { PopoverSlot, SlotClassAccessor } from "@hope-ui/theming";
 
 /**
- * The value every Popover part reads. **Composition, not inheritance**: it *holds* the primitive
- * state as `state` (open/role/ids, every shared element ref, the positioning layer and the shared
- * `contentPresence`) rather than extending `CreatePopoverReturn`, so the styling layer never
- * masquerades as the primitive return. A part passes `ctx.state` into its `createPopoverX(state, …)`
- * hook, and reads recipe classes off `ctx.slots`. All a11y/behavior — including `role` and every
- * positioning option — lives on `ctx.state`; the component layer contributes only `slots`.
+ * The value every Popover part reads. It *holds* the headless state under `state` rather than
+ * extending it, so the styling layer never masquerades as the primitive's return value. All
+ * accessibility and behavior live on `state`; this layer contributes only `slots`.
  */
 export interface PopoverContextValue {
-  /** The primitive popover state — open/role/ids, the trigger/anchor/positioner/content/arrow refs,
-   * `floating` and the shared overlay `contentPresence`. Passed straight into each part's
-   * `createPopoverX(state, …)`. */
+  /** The `createPopover` return — open/role/ids, the trigger/anchor/positioner/content/arrow refs,
+   * the positioning layer, and the shared enter/exit animation state. Each part passes this straight
+   * into its own `createPopoverX(state, …)` hook. */
   state: CreatePopoverReturn;
-  /** One ready-to-call class fn per Popover slot, resolved once on `Root` and shared here. Each takes
-   * the part's own `class`, folded in last through the recipe's tailwind-merge seam. */
+  /** One class function per named slot of the theme's `popover` recipe, resolved once on `Root`. Each
+   * takes the part's own `class` and folds it in last, through tailwind-merge, so a consumer's
+   * utility wins over the recipe's. */
   slots: Record<PopoverSlot, SlotClassAccessor>;
 }
 

@@ -22,22 +22,17 @@ function callEventHandler<T, E extends Event>(
 }
 
 /**
- * Chains event handlers into one, in the order given. Modeled on React Aria's `chain`,
- * with one addition: **a handler that calls `event.preventDefault()` stops the rest.**
+ * Chains event handlers into one, in the order given — the `chain` helper from React Aria (Adobe's
+ * headless accessibility library) plus one addition: **a handler that calls
+ * `event.preventDefault()` stops the rest.**
  *
- * Components pass the consumer's handler first and their own behavior last, which makes
- * `preventDefault()` a cancel channel: `<Dialog.Trigger onClick={(e) => e.preventDefault()}>`
- * runs the consumer's handler and skips the internal `setOpen(true)`. On a
- * `<button type="button">` — what every trigger/close part renders — `preventDefault()`
- * has no other effect, so the channel is unambiguous.
+ * Components pass the consumer's handler first and their own behavior last, so `preventDefault()`
+ * becomes a cancel channel: `<Dialog.Trigger onClick={(e) => e.preventDefault()}>` runs the
+ * consumer's handler and skips the internal `setOpen(true)`. On the `<button type="button">` every
+ * trigger renders, `preventDefault()` has no other effect, so the channel is unambiguous.
  *
- * Handles both handler forms Solid accepts: a plain function, and the bound tuple
- * (`[handler, data]`). An `undefined` entry is skipped, so a consumer prop that isn't set
- * needs no guard at the call site.
- *
- * Call this inside a getter on the merged props (not eagerly in the component body), so
- * the consumer's handler is read inside `spread`'s own effect rather than as an untracked
- * prop read.
+ * Call this inside a getter on the merged props, never eagerly in the component body, so the
+ * consumer's handler is read inside the element's own event-binding effect rather than untracked.
  */
 export function composeEventHandlers<T, E extends Event>(
   ...handlers: Array<JSX.EventHandlerUnion<T, E> | undefined>

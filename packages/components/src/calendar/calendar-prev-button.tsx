@@ -12,15 +12,16 @@ export interface CalendarPrevButtonProps extends JSX.ButtonHTMLAttributes<HTMLBu
 }
 
 /**
- * The previous-period navigation button. Assembles `createCalendarPrev` (which owns the aria-label
- * default, the `disabled`/`data-disabled` boundary reflection, and the paging `onClick`) into a styled
- * ghost icon button — pure assembly + theme, no behavior here.
+ * The previous-period navigation button. The primitive owns the localized `aria-label`, the disabled
+ * state at a `min` boundary, and the paging click.
  *
- * The glyph is **built in**: with no `children`, it renders `ctx.prevIcon()` — the resolved default
- * chevron (instance `prevIcon` ?? preset `defaultProps.calendar.prevIcon` ?? hope's built-in). A
- * consumer `children` (text, a custom icon) overrides it per instance. Single read of `props.children`,
- * so no `children()` and no `<Show>`-`when`-gate hydration hazard; `??` short-circuits, so the default
- * glyph is never built when the consumer supplies one.
+ * The glyph is **built in**: with no `children` it renders the resolved default — instance `prevIcon`,
+ * else the preset's, else hope's chevron. A consumer `children` overrides it per instance.
+ *
+ * `props.children` is read **exactly once** and `??` short-circuits, so the default glyph is never
+ * built when a consumer supplies one. One read also needs no `children()` wrapper: it is the *double*
+ * read — a `<Show>`'s `when` plus its body — that builds and discards a component and shifts the
+ * hydration keys Solid derives from tree position.
  */
 export function PrevButton(props: CalendarPrevButtonProps): JSX.Element {
   const ctx = useCalendarContext();

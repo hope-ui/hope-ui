@@ -17,9 +17,8 @@ import {
   triggerOf,
 } from "./combobox-harness";
 
-// A browser test, like the rest of the family: `createCombobox` owns `createPresence` (effects +
-// rAF), `createFloating` (`getComputedStyle`, `computePosition`) and an entry effect gated on a real
-// measurement — none of which exist in the node environment.
+// A browser test, like the rest of the family: `createCombobox` drives `requestAnimationFrame`,
+// `getComputedStyle` and a real layout measurement, none of which exist in the node environment.
 
 function mountHarness(props: Partial<ComboboxHarnessProps<string>> = {}) {
   let state!: CreateComboboxReturn<string, SelectionMode>;
@@ -36,7 +35,8 @@ function mountHarness(props: Partial<ComboboxHarnessProps<string>> = {}) {
   return { ...result, state: () => state };
 }
 
-/** The popup is `visibility: hidden` until the first measurement lands, and so is the entry effect. */
+/** The popup is `visibility: hidden` until the first measurement lands, and so the highlight-placing
+ *  effect is gated on the same signal. */
 async function waitForPositioned(state: () => CreateComboboxReturn<string, SelectionMode>) {
   await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
 }
@@ -45,11 +45,11 @@ describe("createCombobox", () => {
   it("mounts nothing until open, and composes the listbox in activedescendant mode", async () => {
     const { container, state, dispose } = mountHarness();
 
-    // Decision 8: nothing renders until open. Tabbing a form with ten Selects must not mount ten
-    // option lists — which is only affordable because the options are data, not elements.
+    // Nothing renders until open: tabbing a form with ten Selects must not mount ten option lists.
+    // Only affordable because the options are data, not elements…
     expect(contentOf(container)).toBeNull();
     expect(optionsOf(container)).toHaveLength(0);
-    // …yet the option set already exists, which is what closed-trigger typeahead reads.
+    // …which is also why the option set exists while closed, for closed-trigger typeahead to read.
     expect(state().list.focus.items()).toHaveLength(FRUITS.length);
     expect(state().list.focusMode()).toBe("activedescendant");
 
@@ -82,8 +82,8 @@ describe("createCombobox", () => {
   });
 
   it("refuses to open an empty collection unless allowsEmptyCollection", async () => {
-    // Only meaningful because the options are data: a DOM-registered source is *always* empty before
-    // opening, so this guard could never have been written against one.
+    // Answerable only because the options are data: a source registered from mounted DOM elements is
+    // *always* empty before opening, so this guard could never have been written against one.
     const onOpenChange = vi.fn();
     const guarded = mountHarness({ values: [], options: { onOpenChange } });
     await userEvent.click(page.getByTestId("trigger"));
@@ -105,10 +105,10 @@ describe("createCombobox", () => {
     await vi.waitFor(() => expect(contentOf(one.container)).toBeTruthy());
     await userEvent.click(nth(optionsOf(one.container), 1));
 
-    // A single Select must not hand back `["Banana"]`.
+    // A single Select must not hand back `["Banana"]`…
     expect(single).toHaveBeenCalledWith("Banana");
     expect(one.state().value()).toBe("Banana");
-    // …while the listbox underneath keeps its low-level `V[]` contract untouched.
+    // …while the listbox underneath keeps its plain `V[]` untouched.
     expect(one.state().list.value()).toEqual(["Banana"]);
     one.dispose();
 
@@ -173,8 +173,8 @@ describe("createCombobox", () => {
   });
 
   it("re-selecting the option that is already selected still closes the popup", async () => {
-    // `createControllableState` notifies on every *request*, not only on a changed value, which is
-    // what makes the wrapped `onChange` a reliable close-on-select seam.
+    // `createControllableState` notifies on every *request*, not only on a changed value — which is
+    // what makes wrapping `onChange` a reliable place to hang close-on-select.
     const { container, dispose } = mountHarness({ options: { defaultValue: "Banana" } });
 
     await userEvent.click(page.getByTestId("trigger"));
@@ -188,7 +188,7 @@ describe("createCombobox", () => {
     const selected = mountHarness({ options: { defaultValue: "Cherry" } });
     await userEvent.click(page.getByTestId("trigger"));
     await waitForPositioned(selected.state);
-    // A pointer open lands on the selected option (APG), not on the first.
+    // A pointer open lands on the selected option, not on the first.
     expect(activeLabel(selected.container)).toBe("Cherry");
     selected.dispose();
 
@@ -222,8 +222,8 @@ describe("createCombobox", () => {
   });
 
   it("TYPEAHEAD WHILE CLOSED SELECTS, without ever opening the popup", async () => {
-    // The behavior the whole data-driven redesign exists for, and native `<select>`'s: with the
-    // popup shut there is no row to highlight, so `onMatch` selects outright.
+    // Native `<select>` behavior: with the popup shut there is no row to highlight, so a typeahead
+    // match selects outright. Possible only because the options exist as data while closed.
     const onChange = vi.fn();
     const onOpenChange = vi.fn();
     const { container, state, dispose } = mountHarness({ options: { onChange, onOpenChange } });
@@ -239,7 +239,8 @@ describe("createCombobox", () => {
   });
 
   it("closed typeahead folds diacritics — `acai` matches `Açaí`", async () => {
-    // `sensitivity: "base"` folds diacritics *and* case, which `toLowerCase()` cannot.
+    // Typeahead compares with `Intl.Collator`'s `sensitivity: "base"`, which folds diacritics *and*
+    // case — `toLowerCase()` folds only case.
     const { container, state, dispose } = mountHarness();
     triggerOf(container).focus();
 
@@ -251,7 +252,7 @@ describe("createCombobox", () => {
 
   it("closed typeahead only HIGHLIGHTS in multiple mode", async () => {
     // Toggling per keystroke would make a repeated letter select and immediately deselect, so
-    // multiple mode keeps the default behavior and the position is applied on the next open.
+    // multiple mode only moves the highlight and applies it on the next open.
     const { container, state, dispose } = mountHarness({
       options: { selectionMode: "multiple" },
     });
@@ -260,7 +261,7 @@ describe("createCombobox", () => {
     await userEvent.keyboard("c");
     expect(state().value()).toEqual([]);
     expect(state().list.focus.activeIndex()).toBe(2);
-    // …and no dangling IDREF while the option it names is unmounted.
+    // …with no dangling IDREF: the option it would name is not mounted while the popup is closed.
     expect(triggerOf(container).hasAttribute("aria-activedescendant")).toBe(false);
     dispose();
   });
@@ -275,11 +276,11 @@ describe("createCombobox", () => {
     expect(document.body.style.overflow).toBe("hidden");
     expect(outside.hasAttribute("inert")).toBe(true);
     expect(outside.getAttribute("aria-hidden")).toBe("true");
-    // The trigger is spared from both, or it would lose focus, the pointer, and toggle-to-close.
+    // The trigger is exempt from both, or it would lose focus, the pointer, and toggle-to-close.
     expect(triggerOf(modal.container).hasAttribute("inert")).toBe(false);
     modal.dispose();
 
-    // …and cleanup puts the page back.
+    // …and unmounting puts the page back, rather than leaving it locked and inert.
     expect(document.body.style.overflow).toBe("");
     expect(outside.hasAttribute("inert")).toBe(false);
 
@@ -302,11 +303,10 @@ describe("createCombobox", () => {
     // `visibility: hidden` intermediate and return an `incomplete` nobody can act on.
     await waitForPositioned(open.state);
     await expectNoA11yViolations(open.container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check) —
-      // a popup may be added on demand, so it defers to a human. The closed assertion above runs
-      // strict, and `combobox-trigger.browser.test.tsx` pins the IDREF itself.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `combobox-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     open.dispose();

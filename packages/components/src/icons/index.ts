@@ -1,10 +1,10 @@
-// hope's built-in glyph set — the icons the components render by default (nav chevrons, the selection
-// check, the close `x`, the button loader arc, and the four Alert status glyphs). Each is a
-// self-contained, hand-inlined Lucide `<svg>` (so the library ships **no icon-library dependency**):
-// `currentColor` stroke so it adopts its host's text color, `aria-hidden` (the accessible name comes
-// from the component around it), and no width/height — the consuming recipe sizes the bare `<svg>` via
-// `[&_svg]:size-*`. These are internal resources (no package subpath export): a component imports the
-// one it needs and offers it as the overridable default for its themeable icon prop.
+// The glyphs components render by default. Each is a hand-inlined Lucide `<svg>`, so the library
+// ships no icon-library dependency. Three shared conventions: a `currentColor` stroke, so a glyph
+// adopts its host's text color; `aria-hidden`, since the accessible name comes from the component
+// around it; and **no width/height**, because the consuming recipe sizes the bare `<svg>`.
+//
+// Internal only — there is no package export for these. A component imports the one it needs and
+// offers it as the overridable default for its icon prop.
 export { CheckIcon } from "./check-icon";
 export { ChevronDownIcon } from "./chevron-down-icon";
 export { ChevronLeftIcon } from "./chevron-left-icon";

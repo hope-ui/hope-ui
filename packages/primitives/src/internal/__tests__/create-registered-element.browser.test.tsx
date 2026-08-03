@@ -21,10 +21,10 @@ function Child(props: {
 function Parent(props: { show?: boolean; onChange?: (elements: Element[]) => void }) {
   const [elements, setElements] = createSignal<Element[]>([]);
 
-  // A functional update, not `setElements([...elements(), element])`. `register` is invoked
-  // from `createRegisteredElement`'s effect callback, and reading `elements()` there is an
-  // untracked read of a reactive value — `[STRICT_READ_UNTRACKED]`, which `mount()` now
-  // fails on. `Dialog.Root`'s `addSparedElement` is written the same way for the same reason.
+  // A functional update, not `setElements([...elements(), element])`: `register` is invoked from
+  // `createRegisteredElement`'s effect callback, where reading `elements()` is an untracked read
+  // of a reactive value — `[STRICT_READ_UNTRACKED]`, which `mount()` fails the test on.
+  // `Dialog.Root`'s `addSparedElement` is written the same way for the same reason.
   const publish = (update: (previous: Element[]) => Element[]) => {
     setElements((previous) => {
       const next = update(previous);

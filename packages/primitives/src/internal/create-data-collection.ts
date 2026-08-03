@@ -11,7 +11,8 @@ export interface CreateDataCollectionOptions<V = unknown, G = V> {
   /**
    * The source data, reactive. Flat lists hold the **items**; with `groupToItems` set they hold the
    * **group entries** instead, and `groupToItems` flattens them. Note this is the *input* array —
-   * the returned `items()` is the derived `CollectionItem` list the navigation kernel reads.
+   * the returned `items()` is the derived `CollectionItem` list the navigation kernel (focus,
+   * navigation, typeahead and selection, all in this folder) reads.
    */
   items: Accessor<readonly G[]>;
   /**
@@ -38,7 +39,10 @@ export interface CreateDataCollectionOptions<V = unknown, G = V> {
 }
 
 export interface CreateDataCollectionReturn<V = unknown, G = V> extends IndexedItemSource<V> {
-  /** Reveal the row at `index` inside `scrollElement`. Always present here — see the doc. */
+  /**
+   * Reveal the row at `index` inside `scrollElement`. Always present, unlike the optional
+   * `ItemSource` member — this source is always given a scroll container.
+   */
   scrollIndexIntoView: (index: number) => void;
   /**
    * The index of the item whose `itemToValue` is `value`, or `-1`. Backed by a `Map` rebuilt with
@@ -68,7 +72,7 @@ function warnDuplicateValue(value: string): void {
 
 /**
  * The **data-driven item source**: `CollectionItem`s derived purely from an array, satisfying the
- * same [`ItemSource`](../create-collection/create-collection.md) seam as `createCollection` and
+ * same [`ItemSource`](create-collection.md) seam as `createCollection` and
  * `createVirtualCollection`. It is what lets a Select's options exist while its popup is closed —
  * and therefore what makes closed-trigger typeahead, an `allowsEmptyCollection` open guard, and a
  * full server-rendered `<select>` for autofill possible without mounting a single row the user may
@@ -78,23 +82,18 @@ function warnDuplicateValue(value: string): void {
  * `element.textContent`.** It comes from `itemToLabel` (else `itemToValue`), which is readable
  * before the row mounts — the property offscreen typeahead needs.
  *
- * Ids do **not** come from the data. They are generated per collection and suffixed by index
- * ({@link createItemIds}), because application data makes no promise of being a legal, unique DOM
- * id. `createUniqueId()` is SSR-stable, so the `aria-activedescendant` IDREF still agrees across the
- * server → hydrate round-trip.
+ * Ids are generated per collection and suffixed by index ({@link createItemIds}), never taken from
+ * the data. A mounted row still publishes its element **by index** through `registerElement`, the
+ * same contract `createVirtualCollection` uses — see {@link IndexedItemSource}.
  *
- * A mounted row still publishes its element, by **index**, through `registerElement` — that is what
- * resolves `items()[index].element()` for the activedescendant IDREF's target and for
- * scroll-into-view. Same contract as `createVirtualCollection`; see {@link IndexedItemSource}.
- *
- * Everything here is instance-scoped — no module-level state — so two collections, or two installed
- * copies of this package, never interfere.
+ * All state is instance-scoped — no module-level state — so two collections, or two installed copies
+ * of this package, never interfere.
  */
 export function createDataCollection<V = unknown, G = V>(
   options: CreateDataCollectionOptions<V, G>,
 ): CreateDataCollectionReturn<V, G> {
-  // Mounted row elements, keyed by index — the rendered rows publish here on mount and retire on
-  // unmount. Shared with `createVirtualCollection`, which registers rows the same way.
+  // Shared with `createVirtualCollection`: a rendered row publishes its element here on mount, keyed
+  // by index, and retires it on unmount.
   const { elements, registerElement, unregisterElement } = createElementRegistry();
 
   const groups = () => (options.groupToItems ? options.items() : undefined);

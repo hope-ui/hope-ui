@@ -26,28 +26,25 @@ interface FilteredEntries<V, G> {
 }
 
 /**
- * `ComboboxRootProps` = the kernel's `CreateComboboxOptions` (the `items` data, the value/selection
- * surface, open state, modality, the dismissal toggles and the whole positioning surface) **plus**
- * the text half Combobox adds on top **plus** the themeable `size` axis and the three chrome glyphs
- * (`ComboboxThemeableProps`, owned by `@hope-ui/theming`).
+ * Props for `Combobox.Root`: every option the headless `createCombobox` hook takes (the `items` data,
+ * the value/selection surface, open state, modality, dismissal, positioning) plus the text half
+ * Combobox adds on top, plus the themeable `size` axis and the three chrome glyphs owned by
+ * `@hope-ui/theming`.
  *
- * `<V>` is your item type, `<M>` the selection mode (inferred from `selectionMode`, which is what
- * types `value`/`defaultValue`/`onChange` as a scalar or an array), and `<G>` the shape of an `items`
- * **entry** — the same as `<V>` for a flat list, and the group's shape with `groupToItems` set.
+ * `<V>` is your item type, `<M>` the selection mode — inferred from `selectionMode`, which is what
+ * types `value`/`defaultValue`/`onChange` as a scalar or an array — and `<G>` the shape of an `items`
+ * **entry**: the same as `<V>` for a flat list, the group's shape once `groupToItems` is set.
  *
- * `Root` renders **no host element**, exactly as `Select.Root` does: no `class`, no `render`, no
- * native-attribute passthrough and **no hand-kept `omit` list**. `Popover.Root` is the precedent
- * *and* the warning — don't "fix" that by adding one.
+ * `Root` renders no element of its own, so there is deliberately no `class`, no `render` and no
+ * native-attribute passthrough.
  *
- * Three of the kernel's options are `Omit`-ted, each turning a silent breakage into a compile error:
+ * Two groups of options are `Omit`-ted, each turning a silent breakage into a compile error:
  *
- * - **`estimateSize`/`overscan`** — virtualization. A windowed row is *recycled*, so `indexOfValue`
- *   is `-1` by construction and every row would warn and register nothing. Same reasoning as
- *   `Select.Root`; a virtualized picker is `Listbox`'s job today.
- * - **`name`/`form`/`required`** — native form submission. `Select.Root` renders a `HiddenSelect`
- *   carrying every `<option>`; a Combobox's kernel holds the **filtered** set, so the same field
- *   would drop options as the user typed and submit whatever the query happened to leave. Wiring a
- *   Combobox into a form is a `Field` concern and needs its own design.
+ * - **`estimateSize`/`overscan`** — virtualization. A windowed row is recycled as you scroll, so the
+ *   position `Combobox.Item` looks up would be `-1` for every row. `Listbox` is the virtualized picker.
+ * - **`name`/`form`/`required`** — native form submission. `Select` can render a hidden `<select>`
+ *   because it holds the whole option set; a Combobox holds the **filtered** one, so the same field
+ *   would drop options as the user typed and submit whatever the query happened to leave behind.
  */
 export interface ComboboxRootProps<V = unknown, M extends SelectionMode = "single", G = V>
   extends Omit<
@@ -96,33 +93,29 @@ export interface ComboboxRootProps<V = unknown, M extends SelectionMode = "singl
 }
 
 /**
- * The Combobox root. It is `Select.Root` plus a text value: the same `createCombobox` kernel (open
- * state + the eagerly-created listbox + ids + element registries + the floating layer + the shared
- * presence), and on top of it the four things the kernel deliberately does not own — the input's
- * value, the filter derived from it, the commit/revert policy, and the "show everything" state a
- * chevron-open leaves behind.
+ * The Combobox root. It is `Select.Root` plus a text value: the same headless `createCombobox` hook
+ * (open state, the option list, the ids, the element refs, popup positioning, the animation state)
+ * and, on top, the four things that hook deliberately does not own — the input's value, the filter
+ * derived from it, the commit/revert policy, and the "show everything" state a chevron-open leaves.
  *
- * **The filter is a derived `items` memo, and that is the whole seam.** `createCombobox` is handed
- * the surviving entries and never learns a query exists, so the option count `Combobox.Status`
- * announces, the emptiness `Combobox.Empty` shows and the set the arrow keys traverse all fall out
- * of one array. See `combobox-filter.ts`.
+ * **The filter is a derived `items` memo, and that is the whole seam.** `createCombobox` is handed the
+ * surviving entries and never learns a query exists, so the option count `Combobox.Status` announces,
+ * the emptiness `Combobox.Empty` shows and the set the arrow keys traverse all fall out of one array.
  *
- * **`allowsEmptyCollection` defaults to `true` here**, where the kernel defaults it to `false`. On a
- * Select an empty listbox is a dead end worth refusing to open; on a Combobox it is the normal
- * result of typing something with no matches, and closing the popup would take `Combobox.Empty` —
- * the part whose whole job is saying so — off screen with it.
+ * **`allowsEmptyCollection` defaults to `true` here**, against the hook's own `false`. On a Select an
+ * empty list is a dead end worth refusing to open; on a Combobox it is the normal result of typing
+ * something with no matches, and closing would take `Combobox.Empty` off screen with it.
  *
- * **`modal` defaults to `false`**, where the kernel defaults it to `true`. `createHideOutside` marks
- * the rest of the page `inert`, which is right for a Select the user has committed to and wrong for
- * a search field they are still typing into.
+ * **`modal` defaults to `false`**, against the hook's own `true`. Modal marks the rest of the page
+ * `inert` (unfocusable and un-clickable), which is right for a Select the user has committed to and
+ * wrong for a search field they are still typing into.
  *
- * **The input needs an accessible name.** Combobox ships no `Label` part (labelling is a future
- * `Field`'s job), so an `aria-label` — or an `aria-labelledby` pointing at the consumer's own
- * `<label>` — on `Combobox.Input` is mandatory: a nameless `role="combobox"` is an axe
- * `aria-input-field-name` violation, and so is the `role="listbox"` that inherits its name.
+ * **The input needs an accessible name.** Combobox ships no `Label` part, so an `aria-label` — or an
+ * `aria-labelledby` pointing at your own `<label>` — on `Combobox.Input` is mandatory: a nameless
+ * `role="combobox"` is an axe `aria-input-field-name` violation, and so is the `role="listbox"` popup
+ * that inherits its name.
  *
- * Because it reads a recipe, a `Combobox.Root` **requires a `<ThemeProvider>`** ancestor fed a
- * preset, like every other styled component.
+ * Reading a recipe means a `Combobox.Root` **requires a `<ThemeProvider>`** ancestor fed a preset.
  */
 export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
   props: ComboboxRootProps<V, M, G>,
@@ -138,7 +131,7 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
       filter: "contains" as ComboboxFilter<V>,
       menuTrigger: "input" as ComboboxMenuTrigger,
       allowsCustomValue: false,
-      // Both flipped from the kernel's own defaults — see this component's doc.
+      // Both deliberately flipped from `createCombobox`'s own defaults — see this component's doc.
       allowsEmptyCollection: true,
       modal: false,
       sideOffset: 4,
@@ -157,10 +150,9 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
   const itemToLabel = (item: V): string => merged.itemToLabel?.(item) ?? itemToValue(item);
 
   /**
-   * The text a selection displays. Only single-selection mode puts a value in the field: with
-   * several picked there is no one label to show, so the input stays the query and is emptied after
-   * each pick — the shape every multi-select combobox takes, with the ticks in the list doing the
-   * reporting.
+   * The text a selection displays. Only single-selection mode puts a value in the field: with several
+   * picked there is no one label to show, so the input stays the query and is emptied after each pick,
+   * leaving the ticks in the list to report what is chosen.
    */
   const textForSelection = (selection: SelectionValue<V, M> | undefined): string => {
     if (selectionMode() !== "single") {
@@ -172,8 +164,8 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
 
   const textInput = createTextInput<HTMLInputElement>({
     value: () => merged.inputValue,
-    // Read once, when the internal signal is created — so this resolves the *initial* selection off
-    // the props rather than off the kernel, which does not exist yet.
+    // Read once, when the internal signal is created, so it resolves the *initial* selection off the
+    // props — `state` below does not exist yet at this point.
     defaultValue: () =>
       merged.defaultInputValue ??
       textForSelection((merged.value ?? merged.defaultValue) as SelectionValue<V, M> | undefined),
@@ -184,19 +176,17 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
    * Whether the popup is showing every option rather than the query's matches. It is what makes the
    * chevron work on a committed field: with "Apple" in the input, filtering by it would leave a
    * one-row list, so a pointer open (and every close) resets to the full set and only typing narrows
-   * it. React Aria calls the same state `showAllItems`.
+   * it again.
    */
   const [showAllItems, setShowAllItems] = createSignal(true);
 
   const collator = createCollator({ usage: "search", sensitivity: "base" });
 
   /**
-   * The query the filter runs on, **held while an IME composition is in progress**. A half-typed CJK
-   * word matches nothing, so filtering on it would empty the list and flash `Combobox.Empty` on
-   * every keystroke of a multi-key character. `createTextInput` exposes `isComposing()` precisely so
-   * this decision can be made here — it is a Combobox policy, not a text-input one, and Base UI
-   * makes the same call one layer down. `compositionend` writes the final text and the filter runs
-   * once.
+   * The query the filter runs on, **held while an IME composition is in progress** — the multi-key
+   * sequence used to type CJK and similar scripts. A half-typed word matches nothing, so filtering on
+   * it would empty the list and flash `Combobox.Empty` on every keystroke of a single character.
+   * `compositionend` writes the final text and the filter runs once.
    */
   const query = createMemo<string>((previous) =>
     textInput.isComposing() ? (previous ?? "") : textInput.value(),
@@ -206,8 +196,8 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
     const entries = merged.items as readonly G[];
     const filter = merged.filter;
     const text = query();
-    // `filter === false` keeps the consumer's array **identity**, which is what an async search
-    // needs: nothing downstream re-derives, and the results they fetched are the results shown.
+    // These branches return the consumer's array by **identity**, which is what an async search needs:
+    // nothing downstream re-derives, and the results they fetched are the results shown.
     if (filter === false || showAllItems() || text === "") {
       return { entries, groups: undefined };
     }
@@ -224,8 +214,8 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
     }
 
     // Grouped: filter *within* each group and drop the ones left empty, so a heading never survives
-    // its last row. The surviving sublists are carried out of here because both the kernel (which
-    // flattens them into navigation order) and the consumer's own inner `<For>` need them.
+    // its last row. The surviving sublists are carried out of here because both `createCombobox`
+    // (which flattens them into navigation order) and the consumer's own inner `<For>` need them.
     const groups = new Map<G, readonly V[]>();
     const kept: G[] = [];
     for (const group of entries) {
@@ -250,15 +240,15 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
       },
       get groupToItems() {
         const original = merged.groupToItems;
-        // Wrapped, never forwarded raw: the kernel flattens groups into navigation order, and the
-        // original accessor would hand it every row the filter just removed.
+        // Wrapped, never forwarded raw: `createCombobox` flattens the groups into navigation order,
+        // and the consumer's own accessor would hand it every row the filter just removed.
         return original === undefined
           ? undefined
           : (group: G) => itemsOfGroup(group) as readonly V[];
       },
       onChange: (value: SelectionValue<V, M>) => {
-        // The field's text follows the selection — every path that selects lands here, because the
-        // kernel routes Enter, Space and an option's own click through one `onChange`.
+        // The field's text follows the selection, and every path that selects lands here: Enter, Space
+        // and an option's own click all route through this one callback.
         textInput.setValue(textForSelection(value));
         setShowAllItems(true);
         merged.onChange?.(value);
@@ -272,9 +262,9 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
   };
 
   const commit = () => {
-    // Idempotent by construction: Tab commits and the blur that follows commits again, and both
-    // land on the same branch. Selecting goes through the kernel's wrapped `onChange`, so the text,
-    // the close-on-select and `showAllItems` are all handled there rather than repeated here.
+    // Idempotent by construction, which matters because Tab commits and the blur right after it
+    // commits again: both land on the same branch. Selecting routes through the wrapped `onChange`
+    // above, so the text, the close-on-select and `showAllItems` are handled there, not repeated here.
     if (state.list.focus.activeItem() !== undefined) {
       state.list.selection.selectActive();
       return;
@@ -289,8 +279,8 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
     setShowAllItems(false);
     if (merged.menuTrigger === "input") {
       // "first", so the top suggestion is highlighted and Enter commits it — what a search field is
-      // expected to do. The signal only changes on the first keystroke of a session, so the entry
-      // effect does not re-run per character.
+      // expected to do. The value only changes on the first keystroke of a session, so the effect
+      // reading it does not re-run per character.
       state.setFocusStrategy("first");
       state.setOpen(true);
     }
@@ -303,11 +293,15 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
     }
   };
 
-  // Re-anchor the highlight whenever the filter changes the option set while the popup is open. The
-  // active index points into the *previous* array, so leaving it alone highlights an unrelated row —
-  // or, once the list is shorter than the index, nothing at all, silently dropping
-  // `aria-activedescendant` while the popup still looks navigable. Identity-keyed, so the unfiltered
-  // passes (which return the consumer's own array) never trigger it.
+  // Re-anchor the highlight whenever the filter changes the option set under an open popup. The active
+  // index points into the *previous* array, so leaving it alone highlights an unrelated row — or, once
+  // the list is shorter than that index, nothing at all, silently dropping `aria-activedescendant`
+  // while the popup still looks navigable.
+  //
+  // Solid 2.0's `createEffect` takes a split (dependencies, run) pair and tracks reads only in the
+  // first, so this re-runs on the entries array's *identity*, never on `open()` — whose read is kept
+  // out of tracking by `untrack`. The unfiltered passes hand back the consumer's own array unchanged,
+  // so they never trigger it.
   createEffect(
     () => filtered().entries,
     () =>
@@ -319,7 +313,7 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
   );
 
   const context: ComboboxContextValue = {
-    // The generics cannot flow through Solid context — see `combobox-context.ts`.
+    // A Solid context value is one concrete type, so `<V>` is erased here and cast back per part.
     state: state as unknown as CreateComboboxReturn<unknown>,
     slots,
     textInput,
@@ -330,8 +324,8 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
     items: () => filtered().entries as readonly unknown[],
     itemsOfGroup,
     isEmpty: () => filtered().entries.length === 0,
-    // Accessors (via `runIfFunction`), so each read builds a fresh glyph element from the resolved
-    // factory (instance ?? preset ?? built-in) — never a reused, movable node.
+    // Accessors, so every read builds a fresh glyph element rather than reusing one node that would
+    // then be moved out of the first place it was rendered.
     chevronIcon: () => runIfFunction(merged.chevronIcon),
     checkIcon: () => runIfFunction(merged.checkIcon),
     clearIcon: () => runIfFunction(merged.clearIcon),
@@ -340,5 +334,4 @@ export function Root<V = unknown, M extends SelectionMode = "single", G = V>(
   return <ComboboxContext value={context}>{merged.children}</ComboboxContext>;
 }
 
-// Re-export the recipe vocabulary so consumers can import it from the component's subpath.
 export type { ComboboxSize };

@@ -27,8 +27,8 @@ export interface CreateListExpansionOptions<V> {
   /**
    * How two values are compared for equality — the escape hatch for object values that aren't
    * reference-stable. Defaults to `compareByIdOrReference` (`utils/equality`): `a.id === b.id` when
-   * both values are objects carrying an `id`, else `a === b`. Modeled on Angular Material's
-   * `compareWith`.
+   * both values are objects carrying an `id`, else `a === b`. Same escape hatch Angular Material
+   * spells `compareWith`.
    */
   compareWith?: ValueComparator<V>;
 }
@@ -56,10 +56,11 @@ export interface CreateListExpansionReturn<V> {
  * Expand/collapse state for disclosure widgets — Accordion, Tree, Disclosure. It layers on the
  * collection's items rather than on `createListFocus`, because expansion is orthogonal to which item
  * is focused: a Tree node moves focus with arrows (navigation) and opens/closes with Right/Left or
- * Enter (expansion), independently. Modeled on Angular Aria's `expansion` (its reasoning and public
- * surface, adapted, not its code).
+ * Enter (expansion), independently. Adapted from Angular Aria's `expansion` — Angular's
+ * signal-based accessibility behaviors — taking its reasoning and public surface, not its code.
  *
- * Values are compared with `===`, so an item's `value` should be a primitive or a stable reference.
+ * Values need not be reference-stable: they are compared with `compareWith`, which defaults to
+ * matching objects on `id` and everything else with `===`.
  */
 export function createListExpansion<V>(
   options: CreateListExpansionOptions<V>,

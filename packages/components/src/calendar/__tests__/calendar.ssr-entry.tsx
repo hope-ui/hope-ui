@@ -6,24 +6,22 @@ import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
 import { Calendar } from "../index";
 
-// The single source of truth for Calendar's SSR → hydration round-trip tree, shared by
-// `calendar.ssr.test.tsx` (renders it, inline-snapshots the bytes), `calendar.browser.test.tsx`
-// (passes it to hydrateFixture and drives it), and the hydration-fixture bridge (renders it
-// server-side to feed the browser test). Reusing one tree enforces "structurally identical server
-// and client" — hydration keys are a path through the component tree.
+// The single source of truth for Calendar's server-render → hydration round-trip, shared by
+// `calendar.ssr.test.tsx` (snapshots the bytes), `calendar.browser.test.tsx` (hydrates it and drives
+// it), and the fixture bridge that renders it server-side for that browser test.
 //
-// Deterministic-by-construction for a byte-stable render:
-// - `<ThemeProvider preset={hope}>` resolves the `calendar` recipe (a zero-DOM provider — hope's
-//   token values live in CSS), so the round-trip exercises the real styled markup. It must be present
-//   identically on server and client because it shifts `_hk` keys.
-// - `locale="en-US"` via `I18nProvider` — pins month/weekday names on both server and client (no
-//   dependence on the runner's browser locale).
-// - `timeZone="UTC"` — pins date formatting.
-// - `defaultFocusedValue` in **January 2020** — a month that can never be "today", so `data-today`
-//   never appears and the seed doesn't fall back to the (non-deterministic) system clock.
-// - `defaultValue` (Jan 10) + `name="date"` — a committed selection so the tree exercises both a
-//   painted `data-selected` cell (distinct from the separately-focused Jan 15) and a rendered hidden
-//   `<input>` for native form submission.
+// Reusing one definition is what enforces "structurally identical server and client": Solid pairs
+// server and client nodes by a key derived from each node's path through the component tree.
+//
+// Every prop below exists to make the render deterministic, so the byte-exact snapshot is stable:
+// - `<ThemeProvider>` resolves the real styled markup. It renders no DOM (hope's token values live in
+//   CSS) but it is a node on that key path, so it must be present identically on both sides.
+// - `locale="en-US"` pins month and weekday names, instead of inheriting the runner's browser locale.
+// - `timeZone="UTC"` pins date formatting.
+// - a focused date in **January 2020** — a month that can never be "today", so nothing keys off the
+//   system clock.
+// - `defaultValue` + `name` pull a painted selection (distinct from the separately-focused day) and a
+//   hidden form field into the round-trip.
 
 export function Tree(): JSX.Element {
   return (

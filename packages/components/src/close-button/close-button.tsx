@@ -8,33 +8,29 @@ import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 import { XIcon } from "../icons";
 
-// The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
-// consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
-// so consumers can import it from the component's subpath.
+// Re-exported so consumers get the size vocabulary from the component's own subpath, without
+// importing `@hope-ui/theming` directly.
 export type { CloseButtonSize };
 
 type CloseButtonElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
- * `CloseButtonProps` = the native `<button>` props **plus** the themeable surface
- * (`CloseButtonThemeableProps`: the `size` variant + the glyph, owned by `@hope-ui/theming`) **plus**
- * the per-instance-only props below. Extending `CloseButtonThemeableProps` (rather than re-declaring
- * `size`) keeps the two in lockstep by construction. The one exception is `icon`: the themeable
- * surface narrows it to a **factory** (reuse-safe app-wide default), while a per-instance prop also
- * accepts a bare `JSX.Element`, so it is `Omit`-ted here and re-declared wider below.
+ * The native `<button>` props **plus** the themeable surface (`size` and the glyph) **plus** the
+ * per-instance props below. `icon` is the one key re-declared wider: as an app-wide default it must
+ * be a factory (a single shared element would *move* between instances), but per instance a bare
+ * element is fine.
  *
- * CloseButton is an **always-icon-only** button that is deliberately **surface-adaptive rather than
- * colored** — no `variant`/`colorScheme`, no `loading`, no decorators. The glyph inherits
- * `currentColor` and the hover/press wash + focus ring derive from it (see the `closeButton` recipe),
- * so it reads correctly on any surface with zero configuration.
+ * CloseButton is always icon-only, and deliberately has no `variant` or `colorScheme`. The glyph
+ * inherits `currentColor` and its hover wash and focus ring are derived from it, so one component
+ * reads correctly on any surface with no configuration at all.
  */
 export interface CloseButtonProps
   extends CloseButtonElementProps,
     Omit<CloseButtonThemeableProps, "icon"> {
   /**
-   * The glyph. Defaults to hope's built-in X. Accepts a bare element (per-instance) or a factory
-   * `() => JSX.Element` — the factory form is what a preset supplies as an app-wide `defaultProps.icon`
-   * (reuse-safe; a single shared node would *move* between instances), resolved via `runIfFunction`.
+   * The glyph, defaulting to the built-in X. Pass a bare element per instance; a preset's app-wide
+   * default must be a factory, so every button builds its own node instead of sharing (and moving)
+   * one.
    */
   icon?: JSX.Element | (() => JSX.Element);
   /**
@@ -56,17 +52,18 @@ export interface CloseButtonProps
   /** Merged over the recipe's root class (applied last), so the consumer's utilities win. */
   class?: string;
   /**
-   * Per-instance class overrides, keyed by slot (`root`, `icon`). Folded in after the recipe base and
-   * the preset's global `slotClasses`, before `class` (root only) — so a later utility wins a Tailwind
-   * conflict. Use literal class strings so the consumer's Tailwind scanner can see them.
+   * Per-instance class overrides, keyed by slot (`root`, `icon`). Applied after the recipe base and
+   * the preset's global `slotClasses`, and before `class` — the later utility wins a Tailwind
+   * conflict. Write them as literal class strings, or the consumer's Tailwind scanner will not see
+   * them.
    */
   slotClasses?: SlotClasses<"closeButton">;
 }
 
 export const CloseButton: Component<CloseButtonProps> = (props) => {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`
-  // (never `merge`, which resolves by key *presence*). See `useDefaults`' doc in @hope-ui/theming.
+  // Precedence: instance prop ?? the preset's `defaultProps` ?? the builtins below, each key
+  // resolved with `??`. Never Solid's `merge`, which resolves by key *presence* and so lets an
+  // explicitly-`undefined` prop beat the default.
   const merged = useDefaults({
     recipe: "closeButton",
     props,
@@ -76,23 +73,23 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
     },
   });
 
-  // The localized default accessible name. `useLocale` has a default context, so this works without an
-  // `I18nProvider` (falls back to the default locale/catalog). A consumer `aria-label` wins (below).
+  // For the localized default accessible name. There is a default locale context, so this works
+  // with no `I18nProvider` in the tree; a consumer `aria-label` still wins (see below).
   const i18n = useLocale();
 
-  // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
-  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). `size` is the
-  // whole styling axis; passing the **complete** variant set every call is what `CompleteVariantsOf`
-  // requires (an omitted variant would silently fall back to the recipe's `defaultVariants`).
+  // One class function per slot, each folding in the whole override chain: recipe base → preset
+  // `slotClasses` → instance `slotClasses` → `class` (root only). The *complete* variant set has to
+  // be passed on every call — an omitted variant silently falls back to the recipe's own default.
   const slots = useSlots({
     recipe: "closeButton",
     variantsProps: () => ({ size: merged.size }),
     slotClasses: () => merged.slotClasses,
   });
 
-  // `createButton` owns the element-aware a11y props, disabled-gating, and the press engine. `type` is
-  // forced to `"button"` (a close button must never submit a form). `preventFocusOnPress` keeps the
-  // focus ring keyboard-only (a scripted focus-on-press would make `:focus-visible` match a click too).
+  // `createButton` owns the element-aware ARIA, the disabled gating and the press handling. `type` is
+  // forced to `"button"` so a close button can never submit a surrounding form.
+  // `preventFocusOnPress` keeps the focus ring keyboard-only: a scripted `.focus()` during
+  // pointer-down would make `:focus-visible` match a plain mouse click too.
   const button = createButton<HTMLButtonElement>({
     disabled: () => merged.disabled ?? false,
     nativeButton: () => merged.nativeButton,
@@ -121,39 +118,34 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
     "children",
   );
 
-  // The glyph is a **component** (the built-in `<XIcon/>` or a consumer `icon={<MyIcon/>}`/factory),
-  // rendered **once, unconditionally** — there is always exactly one glyph and no `<Show>` — and
-  // `merged.icon` is read **exactly once** here. Per the codified `children()` decision procedure
-  // (CLAUDE.md / __internal__/solid-2.0-notes.md), the trigger is a component-valued prop read *more than
-  // once*; a single read needs nothing (and a lone read wouldn't hit the hydration case even inside
-  // a `<Show>` — that is the `when`+body double read). So `children()` is deliberately NOT used — it
-  // would only add a memo and shift `_hk`.
+  // `children()` is deliberately NOT used here, unlike in Button and Badge. It is only needed when a
+  // component-valued prop is read more than once in a render, because each read of the lazy getter
+  // re-runs `createComponent`. There is always exactly one glyph, rendered unconditionally, and
+  // `merged.icon` is read exactly once — so a memo would buy nothing and only add a tree position.
   //
-  // First-child safety: the glyph is wrapped in a host `<span>`, so the hydration-keyed `<button>`'s
-  // first child is always a host element, never the component (the `solid2-first-child-component-
-  // hydration` hazard). The `class` binding stays reactive, so a `size` change reflows the glyph size.
+  // The glyph is wrapped in a host `<span>` so the `<button>`'s first child is always a plain
+  // element rather than a component, which is what keeps it hydratable.
   const content = (
     <span data-slot="close-button-icon" class={slots.icon()}>
       {runIfFunction(merged.icon) ?? <XIcon />}
     </span>
   );
 
-  // No dev a11y guard (unlike Button's icon-only warning): CloseButton always has a default
-  // `aria-label`, so it can never be nameless.
+  // No icon-only accessibility warning here, unlike Button: this component always supplies a default
+  // `aria-label`, so it can never end up nameless.
   const elementProps = merge(rest, button.buttonProps, {
     get class(): string {
-      // `useSlots` already folded the override chain into the root slot fn — recipe base → preset
-      // `slotClasses` → instance `slotClasses` → `class` — with the final tailwind-merge inside the
-      // recipe's `{ class }` seam, so a later utility wins a conflict without a separate `cn`.
+      // The consumer's class is passed *into* the slot function, never concatenated after it: only
+      // then does tailwind-merge see both strings and let the consumer's utility win a conflict.
       return slots.root(merged.class);
     },
     get "aria-label"() {
-      // The consumer's `aria-label` (or `aria-labelledby`, which wins at the ARIA level) takes
-      // precedence; otherwise fall back to the localized `common.close`. Mirrors `createDialogCloseTrigger`.
+      // Read off the merged props, so a preset-level default also wins over the localized fallback.
+      // A consumer `aria-labelledby` beats both at the ARIA level.
       return merged["aria-label"] ?? i18n.t("common.close");
     },
-    // The root's own slot marker; the glyph wrapper uses the `close-button-<part>` convention. A
-    // consumer (Dialog.CloseTrigger, Alert.CloseTrigger) may re-scope it to its own value.
+    // The root's own marker; the glyph wrapper uses the `close-button-<part>` convention. A wrapping
+    // component (`Dialog.CloseTrigger`, `Alert.CloseTrigger`) may re-scope it to its own value.
     get "data-slot"() {
       return (merged as { "data-slot"?: string })["data-slot"] ?? "close-button";
     },

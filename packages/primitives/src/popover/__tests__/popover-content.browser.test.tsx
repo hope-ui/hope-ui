@@ -12,8 +12,9 @@ import {
 } from "../popover-root";
 import { createPopoverTrigger } from "../popover-trigger";
 
-// The trigger is part of every tree here on purpose: the exclusion that lets a *toggling* trigger
-// work at all is wired in this hook, so most of what it owns is only observable against a real one.
+// Every tree here includes the trigger on purpose. `createPopoverContent` is what exempts it from
+// dismissal, and that exemption — the reason a *toggling* trigger works at all — is only observable
+// against a real trigger.
 
 const TITLE_ID = "popover-content-title";
 
@@ -131,9 +132,9 @@ describe("createPopoverContent", () => {
 
   it("falls back id / aria-labelledby / aria-describedby to the registered state, consumer wins", async () => {
     const generated = mountHarness({ options: OPEN, contentProps: LABELLED });
-    // No Title part yet (Phase 6), so the fallback resolves to `undefined` and the consumer's own
-    // `aria-labelledby` is what survives — the point being that a blind internal getter returning
-    // `undefined` would have stripped it.
+    // With no Title mounted the internal fallback resolves to `undefined`, and the consumer's own
+    // `aria-labelledby` has to survive that — a getter that returned `undefined` unconditionally
+    // would strip it, and the popup would lose its accessible name.
     expect(contentOf(generated.container)?.getAttribute("aria-labelledby")).toBe(TITLE_ID);
     expect(contentOf(generated.container)?.id).toBe(generated.state().popupId());
     generated.dispose();
@@ -181,12 +182,12 @@ describe("createPopoverContent", () => {
       options: OPEN,
       contentProps: {
         ...LABELLED,
-        // Read lazily by the autofocus effect after mount, so `target` (assigned by the ref below
-        // during the same mount) is resolved by the time focus is applied.
+        // Read lazily by the autofocus effect after mount, so `target` — assigned by the ref
+        // below during that same mount — is resolved by the time focus is applied.
         initialFocus: () => target,
       },
-      // Rendered *before* `target` in the tree, so "first focusable descendant" and "initialFocus"
-      // are different elements and the assertion can tell them apart.
+      // Rendered *before* `target`, so "first focusable descendant" and "initialFocus" are
+      // different elements and the assertion can tell them apart.
       withInnerButton: true,
       extraContent: () => (
         <button type="button" data-testid="target" ref={target}>
@@ -202,10 +203,10 @@ describe("createPopoverContent", () => {
   });
 
   it("does NOT dismiss itself while opening, with closeOnFocusOutside at its default", async () => {
-    // The F1 race, at the configuration it exists in. Autofocus's `.focus()` dispatches `focusin`
-    // synchronously; because `createAutoFocus` is created *before* `createDismissable`, that lands
-    // before the document listener attaches. Two independent guards — the listener's own
-    // `container.contains(target)` early return is the second.
+    // The reopen race. Autofocus's `.focus()` dispatches `focusin` synchronously, and because
+    // `createAutoFocus` is created *before* `createDismissable`, that lands before the dismissal
+    // listener attaches — otherwise the layer would dismiss itself on reopen. The listener's own
+    // containment check is the second, independent guard, covering the cold-open path.
     const { container, state, dispose } = mountHarness({
       contentProps: LABELLED,
       withInnerButton: true,
@@ -220,7 +221,7 @@ describe("createPopoverContent", () => {
   });
 
   it("closes when the trigger is clicked while open, and STAYS closed", async () => {
-    // The Phase 3 payoff, and the whole reason `exclude` exists: without it the capture-phase
+    // The whole reason the trigger is excluded from dismissal: without it the capture-phase
     // pointerdown dismisses and the trigger's own `click` reopens, so the popover could never be
     // closed by the control that opened it.
     const { container, state, dispose } = mountHarness({
@@ -234,7 +235,6 @@ describe("createPopoverContent", () => {
     await userEvent.click(page.getByTestId("trigger"));
     await vi.waitFor(() => expect(contentOf(container)).toBeNull());
 
-    // …and it stayed closed rather than being reopened by the same click.
     await nextFrame();
     expect(contentOf(container)).toBeNull();
     expect(state().open()).toBe(false);
@@ -344,10 +344,10 @@ describe("createPopoverContent", () => {
     // `visibility: hidden` intermediate and return an `incomplete` nobody can act on.
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     await expectNoA11yViolations(container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check).
-      // The IDREF itself is pinned in `popover-trigger.browser.test.tsx`.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `popover-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

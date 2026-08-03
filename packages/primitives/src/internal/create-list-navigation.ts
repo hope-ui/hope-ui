@@ -56,9 +56,9 @@ export interface CreateListNavigationReturn {
  * `focus.focusIndex`. Because focus defers real `.focus()` until the element exists, navigating past
  * a virtualized window's edge "just works" — the target scrolls in, then focuses.
  *
- * Modeled on Angular Aria's `list-navigation` (its reasoning and public surface, adapted, not its
- * code); the edge-case checklist (skip-disabled, wrap, RTL) is cross-checked against react-aria's
- * `ListKeyboardDelegate` and floating-ui-react's `useListNavigation`.
+ * Adapted from Angular Aria's `list-navigation` (its reasoning and public surface, not its code),
+ * with the edge-case checklist — skip-disabled, wrap, RTL — cross-checked against the equivalents in
+ * React Aria (`ListKeyboardDelegate`) and floating-ui-react (`useListNavigation`).
  */
 export function createListNavigation<V = unknown>(
   options: CreateListNavigationOptions<V>,

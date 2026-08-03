@@ -9,8 +9,8 @@ export interface CreatePresenceOptions {
   ref: Accessor<HTMLElement | null | undefined>;
   /**
    * Play the enter animation on the very first mount when `present` starts `true`, instead of
-   * appearing already `"entered"`. Off by default, so a `defaultOpen`/already-present element
-   * paints in its final state without a spurious first-frame transition.
+   * appearing already `"entered"`. Off by default, so an element that starts open paints in its
+   * final state instead of transitioning in on first paint.
    */
   initialEnter?: boolean;
 }
@@ -18,22 +18,17 @@ export interface CreatePresenceOptions {
 export interface PresenceState {
   /** Whether the consumer should render its DOM output at all right now. */
   mounted: Accessor<boolean>;
-  /** Fine-grained lifecycle status, meant to drive a `data-presence` attribute for CSS. */
+  /** Lifecycle phase, meant to be mirrored onto a `data-presence` attribute for CSS to target. */
   status: Accessor<PresenceStatus>;
 }
 
-/**
- * Small cushion added to the computed exit duration before the fallback timer fires, so a real
- * `transitionend`/`animationend` wins the race in the normal case and the timer only acts as a
- * backstop for the events that never arrive.
- */
+/** Cushion on the fallback timer, so a real `transitionend`/`animationend` wins the race. */
 const FALLBACK_BUFFER_MS = 50;
 
 /**
- * Time in **milliseconds** until the last authored exit transition/animation would end
- * (`delay + duration`, maxed across every comma-separated value). `getComputedStyle` reports
- * these in seconds, so we convert. Returns `0` when nothing is authored — the caller then unmounts
- * synchronously rather than waiting for an end event that will never fire.
+ * Milliseconds until the last authored exit transition/animation would end (`delay + duration`,
+ * maxed over every comma-separated value; `getComputedStyle` reports seconds). `0` means nothing is
+ * authored, and the caller must unmount at once rather than await an end event that never fires.
  */
 function getExitTimeoutMs(element: HTMLElement): number {
   const style = window.getComputedStyle(element);
@@ -42,8 +37,8 @@ function getExitTimeoutMs(element: HTMLElement): number {
   const totals = (durations: string, delays: string): number[] => {
     const duration = toMs(durations);
     const delay = toMs(delays);
-    // Per the spec, if there are fewer delays than durations the delay list is repeated; the last
-    // value is a safe-enough stand-in for that here.
+    // CSS repeats the delay list when it is shorter than the duration list; reusing the last delay
+    // is close enough for picking a timeout.
     return duration.map((value, index) => value + (delay[index] ?? delay[delay.length - 1] ?? 0));
   };
   const times = [
@@ -54,24 +49,22 @@ function getExitTimeoutMs(element: HTMLElement): number {
 }
 
 /**
- * Tracks mount/unmount timing across an exit CSS transition or animation, the same idea as Base
- * UI's transition-status handling, built fresh for hope-ui.
+ * Keeps an element mounted through its exit CSS transition/animation so it can animate out before
+ * being removed — the same idea as the transition-status handling in Base UI (a React headless
+ * component library), written fresh here.
  *
- * Consumers gate their DOM output on `mounted()` and use `status()` to drive a `data-presence`
- * attribute for CSS (`entering`/`entered`/`exiting`/`exited`). If the rendered element has no
- * authored `transition`/`animation` duration, exit is immediate (`mounted` flips to `false` in the
- * same effect run) rather than waiting forever for an end event that will never fire.
- *
- * Exit unmount is driven by `transitionend`/`animationend`, with `transitioncancel`/`animationcancel`
- * and a duration-derived `setTimeout` backstop so an interrupted or never-delivered end event can't
- * strand the element mounted with `present` already `false`.
+ * Consumers render their DOM only while `mounted()` is true and mirror `status()` onto a
+ * `data-presence` attribute for CSS. With no authored transition/animation duration, exit is
+ * immediate; otherwise unmount waits for `transitionend`/`animationend`, backed by the `*cancel`
+ * events and a duration-derived timer so an interrupted or undelivered end event can't strand the
+ * element mounted after `present` already went `false`.
  */
 export function createPresence(options: CreatePresenceOptions): PresenceState {
-  // `untrack`, and not because tracking here would be wrong-but-harmless: these reads seed the
-  // initial value of a signal, so they must happen exactly once and must never re-run. Without it
-  // Solid's dev build rightly warns `[STRICT_READ_UNTRACKED]` — and labels the warning with the
-  // *caller's* component name (`<Popup>`, `<Backdrop>`), because a primitive called from a
-  // component body runs inside that component's owner. `mount()` fails any test that emits one.
+  // `untrack` (read a signal without subscribing to it) is required, not merely tidy: these reads
+  // seed a signal's initial value, so they must happen exactly once and never re-run. A tracked read
+  // makes Solid's dev build warn `[STRICT_READ_UNTRACKED]`, blamed on the *calling* component — a
+  // primitive called from a component body runs inside that component's reactive scope. The repo's
+  // `mount()` test helper fails any test that emits one.
   const initialPresent = untrack(options.present);
   const initialEnter = options.initialEnter ?? false;
   const [mounted, setMounted] = createSignal(initialPresent);
@@ -79,9 +72,9 @@ export function createPresence(options: CreatePresenceOptions): PresenceState {
     initialPresent ? (initialEnter ? "entering" : "entered") : "exited",
   );
 
-  // The split `createEffect(compute, effect)` runs its effect once for the initial value too (pinned
-  // in solid-contract.test.ts). This latch tells that first run apart from later ones so an
-  // already-present element doesn't replay its enter transition on mount unless `initialEnter` asks.
+  // Solid 2.0's two-argument `createEffect(compute, effect)` also runs the effect once for the
+  // initial value, so this latch tells that first run apart from later ones — otherwise an element
+  // that starts present would transition in on mount even without `initialEnter`.
   let firstRun = true;
 
   createEffect(
@@ -97,18 +90,12 @@ export function createPresence(options: CreatePresenceOptions): PresenceState {
           return;
         }
         setStatus("entering");
-        // Flip to `entered` only after the browser has painted the `entering` frame, so an authored
-        // CSS *transition* has a prior value to animate from. A SINGLE rAF is not enough here: the
-        // element is inserted (as `entering`) and the rAF is scheduled in the *same task*, so the
-        // rAF runs at the next frame's rendering step *before* that frame's first style recalc — the
-        // element's first-ever computed style is already `entered`, and a transition with no painted
-        // prior value never fires (the "content appears instantly, enter animation skipped" bug).
-        // The inner rAF flips a frame later, after `entering` has been recalculated and painted, so
-        // `entering → entered` is a real change the transition animates. Keyframe *animations* (à la
-        // reka-ui) run on mount without a prior value and wouldn't need this; base-ui, which uses
-        // transitions like us, gets away with one rAF only because React commits/paints the starting
-        // frame in a cycle *before* the rAF — mount and rAF don't share a task there. See
-        // create-presence.md.
+        // Two nested frames, not one. A CSS transition only runs if the browser painted the
+        // starting value first, and here the element is inserted as `entering` in the same task that
+        // schedules the rAF — so a single rAF still fires before that frame's first style recalc,
+        // the element's first computed style is already `entered`, and the enter animation is
+        // silently skipped. The inner rAF flips one frame later, once `entering` has been painted.
+        // Full write-up: __internal__/primitives/internal/create-presence.md.
         let innerFrame = 0;
         const outerFrame = requestAnimationFrame(() => {
           innerFrame = requestAnimationFrame(() => setStatus("entered"));
@@ -120,11 +107,9 @@ export function createPresence(options: CreatePresenceOptions): PresenceState {
       }
 
       setStatus("exiting");
-      // Read the ref on the exit edge only, untracked — deliberately *not* the
-      // `() => [active(), ref()]`-in-compute pattern `createFocusTrap`/`createDismissable` need.
-      // Those read on the *activating* edge, racing the effect that creates the element. This reads
-      // on the exit edge, when the element has been in the document since the entering run; tracking
-      // it would rerun this effect (re-entering the exiting branch) every time the element changes.
+      // Untracked on purpose: by the exit edge the element has been in the document since the
+      // entering run, so there is no race to win, and subscribing to the ref would re-run this
+      // effect — replaying the exiting branch — on every element change.
       const element = untrack(options.ref);
       const timeout = element ? getExitTimeoutMs(element) : 0;
 
@@ -152,11 +137,11 @@ export function createPresence(options: CreatePresenceOptions): PresenceState {
 
       element.addEventListener("transitionend", handleEnd);
       element.addEventListener("animationend", handleEnd);
-      // A cancelled transition (interrupted, `display: none`, a property reset) fires `*cancel`, not
-      // `*end`. Without these the element would stay mounted forever with `present` still `false`.
+      // A cancelled transition (interrupted, `display: none`, a property reset) fires `*cancel` and
+      // never `*end`; without these the element stays mounted forever.
       element.addEventListener("transitioncancel", handleEnd);
       element.addEventListener("animationcancel", handleEnd);
-      // Backstop for the case even `*cancel` misses — a backgrounded tab may fire no event at all.
+      // Last resort: a backgrounded tab may fire no event at all, not even `*cancel`.
       const timer = setTimeout(finish, timeout + FALLBACK_BUFFER_MS);
 
       return () => {
@@ -194,15 +179,14 @@ export interface PresenceItemState<T> extends PresenceState {
 }
 
 /**
- * {@link createPresence} over a value instead of a boolean: animates the presence of whichever
- * item is active, and animates *swaps* between items by exiting the outgoing one before entering
- * the incoming one. Composes the boolean core, so the exit timing, `status`, and backstop behavior
- * are identical.
+ * {@link createPresence} over a value instead of a boolean: animates whichever item is active, and
+ * animates *swaps* by exiting the outgoing item before entering the incoming one. Built on the
+ * boolean core, so exit timing, `status`, and the backstops behave identically.
  */
 export function createPresenceItem<T>(options: CreatePresenceItemOptions<T>): PresenceItemState<T> {
   const initialItem = untrack(options.item);
-  // Boxed for the same reason `createControllableState` boxes: a function-valued `T` would be
-  // swallowed by `createSignal`'s compute-function overload and invoked as a memo.
+  // Boxed in an object because Solid 2.0 reads `createSignal(fn)` as a memo declaration and calls
+  // the function, so a function-valued `T` could never be stored directly.
   const [box, setBox] = createSignal<{ item: T | undefined }>({
     item: itemPresent(initialItem) ? initialItem : undefined,
   });
@@ -218,16 +202,15 @@ export function createPresenceItem<T>(options: CreatePresenceItemOptions<T>): Pr
   });
 
   createEffect(
-    // Track the item, the box (so a swap settles), and the core's `mounted` (so we can swap the new
-    // item in the moment the old one finishes exiting).
+    // `presence.mounted()` is tracked so that the moment the outgoing item finishes exiting, this
+    // re-runs and swaps the incoming one in.
     () => [options.item(), box().item, presence.mounted()] as const,
     ([item, current, coreMounted]) => {
       const shouldMount = itemPresent(item);
 
       if (shouldMount && item !== current) {
         if (coreMounted) {
-          // A different item is still showing; exit it first. When the core unmounts, this effect
-          // re-runs (it tracks `presence.mounted()`) and swaps the new item in.
+          // A different item is still showing: exit it first, and let the re-run below swap.
           setPresent(false);
         } else {
           setMountedItem(item);

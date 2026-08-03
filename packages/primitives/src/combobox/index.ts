@@ -1,10 +1,9 @@
-// The `combobox/` barrel: the `createCombobox` hook family — the shared kernel of Select and
-// Combobox — exported as the single subpath `@hope-ui/primitives/combobox`. Type-first, no namespace
-// object (that's the component layer).
+// The `createCombobox` hook family, shared by Select and Combobox, exported as the single subpath
+// `@hope-ui/primitives/combobox`.
 //
-// There is deliberately no `createComboboxItem`, `createComboboxLabel` or `createComboboxPortal`:
-// an option is `createListboxItem(state.list, …)` unchanged, labelling is the consumer's
-// `aria-label`/`aria-labelledby` on the trigger, and a portal part needs no hook.
+// Three parts are deliberately missing: an option is `createListboxItem(state.list, …)` unchanged,
+// labelling is the consumer's `aria-label`/`aria-labelledby` on the trigger, and a portal needs no
+// hook.
 //
 // Two focus owners, one pattern: `createComboboxTrigger` puts `role="combobox"` on Select's
 // `<button>`, `createComboboxInput` puts it on Combobox's `<input>`. Combobox's own *chevron* is

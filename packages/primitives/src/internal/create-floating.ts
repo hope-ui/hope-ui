@@ -38,12 +38,15 @@ export type {
   VirtualElement,
 } from "@floating-ui/dom";
 
-/** Alignment along the side's cross axis. floating-ui spells the centred case as an absent suffix. */
+/**
+ * Alignment along the side's cross axis. floating-ui — the positioning engine this file wraps —
+ * spells the centred case as an absent suffix rather than as `"center"`.
+ */
 export type FloatingAlign = "start" | "center" | "end";
 
 /**
  * The two inline-relative sides, mirroring `inset-inline-start`/`-end`. Resolved to a physical `Side`
- * before floating-ui ever sees it — floating-ui's placement vocabulary is physical by design.
+ * before floating-ui ever sees it — its placement vocabulary is physical by design.
  */
 export type LogicalSide = "inline-start" | "inline-end";
 
@@ -51,10 +54,11 @@ export type LogicalSide = "inline-start" | "inline-end";
  * What `side` accepts: floating-ui's four physical sides plus the two inline-relative ones.
  *
  * Kept distinct from `Side`, which stays the **output** vocabulary — `side()` always reports a
- * physical side, because it reports where the layer actually landed after `flip`. Base UI mirrors the
- * input vocabulary back out instead; hope-ui deliberately does not, because a recipe (including a
- * third-party preset's) selects on `data-side` and cannot know which vocabulary the consumer
- * happened to ask in. See `__internal__/reference-implementations.md` § createFloating.
+ * physical side, because it reports where the layer actually landed after `flip`. Base UI (MUI's
+ * headless component library) mirrors the input vocabulary back out instead; hope-ui deliberately
+ * does not, because a recipe — a third-party preset's included — selects on `data-side` and cannot
+ * know which vocabulary the consumer happened to ask in. See
+ * `__internal__/reference-implementations.md` § createFloating.
  */
 export type SideOrLogical = Side | LogicalSide;
 
@@ -86,7 +90,7 @@ export interface FloatingSizeState {
 }
 
 export interface CreateFloatingOptions {
-  /** Whether the layer is currently open. Same seam as `createDismissable`/`createFocusTrap`. */
+  /** Whether the layer is currently open. Same option as `createDismissable`/`createFocusTrap`. */
   active: Accessor<boolean>;
   /** The element (or virtual element) to position against. */
   anchor: Accessor<ReferenceElement | null | undefined>;
@@ -99,11 +103,11 @@ export interface CreateFloatingOptions {
    * `flip`, so a logical `"inline-start"`/`"inline-end"` here comes back as `"left"`/`"right"`.
    *
    * A logical side resolves against `getComputedStyle(floating).direction` — deliberately the floating
-   * element and deliberately the DOM, because that is exactly what floating-ui's own
+   * element, and deliberately read from the DOM, because that is exactly what floating-ui's own
    * `platform.isRTL(elements.floating)` reads for its alignment handling. Same element, same call: the
    * side and the alignment cannot disagree, and no `@hope-ui/i18n` import enters the positioning layer.
-   * The practical consequence is that a portaled positioner inherits `dir` from wherever it is
-   * portaled to, not from the anchor's subtree — floating-ui already behaves that way for alignment.
+   * Consequence: a portaled positioner takes `dir` from wherever it is portaled to, not from the
+   * anchor's subtree — floating-ui already behaves that way for alignment.
    */
   side?: SideOrLogical;
   /** Alignment along the cross axis. Default `"center"`. */
@@ -112,7 +116,10 @@ export interface CreateFloatingOptions {
   sideOffset?: number;
   /** Skid along the alignment axis, in px. Default `0`. */
   alignOffset?: number;
-  /** CSS `position` for the positioner. Default `"absolute"` — see the doc on `"fixed"`'s caveat. */
+  /**
+   * CSS `position` for the positioner. Default `"absolute"`; the caveat on `"fixed"` is in
+   * `__internal__/primitives/internal/create-floating.md`.
+   */
   strategy?: Strategy;
   /** Flip to the opposite side when the preferred one overflows. Default `true`. */
   flip?: boolean;
@@ -132,7 +139,7 @@ export interface CreateFloatingOptions {
   autoUpdate?: boolean;
   /** Re-measure every animation frame — for an anchor that moves under a transform. Default `false`. */
   trackAnchorMotion?: boolean;
-  /** Extra middleware, **appended** after the built-in stack. */
+  /** Extra floating-ui middleware (its per-measurement plugins), appended after the built-ins. */
   middleware?: Middleware[];
 }
 
@@ -189,9 +196,9 @@ interface FloatingPosition {
 }
 
 /**
- * Where `size`'s `apply` callback lands its numbers. One per `computePosition` call, never a shared
- * `let`: two measurement chains can interleave at microtask granularity, and the loser would
- * otherwise overwrite the winner's numbers.
+ * Where the `size` middleware's `apply` callback lands its numbers. One per `computePosition` call,
+ * never a shared `let`: two measurements can interleave at microtask granularity, and the one that
+ * finishes second would otherwise overwrite the other's numbers.
  */
 interface SizeSink {
   value: FloatingSizeState | undefined;
@@ -224,10 +231,10 @@ function placementFor(config: FloatingConfig, isRtl: boolean): Placement {
 }
 
 /**
- * The reading direction floating-ui itself would see. `platform.isRTL` in `@floating-ui/dom` is
- * `getComputedStyle(element).direction === "rtl"`, and core always hands it `elements.floating` — so
- * calling it the same way on the same element is what keeps a logical side and floating-ui's own
- * alignment handling from ever disagreeing.
+ * The reading direction floating-ui itself would see: its `platform.isRTL` is
+ * `getComputedStyle(element).direction === "rtl"`, always called on the floating element. Calling it
+ * the same way on the same element is what keeps a logical side and floating-ui's own alignment
+ * handling from ever disagreeing.
  */
 function isFloatingRtl(floating: HTMLElement): boolean {
   return getComputedStyle(floating).direction === "rtl";
@@ -248,7 +255,7 @@ function roundByDevicePixelRatio(element: HTMLElement, value: number): number {
  * Snap a measured span by rounding its two **edges** in device pixels, not its length.
  * `Math.round(width)` drifts by a pixel depending on where the span starts, so a layer sized from it
  * rasterizes one pixel off the anchor it is supposed to match — the whole point of `anchorWidth`.
- * Same reasoning as Base UI's `useAnchorPositioning`.
+ * Base UI's `useAnchorPositioning` rounds for the same reason.
  */
 function snapSpanByDevicePixelRatio(element: HTMLElement, start: number, length: number): number {
   const ratio = getDevicePixelRatio(element);
@@ -256,13 +263,14 @@ function snapSpanByDevicePixelRatio(element: HTMLElement, start: number, length:
 }
 
 /**
- * Ordering is floating-ui's own guidance: `offset` shifts the starting point, `flip` picks the side
- * from the offset geometry, `shift` slides within the side `flip` chose, and `arrow` measures against
- * the final coordinates. Radix deliberately runs `shift` *before* `flip` — preferring to slide rather
- * than jump sides — so a future `collisionPreference` option is an addition here, not a rewrite.
+ * Order matters, and this one is floating-ui's own guidance: `offset` shifts the starting point,
+ * `flip` picks the side from the offset geometry, `shift` slides within the side `flip` chose, and
+ * `arrow` measures against the final coordinates. Radix UI deliberately runs `shift` *before* `flip`
+ * — preferring to slide rather than jump sides — so a future `collisionPreference` option would be
+ * an addition here, not a rewrite.
  *
  * Consumer middleware is appended last, which is also its documented limitation: anything that must
- * run early (`inline()`) needs `flip`/`shift` off and the whole stack supplied.
+ * run early (floating-ui's `inline()`) needs `flip`/`shift` off and the whole stack supplied.
  */
 function buildMiddleware(config: FloatingConfig, sink: SizeSink): Middleware[] {
   const collision = { padding: config.collisionPadding, boundary: config.collisionBoundary };
@@ -291,9 +299,9 @@ function buildMiddleware(config: FloatingConfig, sink: SizeSink): Middleware[] {
     middleware.push(
       sizeMiddleware({
         ...collision,
-        // Measurement only — deliberately no width/height write. Sizing the floating element here
-        // is what creates `size`'s classic ResizeObserver feedback loop; the consumer decides what
-        // to do with the numbers (usually a CSS custom property).
+        // Measurement only — deliberately no width/height write. Sizing the floating element from
+        // inside `apply` is what creates `size`'s classic resize-observation feedback loop; the
+        // consumer decides what to do with the numbers (usually a CSS custom property).
         //
         // The anchor's dimensions are device-pixel snapped and the available space is not: the
         // former is spent on a `width` that has to land on the anchor's own pixels, the latter on a
@@ -315,18 +323,16 @@ function buildMiddleware(config: FloatingConfig, sink: SizeSink): Middleware[] {
 }
 
 /**
- * Positions a floating layer against an anchor: a SolidJS reactive binding over
+ * Positions a floating layer — a popup — against an anchor element: a SolidJS reactive binding over
  * [`@floating-ui/dom`](https://floating-ui.com) (placement, `flip`/`shift`, `offset`, `arrow`,
- * `autoUpdate`), and the substrate every overlay component positions with — Popover, Tooltip,
- * HoverCard, Menu, Select, Combobox.
+ * `autoUpdate`), and what every overlay component positions with: Popover, Tooltip, HoverCard, Menu,
+ * Select, Combobox.
  *
- * **Positioning only.** Dismissal (`createDismissable`), focus (`createFocusTrap`), and hover intent
- * are separate primitives, the same split floating-ui draws between its own packages. A Popover
- * composes them; none of them knows about the others.
- *
- * The API vocabulary is Base UI's — `side`/`align`/`sideOffset`/`alignOffset` — which is the
- * anchor-relative way to say what floating-ui spells as a single `placement` string. The structural
- * reference is `@floating-ui/vue`, not the React port. See `__internal__/reference-implementations.md`.
+ * **Positioning only.** Dismissal (`createDismissable`), focus (`createFocusTrap`) and hover intent
+ * are separate primitives a component composes alongside this one; none of them knows about the
+ * others. The option vocabulary is Base UI's — `side`/`align`/`sideOffset`/`alignOffset` — the
+ * anchor-relative way of saying what floating-ui spells as one `placement` string; the structure
+ * follows `@floating-ui/vue` rather than the React port (`__internal__/reference-implementations.md`).
  *
  * `@floating-ui/dom` is an **optional** peerDependency, so a consumer who never opens a floating
  * layer keeps a dependency-free `@hope-ui/primitives` install.
@@ -343,12 +349,13 @@ function buildMiddleware(config: FloatingConfig, sink: SizeSink): Middleware[] {
  * });
  * ```
  *
- * **Arrow measurement only** — `{x, y, centerOffset}` plus the static side. The 45° rotation and the
- * pinning are CSS the themeable component writes. Nothing here writes a style onto any element; the
- * consumer spreads `floatingStyles()` where it wants. Full usage: `create-floating.md`.
+ * Nothing here writes a style onto an element — the consumer spreads `floatingStyles()` where it
+ * wants — and the arrow is **measured only**: the 45° rotation and the pinning are CSS the themeable
+ * component writes. Full usage: `__internal__/primitives/internal/create-floating.md`.
  *
- * Client-only: `computePosition`/`autoUpdate` are reached from effect bodies alone, so nothing runs
- * under `renderToStringAsync` and the pre-positioned style is a constant both renders agree on.
+ * Client-only by construction: `computePosition`/`autoUpdate` are reached from effect bodies alone,
+ * which never run on the server, so the pre-positioned style is a constant both renders agree on and
+ * hydration finds nothing to mismatch on.
  */
 export function createFloating(options: CreateFloatingOptions): CreateFloatingReturn {
   const config = createMemo<FloatingConfig>(() => ({
@@ -369,18 +376,17 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
     extraMiddleware: options.middleware ?? [],
   }));
 
-  // `untrack`, and not because tracking would merely be redundant: this read seeds a signal, so it
-  // must happen exactly once and never re-run. A tracked read in a primitive body emits
-  // `[STRICT_READ_UNTRACKED]` labelled with the *caller's* component name, which `mount()` fails on.
-  // Seeding placement/strategy from the config rather than from hard-coded defaults is what makes
-  // `data-side` correct on the first paint and identical on the server.
+  // `untrack` — read a signal without subscribing to it — because this read only seeds another
+  // signal and must never re-run. A tracked read here would also emit Solid's
+  // `[STRICT_READ_UNTRACKED]` warning, labelled with the *caller's* component name, which the
+  // `mount()` test helper fails on.
   //
-  // A logical side is seeded as if `ltr`: there is no element to measure yet, and on the server there
-  // is no `getComputedStyle` at all. That costs nothing visible — `isPositioned` is false until the
-  // first measurement lands, and `floatingStyles()` is `visibility: hidden` until then — and it keeps
-  // the server and the client's first render byte-identical, which is what hydration needs. The first
-  // real measurement replaces it with the direction-resolved side, exactly as it already does for a
-  // side that `flip` overrides.
+  // Seeding from the config instead of from hard-coded defaults is what makes `data-side` correct on
+  // the very first paint. A logical side seeds as if `ltr` — there is no element to measure yet, and
+  // no `getComputedStyle` at all on a server. Nothing of that is visible (`floatingStyles()` stays
+  // `visibility: hidden` until the first measurement lands), and it keeps the server and client
+  // first renders identical, which is what hydration needs. The first real measurement then replaces
+  // the seed with the direction-resolved side, exactly as it does for a side `flip` overrides.
   const seed = untrack(config);
   const [position, setPosition] = createSignal<FloatingPosition>({
     x: 0,
@@ -393,8 +399,8 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
   const [isPositioned, setIsPositioned] = createSignal(false);
 
   // `computePosition` is async, so a resolution can land after the attachment it belongs to was torn
-  // down, or after the owner was disposed. Every teardown bumps the generation *before* detaching —
-  // a detach can't recall a Promise already in flight.
+  // down, or after the owning component was disposed. Every teardown bumps the generation *before*
+  // detaching — detaching cannot recall a Promise already in flight.
   let generation = 0;
   let disposed = false;
   onCleanup(() => {
@@ -402,9 +408,9 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
     generation += 1;
   });
 
-  // Every read here is untracked: `update` is called from `autoUpdate`'s scroll/resize/rAF callbacks,
-  // and a tracked read from one of those emits `[STRICT_READ_UNTRACKED]`. The effects below own the
-  // reactivity instead.
+  // Every read here is untracked: `update` runs from `autoUpdate`'s scroll/resize/animation-frame
+  // callbacks, and a tracked read from one of those emits `[STRICT_READ_UNTRACKED]`. The effects
+  // below own the reactivity instead.
   const update = () => {
     const anchor = untrack(options.anchor);
     const floating = untrack(options.floating);
@@ -438,10 +444,10 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
     });
   };
 
-  // (1) Attach `autoUpdate`. Its setup calls `update()` itself, so this is also the first
-  //     measurement. Keyed on the elements, tracked in the compute for the recorded
-  //     conditionally-rendered-ref hazard (see `create-focus-trap.ts`). Deliberately NOT keyed on
-  //     `active`: a closing overlay stays anchored while its exit transition plays.
+  // (1) Attach `autoUpdate`; its setup calls `update()` itself, so this is also the first
+  //     measurement. The elements are tracked in the dependency function because they are
+  //     conditionally rendered — read only in the body below, they would stay `undefined` forever.
+  //     Deliberately NOT keyed on `active`: a closing overlay stays anchored while it animates out.
   createEffect(
     () =>
       [
@@ -469,14 +475,15 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
     },
   );
 
-  // (2) Re-measure on a config change, and reset `isPositioned` on close. `active` lives here rather
-  //     than in (1) because a fast close→open through `createPresence` changes no element, so nothing
-  //     else would flip `isPositioned` back to true.
+  // (2) Re-measure on a config change, and reset `isPositioned` on close. `active` is keyed here
+  //     rather than in (1) because a fast close→open through `createPresence` — the primitive that
+  //     keeps an element mounted through its exit animation — swaps no element, so nothing else
+  //     would flip `isPositioned` back to true.
   //
   //     THE CREATION ORDER OF THESE TWO EFFECTS IS LOAD-BEARING. Solid 2.0 runs sibling effects in
-  //     creation order (pinned in `solid-contract.test.ts`), so effect (1) has already issued the
-  //     first measurement by the time this one runs — hence the latch, the same idiom as
-  //     `create-presence.ts`. Swapping the two silently duplicates `computePosition` on every mount.
+  //     creation order (pinned in `solid-contract.test.ts`), so (1) has already issued the first
+  //     measurement by the time this one runs — hence the latch below. Swapping the two silently
+  //     duplicates `computePosition` on every mount.
   let firstConfigRun = true;
   createEffect(
     () => [config(), options.active()] as const,

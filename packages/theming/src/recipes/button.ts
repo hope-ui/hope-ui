@@ -2,10 +2,9 @@
  * The **Button** recipe contract — its variant vocabulary, slots, and the resulting `ButtonRecipe`
  * type.
  *
- * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
- * `@hope-ui/components` `Button` consumes it via `useRecipe("button")`, and each preset
- * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
- * keeps the registry (`./registry`) a flat list of named recipe types with no shape logic of its own.
+ * A *slot recipe* maps variant props to one class string per named part ("slot"). This file owns only
+ * that shape: `@hope-ui/components`' Button consumes it via `useRecipe("button")` and each preset
+ * implements a `tailwind-variants` recipe against it, so neither layer knows the other.
  */
 import type { JSX } from "@solidjs/web";
 import type { SlotRecipeFn } from "../slot-recipe";
@@ -31,11 +30,9 @@ export type ButtonColorScheme = "primary" | "neutral" | "success" | "info" | "wa
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 /**
- * Where the loader sits while the button is loading: `center` (overlay — hides the label,
- * preserves width), or `start`/`end` (inline). **Layout only** — mounting/unmounting the loader
- * slot is the component's job (it wraps the loader in `<Show when={isLoading()}>`), so this axis
- * never has a "hidden"/"none" member. Shared by the recipe variant and the component's public
- * `loaderPlacement` prop.
+ * Where the loader sits while the button is loading: `center` (overlay — hides the label, preserves
+ * width) or `start`/`end` (inline). **Layout only** — mounting the loader is the component's job, so
+ * this axis has no "hidden"/"none" member.
  */
 export type ButtonLoaderPlacement = "start" | "center" | "end";
 
@@ -63,23 +60,17 @@ export interface ButtonRecipeVariants {
 
 /**
  * The curated Button props a preset may default app-wide via `ComponentOverride.defaultProps`: the
- * recipe variants **plus** component chrome content (`loader`/`loadingText`). A superset of
- * {@link ButtonRecipeVariants} by construction (`extends`), so it registers in
- * `ThemeablePropsRegistry` and `ThemeablePropsOf<"button">` widens the variants-only surface without
- * dropping anything.
+ * recipe variants **plus** component chrome content (`loader`/`loadingText`).
  *
- * Deliberately excludes per-instance payload content (`children`, decorators); transient UI state
- * (`loading`/`disabled` — defaulting these app-wide is a footgun); controlled/identity state; styling
- * channels, events, and raw DOM attributes. It also excludes **per-usage behavioral props**
- * (`nativeButton`/`type`): these describe *what a given button is* (an anchor styled as a button, a
- * submit button in a form), not a design-system-wide policy, so defaulting them app-wide is
- * meaningless — a preset that set `nativeButton: false` would break every plain `<button>` under it.
+ * It deliberately excludes per-instance payload (`children`, decorators), transient UI state
+ * (`loading`/`disabled` — defaulting those app-wide is a footgun), and **per-usage behavioral props**
+ * (`nativeButton`/`type`), which describe *what a given button is* rather than a design-system-wide
+ * policy: a preset setting `nativeButton: false` would break every plain `<button>` under it.
  *
- * Chrome content is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset value
- * is one object shared by every instance, and a Solid `JSX.Element` is an already-built node that
- * would *move* if reused, so a factory (called per instance) is what keeps two simultaneously-loading
- * buttons from fighting over one loader node. Mirrors the `RenderProp` rule
- * (`@hope-ui/primitives/utils` render) and is resolved through `runIfFunction`.
+ * Chrome content is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`. A preset value is
+ * one object shared by every instance, and a Solid `JSX.Element` is an already-built DOM node that
+ * would *move* if reused — so calling a factory per instance is what keeps two simultaneously-loading
+ * buttons from fighting over one loader node. Resolved through `runIfFunction`.
  */
 export interface ButtonThemeableProps extends ButtonRecipeVariants {
   /** Brand loader content, as a factory (called per instance). Falls back to hope's built-in loader. */

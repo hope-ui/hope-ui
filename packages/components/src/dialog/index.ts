@@ -1,7 +1,5 @@
-// The `Dialog` compound component — a styled, themeable layer over the `createDialog` primitive hook
-// family. Each part lives in its own `dialog-<part>.tsx` file (a shared `dialog-context.ts` carries
-// the context that distributes the recipe slot fns + `role`); this barrel is the one place the
-// namespace object is assembled — the component's single subpath export. Mirrors `src/alert/`.
+// Each part lives in its own `dialog-<part>.tsx`; this barrel is the one place the `Dialog` namespace
+// object is assembled, and the component's single published entry point.
 import { Backdrop } from "./dialog-backdrop";
 import { Body } from "./dialog-body";
 import { CloseTrigger } from "./dialog-close-trigger";

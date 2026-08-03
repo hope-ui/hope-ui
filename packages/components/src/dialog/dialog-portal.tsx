@@ -11,12 +11,12 @@ export interface DialogPortalProps {
   children?: JSX.Element;
 }
 
-// The portal renders no recipe slot of its own — its job is the client-only portal + the kernel's
-// pointer-blocking `ModalBackdrop` (the scrim's *look* is the optional `Dialog.Backdrop`).
+// Two jobs, neither of them styling: move Backdrop/Content out to `document.body`, and render the
+// invisible layer that blocks the pointer. The scrim a user actually *sees* is `Dialog.Backdrop`.
 export const Portal: Component<DialogPortalProps> = (props) => {
-  // @solidjs/web's Portal throws server-side ("Portal is not supported on the server") rather
-  // than degrading gracefully, so this must never render it during SSR. `isServer` is a fixed
-  // per-environment constant, so a plain `if` (not `<Show>`) — there's no reactive branch.
+  // `@solidjs/web`'s Portal throws server-side ("Portal is not supported on the server") instead of
+  // degrading, so it must never be reached during SSR. A plain `if`, not `<Show>`: `isServer` is a
+  // build-time constant, so there is no reactive branch to track.
   if (isServer) {
     return null;
   }
@@ -26,12 +26,13 @@ export const Portal: Component<DialogPortalProps> = (props) => {
 
   return (
     <SolidPortal mount={props.mount}>
-      {/* `ModalBackdrop` covers the viewport unconditionally, so an element inserted before
-      hide-outside's MutationObserver marks it `inert` is still unreachable by pointer. It's the
-      Portal's *first* child — before a consumer `Dialog.Backdrop` and the `Dialog.Content` — so it
-      blocks the page behind while leaving both interactive above it. Its ref is spared from
-      hide-outside by `createDialogPortal`. A modal `Content` must be positioned; see
-      `modal-backdrop.md`. */}
+      {/* A full-viewport layer that swallows clicks unconditionally. It is needed because the other
+      half of modality marks background elements `inert` (removing them from focus order and hit
+      testing) through a MutationObserver, and anything inserted before that observer reacts would
+      still be clickable. Rendered as the *first* child, so a consumer's `Dialog.Backdrop` and the
+      `Dialog.Content` both paint and hit-test above it — which also means a modal `Content` must be
+      positioned or it disappears underneath (see `modal-backdrop.md`). It is itself exempted from
+      `inert`, since an inert element is transparent to hit testing and would stop blocking. */}
       <Show when={portal.showModalBackdrop()}>
         <ModalBackdrop ref={portal.setModalBackdropRef} />
       </Show>

@@ -1,8 +1,6 @@
-// The `Listbox` compound component — a styled, themeable layer over the `createListbox` primitive
-// hook family. Each part lives in its own `listbox-<part>.tsx` file (a shared `listbox-context.ts`
-// carries the three contexts that distribute the recipe slot fns + the group/item scopes); this
-// barrel is the one place the namespace object is assembled — the component's single subpath export.
-// Mirrors `src/dialog/`.
+// The `Listbox` compound component — a styled, themeable layer over the headless `createListbox`
+// hook family in `@hope-ui/primitives`. This barrel is the one place the namespace object is
+// assembled, and the component's single published entry point.
 import { Group } from "./listbox-group";
 import { GroupLabel } from "./listbox-group-label";
 import { Item } from "./listbox-item";

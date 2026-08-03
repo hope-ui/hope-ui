@@ -15,14 +15,12 @@ import { describe, expect, it, vi } from "vitest";
 
 describe("@solidjs/web client-build contract", () => {
   describe("applyRef flattens a ref array and skips falsy entries", () => {
-    // Depended on by: `renderElement` (packages/primitives/src/render/render.tsx), which
-    // merges a component's internal ref setter with the consumer's into a SINGLE function ref and
-    // calls `applyRef([internalRef, consumerRef], element)` inside it. Because `applyRef` does
-    // `r.flat(Infinity).forEach(f => f && f(element))`, an absent consumer ref (or one that is
-    // itself an array) is a non-issue, so **no `mergeRefs` helper is needed anywhere in this
-    // codebase** — an invariant CLAUDE.md and `render.md` both state. Exposing the merge as one
-    // function (rather than handing the raw array to the render target) is what lets it wrap a
-    // consumer *component* that only honours function refs, not just host elements.
+    // Depended on by `renderElement` (packages/primitives/src/render/render.tsx), which merges a
+    // component's internal ref setter with the consumer's into a single function ref that calls
+    // `applyRef([internalRef, consumerRef], element)`. Because `applyRef` does
+    // `r.flat(Infinity).forEach(f => f && f(element))`, an absent consumer ref — or one that is
+    // itself an array — is a non-issue, which is why **no `mergeRefs` helper exists anywhere in
+    // this codebase**. If stable stops flattening or stops skipping falsy entries, one is needed.
 
     it("calls every function in a flat array", () => {
       const first = vi.fn();
@@ -65,12 +63,12 @@ describe("@solidjs/web client-build contract", () => {
   });
 
   describe("sharedConfig.hydrating marks the hydration pass, and only it", () => {
-    // Depended on by: `@hope-ui/i18n`'s `readDetectedLocale`
-    // (packages/i18n/src/default-locale.ts), which reports the server's `en-US` for exactly as long
-    // as this flag is set and the detected browser locale otherwise. That gate is what makes
-    // zero-config i18n SSR-safe *without* costing a client-only app the en-US first paint — so if
-    // this flag is renamed (1.x spelled it `sharedConfig.context`) or stops covering component
-    // bodies, the locale silently disagrees with the server's markup again.
+    // Depended on by `@hope-ui/i18n`'s `readDetectedLocale` (packages/i18n/src/default-locale.ts),
+    // which reports the server's `en-US` for exactly as long as this flag is set and the detected
+    // browser locale otherwise — the gate that makes zero-config i18n SSR-safe without costing a
+    // client-only app an en-US first paint. If the flag is renamed (1.x spelled it
+    // `sharedConfig.context`) or stops covering component bodies, the locale silently disagrees
+    // with the server's markup again.
 
     it("is falsy outside any hydration", () => {
       expect(sharedConfig.hydrating).toBeFalsy();
@@ -99,27 +97,25 @@ describe("@solidjs/web client-build contract", () => {
   });
 
   describe("a signal write from one document listener cannot unhook the next one mid-dispatch", () => {
-    // Depended on by: `createDismissable` (packages/primitives/src/internal/create-dismissable.ts),
-    // whose outside-pointerdown guard is deliberately **single-phase** — it answers "am I the
-    // topmost layer?" once, in the capture-phase `pointerdown` handler, at the instant the
-    // interaction starts. React Aria's `useOverlay` instead snapshots the visible-overlay stack at
-    // pointerdown and *decides* at `click`, because that is where it dismisses and the two events
-    // can have different targets. hope-ui dismisses at the start of the interaction, so "topmost at
-    // the snapshot" and "topmost now" are the same instant and the second phase buys nothing.
+    // Depended on by `createDismissable` (packages/primitives/src/internal/create-dismissable.ts),
+    // whose outside-pointerdown guard is deliberately **single-phase**: it answers "am I the
+    // topmost layer?" once, in the capture-phase `pointerdown` handler, and dismisses right there.
+    // (React Aria splits it — snapshot at pointerdown, decide at `click` — because that is where
+    // *it* dismisses, and the two events can have different targets.)
     //
-    // That equivalence is only true if a dispatch cannot be reordered underneath itself: every
-    // layer's listener was attached by its own sibling effect, and the topmost layer's handler
-    // *writes the very signal those effects track* (dismissing unmounts a layer). If that write
-    // could re-run the effects mid-dispatch, a lower layer's listener would be detached before the
-    // event reached it — or a re-attached one would see the event twice — and the single-phase
-    // guard would be reading a stack that changed under it. Solid defers the re-run to the next
-    // flush, so it cannot. If that ever stops holding, the two-phase snapshot becomes necessary.
+    // Single-phase is only safe if a dispatch cannot be reordered underneath itself. Every layer's
+    // listener is attached by its own sibling effect, and the topmost layer's handler writes the
+    // very signal those effects track, because dismissing unmounts a layer. Were that write to
+    // re-run the effects mid-dispatch, a lower layer's listener would be detached before the event
+    // reached it — or a re-attached one would see it twice — and the guard would be reading a stack
+    // that moved under it. Solid defers the re-run to the next flush, so it cannot. If that ever
+    // stops holding, `createDismissable` needs the two-phase snapshot instead.
 
     const PROBE_EVENT = "hope-ui-solid-contract-probe";
 
-    /** Two sibling effects, each attaching a `document` listener while `openLayers` is high
-     * enough to keep its layer "open" — the shape `createDismissable` produces per layer. The
-     * upper one's handler dismisses itself by writing that same signal. */
+    /** Two sibling effects, each attaching a `document` listener while `openLayers` is high enough
+     * to keep its layer open — the shape `createDismissable` produces per layer. The upper one's
+     * handler dismisses itself by writing that same signal. */
     function createProbeLayers(): { log: string[]; dispose: () => void } {
       const log: string[] = [];
       const [openLayers, setOpenLayers] = createSignal(2);
@@ -173,11 +169,11 @@ describe("@solidjs/web client-build contract", () => {
 
       document.body.dispatchEvent(new CustomEvent(PROBE_EVENT, { bubbles: true }));
 
-      // Both handlers ran, in attach order, and nothing detached in between: the write inside the
-      // upper handler is not visible to a plain read until the next flush (client build).
+      // Both handlers ran, in attach order, with nothing detached in between: on the client build
+      // the write inside the upper handler is invisible to a plain read until the next flush.
       expect(log).toEqual(["upper:handled", "lower:handled"]);
 
-      // And the re-run lands afterwards, in sibling creation order — the contract
+      // The re-run lands afterwards, in sibling creation order — the ordering
       // `solid-contract.test.ts` pins for effects generally, observed here through the listeners.
       flush();
       expect(log).toEqual([

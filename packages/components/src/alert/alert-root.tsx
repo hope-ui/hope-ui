@@ -35,13 +35,13 @@ type AlertElementProps = JSX.HTMLAttributes<HTMLDivElement>;
 export type AlertRole = "alert" | "status" | "none";
 
 /**
- * `AlertProps` = the native `<div>` props **plus** the themeable surface (`AlertThemeableProps`: the
- * recipe variants + the four status-icon factories, owned by `@hope-ui/theming`) **plus** the
- * per-instance props below. Extending `AlertThemeableProps` keeps the two in lockstep by construction.
+ * The native `<div>` props **plus** the themeable surface (the styling variants and the four
+ * status-icon factories) **plus** the per-instance props below. Extending the themeable props rather
+ * than re-declaring the variants keeps the two in lockstep by construction.
  *
- * `role` and `title` are `Omit`-ted from the native attributes and re-declared: `role` narrows to the
- * three live-region choices, and `title` is repurposed as a convenience content slot (a `JSX.Element`,
- * not the native tooltip string).
+ * `role` and `title` are re-declared rather than inherited: `role` narrows to the three live-region
+ * choices, and `title` is repurposed as a content slot taking a `JSX.Element`, not the native
+ * tooltip string.
  */
 export interface AlertProps extends Omit<AlertElementProps, "role" | "title">, AlertThemeableProps {
   /** Live-region politeness. `alert` (assertive), `status` (polite), or `none`. Default `alert`. */
@@ -67,7 +67,7 @@ export interface AlertProps extends Omit<AlertElementProps, "role" | "title">, A
   defaultOpen?: boolean;
   /** Called whenever the open state should change (dismiss click, controlled or not). */
   onOpenChange?: (open: boolean) => void;
-  /** Fires after the exit transition finishes and the alert has unmounted (Ant's `afterClose`). */
+  /** Fires after the exit transition finishes and the alert has unmounted. */
   onExitComplete?: () => void;
   /**
    * Renders as a different element/component while keeping Alert's computed props. The only
@@ -78,8 +78,9 @@ export interface AlertProps extends Omit<AlertElementProps, "role" | "title">, A
   class?: string;
   /**
    * Per-instance class overrides, keyed by slot (`root`, `icon`, `content`, `title`, `description`,
-   * `actions`, `closeTrigger`). Folded in after the recipe base and the preset's global `slotClasses`, before
-   * `class` (root only). Use literal class strings so the consumer's Tailwind scanner can see them.
+   * `actions`, `closeTrigger`). Applied after the recipe base and the preset's global `slotClasses`,
+   * and before `class`. Write them as literal class strings, or the consumer's Tailwind scanner will
+   * not see them.
    */
   slotClasses?: SlotClasses<"alert">;
   /** The compound anatomy (`Alert.Icon`/`Alert.Content`/…). When set, the convenience props are ignored. */
@@ -91,24 +92,16 @@ type MergedAlertProps = AlertProps &
   Required<Pick<AlertProps, "variant" | "colorScheme" | "size" | "role" | "closable">>;
 
 /**
- * The slice of the resolved (merged) Alert props {@link resolveStatusIcon} actually reads: the
- * per-instance `icon`, the `colorScheme` role (required — it indexes the status maps), and the four
- * preset status-icon factories. Kept a `Pick` of `MergedAlertProps` so it can't drift from the real
- * props while still declaring exactly what the function depends on.
+ * Exactly the props {@link resolveStatusIcon} reads. Kept as a `Pick` of the merged props so it
+ * cannot drift from them, while still declaring the function's real dependencies.
  */
 type StatusIconInput = Pick<MergedAlertProps, "icon" | "colorScheme" | AlertStatusIconKey>;
 
-/**
- * instance `icon` ?? preset `{role}Icon` factory ?? built-in status glyph. `false` hides it. Pure and
- * module-scope: the caller wraps it in `children(() => resolveStatusIcon(merged))`, which memoizes the
- * *result*.
- */
+/** instance `icon` ?? the preset's `{role}Icon` factory ?? the built-in glyph. `false` hides it. */
 function resolveStatusIcon(merged: StatusIconInput): JSX.Element | null {
-  // Read the instance `icon` **exactly once**. It is a component-valued prop, so each read of the raw
-  // getter re-runs `createComponent` (the `children()` multi-read hazard) — the caller's
-  // `children(() => resolveStatusIcon(...))` memoizes the *result*, not this internal read. Binding it
-  // to a local is the single-read fix the codified rule calls for ("a slot read exactly once needs
-  // nothing"); a consumer `icon={<MyIcon/>}` is then built once, not three times.
+  // Bound to a local so the prop is read exactly *once*: it can hold a component, and each read of
+  // the lazy getter re-runs `createComponent`. The caller's `children()` memoizes this function's
+  // result, not the reads inside it, so without the local a consumer icon would be built three times.
   const instanceIcon = merged.icon;
   if (instanceIcon === false) {
     return null;
@@ -118,8 +111,6 @@ function resolveStatusIcon(merged: StatusIconInput): JSX.Element | null {
   }
   const factoryKey = STATUS_ICON_KEYS[merged.colorScheme];
   if (factoryKey) {
-    // `merged[factoryKey]` is exactly `(() => JSX.Element) | undefined` now that the input is the
-    // narrow `StatusIconInput` (the factory keys carry that value type), so no cast is needed.
     const factory = merged[factoryKey];
     if (factory != null) {
       return runIfFunction(factory) ?? null;
@@ -130,8 +121,8 @@ function resolveStatusIcon(merged: StatusIconInput): JSX.Element | null {
 }
 
 export const Root: Component<AlertProps> = (props) => {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
+  // Precedence: instance prop ?? the preset's `defaultProps` ?? the builtins below, each key
+  // resolved with `??`.
   const merged = useDefaults({
     recipe: "alert",
     props,
@@ -154,17 +145,18 @@ export const Root: Component<AlertProps> = (props) => {
     slotClasses: () => merged.slotClasses,
   });
 
-  // Controlled/uncontrolled open state → presence-driven mount. `defaultOpen` defaults to `true`, so a
-  // plain `<Alert>` renders. `setOpen` is what `Alert.CloseTrigger` calls; `onOpenChange` fires either way.
+  // `defaultOpen` falls back to `true`, so a plain `<Alert>` with no open props renders. `setOpen` is
+  // what `Alert.CloseTrigger` calls; `onOpenChange` fires whether or not the state is controlled.
   const [open, setOpen] = createControllableState({
     value: () => merged.open,
     defaultValue: () => merged.defaultOpen ?? true,
     onChange: (value) => merged.onOpenChange?.(value),
   });
 
-  // A signal-backed root ref feeds both `renderElement`'s ref merge and `createPresence` (which reads
-  // it on the exit edge to detect an authored CSS transition). `initialEnter: false` so a
-  // default-open alert paints in its final state without a spurious first-frame transition.
+  // A *signal*-backed ref, not a plain variable: `createPresence` reads the element on the exit edge
+  // to detect whether the consumer authored a CSS transition, and it has to react when the element
+  // appears. `initialEnter: false` so a default-open alert paints in its final state rather than
+  // animating in on the first frame.
   const [rootEl, setRootEl] = createSignal<HTMLElement | null>(null);
   const presence = createPresence({
     present: open,
@@ -172,10 +164,11 @@ export const Root: Component<AlertProps> = (props) => {
     initialEnter: false,
   });
 
-  // Fire `onExitComplete` on the mounted true→false edge (after the exit transition, once unmounted).
-  // A tracked `createEffect` (not a JSX-embedded call) — the `<Show>` unmounts its children on that
-  // exact edge, so a child expression would never observe it. `untrack` seeds the latch so the effect's
-  // own initial run (which fires for the seed value too) can't mistake mount for an exit.
+  // Fires on the mounted true→false edge, once the exit transition has finished. It has to live in
+  // an effect rather than anywhere in the JSX: the `<Show>` below unmounts its children on that
+  // exact edge, so nothing inside it could ever observe the transition. The latch is seeded with
+  // `untrack` (a read that registers no dependency) so the effect's own first run — which fires for
+  // the seed value too — cannot mistake the initial mount for an exit.
   let previouslyMounted = untrack(presence.mounted);
   createEffect(
     () => presence.mounted(),
@@ -187,9 +180,9 @@ export const Root: Component<AlertProps> = (props) => {
     },
   );
 
-  // The compound parts publish their ids here; `AlertBody` reads them back for `aria-*`. Registered
-  // client-side via `createRegisteredId` (`onSettled`), so the links land after hydration for every
-  // Alert — the auto-compose path reuses the same parts, so it registers the same way.
+  // The title/description parts publish their generated ids here, and `AlertBody` reads them back
+  // for `aria-labelledby`/`aria-describedby`. Registration happens after the render pass and so only
+  // on the client — the links are absent from the server HTML and appear once hydrated.
   const [registeredTitleId, setRegisteredTitleId] = createSignal<string | undefined>(undefined);
   const [registeredDescriptionId, setRegisteredDescriptionId] = createSignal<string | undefined>(
     undefined,
@@ -228,27 +221,25 @@ export const Root: Component<AlertProps> = (props) => {
     "aria-describedby",
   );
 
-  // The rendered alert surface. A real component (not a `<Show>` render-callback), so its body runs
-  // once, untracked — no `untrack`/`_present` hack. Declared inside `Root` so it closes over the
-  // locals above (nothing is threaded through props), and rendered under `<Show>` under
-  // `<AlertContext>` so `children(() => merged.children)` resolves in an owner UNDER the provider —
-  // the consumer's compound parts see `useAlertContext()`.
+  // A real component rather than a `<Show>` render-callback, so its body runs once and untracked.
+  // It is declared *inside* `Root` so it closes over the locals above with nothing threaded through
+  // props, and rendered under the provider below — which is the point: `children()` must resolve the
+  // consumer's compound parts in a scope where `useAlertContext()` can find the provider. Resolving
+  // them in `Root`'s own body would put them above it, and every part would throw.
   function AlertBody(): JSX.Element {
-    // Compound (consumer `children`) vs auto-compose (convenience props): resolved once via
-    // `children()`, so the body reads that resolved node without re-creating the parts.
+    // Resolved once so the body can read the same node without rebuilding the consumer's parts.
     const resolvedChildren = children(() => merged.children);
 
-    // Each convenience slot is read in a `<Show>` `when` gate AND its body below (a multi-read), so the
-    // raw prop is resolved once with `children()` — which also fixes the `when`-gate hydration hazard (a
-    // raw `when={x != null}` builds and discards a component whose `_hk` the client and server place
-    // differently). See CLAUDE.md / __internal__/solid-2.0-notes.md ("children() decision procedure").
+    // Each of these is read twice below — once in a `<Show>`'s `when` gate, once in its body — and a
+    // JSX-valued prop compiles to a lazy getter that runs `createComponent` on every read. Resolving
+    // each once also removes a hydration hazard: a raw `when={prop != null}` builds a component and
+    // throws it away, shifting where the client thinks the next node is.
     const icon = children(() => resolveStatusIcon(merged));
     const title = children(() => merged.title);
     const description = children(() => merged.description);
 
-    // One aria path for both compound and auto: the parts (`Alert.Title`/`Alert.Description`, reused by
-    // `autoBody`) self-register their ids via `createRegisteredId` (`onSettled`, client-only), and a
-    // consumer override always wins. The links land after hydration — never in the server HTML.
+    // One path for both the compound and auto-composed forms, because both render the same parts. A
+    // consumer's own value always wins; otherwise fall back to whatever the parts registered.
     const labelledBy = (): string | undefined => {
       const consumer = merged["aria-labelledby"];
       return typeof consumer === "string" ? consumer : registeredTitleId();
@@ -258,10 +249,9 @@ export const Root: Component<AlertProps> = (props) => {
       return typeof consumer === "string" ? consumer : registeredDescriptionId();
     };
 
-    // The auto-composed body, built from the real `Alert.*` parts — so the `data-slot` + slot-class
-    // wiring (and the parts' id self-registration) lives in one place instead of being duplicated here.
-    // No `id=` is passed; the parts generate and register their own. Built lazily (only when `children`
-    // is absent), so a compound Alert pays for none of it.
+    // Built from the real `Alert.*` parts, so the slot markers, classes and id registration all live
+    // in one place rather than being duplicated here. A function, not a value, so a compound Alert —
+    // which never reaches it — pays nothing.
     const autoBody = (): JSX.Element => (
       <>
         <Show when={icon() != null}>
@@ -322,6 +312,6 @@ export const Root: Component<AlertProps> = (props) => {
   );
 };
 
-// Re-export the recipe vocabulary so consumers can import it from the component's subpath (the barrel
-// re-exports these from here).
+// Re-exported so consumers get the variant vocabulary from the component's own subpath, without
+// importing `@hope-ui/theming` directly.
 export type { AlertColorScheme, AlertSize, AlertVariant };

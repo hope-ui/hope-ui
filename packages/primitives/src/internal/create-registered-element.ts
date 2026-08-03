@@ -2,9 +2,9 @@ import { type Accessor, createEffect } from "solid-js";
 
 export interface CreateRegisteredElementOptions<T extends Element> {
   /**
-   * The element to publish. Must be a real signal accessor: the element is typically created
-   * as a reactive consequence of some `open`/`present` signal, so an untracked read would
-   * catch it still `undefined`, forever. See the identical note in `create-focus-trap.ts`.
+   * The element to publish. Must be a real signal accessor, not a plain variable: the element is
+   * usually created as a reactive consequence of some `open`/`present` signal, so a non-tracking
+   * read would catch it still `undefined` and never see it appear.
    */
   ref: Accessor<T | null | undefined>;
   /** Called with the element once it exists. */
@@ -14,24 +14,19 @@ export interface CreateRegisteredElementOptions<T extends Element> {
 }
 
 /**
- * Publishes a descendant's DOM element into an ancestor's context, so the ancestor can act on
- * an element it doesn't own — `Dialog.Root` collecting the popup, the consumer's backdrop and
- * the `ModalBackdrop` into the `targets` list `createHideOutside` must spare.
+ * Publishes a descendant's DOM element into an ancestor's context, so the ancestor can act on an
+ * element it does not own — a dialog root, for instance, collecting its popup and backdrop so it can
+ * spare exactly those when it hides the rest of the page from assistive tech.
  *
- * The element counterpart of `createRegisteredId`, and it exists for the same reason: a
- * descendant may not write to a signal owned by an ancestor's reactive scope directly from
- * its own synchronous render body — SolidJS 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]`.
- * Where `createRegisteredId` defers into `onSettled` (an id is known at render time and never
- * changes), this defers into `createEffect`, because a ref is only populated *after* render
- * and may be replaced when the element remounts.
+ * The element counterpart of `createRegisteredId`, and it exists for the same reason: SolidJS 2.0
+ * throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` when a descendant writes, from its own synchronous render
+ * body, to a signal an ancestor's reactive scope owns. This defers into `createEffect` rather than
+ * `onSettled` because a ref is only populated *after* render and is replaced when the element
+ * remounts. `unregister` is handed the element that was registered rather than the current one, so
+ * an ancestor holding a list removes exactly the entry it was given.
  *
- * `unregister` receives the element that was registered, not the current one, so an ancestor
- * holding a list can remove exactly the entry it was given.
- *
- * ## SSR
- *
- * `createEffect` bodies never run during SSR, so nothing registers server-side. An ancestor
- * whose server-rendered markup depends on a registered element needs its own fallback.
+ * Effects do not run on the server, so nothing registers there; an ancestor whose server-rendered
+ * markup depends on a registered element needs its own fallback.
  */
 export function createRegisteredElement<T extends Element>(
   options: CreateRegisteredElementOptions<T>,

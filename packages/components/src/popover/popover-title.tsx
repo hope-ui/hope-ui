@@ -11,8 +11,8 @@ export interface PopoverTitleProps extends PopoverTitleElementProps {
 }
 
 // Labels the popup: the hook registers this element's `id` as the content's `aria-labelledby`. A
-// `role="dialog"` surface with no accessible name is an axe `aria-dialog-name` violation, so a
-// popover carries either a `Popover.Title` or its own `aria-label` on `Popover.Content`.
+// `role="dialog"` surface with no accessible name fails accessibility checks, so a popover needs
+// either a `Popover.Title` or an `aria-label` on `Popover.Content`.
 export const Title: Component<PopoverTitleProps> = (props) => {
   const ctx = usePopoverContext();
   const title = createPopoverTitle(ctx.state, omit(props, "render", "class"));

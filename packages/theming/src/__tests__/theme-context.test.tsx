@@ -12,15 +12,14 @@ import type { SlotRecipeFn } from "../slot-recipe";
 import { tv } from "../styling";
 import { ThemeProvider, useDefaults, useRecipe, useSlots, useTheme } from "../theme-context";
 
-// Unit (node, client build): the pure-logic half of the provider — the `use*` hooks reading a
-// Preset out of context, the friendly missing-provider error, and the D7 non-preset guard. Context
-// is exercised without a DOM by invoking the provider's returned accessor (see `inProvider`), the
-// same technique `create-component-context.test.ts` uses. This works because a token-free preset
-// takes the zero-DOM branch, so `ThemeProvider` returns a bare context provider (no `<style>`).
+// Unit tests (node, no DOM): the pure-logic half of the provider — the `use*` hooks reading a preset
+// out of context, the friendly missing-provider error, and the guard against a non-preset value.
+// `ThemeProvider` renders no DOM at all, so context can be exercised without a document by invoking
+// the accessor it returns (see `inProvider`).
 
-// A synthetic recipe standing in for a real component's recipe — two slots, so slot-composition
-// precedence is observable. The slot fns fold in `{ class }` like a real `tv` recipe would, so
-// `useSlots`' output shows the whole `base → preset → instance → class` chain as a plain string.
+// A synthetic recipe standing in for a real component's — two slots, so composition precedence is
+// observable. Its slot fns fold in `{ class }` the way a real `tv` recipe does, which makes the whole
+// `base → preset → instance → class` chain readable as a plain string.
 type DemoVariants = { size?: "sm" | "md" | "lg"; tone?: "brand" | "plain" };
 type DemoSlot = "root" | "label";
 /** Space-join truthy string parts — a stand-in for a `tv` slot fn that keeps the output a `string`. */
@@ -34,22 +33,19 @@ const demo: SlotRecipeFn<DemoVariants, DemoSlot> = () => ({
   label: (o) => join("base-label", o?.class),
 });
 const registry = { demo } as unknown as RecipeRegistry;
-// "demo" isn't a real registry key; cast at the call boundary the way the ssr/browser tests do. It
-// deliberately declares no `ThemeablePropsRegistry` entry, so it stands in for a component that never
-// opted into chrome-content defaults and whose `defaultProps` fall back to the recipe variants
-// (`ThemeablePropsOf`'s `RecipeVariantsOf` branch). Keep it synthetic — don't "fix" it to a
-// registered component later, or that fallback path stops being exercised.
-// Type-punned to the `button` key (see `fullVariants` below): a concrete multi-slot recipe with a
-// `label` slot and the full variant set, so `useSlots({ recipe })` resolves to `Record<"root" |
-// "label" | …, …>` and `variantsProps` demands every key. Pinning to a single key (not the
-// `keyof RecipeRegistry` union) is what keeps this stable as recipes are added — a union collapses
-// `RecipeSlotsOf`/`CompleteVariantsOf` to the intersection across *all* recipes (just `root`/`size`
-// once a two-slot, one-variant recipe like `closeButton` joins). Runtime value stays `"demo"`.
+// "demo" is not a real registry key, so it is cast at the call boundary. Keeping it synthetic is the
+// point: it declares no `ThemeablePropsRegistry` entry, standing in for a component that never opted
+// into non-variant defaults, so `ThemeablePropsOf`'s fallback arm stays exercised. Swapping it for a
+// registered component later would quietly stop testing that path.
+// It is type-punned to one concrete key rather than the `keyof RecipeRegistry` union: `button` has
+// several slots and the full variant set, so `useSlots` resolves to a rich slot record and
+// `variantsProps` demands every key. A union would instead collapse the slots and variants to the
+// intersection across *all* recipes, and shrink further with each recipe added. Runtime value stays
+// `"demo"`.
 const recipe = "demo" as unknown as "button";
 
-// `useSlots`' `variantsProps` demands `CompleteVariantsOf` (every variant key present). The demo is
-// type-punned to the `button` key, so spread this all-`undefined` base and override only the key a
-// given test exercises — mirroring how a real component always passes its full resolved variant set.
+// `variantsProps` demands every variant key be present, so tests spread this all-`undefined` base and
+// override only the key they exercise — as a real component passes its full resolved variant set.
 const fullVariants: CompleteVariantsOf<"button"> = {
   variant: undefined,
   colorScheme: undefined,
@@ -64,9 +60,9 @@ function demoPreset(config?: unknown): Preset {
   return definePreset(registry, config as PresetConfig | undefined);
 }
 
-// Negative pin: `variantsProps` requires *every* variant key to be present, so omitting one is a
-// compile error. If the type is ever loosened back to the all-optional `RecipeVariantsOf`, this stops
-// erroring and `pnpm typecheck` fails on the now-unused `@ts-expect-error` — flagging the regression.
+// Negative pin: omitting a variant key must stay a compile error. If the type is ever loosened back
+// to the all-optional `RecipeVariantsOf`, this call stops erroring and `pnpm typecheck` then fails on
+// the now-unused `@ts-expect-error` — which is how the regression announces itself.
 const _missingVariantKeyIsAnError = () =>
   useSlots({
     recipe,
@@ -76,9 +72,9 @@ const _missingVariantKeyIsAnError = () =>
 void _missingVariantKeyIsAnError;
 
 /**
- * Runs `use()` inside a `<ThemeProvider>`'s owner and returns its result. `ThemeProvider` with a
- * token-free preset returns the `ThemeContext` provider accessor directly (zero-DOM branch);
- * invoking it evaluates `children` within the context, exactly as inserting it into DOM would.
+ * Runs `use()` inside a `<ThemeProvider>`'s owner and returns its result. `ThemeProvider` renders no
+ * DOM, so it hands back the context provider's accessor; invoking that evaluates `children` within
+ * the context exactly as inserting it into a document would.
  */
 function inProvider<T>(preset: Preset, use: () => T): T {
   let captured!: T;
@@ -99,8 +95,8 @@ function inProvider<T>(preset: Preset, use: () => T): T {
 describe("useTheme / useRecipe without a ThemeProvider", () => {
   it("useRecipe throws a friendly error naming ThemeProvider", () => {
     createRoot((dispose) => {
-      // The throw happens before any lookup, because there is no provider; `as never` sidesteps
-      // the registry's key type.
+      // With no provider the throw happens before any lookup, so the key is irrelevant — `as never`
+      // only sidesteps the registry's key type.
       expect(() => useRecipe("anything" as never)).toThrow(/ThemeProvider/);
       dispose();
     });
@@ -204,7 +200,6 @@ describe("useDefaults — precedence instance ?? preset ?? builtin", () => {
       });
       return { size: merged.size, tone: merged.tone };
     });
-    // `size` comes from the preset, `tone` (absent from the preset) from the built-in.
     expect(out).toEqual({ size: "sm", tone: "plain" });
   });
 });
@@ -222,19 +217,16 @@ describe("useSlots — precedence recipe base → preset → instance → class"
       });
       return { root: slots.root("consumer-class"), label: slots.label(), bare: slots.root() };
     });
-    // Every layer, in order; the `class` argument lands last, inside the recipe's own `{ class }` seam.
     expect(out.root).toBe("base-root preset-root instance-root consumer-class");
-    // label gets the preset layer but no instance override, and no `class` was passed to it.
     expect(out.label).toBe("base-label preset-label");
-    // Omitting the argument is exactly the pre-`class` chain — no stray separator, no `undefined`.
+    // Omitting the argument yields exactly the pre-`class` chain: no stray separator, no `undefined`.
     expect(out.bare).toBe("base-root preset-root instance-root");
   });
 
-  // The point of the argument over a second `cx(slots.x(), props.class)` at the call site: the class
-  // goes *through* the recipe's `{ class }` seam, so `tv`'s tailwind-merge resolves the conflict and
-  // the consumer's utility replaces the recipe's. Appending outside that seam leaves both on the
-  // element, with the winner decided by stylesheet order. Uses the real `tv`, not the synthetic
-  // `join` recipe above, since the merge is what's under test.
+  // Why the argument exists rather than a second `cx(slots.x(), props.class)` at the call site: going
+  // *through* the recipe's `{ class }` seam lets tailwind-merge resolve the conflict, so the
+  // consumer's utility replaces the recipe's instead of both shipping and stylesheet order deciding.
+  // Uses the real `tv` rather than the synthetic recipe above, since the merge is what's under test.
   it("routes the class argument through the recipe's tailwind-merge seam", () => {
     const merging = tv({ slots: { root: "p-4 text-sm" } }) as unknown as RecipeRegistry["button"];
     const preset = definePreset({ demo: merging } as unknown as RecipeRegistry);
@@ -244,10 +236,10 @@ describe("useSlots — precedence recipe base → preset → instance → class"
     expect(root).toBe("text-sm p-8");
   });
 
-  // …and the merge spans the *whole* chain, not just base-vs-argument. `useSlots` hands the recipe a
-  // single `cx(preset, instance, consumer)` string — `cx` is a plain concat (`"p-5 p-6 p-8"`), so it
-  // is `tv` that collapses the four conflicting paddings to the last one. Worth pinning separately:
-  // the precedence the docs promise is only real because tailwind-merge reaches inside that argument.
+  // …and the merge spans the *whole* chain, not just base-vs-argument. `useSlots` hands the recipe one
+  // `cx(preset, instance, consumer)` string, and `cx` only concatenates (`"p-5 p-6 p-8"`), so it is
+  // tailwind-merge inside the recipe that collapses the four paddings to the last. Pinned separately
+  // because the documented precedence holds only as long as the merge reaches inside that argument.
   it("collapses conflicting utilities across the whole override chain, last layer winning", () => {
     const merging = tv({
       slots: { root: "p-4 rounded-xl text-sm" },
@@ -265,7 +257,6 @@ describe("useSlots — precedence recipe base → preset → instance → class"
         slotClasses: () => ({ root: "p-6" }) as SlotClasses<"button">,
       }).root("p-8"),
     );
-    // One padding survives — the consumer's — while the non-conflicting base classes are untouched.
     expect(root).toBe("rounded-xl text-sm p-8");
   });
 

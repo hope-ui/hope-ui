@@ -13,7 +13,7 @@ function mountStatus(tree: () => ReturnType<typeof ComboboxInputHarness>) {
   return mounted;
 }
 
-/** The live regions `createAnnounce` builds on `document.body`, outside any mount container. */
+/** The imperative announcer's live regions — built on `document.body`, outside any mount container. */
 function announcedOutside(container: Element): string {
   return [...document.querySelectorAll("[aria-live]")]
     .filter((node) => !container.contains(node))
@@ -34,19 +34,17 @@ describe("createComboboxStatus", () => {
     expect(status.getAttribute("aria-atomic")).toBe("true");
     expect(status.textContent).toBe("5 options available");
 
-    // Axe returns `aria-valid-attr-value` as *incomplete* for any element carrying both
-    // `aria-haspopup` and `aria-controls`, without ever resolving the IDREF
-    // (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check) — undecidable by
-    // construction, not a markup problem. The chevron carries exactly that pair while open, and the
-    // IDREF itself is pinned in `combobox-toggle.browser.test.tsx`.
+    // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that carries
+    // both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a popup may be
+    // added on demand. The chevron carries exactly that pair while open, and the IDREF itself is
+    // pinned in `combobox-toggle.browser.test.tsx`.
     await expectNoA11yViolations(container, { allowIncomplete: ["aria-valid-attr-value"] });
     dispose();
   });
 
   it("counts what the kernel was handed, so a filtered set needs no seam here", async () => {
-    // The hook reads `state.list.focus.items().length`. Combobox hands the kernel the *filtered*
-    // array, so this reports the filtered count without ever learning a filter exists — which is
-    // what keeps the kernel free of one.
+    // The hook just reads `state.list.focus.items().length`. Combobox hands it the already-filtered
+    // array, so it reports the filtered count without any filter existing in this layer.
     const { container } = mountStatus(() => (
       <ComboboxInputHarness
         values={[FRUITS[0] as string, FRUITS[1] as string]}
@@ -74,16 +72,16 @@ describe("createComboboxStatus", () => {
     await userEvent.click(toggleOf(container));
     await vi.waitFor(() => expect(listOf(container)).not.toBeNull());
 
-    // The rendered region above mounts *with* its text, and a live region only announces a change
-    // its assistive technology was already watching — so the open frame is the one moment it cannot
-    // cover. `createAnnounce`'s region lives on `document.body` and outlives every popup.
+    // The rendered region above mounts *with* its text, and a live region only announces changes its
+    // assistive technology was already watching — so the open frame is the one moment it cannot
+    // cover. The imperative announcer's region lives on `document.body` and outlives every popup.
     await vi.waitFor(() => expect(announcedOutside(container)).toContain("5 options available"));
   });
 
   it("does not re-announce imperatively when the count changes", async () => {
     // The two channels are split by moment and must not overlap: a later count change is announced
-    // by the rendered region itself (it has been mounted since the open), so reaching for
-    // `createAnnounce` again would read the number twice.
+    // by the rendered region itself, which has been mounted since the open — so announcing
+    // imperatively again would read the number twice.
     const values = [FRUITS[0] as string, FRUITS[1] as string, FRUITS[2] as string];
     const { container } = mountStatus(() => (
       <ComboboxInputHarness values={values} withStatus options={{ defaultOpen: true }} />

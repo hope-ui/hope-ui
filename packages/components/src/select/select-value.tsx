@@ -7,9 +7,9 @@ import { useSelectContext } from "./select-context";
 type SelectValueElementProps = JSX.HTMLAttributes<HTMLSpanElement>;
 
 /**
- * `<V>` is the item type. It cannot flow here from `Select.Root` (a Solid context value is a single
- * concrete type), so it is inferred from the `children` callback's annotation instead — the same one
- * annotation `Select.List` costs, and only when the callback form is used at all.
+ * `<V>` is the item type. It cannot flow here from `Select.Root` (a Solid context value is one
+ * concrete type), so it is inferred from the `children` callback's annotation instead — and only when
+ * the callback form is used at all.
  */
 export interface SelectValueProps<V = unknown> extends Omit<SelectValueElementProps, "children"> {
   /** Renders as a different element/component while keeping Value's computed props (its registered
@@ -29,10 +29,10 @@ export interface SelectValueProps<V = unknown> extends Omit<SelectValueElementPr
    * <Select.Value placeholder="Any fruit">{(values: Fruit[]) => `${values.length} selected`}</Select.Value>
    * ```
    *
-   * The parameter's type is inferred from the annotation you write — `<V>` cannot flow through a
-   * Solid context, the same one annotation `Select.List`'s callback costs. It is an **array in both
-   * selection modes** (a single Select's is empty or one long), because that is the shape the listbox
-   * holds; the scalar⇄array adaptation is a `Select.Root` `value`/`onChange` concern.
+   * The parameter's type comes from the annotation you write, since `<V>` cannot flow through a Solid
+   * context. It is an **array in both selection modes** — a single Select's is empty or one long —
+   * because that is the shape the option list holds; the scalar⇄array adaptation happens on
+   * `Select.Root`'s `value`/`onChange`.
    *
    * With no `children`, the selected items' labels are joined with `", "` using `Select.Root`'s
    * `itemToLabel` (falling back to `itemToValue`).
@@ -42,23 +42,19 @@ export interface SelectValueProps<V = unknown> extends Omit<SelectValueElementPr
 
 /**
  * The value part: the element inside the trigger that displays the current selection, and the reason
- * the trigger can announce that selection **before** the field's label. `createComboboxValue`
- * registers this element's id upward and `createComboboxTrigger` prepends it to the trigger's
- * `aria-labelledby` — react-aria's `useSelect` ordering. This layer adds the recipe `value` slot +
- * `data-slot` and decides what text to show.
+ * a screen reader announces that selection **before** the field's label. This element registers its
+ * id upward and the trigger prepends it to its own `aria-labelledby`.
  *
- * **It must be rendered as its own part, and the hook called from this body** — never hoisted into an
- * ancestor. The registration publishes a `valueId` upward, so a tree that calls the hook higher up
- * *without* mounting a Value part still publishes one, and the trigger's `aria-labelledby` points at
- * an element that does not exist.
+ * **It must be rendered as its own part** — never hoisted into an ancestor. The registration is what
+ * publishes the id, so a tree that runs the hook higher up without mounting a Value element leaves
+ * the trigger's `aria-labelledby` pointing at nothing.
  *
- * The empty state is `data-placeholder` on this element (owned by the hook), not a part or slot of its
- * own: nothing extra is rendered when the selection is empty, only styled differently.
+ * The empty state is `data-placeholder` on this element rather than a part or slot of its own:
+ * nothing extra is rendered, only styled differently.
  *
- * Both `placeholder` and `children` are component-valued props read **exactly once** per evaluation
- * of the `children` getter, on mutually exclusive branches — never the `<Show>` `when`-gate + body
- * *double* read that misaligns `_hk`, so neither needs `children()`. See the decision procedure in
- * `__internal__/solid-2.0-notes.md`.
+ * `placeholder` and `children` may hold JSX, and each is read **exactly once** per evaluation, on
+ * mutually exclusive branches. Reading such a prop twice would build the component twice and give the
+ * two copies different hydration positions, so neither may be read again below.
  */
 export function Value<V = unknown>(props: SelectValueProps<V>): JSX.Element {
   const ctx = useSelectContext();
@@ -68,8 +64,8 @@ export function Value<V = unknown>(props: SelectValueProps<V>): JSX.Element {
     omit(props, "render", "class", "children", "placeholder"),
   );
 
-  // `itemToLabel` is optional on the primitive return (the source falls back to `itemToValue` for its
-  // own `textValue`), so the display text has to spell the same fallback.
+  // `itemToLabel` is optional (the option list falls back to `itemToValue` for its own text), so the
+  // display text has to spell the same fallback.
   const labelOf = (item: unknown): string => (list.itemToLabel ?? list.itemToValue)(item);
 
   const elementProps = merge(value.props, {

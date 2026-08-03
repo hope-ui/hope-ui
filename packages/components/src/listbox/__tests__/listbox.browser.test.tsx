@@ -10,8 +10,8 @@ import { page, userEvent } from "vitest/browser";
 import { Listbox } from "../index";
 import { Tree } from "./listbox.ssr-entry";
 
-// The `hope` preset supplies the `listbox` recipe, so every mounted tree sits under a
-// `<ThemeProvider>`. It is a zero-DOM provider (its token values live in CSS).
+// Listbox reads a theme recipe, so every mounted tree needs a provider. It renders no DOM of its own
+// (hope's token values live in CSS).
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -72,7 +72,7 @@ function selectedValues(container: HTMLElement): string[] {
     .map((element) => element.dataset.value as string);
 }
 
-/** Dispatch a real `pointermove` at explicit client coords — the fight-guard reads clientX/clientY. */
+/** Explicit client coords, because the guard against spurious hover reads `clientX`/`clientY`. */
 function pointerMoveAt(element: HTMLElement, x: number, y: number): void {
   element.dispatchEvent(new PointerEvent("pointermove", { clientX: x, clientY: y, bubbles: true }));
 }
@@ -114,8 +114,6 @@ function FruitListbox(props: FruitListboxProps): JSX.Element {
   );
 }
 
-// ─── Roles & ARIA ───────────────────────────────────────────────────────────────────────────────
-
 describe("Listbox — roles & ARIA", () => {
   it("emits role=listbox named by aria-label, role=option rows, and vertical orientation", async () => {
     const { container, dispose } = mount(() => <FruitListbox />);
@@ -144,8 +142,6 @@ describe("Listbox — roles & ARIA", () => {
   });
 });
 
-// ─── Roving focus mode (standalone default) ─────────────────────────────────────────────────────
-
 describe("Listbox — roving focus mode", () => {
   it("makes the first item the tab stop, the container untabbable, and no aria-activedescendant", async () => {
     const { container, dispose } = mount(() => <FruitListbox />);
@@ -169,7 +165,6 @@ describe("Listbox — roving focus mode", () => {
     await userEvent.keyboard("{ArrowDown}");
     await expect.element(nth(options(container), 1)).toHaveFocus();
     expect(activeValues(container)).toEqual(["Banana"]);
-    // The tab stop follows the active item.
     expect(tabindexes(container)).toEqual(["-1", "0", "-1", "-1"]);
     dispose();
   });
@@ -188,27 +183,23 @@ describe("Listbox — roving focus mode", () => {
   });
 });
 
-// ─── Highlight follows focus (the two reported bugs) ────────────────────────────────────────────
-
 describe("Listbox — highlight follows focus", () => {
   it("highlights the entry row when focus enters, and clears it when focus leaves", async () => {
     const { container, dispose } = mount(() => <FruitListbox />);
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
-    // Bug 2: no row is highlighted before the list has focus.
+    // Both halves were reported bugs. First: nothing is highlighted before the list has focus.
     expect(activeValues(container)).toEqual([]);
 
-    await userEvent.tab(); // focus enters, landing on the roving tab stop (Apple)
+    await userEvent.tab(); // focus enters, landing on the tab stop (Apple)
     await vi.waitFor(() => expect(activeValues(container)).toEqual(["Apple"]));
 
-    // Bug 1: focus leaves the list — the highlight must not stay painted.
+    // Second: once focus leaves, the highlight must not stay painted.
     (document.activeElement as HTMLElement).blur();
     await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
     dispose();
   });
 });
-
-// ─── Activedescendant focus mode ────────────────────────────────────────────────────────────────
 
 describe("Listbox — activedescendant focus mode", () => {
   it("keeps the container tabbable + owns aria-activedescendant (at a mounted option), items untabbable", async () => {
@@ -219,7 +210,8 @@ describe("Listbox — activedescendant focus mode", () => {
     expect(list.getAttribute("tabindex")).toBe("0");
     expect(tabindexes(container)).toEqual(["-1", "-1", "-1", "-1"]);
 
-    // Focus the container (the focus owner in AD mode) and arrow down.
+    // In this mode the container is the focus owner: it keeps DOM focus and names the highlighted
+    // option through `aria-activedescendant` instead of moving focus onto it.
     list.focus();
     await expect.element(list).toHaveFocus();
     await userEvent.keyboard("{ArrowDown}");
@@ -227,12 +219,12 @@ describe("Listbox — activedescendant focus mode", () => {
     await vi.waitFor(() => {
       const activeId = list.getAttribute("aria-activedescendant");
       expect(activeId).toBeTruthy();
-      // The IDREF must resolve to a *mounted* option — never a dangling reference.
+      // The id must resolve to an element that is actually in the DOM — an `aria-activedescendant`
+      // pointing at nothing is invalid ARIA and announces nothing.
       const active = container.querySelector(`[id="${activeId}"]`);
       expect(active).not.toBeNull();
       expect(active?.getAttribute("role")).toBe("option");
     });
-    // Focus never leaves the container; no option is ever DOM-focused in AD mode.
     await expect.element(list).toHaveFocus();
     for (const option of options(container)) {
       expect(option).not.toHaveFocus();
@@ -241,8 +233,6 @@ describe("Listbox — activedescendant focus mode", () => {
     dispose();
   });
 });
-
-// ─── Selection ──────────────────────────────────────────────────────────────────────────────────
 
 describe("Listbox — selection", () => {
   it("single: clicking selects one row; Enter on the active row replaces the prior selection", async () => {
@@ -257,9 +247,8 @@ describe("Listbox — selection", () => {
 
     await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}"); // → Date
     await vi.waitFor(() => expect(selectedValues(container)).toEqual(["Date"]));
-    // Single mode replaced, never accumulated.
     expect(selectedValues(container)).toHaveLength(1);
-    // `onChange` reported the value objects; their `itemToValue` string is the submitted "4".
+    // `onChange` reports the item objects themselves; `itemToValue` is what a form would submit.
     expect(changes.at(-1)?.map(itemToValue)).toEqual(["4"]);
     await expectNoA11yViolations(container);
     dispose();
@@ -274,7 +263,6 @@ describe("Listbox — selection", () => {
     await vi.waitFor(() => {
       const indicators = container.querySelectorAll('[data-slot="listbox-item-indicator"]');
       expect(indicators).toHaveLength(1);
-      // The indicator is inside the selected row and carries the built-in svg glyph.
       expect(
         nth(options(container), 2).querySelector('[data-slot="listbox-item-indicator"] svg'),
       ).not.toBeNull();
@@ -311,13 +299,10 @@ describe("Listbox — selection", () => {
   });
 });
 
-// ─── Selection glyph (ItemIndicator) ────────────────────────────────────────────────────────────
-
 describe("Listbox selection glyph", () => {
-  // The check glyph is built into the `ItemIndicator` part: a bare `Listbox.ItemIndicator` renders
-  // hope's built-in check with no children, and it is overridable per instance via `children` or
-  // app-wide via the preset's `defaultProps.listbox.checkIcon` — the Calendar `prevIcon`/`nextIcon`
-  // shape, so the SVG is never hard-coded in the component layer.
+  // The glyph is built into `ItemIndicator`: a bare one renders hope's check, overridable per
+  // instance via `children` or app-wide via the preset's `defaultProps`. These three tests pin all
+  // three layers of that chain.
 
   /** Selects the third row (Cherry) and returns the svg inside its now-visible indicator. */
   async function indicatorSvgAfterSelecting(container: HTMLElement): Promise<SVGElement | null> {
@@ -353,15 +338,14 @@ describe("Listbox selection glyph", () => {
     ));
 
     const svg = await indicatorSvgAfterSelecting(container);
-    // The per-instance child wins over the built-in check.
     expect(svg?.getAttribute("data-custom-icon")).toBe("custom");
     await expectNoA11yViolations(container);
     dispose();
   });
 
   it("takes an app-wide check glyph from a preset's defaultProps.listbox", async () => {
-    // `hope` sets no listbox defaultProps, so extend it: a preset supplies the app-wide glyph as a
-    // reuse-safe factory, resolved by Root's `useDefaults` and flowed to the bare `ItemIndicator`.
+    // `hope` sets no listbox `defaultProps`, so extend it. The glyph is supplied as a *factory*, not
+    // an element, so every row builds its own rather than sharing one movable node.
     const withCheckIcon = definePreset(hope, {
       components: {
         listbox: { defaultProps: { checkIcon: () => <CustomIcon mark="preset" /> } },
@@ -387,16 +371,14 @@ describe("Listbox selection glyph", () => {
     ));
 
     const svg = await indicatorSvgAfterSelecting(container);
-    // The preset's factory glyph, not hope's built-in check.
     expect(svg?.getAttribute("data-custom-icon")).toBe("preset");
     await expectNoA11yViolations(container);
     dispose();
   });
 
   it("forwards native attributes onto the indicator element", async () => {
-    // The indicator was the one public part whose props were `children` and nothing else, so it
-    // rendered a `<span>` no consumer could reach: no `id`, `data-*`, `style` or `ref`. Its `class`
-    // is merged over the recipe's `itemIndicator` slot, like every other part's.
+    // This part once declared `children` and nothing else, so it rendered a `<span>` no consumer
+    // could reach — no `id`, `data-*`, `style` or `ref` — with a green typecheck and a green suite.
     let indicatorRef: HTMLElement | undefined;
     const { container, dispose } = mount(() => (
       <Themed>
@@ -445,8 +427,8 @@ describe("Listbox selection glyph", () => {
   });
 
   it("re-targets the list container through a consumer render prop", async () => {
-    // `Root` was the last Listbox part without `render`. Its internal ref is the scroll container in
-    // virtual mode and the navigation element in both, so it has to survive the swap.
+    // Root's internal ref is the scroll container in virtual mode and the navigation element in
+    // both, so it has to survive being re-targeted onto a consumer's element.
     let listRef: HTMLElement | undefined;
     const { container, dispose } = mount(() => (
       <Themed>
@@ -471,14 +453,14 @@ describe("Listbox selection glyph", () => {
 
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
     const list = container.querySelector<HTMLElement>('[data-slot="listbox"]') as HTMLElement;
-    // A `<div>` target, not a `<section>`: `role="listbox"` is not an allowed role on `<section>`
-    // (axe's `aria-allowed-role`), and the part's own valid-HTML rationale is why it is a div to
-    // begin with. The marker attribute is what proves the consumer's element is the one rendered.
+    // A `<div>` target, not a `<section>`: `role="listbox"` is not an allowed role on `<section>`,
+    // so that swap would fail the axe check below. The marker attribute is what proves the
+    // consumer's element is the one actually rendered.
     expect(list.hasAttribute("data-custom-shell")).toBe(true);
     expect(list.getAttribute("role")).toBe("listbox");
     expect(listRef).toBe(list);
 
-    // Still navigable — the keymap rides on the computed props, not on the element being a `<div>`.
+    // Still navigable — the keyboard handling rides on the computed props, not on the tag.
     nth(options(container), 0).focus();
     await userEvent.keyboard("{ArrowDown}");
     await vi.waitFor(() => expect(nth(options(container), 1)).toHaveAttribute("data-active"));
@@ -487,8 +469,6 @@ describe("Listbox selection glyph", () => {
     dispose();
   });
 });
-
-// ─── Grouping (the callback goes one level up) ──────────────────────────────────────────────────
 
 interface Basket {
   kind: string;
@@ -568,18 +548,16 @@ describe("Listbox — grouping", () => {
   });
 });
 
-// ─── Item prop forwarding ───────────────────────────────────────────────────────────────────────
-
 describe("Listbox.Item — DOM prop forwarding", () => {
   it("puts the native attributes it does not consume on the option element", async () => {
-    // The `omit` lists in `listbox-item.ts`/`listbox-item.tsx` are hand-kept, and renaming a control
-    // prop is exactly the change that starts swallowing a consumer's attributes with a green
-    // typecheck and a green suite. Assert them **on the element**.
+    // The lists of props the Item consumes rather than forwards are hand-kept, and renaming one is
+    // exactly the change that starts swallowing a consumer's attributes with a green typecheck and a
+    // green suite. So assert them **on the element**, never on the props type.
     let itemRef: HTMLElement | undefined;
     const { container, dispose } = mount(() => (
       <Themed>
-        {/* A real target for the forwarded `aria-describedby` — a dangling IDREF is an axe
-        `aria-valid-attr-value` incomplete, and it would be the test's bug, not the part's. */}
+        {/* A real target for the forwarded `aria-describedby`: pointing it at a missing id would
+        trip the axe check below, and that would be this test's bug, not the part's. */}
         <span id="hint">Pick one</span>
         <Listbox.Root
           aria-label="fruits"
@@ -618,7 +596,7 @@ describe("Listbox.Item — DOM prop forwarding", () => {
     expect(apple.className).toContain("cursor-default");
     // A consumer `ref` reaches the element even though the primitive needs its own signal accessor.
     expect(itemRef).toBe(nth(options(container), 3));
-    // …and the hook keeps what it owns: `id` is the activedescendant IDREF, generated by the source.
+    // …while the hook keeps what it owns — `id` is what `aria-activedescendant` points at.
     expect(apple.getAttribute("role")).toBe("option");
     expect(apple.id).toBeTruthy();
     expect(apple.getAttribute("data-slot")).toBe("listbox-item");
@@ -627,8 +605,6 @@ describe("Listbox.Item — DOM prop forwarding", () => {
     dispose();
   });
 });
-
-// ─── Typeahead & disabled skip ──────────────────────────────────────────────────────────────────
 
 describe("Listbox — typeahead & disabled", () => {
   it("moves the active item to the first match on typing", async () => {
@@ -659,8 +635,6 @@ describe("Listbox — typeahead & disabled", () => {
     dispose();
   });
 });
-
-// ─── One active item: pointer + keyboard share the highlight ────────────────────────────────────
 
 describe("Listbox — single active item (no double highlight)", () => {
   it("pointer move re-targets the single active item, and a keyboard arrow keeps it single", async () => {
@@ -707,8 +681,6 @@ describe("Listbox — single active item (no double highlight)", () => {
     dispose();
   });
 });
-
-// ─── Native form submission ─────────────────────────────────────────────────────────────────────
 
 describe("Listbox — native form submission", () => {
   function FormListbox(props: { onSubmit: (data: FormData) => void }): JSX.Element {
@@ -762,12 +734,11 @@ describe("Listbox — native form submission", () => {
   });
 });
 
-// ─── Hydration ──────────────────────────────────────────────────────────────────────────────────
-
 describe("Listbox hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a
-  // nested SSR server and `listbox.ssr.test.tsx` inline-snapshots that same render, so they agree
-  // byte-for-byte. Reusing `Tree` keeps the client tree structurally identical to the server's.
+  // `ssrFixture` is genuine server output, produced by rendering `Tree` through a real SSR pass;
+  // `listbox.ssr.test.tsx` snapshots that same render, so the two agree byte-for-byte. Reusing one
+  // `Tree` is what keeps the client structurally identical to the server, which matters because
+  // Solid pairs the two by a key derived from each node's path through the component tree.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     dispose();
@@ -801,18 +772,15 @@ describe("Listbox hydration", () => {
   });
 });
 
-// ─── RTL ────────────────────────────────────────────────────────────────────────────────────────
-
 /**
- * The `browser` project ships **no Tailwind stylesheet** — only Storybook and `apps/docs` run
- * `@tailwindcss/vite` — so the recipe's classes resolve to nothing here and every box would measure
- * identically in both directions.
+ * This test project ships **no Tailwind stylesheet**, so the recipe's classes resolve to nothing and
+ * every box would measure identically in both directions.
  *
- * These are Tailwind v4's own declarations for the utilities under test, plus the two positioning
- * ones the indicator's placement depends on (without them the glyph is a static inline element and
- * `end-1` means nothing). Asserting **both** directions is what keeps this honest: a regression to
- * `pr-8`/`pl-1.5`/`right-1` finds no matching rule at all, both directions collapse onto the same
- * geometry, and the assertions fail rather than quietly passing.
+ * These are Tailwind's own declarations for the *logical* utilities under test (`padding-inline-*`,
+ * `inset-inline-*`, which mirror themselves under `dir="rtl"`), plus the two positioning ones the
+ * glyph's placement needs. Declaring only the logical spellings is what keeps this honest: a
+ * regression to the physical `pr-8`/`pl-1.5`/`right-1` matches no rule here, both directions collapse
+ * onto identical geometry, and the assertions fail instead of quietly passing.
  */
 function injectLogicalUtilities(): () => void {
   const style = document.createElement("style");
@@ -860,12 +828,12 @@ describe("Listbox — RTL", () => {
 
     const { style, rows, indicator } = await selectAndMeasure(container);
 
-    // `pe-8` reserves the glyph gutter on the side the text ENDS — the LEFT edge in an RTL row —
-    // while `ps-1.5` insets the label from the right, where the row now starts. Both flipped.
+    // `padding-inline-end` reserves the glyph gutter where the text ENDS — the left edge of an RTL
+    // row — while `padding-inline-start` insets the label from the right, where it now starts.
     expect(style.paddingLeft).toBe("32px");
     expect(style.paddingRight).toBe("6px");
 
-    // `end-1` puts the check glyph inside that gutter, i.e. against the row's visual left edge.
+    // And `inset-inline-end` puts the glyph inside that gutter, against the row's visual left edge.
     const glyph = indicator.getBoundingClientRect();
     expect(glyph.left - rows.left).toBeLessThan(rows.right - glyph.right);
 
@@ -880,7 +848,7 @@ describe("Listbox — RTL", () => {
     const { style, rows, indicator } = await selectAndMeasure(container);
 
     expect(style.paddingRight).toBe("32px");
-    expect(style.paddingLeft).toBe("6px"); // ps-1.5, the md density's leading inset
+    expect(style.paddingLeft).toBe("6px"); // the md density's leading inset
 
     const glyph = indicator.getBoundingClientRect();
     expect(rows.right - glyph.right).toBeLessThan(glyph.left - rows.left);
@@ -899,7 +867,7 @@ describe("Listbox — RTL", () => {
   it("emits an explicit dir prop onto the list element, not only as primitive config", async () => {
     // `dir` is the one `createListbox` option that is also a real HTML attribute. The primitive reads
     // it to pick the arrow-key mapping; if it stopped there, the browser would lay a horizontal list
-    // out left-to-right while the arrows moved right-to-left.
+    // out left-to-right while the arrow keys moved right-to-left.
     const { container, dispose } = mount(() => (
       <Themed>
         <Listbox.Root
@@ -929,11 +897,10 @@ describe("Listbox — RTL", () => {
   });
 
   it("does NOT write a locale-derived dir, so an ancestor's direction still governs", async () => {
-    // The contract, and the reason it is this way: `useLocale().direction` never returns "nothing" —
-    // with no provider it reports the DETECTED browser direction — so writing it would stamp
-    // `dir="ltr"` here and override the ancestor. Only the consumer's own `dir` prop reaches the DOM.
-    // Same line Base UI and React Aria draw: neither writes a locale-derived `dir` on a non-portaled
-    // component. An app declares direction where the browser can see it.
+    // Why the component must not write its own `dir`: the locale layer never reports "no direction"
+    // — with no provider it falls back to the *detected browser* direction — so writing it would
+    // stamp `dir="ltr"` here and override the ancestor. Only the consumer's own `dir` prop reaches
+    // the DOM. An app declares direction where the browser can see it.
     const { container, dispose } = mount(() => (
       <div dir="rtl">
         <I18nProvider locale="ar-EG">
@@ -951,12 +918,14 @@ describe("Listbox — RTL", () => {
   });
 
   it("warns in dev when a horizontal list's keymap and layout disagree", async () => {
-    // The split is real and both references accept it — so make it loud instead of silent. Only a
-    // HORIZONTAL list warns: a vertical one maps Up/Down, where direction changes nothing.
+    // Since the component deliberately will not reconcile the two channels itself (see above), it
+    // says so out loud instead. Only a HORIZONTAL list warns: a vertical one maps Up/Down, where
+    // reading direction changes nothing.
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const { container, dispose } = mount(() => (
-      // ltr layout (no ancestor `dir`), rtl keymap (the provider locale) — the disagreement.
+      // Left-to-right layout (no ancestor `dir`) against a right-to-left keymap (the provider's
+      // locale) — the disagreement the warning exists for.
       <I18nProvider locale="ar-EG">
         <Themed>
           <Listbox.Root

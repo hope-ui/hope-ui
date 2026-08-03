@@ -44,9 +44,9 @@ describe("mount", () => {
   });
 
   it("fails on dispose when SolidJS emits [STRICT_READ_UNTRACKED]", () => {
-    // The invariant this harness exists to enforce. `STRICT_READ_UNTRACKED` is the one
-    // diagnostic that catches the conditionally-rendered-ref race documented in CLAUDE.md,
-    // and it is worthless as a signal while 170 known-benign ones scroll past every run.
+    // The invariant this harness exists to enforce. `STRICT_READ_UNTRACKED` is the one diagnostic
+    // that catches the conditionally-rendered-ref race, and it is worthless as a signal for as long
+    // as benign ones are allowed to scroll past on every run.
     const { dispose } = mount(() => <UntrackedRead />);
     expect(() => dispose()).toThrow(/STRICT_READ_UNTRACKED/);
   });
@@ -71,9 +71,9 @@ describe("mount", () => {
   });
 
   it("fails on dispose when a diagnostic is reported as a caught Error on console.error", () => {
-    // Solid catches a throw raised inside an effect and re-reports it as `console.error(err)`
-    // — an `Error`, not a string. Reproduced directly rather than through a contrived
-    // component, since the shape of that console call is the whole contract being pinned.
+    // Solid catches a throw raised inside an effect and re-reports it as `console.error(err)` — an
+    // `Error` object, not a string. Reproduced directly rather than through a contrived component,
+    // since the shape of that console call is the whole contract being pinned.
     const { dispose } = mount(() => document.createTextNode("hi"));
 
     console.error(

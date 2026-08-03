@@ -11,9 +11,8 @@ import {
   createListboxSeparator,
 } from "../index";
 
-// Shared test support for the listbox family. Lives under `__tests__/` so `check:coverage-parity`
-// treats it as test support, not a source file needing its own test/doc. Each test file below
-// imports the harness it needs and drives the exposed `state`.
+// Shared test support for the listbox family. It lives under `__tests__/` so `check:coverage-parity`
+// treats it as test support rather than a source file owing its own test + doc.
 
 /** Array access that asserts presence — under `noUncheckedIndexedAccess`, `list[i]` is `T | undefined`. */
 export function nth<T>(list: ArrayLike<T>, index: number): T {
@@ -81,9 +80,8 @@ export interface DataListboxProps<V> {
 }
 
 /**
- * A standalone `<ul role="listbox">` over an `items` array, driving every item off `rootProps` — the
- * convenience binding. Each row is rendered from the data and hands the primitive the `item` it
- * renders, which is what the hook resolves the row's index from.
+ * A standalone `<ul role="listbox">` over an `items` array, wired through `rootProps`. Each row hands
+ * the primitive the `item` it renders, which is what the hook resolves the row's index from.
  */
 export function DataListbox<V>(props: DataListboxProps<V>): JSX.Element {
   const state = createListbox<V>({
@@ -127,9 +125,8 @@ export interface SelectListboxProps<V> {
 
 /**
  * The Select-ready shape: DOM focus lives on an external `<input role="combobox">`, which carries
- * `aria-activedescendant` and the navigation/typeahead key handlers, while the `<ul role="listbox">`
- * is a passive container. `focusMode` is forced to `"activedescendant"`. Proves the focus primitives
- * bind to an owner *outside* the list with no `rootProps`.
+ * `aria-activedescendant` and the navigation/typeahead key handlers, while the list is a passive
+ * container. Pins that the focus primitives bind to an owner *outside* the list, with no `rootProps`.
  */
 export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
   const state = createListbox<V>({
@@ -143,9 +140,9 @@ export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
 
   return (
     <div>
-      {/* The Select seam: DOM focus lives on the input, so *it* drives the highlight gate directly
-          (zag's `INPUT.FOCUS` — set the flag, no entry auto-highlight), not the listbox container's
-          focus-in/out. */}
+      {/* The Select seam: DOM focus lives on the input, so *it* drives the highlight gate rather than
+          the listbox container's focus-in/out — and it only sets the flag, deliberately without
+          auto-highlighting an entry row. */}
       <input
         ref={(element) => state.setListboxElement(element)}
         role="combobox"
@@ -157,8 +154,8 @@ export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
         onBlur={() => state.focus.setFocused(false)}
         onKeyDown={composeEventHandlers(state.navigation.onKeyDown, state.typeahead.onKeyDown)}
       />
-      {/* Passive container: focus + activedescendant live on the input above, so the list is a
-          plain div-based `role="listbox"` (no tabindex, no rootProps). */}
+      {/* Passive container: focus and activedescendant live on the input above, so the list is a plain
+          div-based `role="listbox"` with no tabindex and no `rootProps`. */}
       <div id={state.id()} role="listbox" aria-label="fruits">
         <For each={props.values}>
           {(value) => {
@@ -186,7 +183,7 @@ export interface GroupSpec<V> {
 export interface GroupedListboxProps<V> {
   groups: GroupSpec<V>[];
   labelOf: (value: V) => string;
-  // `groupToItems` is the harness's own — everything else in the option set is `G`-independent.
+  // `groupToItems` is the harness's own; everything else in the option set is independent of `G`.
   options?: Omit<ListboxTestOptions<V>, "groupToItems">;
   onReady?: (state: CreateListboxReturn<V>) => void;
 }
@@ -220,10 +217,10 @@ function Group<V>(props: {
 }
 
 /**
- * A grouped listbox (div-based so nested groups stay valid HTML) with a `GroupLabel` per group and a
- * `Separator` between groups. `items` holds the **group entries**; `groupToItems` flattens them into
- * navigation order, which is the one thing the kernel needs from a group — a row still resolves its
- * own position from its `item`, so the inner iteration is a plain `<For>`.
+ * A grouped listbox — div-based, so nested groups stay valid HTML — with a `GroupLabel` per group and
+ * a `Separator` between groups. `items` holds the **group entries**, and `groupToItems` flattens them
+ * into navigation order. A row still resolves its own position from its `item`, which is what keeps
+ * the inner iteration a plain `<For>`.
  */
 export function GroupedListbox<V>(props: GroupedListboxProps<V>): JSX.Element {
   const state = createListbox<V, GroupSpec<V>>({
@@ -275,9 +272,9 @@ export function virtualLabel(index: number): string {
 }
 
 /**
- * A windowed listbox over `count` numeric rows. The `<div role="listbox">` is the scroll container;
- * an inner sizer of `totalSize()` positions the windowed rows by absolute `top`. Mirrors the
- * `createVirtualCollection` browser test's structure.
+ * A windowed listbox over `count` numeric rows. The `<div role="listbox">` is the scroll container,
+ * and an inner element of `totalSize()` height gives it a real scrollbar while each mounted row is
+ * placed by absolute `top`. Same structure as the `createVirtualCollection` browser test.
  */
 export function VirtualListbox(props: VirtualListboxProps): JSX.Element {
   const rowHeight = props.rowHeight ?? 30;

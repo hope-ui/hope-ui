@@ -4,27 +4,24 @@ import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
 import { Popover } from "../index";
 
-// The single source of truth for Popover's SSR → hydration round-trip tree, shared by
-// `popover.ssr.test.tsx` (renders it, inline-snapshots the bytes), `popover.browser.test.tsx` (passes
-// it to hydrateFixture and drives it open), and the hydration-fixture bridge (renders it server-side
-// to feed the browser test). Reusing one tree is what enforces "structurally identical server and
-// client" — hydration keys are a path through the component tree, so a component inserted before
-// `Popover.Trigger`, even one that renders nothing, would shift the trigger's key.
+// The single source of truth for Popover's server-render → hydration round-trip, shared by
+// `popover.ssr.test.tsx` (snapshots the bytes), `popover.browser.test.tsx` (hydrates it and drives it
+// open), and the fixture bridge that renders it server-side for that browser test.
 //
-// `Popover.Portal` renders nothing server-side and nothing while closed, so the server fixture is
-// just the trigger `<button>`; the Positioner/Content subtree still matters because it appears on the
-// client once the popover opens. `Popover.CloseTrigger` renders a recipe-styled `CloseButton`, so the
-// tree sits under a `<ThemeProvider>` fed the `hope` preset — a zero-DOM provider (its values live in
-// CSS), so the closed server output is still just the trigger, but the provider shifts `_hk` keys, so
-// it must be present identically everywhere. See __internal__/theming.md.
+// Reusing one definition is what enforces "structurally identical server and client": Solid pairs
+// server and client nodes by a key derived from each node's *path through the component tree*, so a
+// component inserted before `Popover.Trigger` — even one that renders nothing — shifts the trigger's
+// key and breaks hydration. The `<ThemeProvider>` counts: it renders no DOM (hope's token values live
+// in CSS) but it is a node on that path, so it must be present identically on both sides.
 //
-// The `Popover.Title` is not decoration: `role="dialog"` with no accessible name is an axe
-// `aria-dialog-name` violation, so every tree in this suite carries a Title or an `aria-label`.
+// `Popover.Portal` renders nothing on the server and nothing while closed, so the server output is
+// just the trigger `<button>`. The Positioner/Content subtree still matters, because it appears on
+// the client the moment the popover opens.
 
 /**
- * `defaultOpen` is optional so the ssr test can also exercise the open server render (its `Portal`
- * `isServer` guard must not crash `renderToStringAsync`, and its portaled content must stay absent
- * from the output). The hydration path uses the default — closed.
+ * `defaultOpen` is optional so the SSR test can also exercise the *open* server render: the Portal's
+ * server guard must not crash `renderToStringAsync`, and the portaled content must stay out of the
+ * output. The hydration path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
   return (

@@ -1,10 +1,8 @@
-// The `Combobox` compound component — a styled, themeable layer over the `createCombobox` kernel (the
-// half it shares with `Select`) plus the text half the kernel deliberately does not own: the input's
-// value, the filter derived from it, and the commit/revert policy. Rows are
-// `createListboxItem`/`Group`/`GroupLabel`/`Separator`, reused unchanged. Each part lives in its own
-// `combobox-<part>.tsx` file (a shared `combobox-context.ts` carries the three contexts); this barrel
-// is the one place the namespace object is assembled — the component's single subpath export.
-// Mirrors `src/select/`.
+// The `Combobox` compound component: a styled, themeable layer over the headless `createCombobox`
+// behavior hook (the half it shares with `Select`) plus the text half that hook deliberately does not
+// own — the input's value, the filter derived from it, and the commit/revert policy. Each part lives
+// in its own `combobox-<part>.tsx` file and this barrel is the one place the namespace object is
+// assembled.
 import { Clear } from "./combobox-clear";
 import { Content } from "./combobox-content";
 import { Control } from "./combobox-control";

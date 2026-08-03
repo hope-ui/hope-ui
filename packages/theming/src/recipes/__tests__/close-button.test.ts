@@ -14,10 +14,9 @@ import type {
 const _variants: CloseButtonRecipeVariants = { size: "lg" };
 void _variants;
 
-// `CloseButtonThemeableProps` is a **superset** of the recipe variants (like Button, unlike Badge):
-// every variants object is a valid themeable-props object, and it carries the `icon` glyph on top in
-// **factory** form — a bare element is *not* assignable, which is what forces a reuse-safe preset
-// default. There is no `variant`/`colorScheme` axis — a close button never asserts its own color.
+// A superset of the recipe variants, carrying the `icon` glyph on top in **factory** form — a bare
+// element is *not* assignable, which is what forces a reuse-safe preset default. There is no
+// `variant`/`colorScheme` axis: a close button never asserts its own color.
 const _variantsAreThemeable = (v: CloseButtonRecipeVariants): CloseButtonThemeableProps => v;
 void _variantsAreThemeable;
 const _themeable: CloseButtonThemeableProps = {
@@ -26,9 +25,9 @@ const _themeable: CloseButtonThemeableProps = {
 };
 void _themeable;
 
-// Negative pin: the glyph must be a factory, not a bare element (a shared preset node would move if
-// reused). If `icon` ever widens to accept a bare `JSX.Element` here, this stops erroring and
-// `pnpm typecheck` fails on the stale `@ts-expect-error`.
+// Negative pin: the glyph must be a factory, never a bare element — one preset node shared across
+// instances would *move* if reused. If `icon` widens to accept a `JSX.Element`, this stops erroring and
+// `pnpm typecheck` fails on the now-stale suppression below.
 const _iconIsFactoryOnly: CloseButtonThemeableProps = {
   // @ts-expect-error a preset-wide `icon` default must be a `() => JSX.Element` factory, never a node.
   icon: null,

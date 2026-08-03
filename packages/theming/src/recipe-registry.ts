@@ -1,16 +1,13 @@
 /**
- * The **recipe registry** — the set of recipes a hope-ui theme must provide.
- *
- * `@hope-ui/theming` owns the look-&-feel contract: every hope-authored component's recipe is
- * declared here — one entry per component, whose type is that component's own `…Recipe` from its
- * contract file in the sibling `recipes/` folder — **not** by module augmentation. This file stays a
- * flat list of named recipe types with no shape logic of its own. A component consumes
- * `useRecipe("<name>")`; a theme implements the matching recipe and checks its map with
+ * The **recipe registry** — the set of recipes a hope-ui theme must provide. A component consumes
+ * `useRecipe("<name>")`; a theme implements the matching recipes and checks its map with
  * `satisfies RecipeRegistry`.
  *
- * This is the top-level `registry/` folder (the contract seam, parallel to `preset`/`theme-context`/
- * `styling`), holding {@link RecipeRegistry} alongside {@link ThemeablePropsRegistry} (its
- * behavioral/chrome counterpart) so the two contracts scale independently as the catalog grows.
+ * Every entry is declared here by hand, deliberately **not** through TypeScript module augmentation:
+ * a closed interface makes a missing or misspelled recipe a compile error in the theme, where an
+ * augmentable one would silently accept anything. Keep this file a flat list of named recipe types
+ * with no shape logic of its own; each component's variants and slots live in its own contract file
+ * under `recipes/`.
  */
 import type { AlertRecipe } from "./recipes/alert";
 import type { BadgeRecipe } from "./recipes/badge";

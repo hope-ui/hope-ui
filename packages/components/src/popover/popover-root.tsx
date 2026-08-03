@@ -10,22 +10,20 @@ import type { Component } from "solid-js";
 import { PopoverContext, type PopoverContextValue } from "./popover-context";
 
 /**
- * `PopoverRootProps` = the primitive's `CreatePopoverOptions` (open state, the three dismissal
- * toggles, `role`, and the whole positioning surface) **plus** the themeable `size` axis
- * (`PopoverThemeableProps`, owned by `@hope-ui/theming`) **plus** the per-instance props below.
- * Extending `PopoverThemeableProps` keeps the recipe variants and this surface in lockstep by
- * construction.
+ * `PopoverRootProps` = the behavior options of the `createPopover` hook (open state, the three
+ * dismissal toggles, `role`, the whole positioning surface) **plus** the themeable `size` axis
+ * **plus** the per-instance props below. Extending `PopoverThemeableProps` keeps the style recipe's
+ * variants and this surface in lockstep by construction.
  *
- * `Root` renders **no host element** — it resolves the recipe variants once and shares the slot class
- * fns on context, exactly as `Dialog.Root` does. Every styled part reads `ctx.slots.<slot>()` through
- * its own `class` getter. Two consequences, both deliberate:
+ * `Root` renders **no host element**: it resolves the theme's `popover` recipe once and shares one
+ * class function per named slot over context, which each styled part applies to itself. Two
+ * deliberate consequences:
  *
- * - **No `class` prop.** Popover has no `root` slot, so a root-only class would have nothing to apply
- *   to (the reason `Dialog.Root.class` was removed). Style the parts.
- * - **No `render` prop, and no native-attribute passthrough.** A part that renders no element of its
- *   own is the one exemption to the forwarding rule — so this is also the one Root in the catalog
- *   that dodges the hand-kept `omit` list `Calendar.Root`/`Listbox.Root` carry. Don't "fix" that by
- *   adding one.
+ * - **No `class` prop.** Popover has no `root` slot, so a root class would have nothing to apply to.
+ *   Style the parts.
+ * - **No `render` prop, and no native-attribute passthrough.** A part rendering no element of its own
+ *   is the single exemption to this repo's "every public part forwards its DOM props and takes
+ *   `render`" rule. Don't "fix" it by adding one.
  */
 export interface PopoverRootProps extends CreatePopoverOptions, PopoverThemeableProps {
   /**
@@ -39,26 +37,25 @@ export interface PopoverRootProps extends CreatePopoverOptions, PopoverThemeable
 }
 
 /**
- * The Popover root. Calls `createPopover` once for the shared state (open/role/ids, every element
- * ref, the positioning layer and the eagerly-created overlay presence), resolves the recipe variants
- * via `useDefaults` + `useSlots`, and puts the state and slot class fns on context (composition —
- * `ctx.state` + `ctx.slots`, not an extended state). Renders only the provider (no host element), so
- * the trigger's SSR hydration key is unaffected.
+ * The Popover root. Calls `createPopover` once for the state every part shares (open/role/ids, each
+ * element ref, the positioning layer, the mount/unmount animation state), resolves the theme recipe,
+ * and publishes both on context. Renders only the context provider — no host element — so the
+ * trigger's server/client hydration key is unaffected.
  *
- * **The visual positioning defaults land here, not in the primitive.** `createPopover` deliberately
- * applies none: a gap from the anchor, a viewport gutter and an arrow inset are *look-and-feel*, so
- * they belong where a preset's `defaultProps.popover` can reach them, while a headless consumer of
- * `@hope-ui/primitives/popover` keeps floating-ui's own zeroes.
+ * **The visual positioning defaults land here, not in the primitive.** A gap from the anchor, a
+ * viewport gutter and an arrow inset are look-and-feel, so they belong where a theme preset's
+ * `defaultProps.popover` can override them; a headless consumer of `@hope-ui/primitives/popover`
+ * keeps floating-ui's own zeroes.
  *
- * Because it reads a recipe, a `Popover.Root` **requires a `<ThemeProvider>`** ancestor (fed a
- * preset), like every other styled component.
+ * Reading a recipe means a `Popover.Root` **requires a `<ThemeProvider>`** ancestor fed a preset,
+ * like every other styled component.
  */
 export const Root: Component<PopoverRootProps> = (props) => {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
+  // `useDefaults` resolves each key with `??` across three layers: instance prop, then the preset's
+  // per-component `defaultProps`, then the built-ins below.
   // `sideOffset: 8` clears the arrow (`--popover-arrow-size` is `0.5rem`, half of which straddles the
   // card's edge); `collisionPadding: 8` keeps the card off the viewport edge; `arrowPadding: 8` keeps
-  // the arrow inside the card's `rounded-lg` corners rather than pointing at the curve.
+  // the arrow inside the card's rounded corners rather than pointing at the curve.
   const merged = useDefaults({
     recipe: "popover",
     props,
@@ -78,17 +75,14 @@ export const Root: Component<PopoverRootProps> = (props) => {
     slotClasses: () => merged.slotClasses,
   });
 
-  // `createPopover` reads only its own option keys off `merged` (open/role/closeOn*/side/align/…) —
-  // the defaulted `size`, `matchAnchorWidth` and `slotClasses` ride along harmlessly. `matchAnchorWidth`
-  // needs no primitive counterpart precisely because it is styling: the kernel measures the anchor and
-  // publishes `--anchor-width` on the positioner unconditionally, and the recipe decides whether to
-  // spend it. Pass `merged`, not raw `props`:
-  // `useDefaults` exposes its defaults as getters over `props`, so `merged` stays just as lazy and
-  // reactive (the controllable-state getters, and every positioning getter `createFloating` tracks,
-  // stay live) while remaining the single source of truth.
+  // Pass `merged`, never raw `props`: `useDefaults` returns a *new object of getters* rather than a
+  // copy, so `props.sideOffset` still reads `undefined` for a defaulted key while `merged.sideOffset`
+  // reads `8`. Getters also keep everything lazy and reactive, which the positioning layer relies on.
   //
-  // Composition, not inheritance: the context *holds* the primitive state as `state`. All a11y +
-  // behavior lives there (the kernel); this component contributes only `slots`.
+  // `createPopover` picks off only the option keys it knows (open/role/closeOn*/side/align/…); the
+  // extra `size`/`matchAnchorWidth`/`slotClasses` ride along harmlessly. `matchAnchorWidth` needs no
+  // primitive counterpart because it is pure styling: the primitive always measures the anchor and
+  // publishes `--anchor-width` on the positioner, and the recipe decides whether to spend it.
   const context: PopoverContextValue = {
     state: createPopover(merged),
     slots,
@@ -97,6 +91,6 @@ export const Root: Component<PopoverRootProps> = (props) => {
   return <PopoverContext value={context}>{merged.children}</PopoverContext>;
 };
 
-// Re-export the recipe vocabulary + the ARIA role type so consumers can import them from the
-// component's subpath (`PopoverRole` originates in the primitive, an a11y concern).
+// Re-exported so a consumer never has to reach into `@hope-ui/theming` or `@hope-ui/primitives` for
+// a type this component's own props use.
 export type { PopoverRole, PopoverSize };

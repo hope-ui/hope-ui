@@ -11,22 +11,20 @@ import {
 type ComboboxItemElementProps = JSX.HTMLAttributes<HTMLElement>;
 
 /**
- * `ComboboxItemProps` = the native option attributes **plus** the per-instance props below. Nothing
- * about the row is declared twice: its label, disabled state and selection identity all come from
- * `Combobox.Root`'s `itemToLabel` / `isItemDisabled` / `itemToValue`.
+ * The native option attributes plus the props below. Nothing about the row is declared twice: its
+ * label, disabled state and selection identity all come from `Combobox.Root`'s `itemToLabel` /
+ * `isItemDisabled` / `itemToValue`.
  */
 export interface ComboboxItemProps<V = unknown> extends ComboboxItemElementProps {
   /**
    * This option's item — one element of the **filtered** entries `Combobox.List` handed you (or of a
-   * group's own filtered items). **Required.** It is what the row resolves its position from, so an
-   * option can sit anywhere in the subtree, which is exactly what makes grouping a plain nested
-   * `<For>`.
+   * group's own filtered items). **Required**, and what the row resolves its own position from, which
+   * is why an option can sit anywhere in the subtree and grouping needs nothing but a nested `<For>`.
    *
-   * There is deliberately **no `index` prop**: the index is a registration *mechanism* the primitive
-   * resolves from the item, not information the author has. An item outside the current entries is a
-   * dev warning — arrow keys traverse that array rather than the DOM, so a row outside it is
-   * unreachable. On a Combobox that warning is also the tripwire for rendering an unfiltered list:
-   * iterate what `Combobox.List` gives you, not your own source array.
+   * There is deliberately **no `index` prop**: the index is a lookup, not information the author has.
+   * An item that is not among the current entries logs a dev warning — arrow keys traverse that array
+   * rather than the DOM, so such a row is unreachable. On a Combobox that warning is also the tripwire
+   * for rendering an unfiltered list: iterate what `Combobox.List` gives you, not your source array.
    */
   item?: V;
   /**
@@ -34,10 +32,9 @@ export interface ComboboxItemProps<V = unknown> extends ComboboxItemElementProps
    * the ARIA state, the `data-active`/`data-selected`/`data-disabled` hooks and the click/pointer
    * handlers all ride on them.
    *
-   * The internal ref is merged into the single function ref `renderElement` passes down. It is
-   * load-bearing: it publishes this row's element into the option source, which is what resolves the
-   * `aria-activedescendant` IDREF's target and what scroll-into-view moves. A target that drops
-   * function refs leaves the row unreachable by the keyboard, with no error.
+   * The internal ref rides along too, and it is load-bearing: it publishes this row's element, which
+   * is what the input's `aria-activedescendant` points at and what scroll-into-view moves. A target
+   * that drops function refs leaves the row unreachable by keyboard, with no error.
    */
   render?: RenderProp<ComboboxItemElementProps>;
   /** Merged over the recipe's `item` slot (applied last), so the consumer's utilities win. */
@@ -45,34 +42,29 @@ export interface ComboboxItemProps<V = unknown> extends ComboboxItemElementProps
 }
 
 /**
- * The option part. Assembles `createListboxItem` — reused **unchanged** from the listbox family,
- * exactly as `Select.Item` does. The hook owns `role="option"`, the ARIA state, the `data-*`
- * attributes, the `tabindex` and the click/pointer handlers. Pure assembly + theme: no behavior lives
- * here.
+ * The option part. Assembles `createListboxItem`, reused unchanged from the listbox family exactly as
+ * `Select.Item` does: it owns `role="option"`, the ARIA state, the `data-*` hooks, the `tabindex` and
+ * the click/pointer handlers. Pure assembly plus theme — no behavior lives here.
  *
- * **Clicking a row never moves DOM focus.** `createComboboxList` `preventDefault()`s the list's
+ * **Clicking a row never moves DOM focus.** `Combobox.List` calls `preventDefault()` on its own
  * `mousedown`, so focus stays in the input, `data-active` keeps painting, and the row's own `click`
  * still selects.
- *
- * The element ref is a real `createSignal` accessor (the row's element is created as a reactive
- * consequence of rendering, so an untracked read would catch it still `undefined`). It publishes
- * `isSelected`/`isActive` on `ComboboxItemContext` for its `ItemIndicator` child.
  */
 export function Item<V = unknown>(props: ComboboxItemProps<V>): JSX.Element {
   const ctx = useComboboxContext();
   const state = ctx.state.list as unknown as CreateListboxReturn<V>;
 
-  // A signal-backed element ref: the primitive reads `ref()` to publish the element, and
-  // `renderElement` sets the element into `setRef`. `{ ref }` is merged **last** so it always wins the
-  // `ref` slot — a consumer `ref` (a DOM callback) must never reach the primitive, which expects a
-  // signal accessor.
+  // The behavior hook expects a *signal accessor* it can track, not a DOM callback — the row's
+  // element only exists as a reactive consequence of rendering, so an untracked read would catch it
+  // still `undefined`. `{ ref }` is merged last so it always wins the `ref` slot and a consumer's own
+  // callback ref can never reach the hook.
   const [ref, setRef] = createSignal<HTMLElement>();
   const item = createListboxItem<V>(state, merge(omit(props, "render", "class"), { ref }));
 
   const elementProps = merge(item.props, {
-    // The consumer's `ref`, put back. `{ ref }` above deliberately wins the hook's `ref` slot and the
-    // hook omits `ref` from what it forwards — so without this the consumer's own ref would reach
-    // neither, silently. `renderElement` collapses it with `setRef` into a single function ref.
+    // The consumer's `ref`, put back: the hook took the `ref` slot above and omits `ref` from what it
+    // forwards, so without this line a consumer ref would silently reach neither. `renderElement` —
+    // the render-prop helper every part routes through — collapses it with `setRef` into one callback.
     get ref() {
       return props.ref;
     },

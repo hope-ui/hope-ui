@@ -9,9 +9,10 @@ import { userEvent } from "vitest/browser";
 import { Combobox, type ComboboxFilter } from "../index";
 import { Tree } from "./combobox.ssr-entry";
 
-// Every tree sits under a `<ThemeProvider>` fed the `hope` preset — `Combobox.Root` reads a recipe.
-// It is a zero-DOM provider (its token values live in CSS), so it changes nothing the assertions look
-// at except `_hk` keys, which is why the hydration tree carries it identically.
+// Every tree needs a `<ThemeProvider>` — `Combobox.Root` reads a recipe. It renders no DOM (the hope
+// preset's token values live in CSS), so it changes nothing the assertions look at *except* the
+// hydration keys Solid assigns by walking the component tree, which is why the hydration tree below
+// has to carry it identically.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -28,7 +29,7 @@ const FRUITS: Fruit[] = [
   { id: 4, name: "Cherry" },
 ];
 
-/** Diacritics on purpose: `sensitivity: "base"` is what makes typing `cafe` match `Café`. */
+/** Diacritics on purpose: the collator folds them, which is what makes typing `cafe` match `Café`. */
 const DRINKS = ["Café", "Cortado", "Espresso"];
 
 interface Basket {
@@ -73,26 +74,23 @@ const CONTROL_STYLE: JSX.CSSProperties = {
 
 /**
  * Mounts a tree **inside landmarks**, hands it a landmark to portal the popup into, and returns
- * queries scoped to that one mount. The shape `select.browser.test.tsx` established, for the same two
- * reasons.
+ * queries scoped to that one mount. The shape `select.browser.test.tsx` established.
  *
- * **Landmarks.** An open Combobox is the shape whose axe run has to cover the whole document: the
- * input's `aria-activedescendant` points into the portaled popup, and the popup's `aria-labelledby`
- * points back at the input, so a subtree-scoped run would report both IDREFs as invalid. Running over
- * `document.body` then makes axe judge this **document's** landmark structure as well — its `region`
- * rule flags a bare `<body>` child — which is a fact about the harness page, not about Combobox. So
- * the harness gives it the landmarks a real page has.
+ * **Landmarks.** An open Combobox has to be axe-checked over the whole document: the input's
+ * `aria-activedescendant` points into the portaled popup and the popup's `aria-labelledby` points back
+ * at the input, so a subtree-scoped run would report both IDREFs as invalid. But running over
+ * `document.body` also makes axe judge this *harness page's* landmark structure — its `region` rule
+ * flags a bare `<body>` child — which is a fact about the harness, not about Combobox.
  *
  * **Scoped queries.** `mount()` only removes its container on `dispose()`, so one failing test leaves
- * a whole live Combobox in the document — and a document-wide `querySelector('[data-slot=…]')` in the
- * *next* test then resolves to that corpse and fails for a reason that has nothing to do with it.
+ * a whole live Combobox in the document, and a document-wide `querySelector` in the *next* test
+ * resolves to that corpse and fails for an unrelated reason.
  *
- * **Teardown is registered, not just returned.** The explicit `dispose()` at the end of each test is
- * skipped whenever an assertion throws, and this harness's portal host is a `<main>` — so a single
- * real failure leaves a second `<main>` in the document and every later `expectNoA11yViolations`
- * over `document.body` fails with `landmark-no-duplicate-main`, burying the one failure that
- * mattered. `onTestFinished` runs either way; `dispose()` stays returned (and idempotent) so a test
- * that wants to tear down early still can.
+ * **Teardown is registered, not just returned.** A trailing `dispose()` is skipped whenever an
+ * assertion throws, and this harness's portal host is a `<main>` — so one real failure leaves a second
+ * `<main>` behind and every later document-wide axe run fails with `landmark-no-duplicate-main`,
+ * burying the failure that mattered. `onTestFinished` runs either way; `dispose()` stays returned and
+ * idempotent so a test that wants to tear down early still can.
  */
 function mountCombobox(tree: (portalMount: HTMLElement) => JSX.Element) {
   const portalMount = document.createElement("main");
@@ -138,11 +136,11 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
   const optionLabels = () => options().map((option) => option.textContent);
 
   /**
-   * The highlighted row, resolved through the input's `aria-activedescendant` — the ARIA channel,
-   * which is what a screen reader follows and the only one that is unconditional.
+   * The highlighted row, resolved through the input's `aria-activedescendant` — what a screen reader
+   * follows, and the only channel that is unconditional.
    *
-   * Deliberately **not** `[data-active]`: that attribute is the *paint* gate, additionally gated on
-   * `focus.isFocused()`, so an open Combobox nobody has focused yet has an active index and no
+   * Deliberately **not** `[data-active]`, which is the *paint* gate and additionally requires the
+   * widget to hold focus: an open Combobox nobody has focused yet has an active index and no
    * `data-active` anywhere. That pairing is pinned on its own below.
    */
   const activeOption = () => {
@@ -151,9 +149,9 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
   };
 
   /**
-   * The component-layer stand-in for `floating.isPositioned()`: `floatingStyles()` is the
-   * `visibility: hidden` pre-positioned branch until the first measurement lands, after which a real
-   * `translate()` appears. Axe and every geometry assertion must wait for it.
+   * Waits for the popup's first measurement: until it lands the positioner is `visibility: hidden` and
+   * parked at 0,0, and only afterwards does a real `translate()` appear. Axe and every geometry
+   * assertion must wait, or they inspect the un-positioned layer inside a hidden subtree.
    */
   async function waitForPositioned(): Promise<HTMLElement> {
     let positioner: HTMLElement | null = null;
@@ -168,10 +166,9 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
 
   /**
    * Types into the field the way a user does, but **in one tick**: a `value` write through the native
-   * setter plus one `input` event. `userEvent.type` is fine for a character or two and slow enough
-   * that a multi-character query arrives as several independent renders, which makes the
-   * filter-narrowing assertions read as a sequence rather than a result. Both paths are exercised —
-   * the per-keystroke one is pinned separately.
+   * setter plus one `input` event. `userEvent.type` is slow enough that a multi-character query
+   * arrives as several independent renders, which turns every filter assertion into a sequence rather
+   * than a result. The real per-keystroke path is pinned by its own test below.
    */
   function type(text: string): void {
     const element = input();
@@ -205,11 +202,10 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
 }
 
 /**
- * Axe returns `aria-valid-attr-value` as *incomplete* for **any** element carrying both
- * `aria-haspopup` and `aria-controls`, without ever resolving the IDREF
- * (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check) — undecidable by construction,
- * not a markup problem. Combobox's chevron carries exactly that pair while open. The closed
- * assertions below run strict, and the IDREFs themselves are pinned.
+ * Axe reports `aria-valid-attr-value` as *incomplete* for **any** element carrying both
+ * `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by construction,
+ * not a markup problem, and Combobox's chevron carries exactly that pair while open. The closed-state
+ * assertions below still run strict, and the IDREFs are pinned by their own tests.
  */
 const AXE_OPTIONS = { allowIncomplete: ["aria-valid-attr-value"] };
 
@@ -297,7 +293,7 @@ function FruitCombobox(props: FruitComboboxProps): JSX.Element {
   );
 }
 
-/** A string-item tree, so the collator's diacritic folding is testable with no `itemToLabel`. */
+/** A string-item tree, so diacritic folding is testable with no `itemToLabel` in the way. */
 function DrinkCombobox(props: { portalMount?: Element; filter?: ComboboxFilter<string> }) {
   return (
     <Themed>
@@ -405,9 +401,9 @@ describe("Combobox — the input is the focus owner", () => {
 
     await userEvent.keyboard("{ArrowDown}{ArrowDown}");
     expect(document.activeElement).toBe(scope.input());
-    // The highlight is `aria-activedescendant`, never DOM focus. A pointer open enters on the
-    // selected row — nothing is selected here, so on the first focusable one (Apple) — and the two
-    // presses move from there.
+    // The highlight is `aria-activedescendant`, never DOM focus. A pointer open enters on the selected
+    // row — nothing is selected here, so on the first focusable one (Apple) — and the two presses move
+    // from there.
     expect(scope.activeOption()?.dataset.value).toBe("Blueberry");
     for (const option of scope.options()) {
       expect(option).not.toBe(document.activeElement);
@@ -442,8 +438,8 @@ describe("Combobox — the input is the focus owner", () => {
     expect(scope.input().getAttribute("autocomplete")).toBe("off");
     expect(scope.input().getAttribute("autocorrect")).toBe("off");
     expect(scope.input().getAttribute("autocapitalize")).toBe("none");
-    // The *effective* property, not just the attribute: `spellcheck` is enumerated, so a JS `false`
-    // would serialize to an absent attribute that inherits back on.
+    // The *effective* property, not just the attribute: `spellcheck` is an enumerated attribute, so a
+    // JS `false` would serialize to an absent attribute that then inherits back on.
     expect(scope.input().getAttribute("spellcheck")).toBe("false");
     expect(scope.input().spellcheck).toBe(false);
 
@@ -457,8 +453,8 @@ describe("Combobox — the input is the focus owner", () => {
     await scope.waitForPositioned();
 
     // Opened without focus ever arriving: there is an active index (`aria-activedescendant` names a
-    // row) and no highlight painted anywhere. That pairing is the point — a highlight that lingered
-    // after focus left the widget is the bug it prevents.
+    // row) and no highlight painted anywhere. That pairing is the point — it is what stops a highlight
+    // lingering after focus leaves the widget.
     expect(scope.activeOption()).not.toBeNull();
     expect(scope.paintedOption()).toBeNull();
 
@@ -491,8 +487,8 @@ describe("Combobox — the filter", () => {
   it("narrows per keystroke through real typing too", async () => {
     const scope = mountCombobox((mount) => <FruitCombobox portalMount={mount} />);
 
-    // The one-tick `type()` helper elsewhere is a convenience, not a different code path; this pins
-    // the real per-character sequence, where each keystroke re-runs the memo on its own.
+    // The one-tick `type()` helper elsewhere is a convenience, not a different code path. This pins
+    // the real per-character sequence, where each keystroke re-runs the filter on its own.
     await userEvent.click(scope.input());
     await userEvent.keyboard("ch");
     await vi.waitFor(() => expect(scope.optionLabels()).toEqual(["Cherry"]));
@@ -553,19 +549,17 @@ describe("Combobox — the filter", () => {
 
     scope.type("zzz");
     await scope.waitForPositioned();
-    // `Combobox.Root` flips the kernel's `allowsEmptyCollection` default to `true` precisely so this
-    // stays open — closing would take the part whose job is saying "nothing matched" off screen.
+    // `Combobox.Root` defaults `allowsEmptyCollection` to `true` precisely so this stays open —
+    // closing would take the part whose whole job is saying "nothing matched" off screen with it.
     expect(scope.input().getAttribute("aria-expanded")).toBe("true");
     expect(scope.options()).toHaveLength(0);
     expect(scope.empty()?.textContent).toBe("Nothing found.");
 
     await expectNoA11yViolations(document.body, {
       ...AXE_OPTIONS,
-      // An empty `role="listbox"` is the state under test. Axe returns `aria-required-children` as
+      // An empty `role="listbox"` is the state under test. Axe reports `aria-required-children` as
       // *incomplete* for a container with no owned children, because "populated later" is legitimate
-      // and indistinguishable from "malformed" — undecidable, not a defect. The message itself lives
-      // beside the listbox rather than inside it, because `listbox` may only contain options and
-      // groups.
+      // and indistinguishable from "malformed" — undecidable, not a defect.
       allowIncomplete: [...AXE_OPTIONS.allowIncomplete, "aria-required-children"],
     });
 
@@ -580,8 +574,8 @@ describe("Combobox — the filter", () => {
       <FruitCombobox portalMount={mount} defaultValue={nth(FRUITS, 0)} />
     ));
 
-    // The field reads "Apple". Filtering by it would leave a one-row list, so a pointer open resets
-    // to the full set — react-aria's `showAllItems`.
+    // The field reads "Apple", and filtering by that would leave a one-row list — so a pointer open
+    // resets to the full set and only typing narrows it again.
     expect(scope.input().value).toBe("Apple");
     await userEvent.click(scope.trigger());
     await scope.waitForPositioned();
@@ -596,7 +590,7 @@ describe("Combobox — the filter", () => {
     scope.type("berry");
     await scope.waitForPositioned();
     expect(scope.optionLabels()).toEqual(["Strawberry", "Blueberry"]);
-    // Citrus lost every row, so its heading went with it — and the separator between two groups has
+    // Citrus lost every row, so its heading goes with it — and the separator between two groups has
     // nothing left to separate.
     const groups = [...scope.portalMount.querySelectorAll('[role="group"]')];
     expect(groups).toHaveLength(1);
@@ -610,20 +604,18 @@ describe("Combobox — the filter", () => {
   it("swaps one surviving group for another, repeatedly", async () => {
     const scope = mountCombobox((mount) => <BasketCombobox portalMount={mount} />);
 
-    // Three things at once, and each has its own failure mode.
+    // Two hazards at once, neither exercised before Combobox — Select's `items` never change.
     //
-    // **The group swap.** `<For>` disposes the outgoing group's row *inside its own memo*, and the
-    // `Combobox.GroupLabel` in it unregisters its id from the group on teardown — an ancestor-signal
-    // write from an owned scope, which Solid 2.0 refuses. That does not merely fail the group: it
-    // **halts the whole reactive system**, so every later assertion here would be reading a frozen
-    // page. `createListboxGroup`'s label-id signal is `ownedWrite` for exactly this, and `mount()`
-    // fails the test on the diagnostic, which is what makes this the load-bearing pin.
+    // **The group swap.** `<For>` disposes the outgoing group's row inside its own reactive scope, and
+    // the `Combobox.GroupLabel` in it unregisters its id from the group as it tears down: a write to
+    // an ancestor-owned signal from a scope that ancestor owns, which Solid 2.0 refuses. That does not
+    // merely fail the group — it **halts the whole reactive system**, leaving every later assertion
+    // here reading a frozen page. The group's label-id signal is explicitly declared to permit the
+    // write, and `mount()` fails the test on the diagnostic if it ever stops being permitted.
     //
-    // **The reused group.** `berry` → `straw` keeps `Berries` (same reference), so `<For>` reuses the
-    // row and never re-invokes the callback — the group's rows can only follow if the callback's
-    // third argument is read as an accessor inside the inner `<For>`.
-    //
-    // Nothing before Combobox exercised either: Select's `items` never change after mount.
+    // **The reused group.** `berry` → `straw` keeps `Berries` (same reference), so `<For>` reuses its
+    // row and never re-invokes the callback: the rows can only follow if the callback's third argument
+    // is read as an accessor *inside* the inner `<For>`.
     for (const [query, group, options] of [
       ["or", "Citrus", ["Orange"]],
       ["blue", "Berries", ["Blueberry"]],
@@ -651,7 +643,7 @@ describe("Combobox — the filter", () => {
     await userEvent.keyboard("{ArrowDown}");
     expect(scope.activeOption()?.dataset.value).toBe("Blueberry");
 
-    // The active index pointed at row 1 of the old array. Narrowing to one row must not leave
+    // The active index pointed at row 1 of the *old* array. Narrowing to one row must not leave
     // `aria-activedescendant` naming nothing — a popup that still looks navigable and is not.
     scope.type("ban");
     await vi.waitFor(() => expect(scope.optionLabels()).toEqual(["Banana"]));
@@ -698,8 +690,8 @@ describe("Combobox — commit and revert", () => {
 
     scope.input().focus();
     await userEvent.keyboard("{Enter}");
-    // The button trigger must always `preventDefault()` Enter (a native button synthesizes a click);
-    // the input must not, or a combobox in a form swallows submission.
+    // A closed Combobox must leave Enter alone, or a combobox inside a form swallows submission. (The
+    // chevron button is the opposite case: a native button synthesizes a click, so it must cancel it.)
     expect(submitted).toHaveBeenCalledTimes(1);
 
     scope.dispose();
@@ -744,8 +736,8 @@ describe("Combobox — commit and revert", () => {
     await scope.waitForPositioned();
     await userEvent.click(scope.container.querySelector('[data-testid="outside"]') as HTMLElement);
 
-    // A picker reporting `Apple` while showing `nonsense` is the mismatch `allowsCustomValue` exists
-    // to make deliberate.
+    // A picker reporting `Apple` while showing `nonsense` is the mismatch `allowsCustomValue` exists to
+    // make deliberate.
     await vi.waitFor(() => expect(scope.input().value).toBe("Apple"));
 
     scope.dispose();
@@ -809,8 +801,8 @@ describe("Combobox — commit and revert", () => {
     await scope.waitForPositioned();
     await userEvent.click(nth(scope.options(), 0));
 
-    // The popup stays open (`shouldCloseOnSelect` derives from the mode) and the field becomes the
-    // next query rather than a joined list of labels.
+    // Multiple mode keeps the popup open, and the field becomes the next query rather than a joined
+    // list of labels.
     expect(scope.input().getAttribute("aria-expanded")).toBe("true");
     await vi.waitFor(() => expect(scope.input().value).toBe(""));
     expect(onChange).toHaveBeenCalledWith([nth(FRUITS, 1)]);
@@ -865,9 +857,9 @@ describe("Combobox — the chevron", () => {
     await scope.waitForPositioned();
     expect(scope.input().getAttribute("aria-expanded")).toBe("true");
 
-    // The regression this pins: the chevron sits inside `Combobox.Control`, and without that shell
-    // registered as the kernel's anchor it falls outside `sparedElements` — so the capture-phase
-    // pointerdown dismisses and this very click reopens, forever.
+    // The regression this pins: the chevron sits inside `Combobox.Control`, so unless that shell is
+    // registered as the anchor the chevron falls outside the elements spared from outside-click
+    // dismissal — its pointerdown closes the popup in the capture phase and this click reopens it.
     await userEvent.click(scope.trigger());
     await vi.waitFor(() => expect(scope.input().getAttribute("aria-expanded")).toBe("false"));
 
@@ -877,8 +869,8 @@ describe("Combobox — the chevron", () => {
   it("carries a localized name and keeps focus in the input", async () => {
     const scope = mountCombobox((mount) => <FruitCombobox portalMount={mount} />);
 
-    // A bare chevron is an axe `button-name` violation, and the label comes from the i18n catalog
-    // rather than from the consumer.
+    // A bare chevron is an axe `button-name` violation, and the label comes from the built-in i18n
+    // message catalog rather than from the consumer.
     expect(scope.trigger().getAttribute("aria-label")).toBe("Show suggestions");
 
     await userEvent.click(scope.trigger());
@@ -890,10 +882,9 @@ describe("Combobox — the chevron", () => {
   });
 
   it("matches the popup's width to the control, not to the bare input", async () => {
-    // **This project compiles no Tailwind**, so the recipe's `w-(--anchor-width)` is an inert string
-    // here. The property is spent through an inline `width` instead — the shape
-    // `popover.browser.test.tsx` established — which is what makes this a test of the *measurement*
-    // rather than of a class name.
+    // **This project compiles no Tailwind**, so the recipe's `w-(--anchor-width)` class is an inert
+    // string here. Spending the property through an inline `width` instead is what makes this a test
+    // of the *measurement* rather than of a class name.
     const scope = mountCombobox((mount) => (
       <Themed>
         <Combobox.Root items={FRUITS} itemToValue={itemToValue} itemToLabel={itemToLabel}>
@@ -925,8 +916,8 @@ describe("Combobox — the chevron", () => {
     const control = scope.inContainer("control") as HTMLElement;
 
     // `--anchor-width` is measured off the registered **anchor**, which `Combobox.Control` claims.
-    // Left to the kernel's default the anchor is the focus owner — the bare `<input>` — and the popup
-    // stops short of the two gutter buttons.
+    // Left at the default the anchor is the focus owner — the bare `<input>` — and the popup stops
+    // short of the two gutter buttons.
     expect(Math.round(positioner.getBoundingClientRect().width)).toBe(
       Math.round(control.getBoundingClientRect().width),
     );
@@ -953,8 +944,8 @@ describe("Combobox — Status", () => {
     expect(status.getAttribute("aria-atomic")).toBe("true");
     expect(status.textContent).toBe("4 options available");
 
-    // The region is already mounted, so a later count change is announced by the region itself —
-    // which is the half `createAnnounce` deliberately does not cover.
+    // The region is already mounted, so a later count change is announced by the region itself — the
+    // half the separate one-shot announcement deliberately does not cover.
     scope.type("b");
     await vi.waitFor(() => expect(status.textContent).toBe("2 options available"));
 
@@ -977,9 +968,9 @@ describe("Combobox — Status", () => {
     await userEvent.click(scope.trigger());
     await scope.waitForPositioned();
 
-    // The rendered region mounts *with* its text, which most screen readers do not announce — so
-    // `createAnnounce`'s own region, which lives on `document.body` and outlives every popup, is what
-    // covers the open. Its node is outside both this mount's container and the portal host.
+    // A live region that mounts *with* its text is not announced by most screen readers, so the open
+    // is covered by a separate region living on `document.body` that outlives every popup. Its node
+    // sits outside both this mount's container and the portal host, hence the filter below.
     await vi.waitFor(() => {
       const announced = [...document.querySelectorAll("[aria-live]")]
         .filter((node) => !scope.portalMount.contains(node) && !scope.container.contains(node))
@@ -1038,9 +1029,9 @@ describe("Combobox — IME composition", () => {
     await scope.waitForPositioned();
     expect(scope.optionLabels()).toEqual(["Banana", "Blueberry"]);
 
-    // A half-typed CJK word matches nothing, so filtering on it would empty the list and flash
-    // `Combobox.Empty` on every keystroke of a multi-key character. The policy is Combobox's —
-    // `createTextInput` exposes `isComposing()` precisely so it can be made here.
+    // An IME composition is the multi-key sequence used to type CJK and similar scripts. A half-typed
+    // word matches nothing, so filtering on it would empty the list and flash `Combobox.Empty` on
+    // every keystroke of a single character.
     input.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
     scope.type("bこ");
     await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -1070,9 +1061,9 @@ describe("Combobox — disabled", () => {
     expect(scope.input().disabled).toBe(true);
     expect((scope.trigger() as HTMLButtonElement).disabled).toBe(true);
 
-    // `.click()` rather than `userEvent.click`: the latter waits for the element to become enabled
-    // and times out. A native disabled `<button>` swallows the dispatched click, which is precisely
-    // the assertion — nothing opens.
+    // `.click()` rather than `userEvent.click`, which waits for the element to become enabled and
+    // times out. A native disabled `<button>` swallows the dispatched click, which is precisely the
+    // assertion — nothing opens.
     scope.trigger().click();
     await new Promise((resolve) => requestAnimationFrame(resolve));
     expect(scope.listbox()).toBeNull();
@@ -1095,13 +1086,13 @@ describe("Combobox hydration", () => {
     const scope = queries(container, document);
     await vi.waitFor(() => expect(scope.inContainer("input")).not.toBeNull());
 
-    // The server render read the label straight off the data — no row was ever mounted for it, and
-    // `createTextInput`'s untracked value snapshot is what makes the two agree.
+    // The server render read the label straight off the data — no row was ever mounted for it — and
+    // the client computes it from the same props rather than re-deriving, so the two agree.
     expect(scope.input().value).toBe("Strawberry");
 
     await userEvent.click(scope.trigger());
     await scope.waitForPositioned();
-    // The popup is grouped, so this is also the grouped tree's client half.
+    // The hydrated tree is grouped, so this doubles as the grouped tree's client half.
     expect(scope.options()).toHaveLength(4);
     expect(scope.selectedOptions().map((option) => option.textContent)).toEqual(["Strawberry"]);
 

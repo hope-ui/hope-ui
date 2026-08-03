@@ -8,9 +8,9 @@ import { useCalendarContext } from "./calendar-context";
 export interface CalendarGridProps extends JSX.HTMLAttributes<HTMLTableElement> {
   /**
    * Renders as a different element/component while keeping Grid's computed props (`role="grid"`, the
-   * `aria-labelledby` to the heading, the roving `tabindex` and the whole keymap). The children stay
+   * `aria-labelledby` to the heading, the tab stop and the whole keyboard handling). The children stay
    * `<thead>`/`<tbody>`/`<tr>`, so a target that isn't table-shaped produces invalid HTML — that is
-   * the consumer's call to make, as it is in Base UI.
+   * the consumer's call to make.
    */
   render?: RenderProp<JSX.HTMLAttributes<HTMLTableElement>>;
   /** Merged over the recipe's `grid` slot (applied last), so the consumer's utilities win. */
@@ -18,26 +18,22 @@ export interface CalendarGridProps extends JSX.HTMLAttributes<HTMLTableElement> 
 }
 
 /**
- * The `<table role="grid">`. Assembles `createCalendarGrid` (roving arrow/Home/End/Page navigation +
- * `aria-labelledby`/`data-view`) and renders the weekday head (month view) + the day rows/cells
- * internally — a consumer can't hand-author 42 reactive cells. The weekday `<th>` carries the `weekday`
- * slot; each `<td>`/`<button>` carries `cell`/`cellTrigger` (via `CalendarCell`). Pure assembly + theme.
+ * The `<table role="grid">`. The primitive owns arrow/Home/End/Page navigation and the labelling; the
+ * weekday head and the day rows are rendered here because a consumer cannot hand-author 42 reactive
+ * cells.
  *
- * The `<table>` and the `<thead>` go through `renderElement`; the remaining `<tr>`/`<th>`/`<tbody>` are
- * plain literals. The distinction is hydration-key stability: an element that **spreads a props object
- * from the primitive hook** allocates `_hk` differently for its subtree under the server (`ssr`) vs the
- * client (`dom`) Solid compile — measured, not assumed: spreading `headerProps` onto a literal `<thead>`
- * left all seven `<th>` unclaimed on hydrate. `renderElement` → `<Dynamic>` (a component call)
- * allocates identically on both. The remaining tags spread nothing, so a literal is correct — and
- * clearer — there.
+ * The `<table>` and `<thead>` go through `renderElement`, while `<tr>`/`<th>`/`<tbody>` are plain
+ * literals. The distinction is hydration-key stability: an element that **spreads a props object from
+ * the primitive** makes Solid's server and client compilers allocate its subtree's hydration keys
+ * differently. Measured, not assumed — spreading onto a literal `<thead>` left all seven `<th>`
+ * unclaimed on hydrate. The remaining tags spread nothing, so a literal is correct and clearer there.
  */
 export function Grid(props: CalendarGridProps): JSX.Element {
   const ctx = useCalendarContext();
   const grid = createCalendarGrid(ctx.state, omit(props, "render"));
 
-  /** The weekday `<thead>`. Its own component so `grid.headerProps` reaches it through
-   * `renderElement`: a spread on a *literal* `<thead>` makes the client compile allocate its subtree's
-   * `_hk` differently from the server's, and the seven `<th>` come back unclaimed on hydrate. */
+  /** Its own component only so the header props reach a `<thead>` through `renderElement` rather
+   * than being spread onto a literal one — see the hydration-key note above. */
   function WeekdayHead(): JSX.Element {
     return renderElement<JSX.HTMLAttributes<HTMLTableSectionElement>>({
       as: "thead",

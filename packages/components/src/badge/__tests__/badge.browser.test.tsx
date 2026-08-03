@@ -6,23 +6,22 @@ import type { JSX } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
 import { Badge, type BadgeProps } from "../badge";
-// Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
-// `.html`). `Tree` is the same tree `badge.ssr.test.tsx` inline-snapshots and the bridge renders —
-// one source of truth, so the hydration input and the client tree cannot structurally diverge.
+// Real server HTML, rendered in-process by the hydration-fixture bridge from the same `Tree` that
+// `badge.ssr.test.tsx` snapshots — so the hydration input and the client tree cannot diverge.
 import { Tree } from "./badge.ssr-entry";
 
-// Badge reads styling through `useSlots`/`useRecipe`, so every render sits under a `<ThemeProvider>`
-// fed the `hope` preset. `hope`'s token overrides are empty (its values live in CSS), so the provider
-// stays on the zero-DOM branch and the fixture is byte-identical. See __internal__/theming.md.
+// Badge reads its styling from the theme, so every render needs a `<ThemeProvider>`. The `hope`
+// preset authors its values in CSS, so the provider emits no DOM — but it still occupies a position
+// in the tree, and Solid matches server and client nodes by position, so both halves of the
+// hydration round-trip must wrap identically.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
 
 /**
- * Renders Badge as an anchor (a linkable tag). Passed as a **direct** `render` prop, never via a
- * spread object: a spread-backed prop reads reactively, and Badge reads `render` synchronously to
- * build the element, which would trip `STRICT_READ_UNTRACKED` for a value that is structural and
- * never changes.
+ * Renders Badge as an anchor. Passed as a **direct** prop, never through a spread object: a
+ * spread-backed prop is read reactively, and Badge reads `render` synchronously to build its
+ * element, which Solid flags as `STRICT_READ_UNTRACKED`.
  */
 const renderAsAnchor: NonNullable<BadgeProps["render"]> = (p) => (
   <a href="/tags/new" {...(p as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} />
@@ -112,12 +111,13 @@ describe("Badge", () => {
 
     const badge = container.querySelector('[data-slot="badge"]');
     const dot = badge?.querySelector('[data-slot="badge-dot"]');
-    // The root chrome is role-neutral; the role color rides the dot slot.
+    // The whole point of the variant: the badge itself stays role-neutral and only the dot carries
+    // the role color.
     expect(badge?.className).toContain("border-neutral-subtle-line");
     expect(badge?.className).not.toContain("bg-success");
     expect(dot).not.toBeNull();
     expect(dot?.className).toContain("bg-success");
-    // The dot is decorative — it carries no accessible name.
+    // Purely decorative, so it must not reach the accessibility tree.
     expect(dot?.getAttribute("aria-hidden")).toBe("true");
     await expectNoA11yViolations(container);
     dispose();
@@ -179,7 +179,7 @@ describe("Badge", () => {
     ));
 
     const badge = container.querySelector('[data-slot="badge"]');
-    // Instance `rounded-none` is applied after the recipe's `rounded-md` → tailwind-merge keeps it.
+    // `rounded-none` is applied after the recipe's `rounded-md`, so tailwind-merge keeps it.
     expect(badge?.className).toContain("rounded-none");
     expect(badge?.className).not.toContain("rounded-md");
     expect(badge?.querySelector('[data-slot="badge-label"]')?.className).toContain("uppercase");
@@ -202,8 +202,8 @@ describe("Badge", () => {
   });
 
   it("applies a preset's defaultProps when the instance leaves the prop unset", async () => {
-    // A preset can set app-wide defaults; the built-in default is the fallback, and an explicit
-    // instance prop still wins (precedence: instance ?? preset ?? builtin), wired via `useDefaults`.
+    // Precedence is instance prop ?? preset default ?? component builtin. `hope` sets no badge
+    // defaults, so extend it with one to have something to test.
     const solidByDefault = definePreset(hope, {
       components: { badge: { defaultProps: { variant: "solid" } } },
     });
@@ -214,7 +214,7 @@ describe("Badge", () => {
       </ThemeProvider>
     ));
 
-    // variant `solid` → `bg-primary`; the built-in default `soft` would be `bg-primary-soft`.
+    // `solid` is `bg-primary`; the built-in default `soft` would be `bg-primary-soft`.
     const cls = container.querySelector('[data-slot="badge"]')?.className ?? "";
     expect(cls).toContain("bg-primary");
     expect(cls).not.toContain("bg-primary-soft");
@@ -241,16 +241,16 @@ describe("Badge", () => {
 });
 
 describe("Badge hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a
-  // nested SSR server (server solid builds) and `badge.ssr.test.tsx` inline-snapshots that same
-  // render, so the two agree byte-for-byte. Here `solid-js`/`@solidjs/web` resolve to their client
-  // builds, so `hydrateFixture` hydrates that HTML rather than re-rendering it. The client tree must
-  // stay structurally identical to the server's — guaranteed by reusing the same `Tree`.
-  // `hydrateFixture` proves hydration was silent and reused every node.
+  // `ssrFixture` is real server HTML: the bridge renders `Tree` through a nested SSR server, and
+  // `badge.ssr.test.tsx` snapshots that same render, so the two agree byte for byte. In this project
+  // Solid resolves to its client builds, so `hydrateFixture` hydrates that HTML instead of
+  // re-rendering it. Both halves import the same `Tree`, which is what keeps the client tree
+  // positionally identical to the server's. `hydrateFixture` asserts hydration was silent and reused
+  // every node, so a silent fallback re-render — visually indistinguishable — still fails.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
-    // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
+    // The provider must stay DOM-free: an injected `<style>` is not something the reuse check sees.
     expect(container.querySelector("style")).toBeNull();
     expect(container.querySelector('[data-slot="badge-label"]')?.textContent).toBe("New");
     dispose();

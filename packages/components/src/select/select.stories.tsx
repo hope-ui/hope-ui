@@ -4,28 +4,24 @@ import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Select, type SelectSize } from ".";
 
 /**
- * `Select` is the trigger + the popup, and nothing else — no `Label` part, no description, no field
- * chrome (that is a future `Field`'s job). So **every tree here names its trigger** with `aria-label`
- * or an `aria-labelledby` pointing at the consumer's own `<label>`: a nameless `role="combobox"` is an
- * axe `aria-input-field-name` violation, and the `role="listbox"` popup inherits its name from the
- * trigger.
+ * `Select` is the trigger plus the popup, and nothing else — no `Label` part, no description, no field
+ * chrome. So **every tree here names its trigger** with `aria-label` or an `aria-labelledby` pointing
+ * at the consumer's own `<label>`: a nameless `role="combobox"` is an axe `aria-input-field-name`
+ * violation, and the `role="listbox"` popup inherits its name from the trigger.
  *
  * **Options are data.** `Select.Root` takes the whole option set as `items`; `Select.List` iterates it
- * and its render-callback child builds one row per entry. Nothing self-registers and nothing renders
- * until the popup opens, which is what lets a *closed* Select do typeahead, guard against opening an
- * empty list, and server-render every `<option>` for browser autofill.
+ * and its render-callback child builds one row per entry. Nothing renders until the popup opens, which
+ * is what lets a *closed* Select run typeahead, refuse to open an empty list, and server-render every
+ * `<option>` for browser autofill.
  *
- * DOM focus never leaves the trigger — the APG 1.2 combobox pattern — so the highlight is
- * `aria-activedescendant` plus the row's `data-active`, never a focused option.
- *
- * The global `withHopeTheme` decorator (`.storybook/preview.tsx`) provides the preset; Storybook's
- * Tailwind build compiles the recipe utilities.
+ * DOM focus never leaves the trigger — the ARIA authoring-practices combobox pattern — so the
+ * highlight is `aria-activedescendant` plus the row's `data-active`, never a focused option.
  */
 const meta = {
   title: "Components/Select",
   component: Select.Root,
-  // `items` is a required prop, so Storybook's story type demands `args`. Every story below renders
-  // its own tree, so this is only here to satisfy that requirement.
+  // `items` is required, so Storybook's story type demands `args`. Every story renders its own tree,
+  // so this only exists to satisfy that.
   args: { items: [] },
 } satisfies Meta<typeof Select.Root>;
 
@@ -46,7 +42,7 @@ const FRUITS: Fruit[] = [
   { id: 5, name: "Elderberry", disabled: true },
   { id: 6, name: "Fig" },
   // Accented on purpose: typing its plain-ASCII prefix ("acai") exercises the collator-backed
-  // typeahead (`sensitivity: "base"`), which `toLowerCase().startsWith()` could never match.
+  // typeahead, which folds diacritics as well as case — `toLowerCase()` folds only case.
   { id: 7, name: "Açaí" },
 ];
 
@@ -127,7 +123,7 @@ export const Default: Story = {
 
 /**
  * Controlled: `value` + `onChange` in the consumer's own signal. The value is a **scalar** in single
- * mode — a single Select never hands back `[apple]`, because the kernel adapts the listbox's `V[]`.
+ * mode — a single Select never hands back `[apple]`.
  */
 export const Controlled: Story = {
   render: () => {
@@ -211,10 +207,10 @@ export const Multiple: Story = {
 };
 
 /**
- * Grouped data, straight from an API shape: `groupToItems` flattens `items` into navigation order for
- * the kernel and switches `Select.List`'s callback from per-item to **per group**. The consumer
- * iterates that group's own items with a plain `<For>` — which is possible only because each
- * `Select.Item` resolves its own row from its `item`, so nesting depth is irrelevant.
+ * Grouped data, straight from an API shape: `groupToItems` flattens `items` into navigation order and
+ * switches `Select.List`'s callback from per-item to **per group**. You iterate that group's own items
+ * with a plain `<For>` — possible only because each `Select.Item` resolves its own row from its
+ * `item`, so nesting depth is irrelevant.
  *
  * Arrow keys still traverse the flattened order, straight across the group boundary.
  */
@@ -283,10 +279,10 @@ export const Sizes: Story = {
 };
 
 /**
- * A long option set: the popup caps itself at the kernel's measured `--available-height` and the list
- * scrolls inside the card, so the rounded corners and the border stay still while the rows move.
- * Arrowing past the fold scrolls the highlighted row into view — in activedescendant mode nothing
- * else would, since no option ever takes DOM focus.
+ * A long option set: the popup caps itself at the measured `--available-height` and the list scrolls
+ * inside the card, so the rounded corners and the border stay still while the rows move. Arrowing past
+ * the fold scrolls the highlighted row into view — nothing else would, since no option ever takes DOM
+ * focus.
  */
 export const LongList: Story = {
   render: () => {
@@ -341,10 +337,10 @@ export const Disabled: Story = {
 };
 
 /**
- * Native form submission. `name` renders the kernel's `HiddenSelect` — a clipped, real `<select>`
- * carrying every `<option>` — so the form submits `itemToValue(fruit)`, browser autofill has the whole
- * set to match against, `required` genuinely blocks an empty submit (and moves focus here), and a
- * native `reset` restores the default. Submit empty to see the browser's own validation bubble.
+ * Native form submission. `name` renders a clipped but real `<select>` carrying every `<option>`, so
+ * the form submits `itemToValue(fruit)`, browser autofill has the whole set to match against,
+ * `required` genuinely blocks an empty submit (and moves focus here), and a native `reset` restores
+ * the default. Submit empty to see the browser's own validation bubble.
  */
 export const InAForm: Story = {
   render: () => {
@@ -386,8 +382,8 @@ export const InAForm: Story = {
 /**
  * `render` re-targets a part without losing anything: the computed props (the `role="combobox"`, the
  * ARIA and the whole keymap) and the internal ref both ride through. The ref is load-bearing here —
- * the trigger element is the positioning anchor and the one element modality spares, so a target that
- * dropped function refs would leave the popup unpositioned and the trigger un-clickable, silently.
+ * the popup is positioned against the trigger, and the trigger is the one element spared from being
+ * made un-clickable while open — so a target that dropped function refs would break both, silently.
  */
 export const PolymorphicTrigger: Story = {
   render: () => (

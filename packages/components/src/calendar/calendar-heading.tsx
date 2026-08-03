@@ -12,10 +12,9 @@ export interface CalendarHeadingProps extends JSX.ButtonHTMLAttributes<HTMLButto
 }
 
 /**
- * The heading / view-switcher button. Assembles `createCalendarHeading` (which owns the drill-up
- * `onClick`, the SSR-stable `id` the grid's `aria-labelledby` points at, and the `disabled`/
- * `data-disabled` at the top of the view stack) into a styled ghost button. Defaults its label to the
- * current period (`state.headingLabel()`); a consumer child overrides it. Pure assembly + theme.
+ * The heading, which doubles as the button that zooms out to the year/decade view. The primitive owns
+ * that click, the server-stable `id` the grid's `aria-labelledby` points at, and the disabled state at
+ * the top of the view stack. Its label defaults to the current period; a consumer child overrides it.
  */
 export function Heading(props: CalendarHeadingProps): JSX.Element {
   const ctx = useCalendarContext();

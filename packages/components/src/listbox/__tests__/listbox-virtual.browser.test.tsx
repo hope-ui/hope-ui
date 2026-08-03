@@ -7,10 +7,11 @@ import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Listbox } from "../index";
 
-// Phase-4 virtual mode, in a real browser: the same `createListbox` state windowed over a huge data
-// set. Only a slice of rows mounts, yet selection/focus/typeahead/form-submission all work over the
-// **full** set. There is no strict hydration round-trip here (a windowed list can't be byte-identical
-// server↔client — see `listbox-virtual.ssr.test.tsx`); the collection-mode `Tree` owns that DoD.
+// Virtual mode in a real browser: the same listbox state windowed over a huge data set. Only a slice
+// of rows mounts, yet selection, focus, typeahead and form submission all work over the **full** set.
+//
+// No hydration round-trip here — a windowed list can never be byte-identical between server and
+// client (see `listbox-virtual.ssr.test.tsx`); the non-virtual tree covers that.
 
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
@@ -55,8 +56,8 @@ function VirtualListbox(props: VirtualListboxProps): JSX.Element {
         itemToLabel={itemToLabel}
         selectionMode={props.selectionMode}
         focusMode={props.focusMode}
-        // A real viewport height + scroll so only a window mounts. Inline, not the recipe class: the
-        // browser test project loads no compiled Tailwind, so the CSS must be inline to take effect.
+        // A real viewport height + scroll, so only a window mounts. Inline rather than the recipe
+        // class, because this test project compiles no Tailwind.
         style={{ height: "256px", "overflow-y": "auto" }}
       >
         {(row: Row, index: Accessor<number>) => (
@@ -97,8 +98,6 @@ function selectedIndices(container: HTMLElement): number[] {
     .map((element) => Number(element.dataset.index));
 }
 
-// ─── Windowing ──────────────────────────────────────────────────────────────────────────────────
-
 describe("Listbox virtual — windowing", () => {
   it("mounts only a window of the full set, each row a role=option carrying data-index", async () => {
     const { container, dispose } = mount(() => <VirtualListbox />);
@@ -109,8 +108,6 @@ describe("Listbox virtual — windowing", () => {
     expect(mounted.length).toBeGreaterThan(0);
     expect(mounted.length).toBeLessThan(50);
 
-    // Virtual mode uses role-based generic elements (see Root's JSDoc): a `<div role="listbox">`
-    // scroll container over `<div role="option">` rows, each keyed by `data-index`.
     const list = listbox(container);
     expect(list.getAttribute("role")).toBe("listbox");
     expect(list.getAttribute("data-slot")).toBe("listbox");
@@ -127,8 +124,6 @@ describe("Listbox virtual — windowing", () => {
   });
 });
 
-// ─── Roving focus into an unmounted region (deferred focus) ─────────────────────────────────────
-
 describe("Listbox virtual — roving over unmounted rows", () => {
   it("End scrolls the last (offscreen) row into the window, then focuses it", async () => {
     const { container, dispose } = mount(() => <VirtualListbox />);
@@ -142,8 +137,9 @@ describe("Listbox virtual — roving over unmounted rows", () => {
     expect(mountedIndices(container)).not.toContain(last);
 
     await userEvent.keyboard("{End}");
-    // The kernel scrolls the target into view first, then focuses it once its element mounts — the
-    // deferred-focus path that makes roving over a virtualized list work.
+    // A row that isn't mounted cannot be focused, so the primitive scrolls the target into view
+    // first and focuses it once its element appears. That deferral is what makes keyboard navigation
+    // over a virtualized list work at all.
     await vi.waitFor(() =>
       expect(container.querySelector(`[data-index="${last}"]`)).not.toBeNull(),
     );
@@ -153,8 +149,6 @@ describe("Listbox virtual — roving over unmounted rows", () => {
     dispose();
   });
 });
-
-// ─── Typeahead over the full set ────────────────────────────────────────────────────────────────
 
 describe("Listbox virtual — typeahead", () => {
   it("jumps the active row to an offscreen match resolved from itemToLabel", async () => {
@@ -176,8 +170,6 @@ describe("Listbox virtual — typeahead", () => {
     dispose();
   });
 });
-
-// ─── Selection over the full set + native form submission ───────────────────────────────────────
 
 describe("Listbox virtual — selection & form submission", () => {
   function FormVirtualListbox(props: { onSubmit: (data: FormData) => void }): JSX.Element {
@@ -236,8 +228,6 @@ describe("Listbox virtual — selection & form submission", () => {
   });
 });
 
-// ─── Page navigation (the reported bug) ─────────────────────────────────────────────────────────
-
 describe("Listbox virtual — page navigation", () => {
   it("PageDown jumps by a page into offscreen rows, and arrow keys keep working afterward", async () => {
     const { container, dispose } = mount(() => <VirtualListbox />);
@@ -246,9 +236,9 @@ describe("Listbox virtual — page navigation", () => {
     await userEvent.click(nth(options(container), 0)); // enter at row 0 (roving)
     await expect.element(nth(options(container), 0)).toHaveFocus();
 
-    // Two PageDowns (default page = 10) reach index 20 — offscreen for the ~8-row viewport. The kernel
-    // scrolls it in and focuses it; PageDown must NOT fall through to a native scroll that unmounts the
-    // focused row and drops focus (the reported failure).
+    // Two PageDowns (default page = 10) reach index 20, offscreen for this ~8-row viewport. It must
+    // be scrolled in and focused — PageDown must NOT fall through to a native scroll, which would
+    // unmount the focused row and drop focus entirely.
     await userEvent.keyboard("{PageDown}{PageDown}");
     await vi.waitFor(() => {
       const row = container.querySelector<HTMLElement>('[data-index="20"]');
@@ -259,7 +249,7 @@ describe("Listbox virtual — page navigation", () => {
       .element(container.querySelector<HTMLElement>('[data-index="20"]') as HTMLElement)
       .toHaveFocus();
 
-    // The regression the report describes: after Page keys, arrows would stop working. They don't.
+    // The other half of the reported bug: after a Page key, the arrows would stop working.
     await userEvent.keyboard("{ArrowDown}");
     await vi.waitFor(() =>
       expect(
@@ -269,8 +259,6 @@ describe("Listbox virtual — page navigation", () => {
     dispose();
   });
 });
-
-// ─── Activedescendant references a mounted option ───────────────────────────────────────────────
 
 describe("Listbox virtual — activedescendant", () => {
   it("points aria-activedescendant at a mounted option after End — never a dangling IDREF", async () => {
@@ -282,17 +270,17 @@ describe("Listbox virtual — activedescendant", () => {
     list.focus();
     await expect.element(list).toHaveFocus();
 
-    await userEvent.keyboard("{End}"); // active → last (offscreen); the kernel scrolls it in first
+    await userEvent.keyboard("{End}"); // active → last row, offscreen until it is scrolled in
 
     await vi.waitFor(() => {
       const activeId = list.getAttribute("aria-activedescendant");
       expect(activeId).toBeTruthy();
-      // The IDREF must resolve to a **mounted** option — never dangle at an unrendered row.
+      // The hazard specific to windowing: the highlighted row may not be rendered, and
+      // `aria-activedescendant` naming an element that isn't in the DOM announces nothing.
       const active = container.querySelector(`[id="${activeId}"]`);
       expect(active).not.toBeNull();
       expect(active?.getAttribute("role")).toBe("option");
     });
-    // Focus never leaves the container in activedescendant mode.
     await expect.element(list).toHaveFocus();
     for (const option of options(container)) {
       expect(option).not.toHaveFocus();

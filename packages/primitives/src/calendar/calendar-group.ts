@@ -16,35 +16,31 @@ export interface CreateCalendarGroupReturn {
 /**
  * The `role="group"` container part: the calendar's accessible name, its calendar-wide state hooks
  * (`data-disabled` / `data-readonly` / `data-required`), and — the reason this part exists at all —
- * React Aria's `commitBehavior`, which decides what becomes of a range the user walks away from
- * mid-selection (`useRangeCalendar`).
+ * the abandonment policy, which decides what becomes of a range the user walks away from mid-selection.
  *
- * A range with an anchor but no second endpoint is a state the user cannot see and cannot leave: the
- * next click anywhere completes a range they had forgotten starting. So the two ways of walking away
- * both resolve it, per `state.commitBehavior()` — `"select"` (default) completes the tentative range
- * at the cursor, `"reset"` restores the selection from before it, `"clear"` empties it:
+ * A range with an anchor but no second endpoint is a state the user can neither see nor leave: the
+ * next click anywhere completes a range they had forgotten starting. So both ways of walking away
+ * resolve it, per `state.commitBehavior()` — `"select"` (default) completes the tentative range at the
+ * cursor, `"reset"` drops the anchor, `"clear"` empties the selection:
  *
  * - **Pointer released outside**, while focus is still in the calendar. A press on a `button` *inside*
  *   the calendar is exempt, which is what lets the month be paged (and the view drilled) mid-selection
  *   — the nav buttons are not an exit.
  * - **Focus leaving** the calendar entirely — a `focusout` after which focus has settled outside it.
  *
- * `Escape` is the third exit and is **not** routed through `commitBehavior` — it always cancels, as in
- * React Aria's `useCalendarGrid`. It lives on the grid's keymap (see `calendar-grid.ts`) because that
- * is where the roving cursor's keyboard already is.
+ * `Escape` is the third exit and always cancels regardless of `commitBehavior`; it lives on the grid's
+ * keymap (`calendar-grid.ts`), where the roving cursor's keyboard already is.
  *
- * `createDismissable` (`internal/create-dismissable.ts`) was evaluated for the outside half and
- * rejected: it fires on outside **pointerdown** with one `onDismiss` covering both Escape and the
- * pointer, where this needs pointer**up**, a split between cancelling and committing, and the
- * in-calendar `button` exemption. Reshaping it to fit would have made a dialog-shaped primitive carry
- * a calendar-shaped policy.
+ * Why not `createDismissable`, and the rest of the reasoning:
+ * `__internal__/primitives/calendar/calendar-group.md`.
  */
 export function createCalendarGroup(
   state: CreateCalendarReturn,
   props: JSX.HTMLAttributes<HTMLElement> = {},
 ): CreateCalendarGroupReturn {
-  // A real signal, not a plain variable: the effect below must re-run once the container mounts, and
-  // its compute fn is the only place a ref may be tracked (see `create-focus-trap.ts`).
+  // A real signal, not a plain variable: the effect below has to re-run once the container mounts, and
+  // a `createEffect`'s compute function is the only place a ref may be tracked under Solid 2.0 (see
+  // `../internal/create-focus-trap.ts`).
   const [container, setContainer] = createSignal<HTMLElement>();
 
   const applyCommitBehavior = () => {
@@ -59,9 +55,9 @@ export function createCalendarGroup(
   };
 
   // Listening only while a range is anchored keeps a single/multiple calendar — and an idle range one
-  // — free of a window listener entirely. Safe to arm this late: the anchor is set by the day cell's
-  // `click`, which fires *after* the `pointerup` that produced it, so the gesture that anchors can
-  // never be the gesture that commits.
+  // — free of a window listener entirely. Arming this late is safe: the anchor is set by the day
+  // cell's `click`, which fires *after* the `pointerup` that produced it, so the gesture that anchors
+  // can never be the gesture that commits.
   createEffect(
     () => [state.anchorDate(), container()] as const,
     ([anchor, element]) => {
@@ -70,8 +66,8 @@ export function createCalendarGroup(
       }
 
       const handlePointerUp = (event: PointerEvent) => {
-        // React Aria's `isFocusWithin` guard: once focus has already left, the focus-out branch owns
-        // the decision, and running both would commit twice.
+        // Once focus has already left, the focus-out branch below owns the decision — running both
+        // would resolve the range twice.
         if (!element.contains(document.activeElement)) {
           return;
         }
@@ -93,19 +89,18 @@ export function createCalendarGroup(
 
   const handleFocusOut: JSX.EventHandler<HTMLElement, FocusEvent> = (event) => {
     // `createListFocus` moves DOM focus from inside its own effect (`element.focus()`), which fires
-    // this synchronously — so a plain read here would land in that effect's tracking scope. Same
-    // deliberate imperative sync as `createCalendarCell`'s `onFocus`.
+    // this handler synchronously — so a plain read here would register as a dependency of that effect.
+    // Same deliberate imperative sync as `createCalendarCell`'s `onFocus`.
     if (untrack(state.anchorDate) === null) {
       return;
     }
     const element = event.currentTarget;
-    // Where focus went is decided on the next task, not from this event. React Aria reads
-    // `relatedTarget`, which it can trust because React *reuses* the day cells across a month change;
-    // Solid's `<For>` rebuilds them, so paging destroys the focused button and Chrome reports the
-    // blur with no `relatedTarget` at all — indistinguishable, at this instant, from tabbing away.
-    // Measured, not theoretical: reading `relatedTarget` ended the range on every `PageDown`. Letting
-    // the flush settle and then asking where focus actually *is* answers both cases with one rule,
-    // since the re-render and the grid's deferred focus nudge share that flush.
+    // Where focus went is decided on the next task, NOT from `event.relatedTarget`. Solid's `<For>`
+    // rebuilds the day cells on a month change, so paging destroys the focused button and Chrome
+    // reports the blur with no `relatedTarget` at all — at this instant indistinguishable from tabbing
+    // away. Measured, not theoretical: reading `relatedTarget` ended the range on every `PageDown`.
+    // Deferring and then asking where focus actually *is* answers both cases with one rule, because
+    // the re-render and the grid's deferred focus nudge land in the same flush.
     setTimeout(() => {
       untrack(() => {
         if (state.anchorDate() === null || !element.isConnected) {
@@ -139,7 +134,7 @@ export function createCalendarGroup(
   });
 
   // Two consumers of the same element, so `setRef` feeds both: the abandonment policy measures
-  // "outside" against it, and the root state's dev direction warning measures its applied layout.
+  // "outside" against it, and the root state's dev direction warning reads its applied layout.
   const setRef = (element: HTMLElement) => {
     setContainer(element);
     state.setGroupElement(element);

@@ -52,14 +52,13 @@ describe("hope calendar recipe", () => {
     const parts = calendarRecipe({});
     const cell = parts.cell();
     const trigger = parts.cellTrigger();
-    // The continuous band is painted on the <td> so it spans columns seamlessly. One band, so the
-    // tentative and committed phases share these rules rather than needing a parallel set.
+    // The band is painted on the <td> so it spans columns seamlessly. There is only ever ONE band, so
+    // the tentative and committed phases share these rules rather than needing a parallel set.
     expect(cell).toContain("data-selection-start:bg-selected");
     expect(cell).toContain("data-selection-end:bg-selected");
     expect(cell).toContain("data-selection-middle:bg-selected");
-    // The trigger paints one solid pill on the band's endpoints. A single/multiple selection caps both
-    // ends of its own one-day band, so the same two rules give it a pill too; `:not([data-disabled])`
-    // keeps a disabled day off it.
+    // The trigger paints a solid pill on the band's endpoints. A single/multiple selection caps both
+    // ends of its own one-day band, so the same two rules give it a pill too.
     expect(trigger).toContain("[&[data-selection-start]:not([data-disabled])]:bg-primary");
     expect(trigger).toContain("[&[data-selection-end]:not([data-disabled])]:bg-primary");
     expect(trigger).toContain("[&[data-selection-start]:not([data-disabled])]:text-on-primary");
@@ -85,8 +84,8 @@ describe("hope calendar recipe", () => {
   it("resolves overlapping day state by mutually-exclusive guards, not source order", () => {
     const trigger = calendarRecipe({}).cellTrigger();
     // A day is routinely several states at once (today AND selected, an interior that also reports
-    // selected). Precedence is encoded so that exactly ONE text-color rule can match: each
-    // lower-priority rule excludes every state above it, so the winner never depends on class/emit
+    // selected), so precedence is encoded such that exactly ONE text-color rule can match: each
+    // lower-priority rule excludes every state above it, and the winner never depends on class or emit
     // order. High→low: band endpoint › band interior › unavailable › today › outside.
     expect(trigger).toContain("[&[data-selection-start]:not([data-disabled])]:text-on-primary");
     // The interior excludes both endpoints, so an endpoint keeps its pill text rather than band text.
@@ -114,8 +113,9 @@ describe("hope calendar recipe", () => {
     const parts = calendarRecipe({});
     const cell = parts.cell();
     const trigger = parts.cellTrigger();
-    // The band rounds its leading/trailing ends and squares the interior, then rounds again at a row
-    // wrap (`first`/`last`) so a range spanning weeks reads as one shape per row.
+    // The band rounds its leading/trailing ends (logical `-s-`/`-e-`, so RTL mirrors for free) and
+    // squares the interior, then rounds again at a row wrap so a multi-week range reads as one shape
+    // per row.
     expect(cell).toContain("data-selection-start:rounded-e-none");
     expect(cell).toContain("data-selection-end:rounded-s-none");
     expect(cell).toContain("data-selection-middle:rounded-none");
@@ -129,7 +129,6 @@ describe("hope calendar recipe", () => {
     // mirroring the middle-cell row-wrap rounding, which otherwise only fires on interior cells.
     expect(cell).toContain("data-selection-start:last:rounded-e-md");
     expect(cell).toContain("data-selection-end:first:rounded-s-md");
-    // Logical sides only (`-s-`/`-e-`), never physical, so RTL mirrors for free.
     expect(cell).not.toMatch(/rounded-(?:tl|tr|bl|br|l|r)-/);
     // The pill on top stays uniformly rounded — the band, not the trigger, carries the range shape.
     expect(trigger).toContain("rounded-md");
@@ -158,9 +157,9 @@ describe("hope calendar recipe", () => {
   it("drives the roving focus ring from data-focused, gated on the grid holding focus", () => {
     const parts = calendarRecipe({});
     const trigger = parts.cellTrigger();
-    // No :focus-visible on the day trigger — the ring keys off the primitive's data-focused (the
-    // roving cursor), shown only while the grid is focus-within, so a programmatic arrow-nav focus
-    // can't defeat it. The UA outline is dropped since real focus still lands on the button.
+    // No `:focus-visible` on the day trigger — the ring keys off the primitive's `data-focused` (the
+    // roving cursor), gated on the grid being focus-within, so the heuristic cannot suppress it after
+    // the programmatic focus arrow-key navigation performs.
     expect(trigger).not.toContain("focus-visible:");
     expect(trigger).toContain("outline-none");
     expect(trigger).toContain("group-focus-within/grid:data-focused:border-focus");
@@ -205,20 +204,18 @@ describe("hope calendar recipe", () => {
   });
 
   it("scales density per size via --cell-size on root, each size self-contained", () => {
-    // sm: 32px day box (via --cell-size), tighter nav button.
     const sm = calendarRecipe({ size: "sm" });
     expect(sm.root()).toContain("[--cell-size:2rem]");
     expect(sm.cellTrigger()).toContain("text-xs");
     expect(sm.prevButton()).toContain("size-7");
 
-    // lg: 40px day box, roomier nav button.
     const lg = calendarRecipe({ size: "lg" });
     expect(lg.root()).toContain("[--cell-size:2.5rem]");
     expect(lg.cellTrigger()).toContain("text-base");
     expect(lg.prevButton()).toContain("size-9");
 
-    // The day box is view-independent: the button fills its column (width = --cell-size), so it carries
-    // no per-size `size-N` — only the text size changes.
+    // The button fills its column, whose width comes from `--cell-size`, so it carries no per-size
+    // `size-N` of its own — only the text size changes.
     expect(sm.cellTrigger()).toContain("h-(--cell-size)");
     expect(sm.cellTrigger()).toContain("w-full");
     expect(sm.cellTrigger()).not.toMatch(/\bsize-\d/);
@@ -251,9 +248,9 @@ describe("hope calendar recipe", () => {
   });
 
   it("merges a consumer class through the cellTrigger slot function", () => {
-    // Override the base `font-normal` — a utility with no variant twin, so the assertion proves the
-    // consumer class both lands and wins tailwind-merge (unlike `rounded-none`, which a range-middle
-    // variant already carries and would satisfy trivially).
+    // Overriding `font-normal` — a base utility with no variant twin — proves the consumer class both
+    // lands and wins tailwind-merge. `rounded-none` would not: a range-middle variant already carries
+    // it, so the assertion would pass trivially.
     const merged = calendarRecipe({ size: "md" }).cellTrigger({ class: "font-bold" });
     expect(merged).toContain("font-bold");
     expect(merged).not.toContain("font-normal");

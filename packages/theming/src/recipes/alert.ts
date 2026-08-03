@@ -2,16 +2,14 @@
  * The **Alert** recipe contract — its variant vocabulary, slots, and the resulting `AlertRecipe`
  * type.
  *
- * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
- * `@hope-ui/components` `Alert` consumes it via `useRecipe("alert")`, and each preset
- * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
- * keeps the registry (`./registry`) a flat list of named recipe types with no shape logic of its own.
+ * A *slot recipe* maps variant props to one class string per named part ("slot"). This file owns only
+ * that shape: `@hope-ui/components`' Alert consumes it via `useRecipe("alert")` and each preset
+ * implements a `tailwind-variants` recipe against it, so neither layer knows the other.
  *
- * Alert is a **static, non-interactive** status surface (a styled `<div>` with a compound anatomy),
- * so — like Badge — its recipe carries no interaction ladder (no `hover:`/`data-pressed`/
- * `focus-visible:`). Its axes are the visual variant × colorScheme × size, plus the one structural
- * quirk Badge lacks: the `default` variant colors the `icon` + `title` slots per role rather than the
- * `root` (see the preset recipe's `compoundVariants`).
+ * Alert is a **static, non-interactive** status surface, so — like Badge — its recipe carries no
+ * interaction ladder (no `hover:`/`data-pressed`/`focus-visible:`). Its axes are variant × colorScheme
+ * × size, plus the one structural quirk Badge lacks: the `default` variant colors the `icon` and
+ * `title` slots per role rather than the `root`.
  */
 import type { JSX } from "@solidjs/web";
 import type { SlotRecipeFn } from "../slot-recipe";
@@ -52,25 +50,21 @@ export interface AlertRecipeVariants {
 }
 
 /**
- * One preset-overridable default-glyph factory per {@link AlertStatusRole}, keyed `{role}Icon`
- * (`infoIcon`/`successIcon`/`warningIcon`/`dangerIcon`) — the icon slice of {@link AlertThemeableProps},
- * constructed from {@link AlertStatusIconKey} so the key set can't drift from the roles.
+ * One preset-overridable default-glyph factory per {@link AlertStatusRole}, keyed `{role}Icon`, and
+ * constructed from {@link AlertStatusIconKey} so the key set cannot drift from the roles.
  *
- * The glyphs are **flat, discrete factory keys**, never a nested `statusIcons` map:
- * `mergeComponentOverrides` merges `defaultProps` shallowly per key, so a nested map would drop a
+ * The glyphs are **flat, discrete keys**, never a nested `statusIcons` map, because
+ * `mergeComponentOverrides` merges `defaultProps` shallowly per key — a nested map would drop a
  * partial override. Each is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset
- * value is one object shared by every instance, and a Solid `JSX.Element` is an already-built node that
- * would *move* if reused — so a factory (called per instance, via `runIfFunction`) is what lets a
- * preset swap the app-wide default icon for a role.
+ * value is one object shared by every instance, and a Solid `JSX.Element` is an already-built DOM node
+ * that would *move* if reused. Called per instance through `runIfFunction`.
  */
 type AlertStatusGlyphs = { [Key in AlertStatusIconKey]?: () => JSX.Element };
 
 /**
  * The curated Alert props a preset may default app-wide via `ComponentOverride.defaultProps`: the
- * recipe variants **plus** the per-role status glyphs ({@link AlertStatusGlyphs}). A superset of
- * {@link AlertRecipeVariants} by construction (`extends`), so it registers in `ThemeablePropsRegistry`
- * and `ThemeablePropsOf<"alert">` widens the variants-only surface without dropping anything. Only the
- * status roles carry a built-in glyph; `primary`/`neutral` ship none (they need an explicit `icon`).
+ * recipe variants **plus** the per-role status glyphs ({@link AlertStatusGlyphs}). Only the status
+ * roles carry a built-in glyph; `primary`/`neutral` ship none and need an explicit `icon`.
  */
 export interface AlertThemeableProps extends AlertRecipeVariants, AlertStatusGlyphs {}
 

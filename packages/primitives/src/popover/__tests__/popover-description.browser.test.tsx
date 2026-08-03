@@ -144,10 +144,10 @@ describe("createPopoverDescription", () => {
     // `visibility: hidden` intermediate and return an `incomplete` nobody can act on.
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     await expectNoA11yViolations(container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check).
-      // The IDREF itself is pinned in `popover-trigger.browser.test.tsx`.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `popover-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

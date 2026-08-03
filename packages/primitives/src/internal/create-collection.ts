@@ -43,12 +43,11 @@ export interface ItemSource<V = unknown> {
 
 /**
  * An {@link ItemSource} whose rows publish their element **by index** instead of registering
- * themselves. Both data-derived implementations — `createDataCollection` and
- * `createVirtualCollection` — build their `CollectionItem`s from an array, so a mounted row has to
- * say *which* row it is: `registerElement(index, element)` is what resolves
- * `items()[index].element()` for the `aria-activedescendant` IDREF's target and for
- * scroll-into-view. {@link createCollection} is the odd one out — there the registrations *are* the
- * items — which is why this is a separate interface rather than a member of `ItemSource`.
+ * themselves. `createDataCollection` and `createVirtualCollection` both build their items from an
+ * array, so a mounted row has to say *which* row it is before `items()[index].element()` can
+ * resolve — and that is what `aria-activedescendant` and scroll-into-view point at.
+ * {@link createCollection} needs none of this (there the registrations *are* the items), hence a
+ * separate interface rather than a member of `ItemSource`.
  */
 export interface IndexedItemSource<V = unknown> extends ItemSource<V> {
   /** Publish a mounted row's element for `index`, or `null` to clear that slot. */
@@ -57,11 +56,10 @@ export interface IndexedItemSource<V = unknown> extends ItemSource<V> {
    * Retire a row's element from wherever it is registered — the teardown half of
    * {@link registerElement}, and the one a row that can **move** must use.
    *
-   * Clearing by index is unsafe the moment the data reorders: sibling effects re-run one after
-   * another, so by the time a moved row tears down its old slot another row may already own it, and
-   * a plain read cannot tell (a signal write is not visible until the next flush). Addressing the
-   * element instead makes the removal order-independent — the lookup happens inside the functional
-   * update, which does see the settled map.
+   * Clearing by index is unsafe once the data reorders: sibling effects re-run one at a time, so a
+   * moved row can tear down a slot another row already owns, and it cannot tell by reading — in
+   * Solid a write stays invisible to a plain read until the next flush. Looking the element up
+   * *inside* the functional update sees the settled map instead, so removal is order-independent.
    */
   unregisterElement: (element: HTMLElement) => void;
   /** Hand a mounted row to the source's measurer, where it has one (variable-height virtual rows). */
@@ -72,9 +70,10 @@ export interface IndexedItemSource<V = unknown> extends ItemSource<V> {
  * The shared element registry behind both index-registered sources ({@link IndexedItemSource}) —
  * `registerElement` publishes a mounted row by index, `unregisterElement` retires it by identity.
  *
- * `ownedWrite` because a row unmounts during `<For>` reconciliation (a computation) and its cleanup
- * writes from within that scope: a deliberate bridge write, not the ancestor-scope mistake the
- * diagnostic guards. Every write is **functional**, because register/unregister run inside an effect
+ * `ownedWrite: true` opts the signal out of Solid's `[REACTIVE_WRITE_IN_OWNED_SCOPE]` diagnostic: a
+ * row unmounts during `<For>` reconciliation — a computation — and its cleanup writes from inside
+ * that scope. That is a deliberate bridge write, not the ancestor-scope mistake the diagnostic
+ * guards against. Every write is **functional** because register/unregister run inside an effect,
  * where reading the map would be an untracked read of a reactive value (`[STRICT_READ_UNTRACKED]`).
  */
 export function createElementRegistry(): {
@@ -114,28 +113,28 @@ export function createElementRegistry(): {
 }
 
 /**
- * The ids an {@link IndexedItemSource} gives its rows: one generated prefix per collection instance,
- * plus the row's index — Base UI's `${rootId}-${index}` scheme, where the item's own id is not even
- * a prop a consumer can set.
+ * The ids an {@link IndexedItemSource} gives its rows: one generated prefix per collection instance
+ * plus the row's index — the scheme Base UI (the headless React library this kernel borrows its API
+ * shape from) uses, where a row's id is likewise not a consumer-settable prop.
  *
- * Deliberately **not** derived from the item's value. A value is arbitrary application data, and
- * usually server data: it can carry whitespace (an IDREF containing a space can never be pointed
- * at), collide with a second collection rendering the same records on the same page, or simply not
- * be a legal id — and every one of those failures is silent, breaking `aria-activedescendant` for a
- * screen-reader user while every test stays green.
+ * Deliberately **not** derived from the item's value: values are arbitrary, usually server-supplied
+ * data, so they can contain whitespace (an id with a space can never be referenced by
+ * `aria-activedescendant`), collide with a second collection rendering the same records, or not be a
+ * legal id at all — each failure silent, breaking screen-reader navigation with every test green.
  *
- * `createUniqueId()` is SSR-stable (the server render and the hydrating client bottom out in the
- * same `nextChildIdFor(owner)`), so the IDREF still agrees across the round-trip. That is the
- * property a data-driven source is chosen for, and it survives generated ids intact.
- *
- * Call it **once**, where the collection is created — it consumes a hydration id.
+ * `createUniqueId()` produces the same id on the server render and on the hydrating client, so the
+ * reference survives the round-trip. Call it **once**, where the collection is created: every call
+ * advances the id counter both halves must walk identically.
  */
 export function createItemIds(): (index: number) => string {
   const prefix = createUniqueId();
   return (index) => `${prefix}-${index}`;
 }
 
-/** Reactive inputs a part hook passes to {@link CreateCollectionReturn.register}. */
+/**
+ * Reactive inputs an item's part hook — the behavior hook behind a part like `Listbox.Option` —
+ * passes to {@link CreateCollectionReturn.register}.
+ */
 export interface RegisterItemOptions<V = unknown> {
   /**
    * The item's element as a **real signal accessor** (not a closure over a plain `let`): the
@@ -167,25 +166,22 @@ export interface CreateCollectionReturn<V = unknown> extends ItemSource<V> {
 }
 
 /**
- * Ordered, reactive registry of the items a collection component renders — the **default item
- * source** the navigation kernel reads. It sits on top of `createRegisteredElement` (a
- * one-directional publisher with no ordering guarantee) and adds the one thing that publisher
- * deliberately lacks: **DOM order**. Registration order is effect-creation order, which is not the
- * order a screen reader or an ArrowDown press should follow, so `items()` sorts every registered
- * element by `compareDocumentPosition`.
+ * Ordered, reactive registry of the items a collection component renders — the default source the
+ * list behaviors in this folder read. It sits on top of `createRegisteredElement` (a one-directional
+ * publisher with no ordering guarantee) and adds what that publisher deliberately lacks: **DOM
+ * order**. Items register in effect-creation order, which is not the order a screen reader or an
+ * ArrowDown press follows, so `items()` sorts them by `compareDocumentPosition`.
  *
- * Modeled on Angular Aria's `SortedCollection` + `private/behaviors/list` (its reasoning and public
- * surface, not its code). Everything here is instance-scoped — there is no module-level state — so
- * two collections, or two installed copies of this package, never interfere.
+ * Adapted from Angular Aria's `SortedCollection` (its reasoning and public surface, not its code).
+ * All state is instance-scoped — no module-level state — so two collections, or two installed copies
+ * of this package, never interfere.
  *
  * Call it **once**, at the root of a collection (a `Listbox.Root` body or a `createRoot`).
  */
 export function createCollection<V = unknown>(): CreateCollectionReturn<V> {
-  // The registered items, in registration order. `items()` derives DOM order from this.
-  // `ownedWrite` because register/unregister fire from descendant lifecycle (via
-  // `createRegisteredElement`), and unregister can run while a parent `<For>`/`<Show>` is
-  // reconciling — a computation — when the items are keyed off changing data. That is a
-  // deliberate bridge write, not the ancestor-scope mistake the diagnostic guards against.
+  // Registration order, not DOM order — `items()` derives that below. `ownedWrite: true` for the
+  // same reason as in `createElementRegistry`: unregister can fire while a parent `<For>`/`<Show>`
+  // is reconciling, which is a write from inside a computation Solid would otherwise flag.
   const [entries, setEntries] = createSignal<CollectionItem<V>[]>([], { ownedWrite: true });
 
   const items = createMemo<ReadonlyArray<CollectionItem<V>>>(() =>

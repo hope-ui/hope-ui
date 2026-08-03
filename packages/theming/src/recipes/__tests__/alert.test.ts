@@ -21,10 +21,9 @@ const _variants: AlertRecipeVariants = {
 };
 void _variants;
 
-// `AlertThemeableProps` is the curated surface a preset may default app-wide: the recipe variants
-// **plus** the four flat, discrete status-icon factory keys (never a nested map — a nested map would
-// lose a partial override under `mergeComponentOverrides`' shallow per-key merge). It is a strict
-// superset of the variants, so a bare variants object is still assignable to it.
+// The curated surface a preset may default app-wide: the recipe variants **plus** four flat, discrete
+// status-icon factory keys. Flat rather than a nested map because `mergeComponentOverrides` merges
+// `defaultProps` shallowly per key, so a nested map would lose a partial override.
 const _variantsAreThemeable = (v: AlertRecipeVariants): AlertThemeableProps => v;
 void _variantsAreThemeable;
 const _statusIcons: AlertThemeableProps = {

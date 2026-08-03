@@ -3,12 +3,10 @@ import { expectNoA11yViolations, hydrateFixture } from "@hope-ui/internal-test-u
 import { describe, expect, it } from "vitest";
 import { Tree } from "./badge-icons.ssr-entry";
 
-// Regression: a Badge with an **icon component** in its `<Show>`-gated decorator slots — and a
-// **component** in its `<Show>`-gated label — must hydrate cleanly. Before the fix, a component read
-// inside a `<Show>`-gated slot span computed a hydration key one off from the server's, so
-// `hydrate()` looked up the wrong node. `hydrateFixture` asserts the full contract — silent
-// hydration, no node added/dropped, every server node reused. `ssrFixture` is genuine server HTML
-// rendered fresh by the hydration-fixture bridge from the same `Tree`. See __internal__/solid-2.0-notes.md.
+// Regression: a component inside a `<Show>`-gated slot used to land one position off from the
+// server's, so hydration looked up the wrong node. The cause was the `<Show>` gate reading the raw
+// prop, which builds and discards a component; Badge now resolves those props once with
+// `children()`. Badge gates its label as well as its decorators, so all three are at risk here.
 
 describe("Badge (icon components) hydration", () => {
   it("hydrates component decorators and label in place, without a mismatch or a second render", () => {

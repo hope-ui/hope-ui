@@ -19,15 +19,15 @@
  */
 
 /**
- * Provenance: this press engine is **derived from React Spectrum's `@react-aria/interactions`
- * `usePress`** — its interaction model and reasoning, re-expressed for SolidJS 2.0, not a
- * line-for-line port. The behaviors adapted
- * from it: unifying pointer/touch/mouse/keyboard/virtual-click into a single press,
- * cancel-on-drag-out with re-arm, scroll cancellation, focus-on-press normalization, and touch
- * text-selection suppression. What differs here is deliberate and documented on `createPress`:
- * `onPress` is fired from the `click` event (so it composes with a native `onClick` API and
- * never double-fires), and the reactive surface is a single plain-value signal (hydration-safe
- * by construction). Do not "correct" these divergences back toward the React source.
+ * Derived from `usePress` in React Aria — Adobe's headless accessibility hooks — as an interaction
+ * model re-expressed for SolidJS 2.0, not a line-for-line port. Adapted from it: unifying
+ * pointer/touch/mouse/keyboard/virtual clicks into a single press, cancel-on-drag-out with re-arm,
+ * scroll cancellation, focus-on-press normalization, touch text-selection suppression.
+ *
+ * Two divergences are deliberate — **do not "correct" them back toward the React source**. `onPress`
+ * fires from the `click` event, so it composes with a native `onClick` API and never double-fires;
+ * and the reactive surface is one plain-value signal, which is what keeps it hydration-safe. Both
+ * are explained on {@link createPress}.
  */
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createSignal, onCleanup } from "solid-js";
@@ -137,34 +137,31 @@ interface ActivePress {
 }
 
 /**
- * The unified press engine — one `onPress` from pointer, touch, mouse, keyboard, and
- * screen-reader virtual clicks — API-modeled on React Aria's `usePress` (its behavior, not
- * its code). A shared behavior primitive for `createButton` and every future pressable.
+ * The unified press engine — one `onPress` from pointer, touch, mouse, keyboard and screen-reader
+ * virtual clicks. Shared by `createButton` and every future pressable.
  *
  * ## Activation vs. lifecycle
  *
- * `onPress` is fired from the **`click` event**, which is the one signal every input modality
- * ultimately produces: a mouse click, a native button's Enter/Space (the browser dispatches a
- * click), a touch tap, a screen-reader activation, and the synthetic `element.click()` that
- * `createButton` fires for non-native Enter/Space all land on `onClick`. Making the click
- * canonical means a single source of truth and no double-fire — and it dovetails with a
- * component whose public API is the native `onClick`. The **lifecycle** callbacks
- * (`onPressStart`/`onPressEnd`/`onPressUp`/`onPressChange`) and `isPressed` are driven by the
- * pointer/keyboard handlers, so `data-pressed` reflects the physical press even mid-drag.
+ * `onPress` fires from the **`click` event**, the one signal every input modality ultimately
+ * produces: a mouse click, a native button's Enter/Space (the browser dispatches a click), a touch
+ * tap, a screen-reader activation, and the synthetic `element.click()` this engine fires for a
+ * non-native Enter/Space all land on `onClick`. That means one source of truth, no double-fire, and
+ * it composes with a component whose public API is the native `onClick`. The **lifecycle** callbacks
+ * (`onPressStart`/`onPressEnd`/`onPressUp`/`onPressChange`) and `isPressed` run off the
+ * pointer/keyboard handlers instead, so `data-pressed` reflects the physical press even mid-drag.
  *
- * Cancel-on-drag-out fires `onPressEnd` and clears `isPressed` when the pointer leaves the
- * target, and re-arms (`onPressStart`) on re-entry; a release outside the target produces no
- * `click`, so no `onPress` — exactly the native button contract. A scroll or pointer-cancel
- * during a press cancels it (fixes sticky mobile `:active`).
+ * Dragging off the target fires `onPressEnd` and clears `isPressed`; re-entering re-arms it. A
+ * release outside the target produces no `click`, so no `onPress` — exactly the native button
+ * contract. A scroll or a pointer-cancel during a press cancels it, which is what prevents a sticky
+ * `:active` on mobile.
  *
- * ## SSR / hydration
+ * ## Server rendering and hydration
  *
- * The only reactive state is a plain-value `createSignal(false)` for `isPressed` — not a
- * compute-form signal/memo — so it consumes no hydration id and is byte-stable: `false` on the
- * server and initial client alike, and the consumer emits `data-pressed` only when truthy.
- * Every `document` listener is added imperatively inside an event handler (never during
- * render) and removed on release/cancel; `onCleanup` tears down a press still active at
- * dispose. Nothing touches the DOM in the render body, so the body is a no-op under SSR. No
+ * The only reactive state is a plain-value `createSignal(false)` for `isPressed` — not the compute
+ * form `createSignal(fn)`, which would consume a hydration id — so it is `false` on the server and
+ * on the first client render alike, and the consumer emits `data-pressed` only when truthy. Every
+ * `document` listener is added imperatively from inside an event handler, never during render, and
+ * removed on release/cancel; `onCleanup` tears down a press still active at disposal. No
  * module-scope state — the transient bookkeeping is a per-instance closure.
  */
 export function createPress<T extends HTMLElement = HTMLElement>(
@@ -172,8 +169,8 @@ export function createPress<T extends HTMLElement = HTMLElement>(
 ): CreatePressReturn<T> {
   const [isPressed, setIsPressed] = createSignal(false);
 
-  // A plain mirror of `isPressed`, so the handlers never read the signal outside a tracking
-  // scope (which would trip `STRICT_READ_UNTRACKED` in dev) to decide whether the state changed.
+  // A plain mirror of `isPressed`: event handlers run outside any reactive scope, where reading the
+  // signal itself would emit Solid's `[STRICT_READ_UNTRACKED]` warning in dev.
   let pressedNow = false;
   let activePointer: ActivePress | undefined;
   let keyboardPressed = false;

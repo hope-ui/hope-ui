@@ -267,11 +267,11 @@ describe("createListTypeahead — collator", () => {
   });
 
   // A named, pinned limitation — not a bug to "fix" here. `matchesQuery`'s
-  // `textValue.slice(0, query.length)` counts UTF-16 code units, while the collator compares
-  // collation elements; the same expression `ListKeyboardDelegate.getKeyForSearch` and
-  // `useFilter.ts` use, and react-aria lives with. When the query and the target normalize
-  // differently — a precomposed character on one side, the decomposed base letter + combining
-  // mark on the other — the slice can land mid-grapheme and compare a truncated fragment.
+  // `textValue.slice(0, query.length)` counts UTF-16 code units while the collator compares
+  // collation elements, so when query and target normalize differently — a precomposed character
+  // on one side, the decomposed base letter + combining mark on the other — the slice can land
+  // mid-grapheme and compare a truncated fragment. React Aria's typeahead is the same expression
+  // and lives with the same limitation.
   it("known limitation: a query normalized differently than its target can miss a real prefix match", async () => {
     let api!: HarnessApi;
     let collator!: Accessor<Intl.Collator>;

@@ -2,22 +2,20 @@
  * The **Dialog** recipe contract — its variant vocabulary, slots, and the resulting `DialogRecipe`
  * type.
  *
- * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
- * `@hope-ui/components` `Dialog` consumes it via `useRecipe("dialog")`, and each preset
- * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
- * keeps the registry (`../registry`) a flat list of named recipe types with no shape logic of its own.
+ * A *slot recipe* maps variant props to one class string per named part ("slot"). This file owns only
+ * that shape: `@hope-ui/components`' Dialog consumes it via `useRecipe("dialog")` and each preset
+ * implements a `tailwind-variants` recipe against it, so neither layer knows the other.
  *
  * Dialog is a **compound overlay surface** — a portaled, positioned card over a scrim — so its axes
- * are the layout ones a consumer sets once on `Dialog.Root`: `size` (the width scale, plus the two
- * viewport-filling edge sizes), `placement` (centered vs. top-anchored), and `scrollBehavior` (where
- * overflow scrolls). It carries **no** color axis: v1 is a neutral container, and role accents live on
- * the footer's action `Button`, not the dialog chrome (see the design proposal, §resolved decisions).
- * `role` (`dialog` vs. `alertdialog`) is **not** a recipe variant — it changes ARIA, not styling, so
- * it is a component-layer prop lifted to `Dialog.Root` and threaded to the content hook via context.
+ * are the layout ones a consumer sets once on `Dialog.Root`: `size`, `placement` and `scrollBehavior`.
+ * It carries **no** color axis: a dialog is a neutral container, and role accents live on the footer's
+ * action `Button`, not the chrome. `role` (`dialog` vs `alertdialog`) is **not** a recipe variant
+ * either — it changes ARIA, not styling, so it is a component-layer prop threaded through context.
  *
- * Enter/exit is expressed on the preset's `data-entering:`/`data-exiting:` custom variants (→
- * `[data-presence="…"]`, the status the parts write to `data-presence`), never on arbitrary
- * `data-[state=…]`; every color is a finished `--hope-*` token (recipe purity). See `theming.md`.
+ * Enter/exit is expressed on the preset's `data-entering:`/`data-exiting:` variants (→
+ * `[data-presence="…"]`, the status the parts write to `data-presence`), never an arbitrary
+ * `data-[state=…]`. Every color is a *finished* `--hope-*` design token, never one the recipe computes
+ * ("recipe purity" — see `theming.md`).
  */
 import type { SlotRecipeFn } from "../slot-recipe";
 
@@ -50,9 +48,8 @@ export interface DialogRecipeVariants {
 
 /**
  * The curated Dialog props a preset may default app-wide via `ComponentOverride.defaultProps`. Dialog
- * carries no non-variant chrome content (no status glyphs like Alert), so this is exactly the recipe
- * variants — a strict superset of {@link DialogRecipeVariants} by construction (`extends`), so it
- * registers in `ThemeablePropsRegistry` and `ThemeablePropsOf<"dialog">` widens nothing away.
+ * carries no non-variant chrome content (no status glyphs like Alert's), so this is exactly the recipe
+ * variants — kept as its own name for contract uniformity with the components that do add props.
  */
 export interface DialogThemeableProps extends DialogRecipeVariants {}
 

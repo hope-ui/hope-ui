@@ -16,9 +16,8 @@ const _variants: ListboxRecipeVariants = {
 };
 void _variants;
 
-// `ListboxThemeableProps` is the curated surface a preset may default app-wide. Listbox carries no
-// non-variant chrome content, so it is exactly the recipe variants — a strict superset by
-// construction, so a bare variants object is still assignable to it (and vice versa).
+// Listbox carries no non-variant chrome content, so the themeable surface is exactly the recipe
+// variants and the two are mutually assignable.
 const _variantsAreThemeable = (v: ListboxRecipeVariants): ListboxThemeableProps => v;
 void _variantsAreThemeable;
 const _themeableAreVariants = (v: ListboxThemeableProps): ListboxRecipeVariants => v;

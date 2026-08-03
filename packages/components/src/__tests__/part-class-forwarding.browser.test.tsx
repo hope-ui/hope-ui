@@ -17,25 +17,23 @@ import { Popover } from "../popover";
 import { Select } from "../select";
 
 /**
- * The cross-component pin for **one** invariant: every public part that renders a host element puts
- * the consumer's `class` on that element.
+ * One invariant, pinned across every component: a public part that renders a host element puts the
+ * consumer's `class` on that element.
  *
- * It exists because this bug class has now shipped three times, always silently: `Calendar.Root`
- * declared no native attributes, `Listbox.ItemIndicator` declared only `children`, and five `Alert`
- * parts computed `class` from their slot without folding `props.class` in — so the getter won the
- * `merge` and the consumer's string vanished. Every one of them type-checked, passed its own suite,
- * and shipped docs promising the opposite.
+ * It exists because this bug has now shipped three times, always silently — a part declaring no
+ * native attributes at all, a part declaring only `children`, and five parts computing `class` from
+ * their slot without folding `props.class` in, so the computed getter won the merge and the
+ * consumer's string vanished. Each type-checked, passed its own suite, and shipped docs promising
+ * the opposite.
  *
- * **This list is hand-kept — a new part is covered only once someone adds it here.** That is the
- * limitation `pnpm check:class-forwarding` exists to cover: the script reads every part file, so it
- * catches the two source shapes that drop a class without anyone remembering anything. The two are
- * complementary and neither subsumes the other — the script cannot see the DOM (a part could compute
- * the right string and still render it onto the wrong element, or a `render` target could swallow
- * it), and this file cannot see a part nobody listed.
+ * **The list below is hand-kept**, so a new part is covered only once someone adds it. That gap is
+ * what `pnpm check:class-forwarding` fills: the script reads every part file and catches the two
+ * source shapes that drop a class, with nobody having to remember. Neither subsumes the other — the
+ * script cannot see the DOM (a part could compute the right string and render it onto the wrong
+ * element, or a `render` target could swallow it), and this file cannot see an unlisted part.
  *
- * Deliberately narrow: `class` only, asserted **on the element**. The recipe's own classes surviving
- * the merge, tailwind-merge precedence, and the rest of the native attributes stay with each
- * component's own suite, which can express them per part.
+ * Deliberately narrow: `class` only, asserted on the element. Recipe classes surviving the merge and
+ * tailwind-merge precedence stay in each component's own suite, which can express them per part.
  */
 
 function Themed(props: { children: JSX.Element }): JSX.Element {
@@ -64,8 +62,8 @@ interface Basket {
   fruits: Fruit[];
 }
 const APPLE: Fruit = { id: 1, name: "Apple" };
-// Grouped, so one tree probes every Listbox part: `items` holds the group entries and the per-entry
-// callback renders the Group/GroupLabel/Item/ItemIndicator/Separator chain.
+// Grouped, so a single tree can probe every list part at once — the group, its label, an item, the
+// item's indicator and a separator.
 const BASKETS: Basket[] = [{ kind: "Fruits", fruits: [APPLE] }];
 const itemToValue = (fruit: Fruit) => String(fruit.id);
 const itemToLabel = (fruit: Fruit) => fruit.name;
@@ -145,8 +143,8 @@ describe("every public part forwards its class to the element it renders", () =>
     dispose();
   });
 
-  // Dialog's parts portal to `document.body`, so they are probed against the document, not the mount
-  // container. `Dialog.Root`/`Dialog.Portal` render no element of their own and are exempt by design.
+  // Dialog's parts move out to `document.body`, so they are probed against the document rather than
+  // the mount container. `Dialog.Root`/`Dialog.Portal` render no element at all and are exempt.
   it("Dialog", async () => {
     const { dispose } = mount(() => (
       <Themed>
@@ -155,7 +153,7 @@ describe("every public part forwards its class to the element it renders", () =>
           <Dialog.Portal>
             <Dialog.Backdrop class="probe-backdrop" style={{ position: "fixed", inset: "0" }} />
             <Dialog.Positioner class="probe-positioner">
-              {/* The auto CloseTrigger is off, so the only `dialog-close-trigger` in the document is
+              {/* The auto close button is off, so the only `dialog-close-trigger` in the document is
               the probed one below — otherwise the query would find Content's unprobed one first. */}
               <Dialog.Content
                 class="probe-content"
@@ -187,17 +185,16 @@ describe("every public part forwards its class to the element it renders", () =>
       "dialog-footer": "probe-footer",
       "dialog-close-trigger": "probe-close-trigger",
     });
-    // The trigger carries no recipe slot (and so no `data-slot`) — its `class` rides the primitive's
-    // prop passthrough instead of a slot fn, which is exactly why it needs pinning here too.
+    // The trigger is unstyled and so carries no `data-slot`: its `class` rides the hook's plain prop
+    // forwarding rather than a slot function, which is a different path and needs its own pin.
     expect(document.querySelector("button.probe-trigger")).not.toBeNull();
     await expectNoA11yViolations(document.body);
     dispose();
   });
 
-  // Popover's parts portal to `document.body` too. `Popover.Root`/`Popover.Portal` render no element
-  // of their own and are exempt by design; `Trigger` and `Anchor` render one but carry no recipe slot
-  // (so no `data-slot`) — their `class` rides the primitive's prop passthrough, which is exactly why
-  // they need pinning here.
+  // Popover's parts move out to `document.body` too. `Popover.Root`/`Popover.Portal` render no
+  // element and are exempt; `Trigger` and `Anchor` do render one but are unstyled, so their `class`
+  // takes the plain prop-forwarding path and is asserted separately below.
   it("Popover", async () => {
     const { dispose } = mount(() => (
       <Themed>
@@ -228,8 +225,8 @@ describe("every public part forwards its class to the element it renders", () =>
       </Themed>
     ));
 
-    // The layer is `visibility: hidden` until the first measurement lands; axe would otherwise
-    // inspect that pre-positioned intermediate and return an `incomplete` nobody can act on.
+    // The layer stays `visibility: hidden` until its first measurement lands; running axe against
+    // that intermediate state returns an `incomplete` nobody can act on.
     await vi.waitFor(() => {
       const positioner = document.querySelector<HTMLElement>('[data-slot="popover-positioner"]');
       expect(positioner?.style.visibility).not.toBe("hidden");
@@ -247,9 +244,9 @@ describe("every public part forwards its class to the element it renders", () =>
     expect(document.querySelector("button.probe-trigger")).not.toBeNull();
     expect(document.querySelector("div.probe-anchor")).not.toBeNull();
     await expectNoA11yViolations(document.body, {
-      // Axe returns `aria-valid-attr-value` as *incomplete* for any element carrying both
-      // `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by
-      // construction. The IDREF itself is pinned in `popover.browser.test.tsx`.
+      // Axe reports `aria-valid-attr-value` as *incomplete* for any element carrying both
+      // `aria-haspopup` and `aria-controls`, without ever resolving the id reference — undecidable
+      // by construction. That the reference resolves is pinned in `popover.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();
@@ -299,16 +296,15 @@ describe("every public part forwards its class to the element it renders", () =>
     dispose();
   });
 
-  // Select's popup portals out of the mount container, so the probe runs against the document.
-  // `Select.Root` and `Select.Portal` render no element of their own and are exempt by design — every
-  // other part carries a recipe slot, so unlike Popover there is no slot-less part to pin separately.
-  // The tree is grouped and opened, since nothing renders until it is.
+  // Select's popup moves out of the mount container, so the probe runs against the document.
+  // `Select.Root`/`Select.Portal` render no element and are exempt; unlike Popover, every other part
+  // is styled, so there is no separate slot-less part to pin. The tree is grouped and opened,
+  // because nothing renders until it is.
   //
-  // It is also the one tree here that needs **landmarks**. An open Select's IDREFs cross the portal in
-  // both directions (`aria-activedescendant` out, `aria-labelledby` back), so axe has to see the whole
-  // document — and axe's `region` rule then flags a bare `<body>` child, which is a fact about this
-  // harness page rather than about Select. So the control sits in a named region and the popup portals
-  // into a `<main>`, the landmarks a real page has. `select.browser.test.tsx` does the same.
+  // It is also the one tree here that needs **landmarks**. An open Select's id references cross the
+  // portal in both directions, so axe has to inspect the whole document — and axe's `region` rule
+  // then flags a bare `<body>` child, which is a fact about this harness page rather than about
+  // Select. Hence the named region and the `<main>` to portal into, the landmarks a real page has.
   it("Select", async () => {
     const portalMount = document.createElement("main");
     document.body.appendChild(portalMount);
@@ -364,8 +360,8 @@ describe("every public part forwards its class to the element it renders", () =>
       </Themed>
     ));
 
-    // The layer is `visibility: hidden` until the first measurement lands; axe would otherwise
-    // inspect that pre-positioned intermediate and return an `incomplete` nobody can act on.
+    // The layer stays `visibility: hidden` until its first measurement lands; running axe against
+    // that intermediate state returns an `incomplete` nobody can act on.
     await vi.waitFor(() => {
       const positioner = document.querySelector<HTMLElement>('[data-slot="select-positioner"]');
       expect(positioner?.style.visibility).not.toBe("hidden");
@@ -386,9 +382,9 @@ describe("every public part forwards its class to the element it renders", () =>
       "select-item-indicator": "probe-item-indicator",
     });
     await expectNoA11yViolations(document.body, {
-      // Axe returns `aria-valid-attr-value` as *incomplete* for any element carrying both
-      // `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by
-      // construction. The IDREF itself is pinned in `select.browser.test.tsx`.
+      // Axe reports `aria-valid-attr-value` as *incomplete* for any element carrying both
+      // `aria-haspopup` and `aria-controls`, without ever resolving the id reference — undecidable
+      // by construction. That the reference resolves is pinned in `select.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();
@@ -415,7 +411,7 @@ describe("every public part forwards its class to the element it renders", () =>
             >
               <Combobox.Input class="probe-input" aria-label="fruits" />
               {/* `alwaysVisible`, because `Combobox.Clear` hides itself when there is nothing to
-                  clear — and a part that rendered nothing would pass this probe vacuously. */}
+                  clear — and a part that renders nothing would pass this probe vacuously. */}
               <Combobox.Clear class="probe-clear" alwaysVisible />
               <Combobox.Trigger class="probe-trigger">
                 <Combobox.Icon class="probe-icon" />
@@ -481,7 +477,7 @@ describe("every public part forwards its class to the element it renders", () =>
     });
     await expectNoA11yViolations(document.body, {
       // The chevron carries both `aria-haspopup` and `aria-controls` while open — see the note on
-      // Select. The IDREF itself is pinned in `combobox.browser.test.tsx`.
+      // Select. That the reference resolves is pinned in `combobox.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();
@@ -490,8 +486,8 @@ describe("every public part forwards its class to the element it renders", () =>
 
   it("Combobox.Empty", async () => {
     // Its own tree, because the part renders only while the filtered option set is empty — which
-    // means an `items={[]}` root, which in turn is only openable because `Combobox.Root` flips the
-    // kernel's `allowsEmptyCollection` default to `true`.
+    // needs an `items={[]}` root, openable at all only because `Combobox.Root` flips the underlying
+    // `allowsEmptyCollection` default to `true`.
     const portalMount = document.createElement("main");
     document.body.appendChild(portalMount);
     const { dispose } = mount(() => (
@@ -522,11 +518,11 @@ describe("every public part forwards its class to the element it renders", () =>
     expectProbedClasses(document, { "combobox-empty": "probe-empty" });
     await expectNoA11yViolations(document.body, {
       // An empty `role="listbox"` is exactly the state this tree exists to render, and axe cannot
-      // decide it: `aria-required-children` returns *incomplete* for a container with no owned
-      // children, because "populated later" is legitimate and indistinguishable from "malformed". It
-      // is also the state the APG combobox pattern asks for — a query that matches nothing keeps the
-      // popup open so `Combobox.Empty` can say so — and the message lives beside the listbox rather
-      // than inside it precisely because `listbox` may only contain options and groups.
+      // decide it: `aria-required-children` is *incomplete* for a container with no owned children,
+      // because "populated later" is legitimate and indistinguishable from "malformed". It is also
+      // the state the combobox pattern asks for — a query matching nothing keeps the popup open so
+      // the empty message can say so — and that message sits *beside* the listbox rather than inside
+      // it precisely because a listbox may only contain options and groups.
       allowIncomplete: ["aria-required-children"],
     });
     dispose();

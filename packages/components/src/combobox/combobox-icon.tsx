@@ -13,20 +13,17 @@ export interface ComboboxIconProps extends ComboboxIconElementProps {
   /**
    * A custom chevron, overriding the default for this one trigger. When omitted, renders the resolved
    * default (instance `chevronIcon` ?? preset `defaultProps.combobox.chevronIcon` ?? hope's built-in
-   * chevron-down) from context. Read **exactly once**.
+   * chevron-down) from context.
    */
   children?: JSX.Element;
 }
 
 /**
- * The trigger's chevron. Purely presentational and purely decorative — it conveys nothing the
- * input's `aria-expanded` does not already say, which is why it is `aria-hidden` and carries no
- * behavior of its own. There is no primitive part hook, for the same reason `Select.Icon` has none:
- * no ARIA beyond one constant, so there is nothing for the kernel to own.
+ * The trigger's chevron: purely decorative, and `aria-hidden` because it conveys nothing the input's
+ * own `aria-expanded` does not already say.
  *
- * The glyph is **built in**: with no `children`, it renders `ctx.chevronIcon()` — an accessor, so
- * each read builds a fresh element. A consumer's `children` overrides it per instance. This keeps
- * the default glyph themeable app-wide from a preset rather than hard-coded here.
+ * The glyph is **built in**: with no `children` it renders the one resolved on `Combobox.Root`, so a
+ * preset can swap the default app-wide instead of every consumer hard-coding an SVG.
  */
 export const Icon: Component<ComboboxIconProps> = (props) => {
   const ctx = useComboboxContext();
@@ -34,8 +31,8 @@ export const Icon: Component<ComboboxIconProps> = (props) => {
 
   const elementProps = merge(rest, {
     "data-slot": "combobox-icon",
-    // Component-owned, deliberately not forwardable: un-hiding the chevron would announce a state
-    // the input's own `aria-expanded` already conveys, on a button that already has a name.
+    // Deliberately not forwardable: un-hiding the chevron would announce a state the input's own
+    // `aria-expanded` already conveys, on a button that already has a name.
     "aria-hidden": "true" as const,
     get class(): string {
       return ctx.slots.icon(props.class);

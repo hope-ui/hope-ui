@@ -26,10 +26,10 @@ export const Sizes: Story = {
 };
 
 /**
- * The whole point: CloseButton asserts **no color of its own**. The glyph inherits `currentColor` and
- * the hover/press wash + focus ring derive from it, so one component reads correctly on any surface —
- * light, soft-tinted, solid-colored, dark — with zero configuration. Hover/focus each cell to see the
- * adaptive wash and ring pick up that surface's text color.
+ * The whole point: CloseButton asserts **no color of its own**. The glyph inherits `currentColor`,
+ * and the hover wash and focus ring are derived from it, so one component reads correctly on any
+ * surface with no configuration. Hover and focus each cell to watch both pick up that surface's
+ * text color.
  */
 export const AdaptsToTheSurface: Story = {
   parameters: { layout: "padded" },
@@ -56,8 +56,8 @@ export const AdaptsToTheSurface: Story = {
 };
 
 /**
- * `icon` overrides the built-in X (per instance, or app-wide via a preset's `defaultProps.icon`
- * factory). Here a trash glyph stands in for a "remove" affordance.
+ * `icon` overrides the built-in X, per instance or app-wide through a preset. Here a trash glyph
+ * stands in for a "remove" affordance.
  */
 export const CustomIcon: Story = {
   render: () => (
@@ -98,8 +98,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Light + dark side by side, driven purely by the `.dark` class. Because the wash is `currentColor`-
- * derived, the same markup adapts to each theme with no per-scheme tokens.
+ * Light and dark side by side, driven purely by the `.dark` class. Because the wash is derived from
+ * `currentColor`, the same markup adapts to each theme with no per-scheme tokens.
  */
 export const LightAndDark: Story = {
   parameters: { layout: "fullscreen" },

@@ -1,16 +1,13 @@
 import { type Accessor, createEffect } from "solid-js";
 
 /**
- * The lock's ref count and the pre-lock style snapshot live on `document.body`, under a
- * cross-realm shared symbol — **not** at module scope.
+ * The lock's ref count and the pre-lock style snapshot live on `document.body`, keyed by a symbol
+ * from the global registry — **not** at module scope.
  *
- * `@hope-ui/primitives` is public API, and `@hope-ui/components` depends on it as a
- * plain `dependencies` entry, which does not force a single installed instance. With two
- * copies in the tree there would be two module-scope `lockCount`s: two overlays open at
- * once, and the body's `overflow` is either restored while one is still open, or never
- * restored at all. `Symbol.for` resolves through the cross-realm global symbol registry, so
- * every copy of this module reads and writes the same slot. Base UI stores its lock state on
- * the element for the same reason. `createHideOutside` does the same with its own count.
+ * Nothing forces a consumer to end up with a single installed copy of this package, and two
+ * module-scope counts each believing they own the body is an unreproducible field bug: with two
+ * overlays open, the body's `overflow` is restored while one is still open, or never restored at
+ * all. `Symbol.for` returns the same symbol in every copy, so they all share one slot.
  */
 const LOCK_STATE = Symbol.for("hope-ui.scroll-lock");
 
@@ -22,9 +19,9 @@ interface ScrollLockState {
   /**
    * The body's own `padding-inline-end` before the first lock took hold.
    *
-   * Logical, not `padding-right`: an RTL engine puts the viewport scrollbar on the **left**, so
-   * physical compensation would move the page by exactly the width this exists to absorb — the
-   * layout shift, doubled, in every RTL locale.
+   * Logical, not `padding-right`: in a right-to-left layout the browser puts the scrollbar on the
+   * **left**, so padding the right would move the page by exactly the width this exists to absorb —
+   * doubling the layout shift rather than cancelling it.
    */
   paddingInlineEnd: string;
 }
@@ -83,11 +80,10 @@ export interface CreateScrollLockOptions {
 }
 
 /**
- * Locks `document.body` scrolling while active, compensating for scrollbar-width layout
- * shift with a matching `padding-inline-end`. Ref-counted on `document.body` so multiple
- * simultaneously active locks (e.g. two overlays open at once) don't restore the body's
- * styles until the last one deactivates — including locks created by a *different installed
- * copy* of this package. See the note on `LOCK_STATE` above.
+ * Locks `document.body` scrolling while active, padding the body by the width of the scrollbar it
+ * removes so the page does not jump. Ref-counted on `document.body`, so two overlays open at once
+ * do not restore the body's styles until the last of them deactivates — even when they come from
+ * different installed copies of this package. See `LOCK_STATE` above.
  */
 export function createScrollLock(options: CreateScrollLockOptions): void {
   createEffect(

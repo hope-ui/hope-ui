@@ -101,14 +101,13 @@ describe("renderElement", () => {
   });
 
   it("merges refs onto a component that only honours function refs (TanStack `Link` shape)", async () => {
-    // The regression guard for the array-ref flaw. Every other ref test above renders into a host
-    // element (`<a>`/`<button>`), whose compiler flattens a ref array via `applyRef` — so they pass
-    // even when the merge output is an array. A user *component*, however, receives `props.ref`
-    // verbatim and composes it itself. `@tanstack/solid-router`'s `Link` (and most libraries) only
-    // honour a *function* ref: `if (typeof r === "function") r(el)`. This mock reproduces that
-    // exactly — it reads `props.ref`, applies it only when callable, and never spreads `ref` onto
-    // its host `<a>`. An array `[internalRef, consumerRef]` fails that guard and drops BOTH refs;
-    // a single merged function ref satisfies it and both fire.
+    // The regression guard for the array-ref flaw, and the only test here that can catch it: every
+    // other ref test renders into a host element, whose compiled output flattens a ref array via
+    // `applyRef`, so they pass even when the merge produces an array. A user *component* instead
+    // receives `props.ref` verbatim and composes it itself, and most libraries honour only a
+    // function ref — `@tanstack/solid-router`'s `Link` does `if (typeof r === "function") r(el)`.
+    // This mock reproduces that: an array `[internalRef, consumerRef]` fails its guard and drops
+    // BOTH refs, a single merged function ref satisfies it and both fire.
     function LinkLike(props: { ref?: unknown; children?: string }) {
       const applyFunctionRefOnly = (element: HTMLAnchorElement) => {
         const consumerRef = props.ref;
@@ -138,9 +137,8 @@ describe("renderElement", () => {
   });
 
   it("has no baseline accessibility violations", async () => {
-    // Every primitive that puts real DOM on the page gets a baseline axe run, enforced by
-    // `check:coverage-parity`. `renderElement` is the one every public component's markup
-    // flows through, so a defect here is a defect in all of them.
+    // Every public component's markup flows through `renderElement`, so a defect here is a defect
+    // in all of them.
     const { container, dispose } = mount(() =>
       renderElement({ as: "button", props: { type: "button" as const, children: "click" } }),
     );

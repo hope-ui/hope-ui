@@ -2,10 +2,8 @@ import type { AlertColorScheme, AlertStatusIconKey } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { CircleCheckIcon, CircleXIcon, InfoIcon, TriangleAlertIcon } from "../icons";
 
-// The Alert status role → built-in glyph mapping. The glyphs themselves live in the shared `../icons`
-// set (hand-inlined Lucide paths, `currentColor` stroke, `aria-hidden`, sized by the recipe's `icon`
-// slot); this file owns only which glyph each `colorScheme` role gets. Only the four status roles have
-// one; `primary`/`neutral` ship none (they need an explicit `icon`).
+// This file owns only *which* glyph each role gets; the glyphs themselves live in the shared
+// `../icons` set.
 
 /** The built-in glyph per role (`primary`/`neutral` ship none — they need an explicit `icon`). */
 export const BUILTIN_STATUS_ICONS: Record<AlertColorScheme, (() => JSX.Element) | undefined> = {
@@ -17,9 +15,9 @@ export const BUILTIN_STATUS_ICONS: Record<AlertColorScheme, (() => JSX.Element) 
   danger: CircleXIcon,
 };
 
-// `AlertStatusIconKey` (the `{role}Icon` factory keys) is owned by `@hope-ui/theming`, constructed
-// there from `AlertStatusRole`. Typing the values against it means renaming a status role in the
-// theming contract is a **compile error** here (a value literal stops matching), never a silent miss.
+// Maps each role to the name of the prop a preset overrides its glyph with. Typing the *values*
+// against the theming contract's own key union is what makes renaming a role over there a compile
+// error here — the literal stops matching — rather than a silently unreachable branch.
 export const STATUS_ICON_KEYS: Record<AlertColorScheme, AlertStatusIconKey | undefined> = {
   primary: undefined,
   neutral: undefined,

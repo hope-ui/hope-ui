@@ -15,10 +15,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Calendar is now a styled recipe-driven component: the look comes entirely from the `calendar` recipe
-// resolved through `<ThemeProvider preset={hope}>` (the shadcn/Nova identity), no scoped demo CSS.
-// This is where the Phase 2 zero-specificity cascade ordering (today < range-middle < solid endpoints)
-// gets its first real visual confirmation, in both light and dark.
+// The look comes entirely from the theme's `calendar` recipe — there is no demo CSS here. These
+// stories are the only place the day-cell cascade order (today < range middle < range endpoints) is
+// visible, in both light and dark.
 function CalendarDemo(props: CalendarRootProps): JSX.Element {
   return (
     <ThemeProvider preset={hope}>
@@ -65,9 +64,8 @@ export const Unavailable: Story = {
 };
 
 // The same unavailable weekends, in range mode: pick a weekday and the calendar clamps to that week's
-// available run — every day past the neighbouring weekend goes inert, so a range can never straddle an
-// unavailable day. Pass `allowsNonContiguousRanges` to opt out and let a range span them (the
-// unavailable days still drop out of the paint).
+// available run, so a range can never straddle an unavailable day. Pass `allowsNonContiguousRanges`
+// to opt out and let a range span them; the unavailable days still drop out of the paint.
 export const UnavailableRange: Story = {
   render: () => (
     <CalendarDemo
@@ -81,12 +79,11 @@ export const UnavailableRange: Story = {
   ),
 };
 
-// The whole calendar off: every cell is inert (`aria-disabled` + `data-disabled`, no tab stop) and
-// both nav buttons are disabled, so the month can't be paged either. It has a `defaultValue`, which
-// deliberately paints nothing: `disabled` makes every cell non-selectable, and React Aria drops
-// non-selectable days out of the selection paint. Contrast with `ReadOnly` below — a disabled
-// calendar looks unavailable; a read-only one looks normal, keeps showing its value, and refuses to
-// change it.
+// The whole calendar off: every cell is `aria-disabled` with no tab stop, and both nav buttons are
+// disabled, so the month can't be paged either. It carries a `defaultValue` that deliberately paints
+// nothing — `disabled` makes every cell non-selectable, and a non-selectable day never shows as
+// selected. Contrast with `ReadOnly` below: a disabled calendar looks unavailable, a read-only one
+// looks normal, keeps showing its value, and refuses to change it.
 export const Disabled: Story = {
   render: () => <CalendarDemo defaultFocusedValue={june} defaultValue={june} disabled />,
 };
@@ -102,12 +99,11 @@ export const WeekStartsMonday: Story = {
 };
 
 // Both channels declared, which is the contract: `dir="rtl"` mirrors the LAYOUT (the grid's columns,
-// the chevrons' `rtl:` rotation), the provider locale mirrors the ARROW KEYS and supplies the Arabic
-// month name and Arabic-Indic numerals. hope-ui never joins the two for you — the same split Base UI
-// declares in every RTL test and React Aria's `useCalendarGrid` leaves to the app.
+// the chevrons' rotation), while the provider's locale mirrors the ARROW KEYS and supplies the Arabic
+// month name and Arabic-Indic numerals. hope-ui never joins the two for you.
 //
-// Note the provider rather than a `locale` prop: `createCalendar` reads the provider for direction, so
-// a `locale` prop alone changes formatting only.
+// A provider, not a `locale` prop: direction is read from the provider, so a `locale` prop alone
+// changes formatting only.
 export const RightToLeft: Story = {
   render: () => (
     <div dir="rtl">
@@ -118,10 +114,10 @@ export const RightToLeft: Story = {
   ),
 };
 
-// The half only a story can show: declare the LOCALE and forget the `dir`, and you get Arabic numerals
-// and reversed arrows over a grid still laid out left-to-right, Sunday on the left. hope-ui doesn't
-// silently paper over it (writing `dir` here would override any ancestor the app did set) — it warns
-// in dev instead. Open the console on this story: `[hope-ui] Calendar: its arrow keys mirror "rtl"…`.
+// The half only a story can show: declare the LOCALE and forget the `dir`, and you get Arabic
+// numerals and reversed arrows over a grid still laid out left-to-right, Sunday on the left. hope-ui
+// will not paper over it — writing `dir` here would override any ancestor the app did set — so it
+// warns in dev instead. Open the console on this story to see it.
 export const RightToLeftMissingDir: Story = {
   name: "locale without dir (arrows disagree — warns in dev)",
   render: () => (
@@ -135,11 +131,9 @@ export const Today: Story = {
   render: () => <CalendarDemo defaultFocusedValue={today(getLocalTimeZone())} />,
 };
 
-// ── Phase 4: convenience (auto-chrome) API ──────────────────────────────────────────────────────
-// The zero-children ergonomics. A bare `<Calendar.Root/>` — no compound parts — auto-renders the
-// built-in default chrome (navigation header with the chevron nav + heading, then the month grid).
-// Same recipe, same behavior as the compound `CalendarDemo` above; the only difference is who authored
-// the parts (Root's internal `DefaultCalendar` vs the consumer).
+// A bare `<Calendar.Root/>` with no compound parts renders the built-in chrome itself (navigation
+// header with chevrons and heading, then the month grid). Same recipe and same behavior as the
+// hand-composed `CalendarDemo` above; the only difference is who authored the parts.
 export const Convenience: Story = {
   render: () => (
     <ThemeProvider preset={hope}>
@@ -148,8 +142,8 @@ export const Convenience: Story = {
   ),
 };
 
-// The `size` density axis (`sm`/`md`/`lg`) side by side, each on the convenience API so the default
-// chrome's nav-button + glyph + cell scaling is visible in one shot.
+// The density axis side by side, each with the built-in chrome so the nav button, glyph and cell all
+// scale visibly in one shot.
 const SIZES: CalendarSize[] = ["sm", "md", "lg"];
 
 export const Sizes: Story = {

@@ -94,12 +94,12 @@ describe("createDismissable", () => {
 });
 
 /**
- * A second harness rather than props on the first: the six tests above are the gate proving the
- * new options are inert by default, so the tree they run against stays byte-identical.
+ * A separate harness, not extra props on the first — do not merge them. The tests above are the
+ * gate proving these options are inert by default, which only holds while their tree is untouched.
  *
- * `trigger` stands in for the control that opened the layer — the case `exclude` exists for. The
- * wrapper around `excluded-child` is what proves exclusion covers a subtree, not just the listed
- * element itself.
+ * `trigger` stands in for the control that opened the layer, the case `exclude` exists for. The
+ * wrapper around `excluded-child` is what proves exclusion covers a subtree rather than only the
+ * listed element.
  */
 function OutsideHarness(props: {
   onDismiss: () => void;
@@ -255,12 +255,12 @@ describe("createDismissable — dismissOnFocusOutside", () => {
     removable.focus();
     expect(document.activeElement).toBe(removable);
 
-    // Removing the focused element drops focus to `<body>`, which is *outside* the container. It
-    // must not dismiss, and `focusin` is what makes that true: measured against this repo's
-    // Chromium, this path fires `focusout` only, so the event never arrives at all rather than
-    // arriving and being filtered. The implementation this pins against is `focusout` +
-    // `relatedTarget` — `relatedTarget` is `null` here, and reading that as "focus went outside"
-    // dismisses a layer nobody left.
+    // Removing the focused element drops focus to `<body>`, technically *outside* the container —
+    // and it must not dismiss. Listening on `focusin` is what makes that true: measured against
+    // this repo's Chromium, the path fires `focusout` only, so the event never arrives rather than
+    // arriving and being filtered. A `focusout` + `relatedTarget` implementation sees
+    // `relatedTarget === null` here and, reading that as "focus went outside", closes a layer
+    // nobody left.
     removable.remove();
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 
@@ -289,18 +289,17 @@ describe("createDismissable — dismissOnFocusOutside", () => {
 });
 
 /**
- * A third harness, for the same reason the second one exists: the trees above are the gate proving
- * the layer stack changed nothing for a lone layer, so they stay byte-identical.
+ * A third harness, kept separate for the same reason as the second: the trees above are the gate
+ * proving the layer stack changed nothing for a lone layer.
  *
- * Two layers, **siblings** rather than parent/child. That is the shape the stack exists for: a
+ * Two layers, **siblings** rather than parent/child. That is the shape the stack exists for — a
  * `Popover` portaled out of the `Dialog` it was opened in, whose card is not inside the dialog's
  * container and so cannot be reached by `container.contains` at all. Nesting them in the DOM would
  * make every assertion below pass for the wrong reason.
  *
- * Both containers are mounted unconditionally and only `active` is flipped, so a test can choose the
- * activation order independently of the mount order — which is the ordering the stack claims to use.
- * `createDismissable` for the inner layer is injectable so the cross-copy test can hand it a second
- * module instance of this primitive.
+ * Both containers mount unconditionally and only `active` flips, so a test can pick the activation
+ * order independently of the mount order — the ordering the stack claims to use. `createDismissable`
+ * for the inner layer is injectable so the cross-copy test can hand it a second module instance.
  */
 function NestedLayers(props: {
   onOuterDismiss: () => void;
@@ -576,10 +575,10 @@ describe("createDismissable — nested layers", () => {
 });
 
 /**
- * A fourth harness: two layers that are both always active, with `bubbles` on the **lower** one.
- * Separate from `NestedLayers` because the option is the opposite question — not "who is topmost"
- * but "what does a layer that is *not* topmost still react to" — and because every test here needs
- * both layers up for the whole test, with no activation flag to reason about.
+ * A fourth harness: two always-active layers, with `bubbles` on the **lower** one. Separate from
+ * `NestedLayers` because the question is the opposite — not "who is topmost" but "what does a layer
+ * that is *not* topmost still react to" — and because every test here needs both layers up
+ * throughout, with no activation flag to reason about.
  */
 function BubblingLayers(props: {
   onOuterDismiss: () => void;
@@ -631,8 +630,8 @@ describe("createDismissable — bubbles", () => {
       <BubblingLayers onOuterDismiss={onOuterDismiss} onInnerDismiss={onInnerDismiss} />
     ));
 
-    // The control for every case below: both channels default to topmost-only. Base UI defaults
-    // `outsidePress` to `true` instead; this is the assertion that says hope-ui does not.
+    // The control for every case below: both channels default to topmost-only, so a layer that is
+    // not on top reacts to neither until `bubbles` opts it in.
     await userEvent.keyboard("{Escape}");
     await userEvent.click(page.getByTestId("outside"));
 

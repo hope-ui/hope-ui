@@ -21,14 +21,12 @@ export interface SelectGroupProps extends SelectGroupElementProps {
  * A `role="group"` section that names itself from its `Select.GroupLabel`. Rendered from
  * `Select.List`'s per-entry callback once `groupToItems` is set on `Select.Root`.
  *
- * `createListboxGroup` is reused **unchanged** — it takes props only, no state, so there is nothing
- * for the combobox kernel to adapt. It owns the `role` + `aria-labelledby` + the label-id
- * registration seam (published on `SelectGroupContext` for the label child); this layer adds the
- * recipe `group` slot + `data-slot`.
+ * `createListboxGroup` owns the `role`, the `aria-labelledby` and the id-registration seam its label
+ * child uses; this layer adds the recipe `group` slot.
  *
- * The group's *label text* never reaches the kernel — the consumer renders it from their own key —
- * so there is no `groupToLabel` and no `{ label, items }` shape to conform to. What is registered is
- * the wiring, not the text.
+ * The group's *label text* never reaches the behavior layer — you render it from your own data — so
+ * there is no `groupToLabel` and no `{ label, items }` shape to conform to. What gets registered is
+ * the ARIA wiring, not the text.
  */
 export const Group: Component<SelectGroupProps> = (props) => {
   const ctx = useSelectContext();

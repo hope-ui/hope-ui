@@ -13,11 +13,10 @@ function TestHarness(props: {
   hidden?: () => boolean;
   initialEnter?: boolean;
 }) {
-  // A signal-backed ref, not `let ref; ref={ref}`. `createPresence` happens to get away with
-  // the plain `let` — it only reads the ref on the *exit* edge, by which point the element
-  // exists and the variable is populated. But the pattern is wrong for every sibling
-  // primitive (see create-focus-trap.md), and the moment one ref is shared between them, the `let`
-  // version silently breaks the others. Not worth demonstrating anywhere.
+  // A signal-backed ref, not a plain `let`. `createPresence` alone would get away with the `let`,
+  // since it reads the ref only on the exit edge, by which point the element exists. Every sibling
+  // primitive reads it earlier and needs to react to it being set, so the moment a ref is shared
+  // between them the `let` version breaks them silently. See `create-focus-trap.md`.
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const { mounted, status } = createPresence({
     present: props.present,
@@ -281,13 +280,11 @@ describe("createPresenceItem", () => {
     await vi.waitFor(() => expect(popupOf(container)?.getAttribute("data-item")).toBe("a"));
 
     setItem("b");
-    // "a" keeps showing while it exits...
     await vi.waitFor(() =>
       expect(popupOf(container)?.getAttribute("data-presence")).toBe("exiting"),
     );
     expect(popupOf(container)?.getAttribute("data-item")).toBe("a");
 
-    // ...then "b" swaps in once "a" has finished exiting.
     await vi.waitFor(() => expect(popupOf(container)?.getAttribute("data-item")).toBe("b"), {
       timeout: 2000,
     });

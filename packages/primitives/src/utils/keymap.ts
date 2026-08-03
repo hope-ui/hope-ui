@@ -16,8 +16,8 @@ interface Binding<T> {
 
 /**
  * Fluent, modifier-aware keymap builder — the declarative counterpart to the imperative `switch
- * (event.key)` every collection component would otherwise hand-roll. Modeled on Angular Aria's
- * `private/behaviors/event-manager` (its idea, not its code).
+ * (event.key)` every collection component would otherwise hand-roll. Modeled on the event-manager
+ * behavior in Angular Aria (Angular's headless accessibility package): its idea, not its code.
  *
  * ```ts
  * const keys = createKeyboardHandler<HTMLUListElement>()
@@ -71,12 +71,11 @@ const MODIFIER_TOKENS = new Set([
   "shift",
 ]);
 
-/** `true` on Apple platforms, where `mod` means ⌘ (Meta) rather than Ctrl. Read at event time. */
+/** `true` on Apple platforms, where `mod` means ⌘ (Meta) rather than Ctrl. */
 function isApplePlatform(): boolean {
   if (typeof navigator === "undefined") {
     return false;
   }
-  // `userAgentData.platform` when present (Chromium), else the legacy `platform` string.
   const platform =
     (navigator as { userAgentData?: { platform?: string } }).userAgentData?.platform ??
     navigator.platform ??
@@ -90,9 +89,8 @@ function normalizeKey(key: string): string {
 }
 
 function parseCombo<T>(combo: string, handler: (event: KeyboardEventFor<T>) => void): Binding<T> {
-  // Split on the *last* `+`, never on every `+`, and never trim the key segment: the key can
-  // itself be a `+` (bind `"+"`) or a space (bind `" "`, which a naive trim would erase into the
-  // separator). Everything before the last `+` is the modifier list.
+  // Split on the *last* `+`, and never trim the key segment: the key can itself be `"+"`, or a
+  // space (`" "`, which a trim would erase). Everything before that `+` is the modifier list.
   const splitAt = combo === "+" ? -1 : combo.lastIndexOf("+");
   const rawKey = splitAt <= 0 ? combo : combo.slice(splitAt + 1);
   const modifiers =
@@ -119,9 +117,8 @@ function parseCombo<T>(combo: string, handler: (event: KeyboardEventFor<T>) => v
     }
     switch (modifier) {
       case "mod":
-        // Resolved once, here at build time. Keymaps are built client-side (a component body or an
-        // event handler), where the platform is known and never changes, so this needs no
-        // per-event recomputation.
+        // Resolved once here, when the combo is parsed: keymaps are built client-side, where the
+        // platform is known and never changes.
         if (isApplePlatform()) {
           binding.meta = true;
         } else {
@@ -154,8 +151,7 @@ function matches<T>(binding: Binding<T>, event: KeyboardEvent): boolean {
   if (normalizeKey(event.key) !== binding.key) {
     return false;
   }
-  // Exact modifier match, so `"ArrowDown"` ignores `Shift+ArrowDown` and `"a"` never fires for
-  // `mod+a`. `mod` was already resolved to the platform's ctrl/meta when the binding was parsed.
+  // Exact match, so `"ArrowDown"` ignores `Shift+ArrowDown` and `"a"` never fires for `mod+a`.
   return (
     event.ctrlKey === binding.ctrl &&
     event.metaKey === binding.meta &&

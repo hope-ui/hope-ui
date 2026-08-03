@@ -19,16 +19,15 @@
  */
 
 /*
- * Browser/system default locale. Two hope-ui improvements over the source are called out inline:
- *   1. Hydration-gated detection — the detected locale is reported immediately *except* while a
- *      hydration pass is in flight, where `en-US`/`ltr` (what the server rendered) is reported
- *      until the pass ends. The original source reads the real locale at module load, which a
- *      server-rendered page then contradicts. Scoping the gate to the hydration pass — rather
- *      than always seeding `en-US` — is what keeps a client-only app flash-free.
- *   2. Dual-copy safety — the shared locale signal and `languagechange` subscription live in a
- *      `Symbol.for(...)` global registry (hope-ui's `createScrollLock`/`createHideOutside`
- *      convention) instead of bare module-scope `let`s, so two installed copies of this package
- *      observe one registry and agree on one value.
+ * Browser/system default locale. Two deliberate deviations from the source it was derived from:
+ *   1. Hydration-gated detection. The detected locale is reported immediately, *except* while a
+ *      hydration pass is in flight, when `en-US`/`ltr` — what the server rendered — is reported
+ *      until that pass ends. The original reads the real locale at module load, which a
+ *      server-rendered page then contradicts. Gating on the hydration pass alone, rather than always
+ *      seeding `en-US`, is what keeps a client-only app free of a visible flash.
+ *   2. Dual-copy safety. The shared locale signal and the `languagechange` subscription live in a
+ *      `Symbol.for(...)` registry on `globalThis` instead of module-scope `let`s, so two installed
+ *      copies of this package still observe one registry and agree on one value.
  */
 
 import { isServer } from "@solidjs/web";
@@ -65,13 +64,12 @@ export function getDefaultLocale(): Locale {
 }
 
 /**
- * Process-wide locale state, keyed through the cross-realm global symbol registry so two installed
- * copies of `@hope-ui/i18n` share one `languagechange` subscription, one locale signal and one
- * hydration gate — the same reasoning as `createScrollLock`'s `document.body` symbol slot.
+ * Process-wide locale state, reached through a global symbol so two installed copies of
+ * `@hope-ui/i18n` share one `languagechange` subscription, one locale signal, and one hydration gate.
  *
- * Both members are **signals** rather than plain values: every consumer reads them directly, so a
- * `languagechange` (or the end of the hydration pass) propagates by writing one signal. That is what
- * removes the per-consumer signal + `onSettled` + listener-set fan-out this file used to carry.
+ * `locale` and `hydrationOver` are **signals** rather than plain values because every consumer reads
+ * them directly: a `languagechange`, or the end of the hydration pass, then propagates everywhere by
+ * writing a single signal, with no fan-out list to maintain.
  */
 interface LocaleRegistry {
   locale: Accessor<Locale>;
@@ -112,9 +110,9 @@ function updateLocale(): void {
 }
 
 /**
- * `sharedConfig.hydrating` is cleared synchronously when the hydration pass ends, but nothing
- * *notifies* — so the gate is opened from a microtask that re-queues while the flag is still set.
- * `hydrate()` runs synchronously, so in practice this settles on the first tick after it returns.
+ * Solid clears `sharedConfig.hydrating` synchronously when the hydration pass ends, but emits no
+ * notification — so the gate opens from a microtask that re-queues itself while the flag is still
+ * set. `hydrate()` runs synchronously, so in practice this settles on the first tick after it returns.
  */
 let openingScheduled = false;
 
@@ -139,9 +137,9 @@ function openGateAfterHydration(registry: LocaleRegistry): void {
  * flight it reports {@link SSR_LOCALE}, matching the markup the server produced, and flips to the
  * detected locale the moment the pass ends.
  *
- * That gate is the whole SSR story. Hydration reuses the server's DOM rather than re-deriving it, so
- * a client that renders a *different* locale during the pass leaves markup that silently contradicts
- * its own state — no warning, no replaced node (see `__internal__/i18n/default-locale.md`).
+ * That gate is the whole SSR story. Hydration reuses the server's DOM instead of re-deriving it, so a
+ * client that resolves a *different* locale during the pass ends up with markup contradicting its own
+ * state — silently: no warning, no node replaced. See `__internal__/i18n/default-locale.md`.
  */
 export function readDetectedLocale(): Locale {
   if (isServer) {
@@ -161,17 +159,17 @@ function subscribeToLanguageChange(registry: LocaleRegistry): void {
     return;
   }
   registry.subscribed = true;
-  // Never removed: the registry is process-wide, so there is no last consumer to unsubscribe on, and
-  // one listener that outlives a component is cheaper than reference-counting every reader.
+  // Never removed: the registry is process-wide, so there is no "last consumer" to unsubscribe on,
+  // and one listener outliving a component is cheaper than reference-counting every reader.
   window.addEventListener("languagechange", updateLocale);
 }
 
 /**
  * An accessor for the current browser/system locale + direction that updates on `languagechange`.
  *
- * Reads {@link readDetectedLocale}, so it is SSR-safe by construction: `en-US`/`ltr` on the server
- * and through the hydration pass, the detected locale immediately in a client-only app. Needs no
- * reactive owner — the state it reads lives in the shared registry, not in the caller.
+ * Reads {@link readDetectedLocale}, so it is SSR-safe by construction: `en-US`/`ltr` on the server and
+ * through the hydration pass, the detected locale immediately in a client-only app. Needs no reactive
+ * owner, since the state it reads lives in the shared registry rather than in the caller.
  */
 export function createDefaultLocale(): {
   locale: () => string;

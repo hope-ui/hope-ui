@@ -8,46 +8,29 @@ type ModalBackdropElementProps = JSX.HTMLAttributes<HTMLDivElement> & Record<typ
 
 export interface ModalBackdropProps {
   /**
-   * Receives the rendered element. Pass it on to `createHideOutside`'s `spare` list: an
-   * `inert` element is transparent to hit testing, so a backdrop that let itself be hidden
-   * would silently stop blocking the pointer — the one job it exists for.
+   * Receives the rendered element. Pass it on to `createHideOutside`'s `spare` list: an `inert`
+   * element is transparent to hit testing, so a backdrop that let itself be marked would silently
+   * stop blocking the pointer — the one job it exists for.
    */
   ref?: (element: HTMLDivElement) => void;
 }
 
 /**
- * An invisible, viewport-covering element that blocks pointer interaction with everything
- * behind a modal layer. Base UI ships an equivalent `InternalBackdrop` for the same reason.
+ * An invisible, viewport-covering element that blocks pointer interaction with everything behind a
+ * modal layer. Not the consumer's optional decorative backdrop (`Dialog.Backdrop`) — this one is
+ * always present while a layer is modal.
  *
- * Modality is three separate mechanisms, because no single one covers all three input
- * channels: `createHideOutside` (`aria-hidden` + `inert`) for assistive technology and the
- * focus order, `createFocusTrap` for Tab cycling, and this for the pointer.
+ * It is the *pointer* third of modality, alongside `createHideOutside` (`aria-hidden` + `inert`,
+ * the HTML attribute that makes a subtree unfocusable and untouchable) and `createFocusTrap`.
+ * `inert` blocks the pointer too, but only on elements the layer actually marked, so anything
+ * inserted into the page before `createHideOutside`'s `MutationObserver` reaches it would stay
+ * clickable. Covering the viewport unconditionally closes that hole.
  *
- * `inert` alone would block the pointer too — but only on elements the layer actually marked.
- * This backdrop covers the viewport unconditionally, so an element inserted into the page
- * before `createHideOutside`'s `MutationObserver` has marked it is still unreachable. That
- * belt-and-braces guarantee is the whole reason it survives alongside `inert`.
- *
- * This is the *component-rendered* backdrop, always present while a layer is modal. It is not
- * the consumer's optional, visible backdrop (`Dialog.Backdrop`), which is purely decorative
- * and may be absent.
- *
- * ## Where to render it
- *
- * As the **first child** of the portal, before any consumer backdrop and before the popup.
- * Everything it should block comes earlier in the document; everything that must stay
- * interactive comes later. Both are positioned, so DOM order decides paint and hit-test order.
- *
- * Two consequences, both documented in `modal-backdrop.md`:
- * - The popup must be positioned, or it paints beneath this and its content stops responding
- *   to the mouse.
- * - Clicking this dismisses the layer, exactly as clicking a consumer backdrop does — it's
- *   outside the popup, so `createDismissable`'s outside-pointerdown check fires.
- *
- * Rendered through `renderElement`, which merges the consumer's `ref` with nothing here (the
- * backdrop has no internal ref) and gives one consistent render path. A literal `<div>` would
- * work equally now that the library ships source — `renderElement` earns its keep for `as`/
- * render-prop polymorphism, not as an SSR wrapper — but there's no reason to churn this.
+ * Render it as the **first child** of the portal, before any consumer backdrop and before the
+ * popup: what it must block comes earlier in the document, what must stay interactive comes later.
+ * So a popup that isn't positioned paints *beneath* this and stops responding to the mouse, and
+ * clicking here dismisses the layer (it counts as a pointerdown outside the popup). Details:
+ * `__internal__/primitives/modal-backdrop/modal-backdrop.md`.
  */
 export function ModalBackdrop(props: ModalBackdropProps): JSX.Element {
   return renderElement<ModalBackdropElementProps, HTMLDivElement>({
@@ -58,8 +41,8 @@ export function ModalBackdrop(props: ModalBackdropProps): JSX.Element {
       [MARKER]: "",
       style: { position: "fixed", inset: "0" },
     },
-    // Wrapped rather than passed straight through, so `props.ref` is read inside `spread`'s
-    // own effect instead of eagerly in this component body.
+    // Wrapped rather than passed straight through, so `props.ref` is read inside the element's own
+    // ref effect instead of eagerly in this component body.
     ref: (element) => props.ref?.(element),
   });
 }

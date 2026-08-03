@@ -9,9 +9,10 @@ import { page, userEvent } from "vitest/browser";
 import { Select } from "../index";
 import { Tree } from "./select.ssr-entry";
 
-// Every tree sits under a `<ThemeProvider>` fed the `hope` preset — `Select.Root` reads a recipe. It
-// is a zero-DOM provider (its token values live in CSS), so it changes nothing the assertions look
-// at except `_hk` keys, which is why the hydration tree carries it identically.
+// Every tree needs a `<ThemeProvider>` — `Select.Root` reads a recipe. It renders no DOM (the hope
+// preset's token values live in CSS), so it changes nothing the assertions look at *except* the
+// hydration keys Solid assigns by walking the component tree, which is why the hydration tree below
+// has to carry it identically.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -28,7 +29,7 @@ const FRUITS: Fruit[] = [
   { id: 4, name: "Date" },
 ];
 
-/** Diacritics on purpose: `sensitivity: "base"` is what makes typing `cafe` match `Café`. */
+/** Diacritics on purpose: the collator folds them, which is what makes typing `cafe` match `Café`. */
 const DRINKS = ["Café", "Cortado", "Espresso"];
 
 interface Basket {
@@ -73,24 +74,19 @@ const TRIGGER_STYLE: JSX.CSSProperties = {
 
 /**
  * Mounts a tree **inside landmarks**, hands it a landmark to portal the popup into, and returns
- * queries scoped to that one mount.
+ * queries scoped to that one mount. Two problems, one helper.
  *
- * Two problems, one helper.
- *
- * **Landmarks.** An open Select is the one shape whose axe run has to cover the whole document: the
- * trigger's `aria-activedescendant` points into the portaled popup, and the popup's
- * `aria-labelledby` points back at the trigger, so a subtree-scoped run would report both IDREFs as
- * invalid. Running over `document.body` then makes axe judge this **document's** landmark structure
- * as well — its `region` rule flags a bare `<body>` child — which is a fact about the harness page,
- * not about Select. So the harness gives it the landmarks a real page has: the control in a named
- * region, the popup in the `<main>`. Nothing about the component changes; the surrounding page stops
- * being the subject.
+ * **Landmarks.** An open Select has to be axe-checked over the whole document: the trigger's
+ * `aria-activedescendant` points into the portaled popup and the popup's `aria-labelledby` points back
+ * at the trigger, so a subtree-scoped run would report both IDREFs as invalid. But running over
+ * `document.body` also makes axe judge this *harness page's* landmark structure — its `region` rule
+ * flags a bare `<body>` child — which is a fact about the harness, not about Select. Giving the tree
+ * the landmarks a real page has takes the surrounding page out of the picture.
  *
  * **Scoped queries.** `mount()` only removes its container on `dispose()`, so one failing test leaves
- * a whole live Select in the document — and a document-wide `querySelector('[data-slot=…]')` in the
- * *next* test then resolves to that corpse and fails for a reason that has nothing to do with it.
- * That cascade is unreadable. Every query below is bound to this mount's container and its own portal
- * host instead, so a failure stays a single failure.
+ * a whole live Select in the document, and a document-wide `querySelector` in the *next* test resolves
+ * to that corpse and fails for an unrelated reason. Binding every query to this mount's own container
+ * and portal host keeps a failure a single failure.
  */
 function mountSelect(tree: (portalMount: HTMLElement) => JSX.Element) {
   const portalMount = document.createElement("main");
@@ -126,14 +122,13 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
   const options = () => [...popupRoot.querySelectorAll<HTMLElement>('[role="option"]')];
 
   /**
-   * The highlighted row, resolved through the trigger's `aria-activedescendant` — the ARIA channel,
-   * which is what a screen reader follows here and the only one that is unconditional.
+   * The highlighted row, resolved through the trigger's `aria-activedescendant` — what a screen reader
+   * follows, and the only channel that is unconditional.
    *
-   * Deliberately **not** `[data-active]`: that attribute is the *paint* gate, additionally gated on
-   * `focus.isFocused()` (react-aria's `manager.isFocused && focusedKey === key`), so an open Select
-   * nobody has focused yet has an active index and no `data-active` anywhere. That pairing is correct
-   * — a highlight lingering after focus left the widget is the bug it prevents — and it is pinned on
-   * its own below.
+   * Deliberately **not** `[data-active]`, which is the *paint* gate and additionally requires the
+   * widget to hold focus: an open Select nobody has focused yet has an active index and no
+   * `data-active` anywhere. That pairing is correct — it is what stops a highlight lingering after
+   * focus leaves — and it is pinned on its own below.
    */
   const activeOption = () => {
     const id = trigger().getAttribute("aria-activedescendant");
@@ -141,10 +136,9 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
   };
 
   /**
-   * The component-layer stand-in for `floating.isPositioned()`: `floatingStyles()` is the
-   * `visibility: hidden` pre-positioned branch until the first measurement lands, after which a real
-   * `translate()` appears. Axe and every geometry assertion must wait for it — before it, they would
-   * inspect the layer parked at 0,0 inside a hidden subtree.
+   * Waits for the popup's first measurement: until it lands the positioner is `visibility: hidden` and
+   * parked at 0,0, and only afterwards does a real `translate()` appear. Axe and every geometry
+   * assertion must wait, or they inspect the un-positioned layer inside a hidden subtree.
    */
   async function waitForPositioned(): Promise<HTMLElement> {
     let positioner: HTMLElement | null = null;
@@ -172,10 +166,10 @@ function queries(container: HTMLElement, popupRoot: ParentNode) {
 }
 
 /**
- * Axe returns `aria-valid-attr-value` as *incomplete* for **any** element carrying both
- * `aria-haspopup` and `aria-controls`, without ever resolving the IDREF
- * (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check) — undecidable by construction,
- * not a markup problem. The closed assertions below run strict, and the IDREF itself is pinned.
+ * Axe reports `aria-valid-attr-value` as *incomplete* for **any** element carrying both
+ * `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by construction,
+ * not a markup problem. The closed-state assertions below still run strict, and the IDREF is pinned by
+ * its own test.
  */
 const AXE_OPTIONS = { allowIncomplete: ["aria-valid-attr-value"] };
 
@@ -262,7 +256,7 @@ describe("Select — roles & ARIA", () => {
     // Nothing renders until open — the whole reason a form with ten Selects mounts zero option lists.
     expect(listbox()).toBeNull();
     expect(options()).toHaveLength(0);
-    // An `aria-controls` naming an unmounted element is an invalid IDREF on every closed Select.
+    // An `aria-controls` naming an unmounted element would be an invalid IDREF on every closed Select.
     expect(trigger().hasAttribute("aria-controls")).toBe(false);
     expect(trigger().hasAttribute("aria-activedescendant")).toBe(false);
 
@@ -295,9 +289,9 @@ describe("Select — roles & ARIA", () => {
     );
     await waitForPositioned();
 
-    // Open and highlighted in ARIA — and deliberately not painted, because focus has not arrived. A
-    // highlight that lingered while focus was elsewhere is the bug this pairing prevents; it is also
-    // why the recipe styles the row on `data-active:` alone and never on `hover:`.
+    // Open and highlighted in ARIA, and deliberately not painted, because focus has not arrived. A
+    // highlight lingering while focus is elsewhere is the bug this pairing prevents; it is also why
+    // the recipe styles the row on `data-active:` alone and never on `hover:`.
     await vi.waitFor(() => expect(activeOption()).not.toBeNull());
     expect(paintedOption()).toBeNull();
 
@@ -339,8 +333,8 @@ describe("Select — open and close", () => {
     await waitForPositioned();
     expect(options()).toHaveLength(4);
 
-    // Without the trigger in the kernel's `sparedElements` the capture-phase pointerdown would
-    // dismiss and the trigger's own click reopen, so it could never be closed by what opened it.
+    // Unless the trigger is spared from outside-click dismissal, its own pointerdown closes the popup
+    // in the capture phase and its click immediately reopens it — never closable by what opened it.
     await userEvent.click(trigger());
     await vi.waitFor(() => expect(options()).toHaveLength(0));
 
@@ -376,10 +370,10 @@ describe("Select — open and close", () => {
 
     await userEvent.click(trigger());
     await waitForPositioned();
-    // Modality is two mechanisms and needs both: `aria-hidden` takes the background out of the
-    // accessibility tree (`inert` alone does not, as far as ARIA tooling is concerned), and `inert`
-    // takes it out of the focus order and out of hit testing. There is deliberately no focus trap and
-    // no backdrop — focus never leaves the trigger, and a backdrop would cover it.
+    // Modality needs both attributes: `aria-hidden` takes the background out of the accessibility
+    // tree, and `inert` takes it out of the focus order and out of hit testing. Neither substitutes
+    // for the other — ARIA tooling still finds an `inert` element. There is deliberately no focus trap
+    // and no backdrop: focus never leaves the trigger, and a backdrop would cover it.
     await vi.waitFor(() => {
       expect(outside.hasAttribute("inert")).toBe(true);
       expect(outside.getAttribute("aria-hidden")).toBe("true");
@@ -396,8 +390,8 @@ describe("Select — open and close", () => {
   });
 
   it("closes on an outside pointerdown once modality is off", async () => {
-    // With `modal` on (the default) outside content is `inert`, so it cannot be clicked at all — the
-    // assertion above. `modal={false}` is the mode Combobox uses, and the one where an outside
+    // Under the default `modal` the outside content is `inert` and cannot be clicked at all (the
+    // assertion above), so `modal={false}` — the mode Combobox uses — is the only one where an outside
     // pointerdown is a reachable gesture.
     const { trigger, options, waitForPositioned, dispose } = mountSelect((host) => (
       <>
@@ -438,8 +432,8 @@ describe("Select — open and close", () => {
     await vi.waitFor(() => expect(trigger()).not.toBeNull());
 
     await userEvent.click(trigger());
-    // The guard is only *meaningful* because the option set is data: a DOM-registered source is
-    // always empty before opening, so it could never have been written against one.
+    // The guard is only *meaningful* because the option set is data: a list built from mounted rows is
+    // always empty before opening, so it could never tell "no options" from "not opened yet".
     await vi.waitFor(() => expect(trigger().getAttribute("aria-expanded")).toBe("false"));
     expect(listbox()).toBeNull();
 
@@ -488,8 +482,7 @@ describe("Select — keyboard", () => {
     await userEvent.keyboard("{Enter}");
     await vi.waitFor(() => expect(options()).toHaveLength(0));
     expect(onChange).toHaveBeenCalledWith(FRUITS[1]);
-    // Single mode hands back a scalar, never `[banana]` — the kernel's adapter, and the reason the
-    // component layer is a pure pass-through.
+    // Single mode hands back a scalar, never `[banana]`.
     expect(onChange.mock.calls[0]?.[0]).not.toBeInstanceOf(Array);
     expect(inContainer("value")?.textContent).toBe("Banana");
 
@@ -583,8 +576,8 @@ describe("Select — typeahead", () => {
     trigger().focus();
     await userEvent.keyboard("cafe");
 
-    // `sensitivity: "base"` folds diacritics *and* case, which `toLowerCase()` cannot do. Without the
-    // collator "cafe" matches nothing at all — the buffer never prefixes "Café".
+    // The collator folds diacritics *and* case, which `toLowerCase()` cannot do: without it, "cafe"
+    // never prefixes "Café" and matches nothing at all.
     await vi.waitFor(() => expect(value()).toBe("Café"));
 
     await expectNoA11yViolations(container);
@@ -622,9 +615,9 @@ describe("Select — selection and the value", () => {
     ));
     await vi.waitFor(() => expect(inContainer("value")?.id).toBeTruthy());
 
-    // React-aria's `useSelect` ordering: the current selection first, the field's label after. The
-    // trigger names *itself* second because `aria-labelledby` outranks `aria-label` in the accname
-    // algorithm — without the self-reference the consumer's label would simply vanish.
+    // The current selection first, the field's label after. The trigger names *itself* second because
+    // `aria-labelledby` outranks `aria-label` when a name is computed — without the self-reference the
+    // consumer's own label would simply vanish.
     await vi.waitFor(() => {
       const labelledBy = trigger().getAttribute("aria-labelledby") ?? "";
       expect(labelledBy.split(" ")).toEqual([inContainer("value")?.id, trigger().id]);
@@ -652,12 +645,11 @@ describe("Select — selection and the value", () => {
 
     await userEvent.click(nth(options(), 0));
     await userEvent.click(nth(options(), 2));
-    // Ticking several values is not finished business, so `shouldCloseOnSelect` defaults to false.
+    // Ticking several values is not finished business, so multiple mode defaults to staying open.
     await vi.waitFor(() => expect(selectedOptions()).toHaveLength(2));
     expect(onChange).toHaveBeenLastCalledWith([FRUITS[0], FRUITS[2]]);
     expect(listbox()?.getAttribute("aria-multiselectable")).toBe("true");
 
-    // Toggling off is the other half of `multiple`.
     await userEvent.click(nth(options(), 0));
     await vi.waitFor(() => expect(selectedOptions()).toHaveLength(1));
 
@@ -778,8 +770,8 @@ describe("Select — grouping", () => {
 
     const groups = [...portalMount.querySelectorAll<HTMLElement>('[role="group"]')];
     expect(groups).toHaveLength(2);
-    // The label registers its id onto the group's `aria-labelledby` — the wiring, never the text,
-    // which is why there is no `groupToLabel`.
+    // The label registers its id onto the group's `aria-labelledby`: the wiring is what gets
+    // registered, never the text, which is why there is no `groupToLabel` prop.
     for (const group of groups) {
       const labelId = group.getAttribute("aria-labelledby");
       expect(labelId).toBeTruthy();
@@ -819,9 +811,10 @@ describe("Select — grouping", () => {
 // ─── The recipe reaching the DOM ────────────────────────────────────────────────────────────────
 
 /**
- * **The browser project compiles no Tailwind**, so `w-(--anchor-width)` is an inert string here. This
- * is Tailwind's own declaration for the one utility under test, so the measurement means what it
- * says: a missing or malformed custom property leaves the declaration invalid and the width unchanged.
+ * **The browser test project compiles no Tailwind**, so the recipe's `w-(--anchor-width)` class is an
+ * inert string here. Injecting Tailwind's own declaration for that one utility is what makes the
+ * measurement below mean something: a missing or malformed custom property leaves the declaration
+ * invalid and the width unchanged.
  */
 function injectAnchorWidthUtility(): () => void {
   const style = document.createElement("style");
@@ -838,16 +831,16 @@ describe("Select — the recipe actually paints", () => {
     ));
 
     const positioner = await waitForPositioned();
-    // The kernel publishes nothing before the first measurement — an absent property is what keeps
-    // the server render and the first client render identical — so this is asserted after it lands.
+    // Nothing is published before the first measurement — an absent property is what keeps the server
+    // render and the first client render identical — so this is asserted only after it lands.
     expect(positioner.style.getPropertyValue("--anchor-width")).toMatch(/^\d/);
     expect(positioner.style.getPropertyValue("--available-height")).toMatch(/^\d/);
 
     const triggerWidth = trigger().getBoundingClientRect().width;
     expect(positioner.getBoundingClientRect().width).toBeCloseTo(triggerWidth, 1);
 
-    // The recipe wiring reaching the DOM, and the absence half: Select has exactly one width, so no
-    // competing class is ever emitted for tailwind-merge to have to resolve.
+    // The recipe wiring reaching the DOM, and the absence half: Select emits exactly one width class,
+    // so tailwind-merge is never left resolving two competing ones.
     expect(positioner.className).toContain("w-(--anchor-width)");
     expect(positioner.className).not.toContain("w-max");
     expect(inPopup("content")?.className).toContain("max-h-(--available-height)");
@@ -876,8 +869,8 @@ describe("Select — the recipe actually paints", () => {
 
 describe("Select — render re-targets a part without losing anything", () => {
   it("keeps the trigger's computed props and its internal ref through a custom target", async () => {
-    // A component target, not a bare tag: it is the case that actually drops things, because it has
-    // to spread the props and honour the function ref itself.
+    // A component target, not a bare tag: it is the case that actually drops things, because it has to
+    // spread the props and honour the function ref itself.
     const FancyButton = (props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => (
       <button {...props} data-fancy="" />
     );
@@ -918,10 +911,10 @@ describe("Select — render re-targets a part without losing anything", () => {
     trigger().focus();
     await userEvent.keyboard("{ArrowDown}");
     const positioner = await waitForPositioned();
-    // And the internal ref survives it: the trigger element is the positioning anchor, so an
+    // And the internal ref survives it: the popup is positioned against the trigger element, so an
     // unpositioned layer is exactly what a dropped function ref looks like.
     expect(positioner.style.transform).toContain("translate(");
-    // It is also the spared element — a dropped ref would make the trigger un-toggleable.
+    // The trigger is also the element spared from dismissal — a dropped ref makes it un-toggleable.
     await userEvent.click(trigger());
     await vi.waitFor(() => expect(options()).toHaveLength(0));
 
@@ -967,7 +960,7 @@ describe("Select — render re-targets a part without losing anything", () => {
     // `role="listbox"` and the id the trigger's `aria-controls` names both ride the computed props.
     expect(list.getAttribute("role")).toBe("listbox");
     expect(trigger().getAttribute("aria-controls")).toBe(list.id);
-    // `renderElement` collapses the internal + consumer refs into one function ref, so both land.
+    // The internal and consumer refs are collapsed into one callback, so both land.
     expect(scrollContainers).toContain(list);
 
     await expectNoA11yViolations(document.body, AXE_OPTIONS);
@@ -1048,8 +1041,8 @@ describe("Select — native form submission", () => {
     ));
     await vi.waitFor(() => expect(trigger()).not.toBeNull());
 
-    // `<input type="hidden">` is barred from constraint validation, so `required` on it is silently
-    // ignored — the dead-plumbing bug `HiddenSelect`'s real `<select>` replaces.
+    // Constraint validation skips `<input type="hidden">` entirely, so `required` on one is silently
+    // ignored — which is why the hidden field is a real, merely clipped, `<select>`.
     const submit = container.querySelector('button[type="submit"]') as HTMLElement;
     await userEvent.click(submit);
     await vi.waitFor(() => expect(trigger()).toHaveFocus());
@@ -1062,12 +1055,12 @@ describe("Select — native form submission", () => {
 // ─── Hydration ──────────────────────────────────────────────────────────────────────────────────
 
 describe("Select hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a
-  // nested SSR server and `select.ssr.test.tsx` inline-snapshots that same render, so they agree
-  // byte-for-byte. Reusing `Tree` keeps the client tree structurally identical to the server's.
+  // `ssrFixture` is genuine server output: a bridge renders `Tree` through a nested SSR server, and
+  // `select.ssr.test.tsx` inline-snapshots that same render, so the two agree byte-for-byte. Reusing
+  // `Tree` here keeps the client tree structurally identical to the server's.
   //
-  // The `Tree` portals to `document.body` (it is the shape a consumer writes, with no `mount`), so
-  // these queries are document-scoped rather than bound to a portal host of their own.
+  // This `Tree` portals to `document.body` (no `mount` prop, the shape a consumer writes), so these
+  // queries are document-scoped rather than bound to a portal host of their own.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     dispose();
@@ -1083,7 +1076,7 @@ describe("Select hydration", () => {
 
     await userEvent.click(scope.trigger());
     await scope.waitForPositioned();
-    // The popup is grouped, so this is also the grouped tree's client half.
+    // The hydrated tree is grouped, so this doubles as the grouped tree's client half.
     expect(scope.options()).toHaveLength(4);
     expect(scope.selectedOptions().map((option) => option.textContent)).toEqual(["Strawberry"]);
 

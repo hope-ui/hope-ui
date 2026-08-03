@@ -31,8 +31,8 @@ const SLOTS = [
   "closeTrigger",
 ] as const;
 
-// `description` is intentionally unstyled by default (it inherits the root's content color and body
-// metrics), so it's checked for presence via `unstyledSlots` rather than the non-empty `slots` set.
+// `description` is intentionally unstyled — it inherits the root's content color and body metrics — so
+// it is checked for presence via `unstyledSlots` rather than the non-empty `slots` set.
 const STYLED_SLOTS = SLOTS.filter((slot) => slot !== "description");
 const UNSTYLED_SLOTS = ["description"] as const;
 
@@ -71,8 +71,8 @@ describe("hope alert recipe", () => {
     const soft = alertRecipe({ variant: "soft", colorScheme: "primary" }).root();
     expect(soft).toContain("bg-primary-soft");
     expect(soft).toContain("text-primary-emphasis");
-    // soft's reserved border matches its own fill (closing the page-bg gap), not the darker
-    // `-subtle-line` edge the `subtle` variant uses.
+    // soft's reserved border matches its own fill, closing the gap to the page background, rather than
+    // taking the darker `-subtle-line` edge the `subtle` variant uses.
     expect(soft).toContain("border-primary-soft");
     expect(soft).not.toContain("border-primary-subtle-line");
   });
@@ -93,18 +93,17 @@ describe("hope alert recipe", () => {
 
   it("colors only the icon + title per role for the default variant, leaving root a raised surface", () => {
     const parts = alertRecipe({ variant: "default", colorScheme: "danger" });
-    // root is the role-neutral raised chrome, with no role fill.
     const root = parts.root();
     expect(root).toContain("bg-surface-raised");
     expect(root).toContain("border-subtle");
     expect(root).toContain("text-foreground");
     expect(root).not.toContain("bg-danger");
     expect(root).not.toContain("text-danger-emphasis");
-    // the role color rides the icon + title slots.
+    // The role color rides the icon and title slots instead.
     expect(parts.icon()).toContain("text-danger-emphasis");
     expect(parts.title()).toContain("text-danger-emphasis");
-    // the description is an intentionally-unstyled slot — it carries no class of its own (it inherits
-    // the root's content color), so it never picks up the role color.
+    // `description` carries no class of its own, so it inherits the root's content color and never
+    // picks up the role color.
     expect(parts.description() ?? "").toBe("");
   });
 
@@ -121,8 +120,8 @@ describe("hope alert recipe", () => {
   });
 
   it("reserves a fill-matched 1px border on every variant so none shifts a pixel (no transparent gap)", () => {
-    // The reserved border is now a real, fill-matched color — never a transparent gap to the page bg,
-    // so `bg-clip-padding` is gone too.
+    // The reserved border is a real, fill-matched color rather than a transparent gap to the page
+    // background, so `bg-clip-padding` is unnecessary.
     const solid = alertRecipe({ variant: "solid", colorScheme: "primary" }).root();
     expect(solid).toMatch(/(?:^|\s)border(?:\s|$)/); // the 1px width utility from the base
     expect(solid).toContain("border-primary");
@@ -137,7 +136,7 @@ describe("hope alert recipe", () => {
   });
 
   it("scales the box + glyph per size", () => {
-    // Word-boundary matches so a `gap-N` never accidentally satisfies the `p-N` padding assertion.
+    // Word-boundary matches, so a `gap-N` can never accidentally satisfy the `p-N` padding assertion.
     expect(alertRecipe({ size: "sm" }).root()).toMatch(/(?:^|\s)p-2(?:\s|$)/);
     expect(alertRecipe({ size: "sm" }).icon()).toContain("[&_svg]:size-4");
     expect(alertRecipe({ size: "md" }).root()).toMatch(/(?:^|\s)p-3(?:\s|$)/);
@@ -176,14 +175,14 @@ describe("hope alert recipe", () => {
     const parts = alertRecipe({});
     expect(parts.root()).toContain("bg-surface-raised");
     expect(parts.root()).toMatch(/(?:^|\s)p-3(?:\s|$)/); // md
-    // primary default colorScheme colors the icon/title primary-emphasis.
+    // The default `primary` colorScheme colors the icon and title.
     expect(parts.icon()).toContain("text-primary-emphasis");
   });
 
   it("keeps description a present but unstyled slot (declared, no default class)", () => {
-    // The slot is declared across variants — so the component can safely call `ctx.slots.description()`
-    // and consumers can target it via `slotClasses.description` — but it carries no default classes.
-    // An empty tailwind-variants slot base resolves to `undefined`, which is the "no class" result.
+    // Declared across every variant so the component can safely call `ctx.slots.description()` and a
+    // consumer can target it, but carrying no default classes. An empty tailwind-variants slot base
+    // resolves to `undefined`, which is the "no class" result.
     for (const variant of VARIANTS) {
       const parts = alertRecipe({ variant, colorScheme: "primary" });
       expect(typeof parts.description).toBe("function");

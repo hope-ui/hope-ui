@@ -15,16 +15,15 @@ function CopyTestHarness(props: { active: () => boolean; create: typeof createSc
 }
 
 /*
- * ── Why a gutter exists here at all ─────────────────────────────────────────────────────────────
- * `createScrollLock` only writes padding when `window.innerWidth - document.documentElement
- * .clientWidth` is positive — a classic scrollbar's gutter. That measured 0 until the browser
- * project stopped passing Playwright's default `--hide-scrollbars`
- * (`vitest.config.ts` → `ignoreDefaultArgs`), which every headless launch used to add; overlay
- * scrollbars were never the cause. With the arg dropped the headless *shell* build CI installs
- * draws a real 15px gutter, so the compensation arithmetic is reachable and asserted below.
+ * Why these tests can measure a gutter at all: `createScrollLock` writes padding only when
+ * `window.innerWidth - document.documentElement.clientWidth` is positive, and that measured 0 for
+ * as long as the browser project let Playwright pass its default `--hide-scrollbars`. Dropping that
+ * arg (`vitest.config.ts` → `ignoreDefaultArgs`) is what makes the headless shell draw a real
+ * gutter and puts the compensation arithmetic below within reach. Put the arg back and every
+ * assertion here passes vacuously.
  *
- * `gutterOf` re-measures per test rather than hard-coding 15: the width is a platform detail, and
- * the assertions only care that the lock adds *exactly what collapsed* to the edge the text ends on.
+ * `gutterOf` re-measures per test rather than hard-coding a width: the exact number is a platform
+ * detail, and the assertions only care that the lock adds back exactly what collapsed.
  */
 
 /**

@@ -24,7 +24,6 @@ describe("hope closeButton recipe", () => {
   });
 
   it("defaults to sm", () => {
-    // The sm box + glyph metrics are what an unspecified close button paints.
     expect(closeButtonRecipe({}).root()).toContain("size-6");
     expect(closeButtonRecipe({}).icon()).toContain("[&_svg]:size-4");
   });
@@ -45,7 +44,8 @@ describe("hope closeButton recipe", () => {
     for (const size of SIZES) {
       const root = closeButtonRecipe({ size }).root();
       const icon = closeButtonRecipe({ size }).icon();
-      // No role/foreground text color anywhere; the SVG's `stroke="currentColor"` is what paints it.
+      // No role or foreground text color anywhere — the glyph inherits `currentColor` from whatever
+      // surface it sits on, which is what makes a close button surface-adaptive.
       expect(root).not.toMatch(/\btext-[\w-]+\b/);
       expect(icon).not.toMatch(/\btext-[\w-]+\b/);
     }
@@ -55,7 +55,7 @@ describe("hope closeButton recipe", () => {
     const root = closeButtonRecipe({}).root();
     expect(root).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
     expect(root).toContain("data-pressed:bg-surface-adaptive-pressed");
-    // Focus is the shared halo ring, the same indicator every other focusable control uses.
+    // The shared halo ring, the same indicator every other focusable hope control uses.
     expect(root).toContain("focus-visible:ring-focus-halo");
   });
 

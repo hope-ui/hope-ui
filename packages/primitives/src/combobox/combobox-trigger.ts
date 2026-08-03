@@ -16,20 +16,19 @@ export interface CreateComboboxTriggerProps extends JSX.ButtonHTMLAttributes<HTM
 export interface CreateComboboxTriggerReturn {
   /**
    * Spread onto the trigger element: `role="combobox"` + the popup ARIA + the keymap + the button
-   * behavior. `id`/`aria-labelledby` fall back to the consumer's; the rest is kernel-owned.
+   * behavior. `id`/`aria-labelledby` fall back to the consumer's; the rest is owned here.
    */
   props: JSX.ButtonHTMLAttributes<HTMLButtonElement>;
-  /** Hand to the trigger element's `ref`; registers it as the anchor and the one spared element. */
+  /** Hand to the trigger element's `ref`; registers it as the positioning anchor and as the one
+   *  element modality and dismissal must leave alone. */
   setRef: (element: HTMLButtonElement) => void;
 }
 
 /**
- * The trigger part: the **focus owner**. It keeps real DOM focus for the widget's whole lifetime —
- * open or closed — and points `aria-activedescendant` at the active option, which is what the APG
- * 1.2 combobox pattern asks for and what makes a popup that mounts lazily possible at all.
- *
- * It owns the entire keymap, because there is nowhere else for it to live: no option is ever
- * focused, so no option ever receives a keydown.
+ * The trigger part: Select's **focus owner**. It keeps real DOM focus for the widget's whole
+ * lifetime — open or closed — and points `aria-activedescendant` at the highlighted option, which is
+ * what makes a lazily-mounted popup possible at all. It also owns the entire keymap, because there
+ * is nowhere else for it to live: no option is ever focused, so no option ever gets a keydown.
  *
  * | Key | Closed | Open |
  * | --- | --- | --- |
@@ -40,19 +39,18 @@ export interface CreateComboboxTriggerReturn {
  * | `Home` / `End` / `PageUp` / `PageDown` | — | delegate to `list.navigation` |
  * | printable | typeahead → **select**, popup stays shut | typeahead → highlight |
  *
- * Two things about that table are easy to get wrong and are pinned by tests:
+ * Two details are easy to get wrong, and both are pinned by tests:
  *
- * **Enter and Space `preventDefault()`.** On a native `<button>` the browser synthesizes a `click`
- * from both, which would re-enter the toggle below and close what the keydown just opened.
+ * - **Enter and Space `preventDefault()`.** A native `<button>` synthesizes a `click` from both,
+ *   which would re-enter the toggle below and close what the keydown just opened.
+ * - **The navigation keys call `list.navigation` directly**, never `navigation.onKeyDown` — that
+ *   handler binds the arrows too, so composing it would run `next()` twice per ArrowDown. Only
+ *   `typeahead.onKeyDown` is composed, and only because its printable-character fallback fires
+ *   exclusively for keys no binding above claimed.
  *
- * **The navigation keys call `list.navigation` directly rather than composing
- * `navigation.onKeyDown`.** That handler binds the arrows too, so composing it would run `next()`
- * twice per ArrowDown. Only `typeahead.onKeyDown` is composed, and only because its printable-char
- * fallback fires exclusively for keys no binding above claimed.
- *
- * `role="combobox"` **needs an accessible name** — a nameless one is an axe `aria-input-field-name`
- * violation. With no `Label` part in scope (see `combobox-root.md`), that means an `aria-label` or
- * `aria-labelledby` from the consumer, on every tree.
+ * `role="combobox"` **needs an accessible name**, and there is no `Label` part — so every tree owes
+ * an `aria-label` or `aria-labelledby` from the consumer, or axe reports `aria-input-field-name`.
+ * Full rationale: `__internal__/primitives/combobox/combobox-trigger.md`.
  */
 export function createComboboxTrigger<V = unknown, M extends SelectionMode = "single">(
   state: CreateComboboxReturn<V, M>,
@@ -61,21 +59,21 @@ export function createComboboxTrigger<V = unknown, M extends SelectionMode = "si
   const list = state.list;
 
   const openWith = (strategy: ComboboxFocusStrategy) => {
-    // Strategy first, then open: both writes land in one flush, so the entry effect — which tracks
-    // both — runs once, with the strategy this open asked for.
+    // Strategy first, then open. Solid batches both writes into one flush, so the root's entry effect
+    // — which tracks both — runs once, with the strategy this open asked for.
     state.setFocusStrategy(strategy);
     state.setOpen(true);
   };
 
   const close = () => {
     state.setOpen(false);
-    // Focus has not moved (nothing here takes it away), so this is a no-op on the normal path. It
-    // exists for the one that isn't: a consumer's `render` target, or chrome inside the popup, that
-    // pulled focus off the trigger while it was open.
+    // A no-op on the normal path — nothing here moves focus off the trigger. It exists for the path
+    // that isn't: a consumer's re-targeted element, or chrome inside the popup, that took focus away
+    // while the popup was open.
     state.triggerElement()?.focus();
   };
 
-  /** The Home/End/Page keys are inert while closed — a closed trigger is a plain button. */
+  /** The Home/End/Page keys do nothing while closed — a closed trigger is a plain button. */
   const runWhenOpen = (event: KeyboardEvent, move: () => void) => {
     if (!state.open()) {
       return;
@@ -110,21 +108,21 @@ export function createComboboxTrigger<V = unknown, M extends SelectionMode = "si
       openWith("last");
     })
     .on(["Enter", " "], (event) => {
-      // See the doc above: without this a native button fires a synthesized `click`, and the toggle
-      // closes what this just opened.
+      // Without this a native `<button>` fires a synthesized `click`, and the toggle below closes
+      // what this keydown just opened.
       event.preventDefault();
       if (!state.open()) {
         openWith("selected");
         return;
       }
-      // `shouldCloseOnSelect` is applied by the root's wrapped `onChange`, so every path that
-      // selects — this one, and an option's own click — closes on the same terms.
+      // Closing after selection is the root's business — it wraps the selection's `onChange` — so
+      // this path and an option's own click close on identical terms.
       list.selection.selectActive();
     })
     .on("Escape", (event) => {
       if (!state.open()) {
-        // Deliberately no `preventDefault` and no handling: a closed combobox must let Escape reach
-        // whatever encloses it (a Dialog).
+        // Deliberately unhandled and uncancelled: a closed combobox must let Escape reach whatever
+        // encloses it, so a Dialog it sits inside still closes.
         return;
       }
       event.preventDefault();
@@ -137,7 +135,7 @@ export function createComboboxTrigger<V = unknown, M extends SelectionMode = "si
 
   const toggle = () => {
     if (!state.open()) {
-      // A pointer open lands on the selected option — APG, and what a native `<select>` does.
+      // A pointer open lands on the selected option, as a native `<select>` does.
       openWith("selected");
       return;
     }
@@ -147,8 +145,8 @@ export function createComboboxTrigger<V = unknown, M extends SelectionMode = "si
   const button = createButton<HTMLButtonElement>({
     disabled: () => list.disabled(),
     nativeButton: () => props.nativeButton ?? true,
-    // Consumer first in every chain, so their `preventDefault()` cancels the kernel's behavior —
-    // and, for the keymap, cancels the whole map at once.
+    // Consumer first in every chain, so their `preventDefault()` cancels this hook's behavior — and,
+    // for the keymap, cancels the whole map at once.
     onClick: () => composeEventHandlers<HTMLButtonElement, MouseEvent>(props.onClick, toggle),
     onKeyDown: () =>
       composeEventHandlers<HTMLButtonElement, KeyboardEvent>(
@@ -194,14 +192,14 @@ export function createComboboxTrigger<V = unknown, M extends SelectionMode = "si
         return state.open() ? ("true" as const) : ("false" as const);
       },
       get "aria-controls"() {
-        // Only while open. The popup is mounted lazily, and an `aria-controls` naming an element
-        // that is not in the DOM is an invalid IDREF (axe `aria-valid-attr-value`) — on every closed
+        // Only while open: the popup mounts lazily, and an `aria-controls` naming an element that
+        // is not in the DOM is an invalid IDREF — axe `aria-valid-attr-value`, on every closed
         // Select on the page.
         return state.open() ? state.popupId() : undefined;
       },
       get "aria-activedescendant"() {
-        // Same IDREF rule: the active index survives a close (and closed typeahead can set one in
-        // multiple mode), so the attribute has to be gated on the option actually being mounted.
+        // Same IDREF rule: the active index survives a close (and closed-trigger typeahead can set
+        // one in multiple mode), so this has to be gated on the option actually being mounted.
         return state.open() ? list.focus.activeDescendant() : undefined;
       },
       get "aria-labelledby"() {
@@ -210,16 +208,16 @@ export function createComboboxTrigger<V = unknown, M extends SelectionMode = "si
         if (value == null) {
           return own;
         }
-        // The value first — react-aria's `useSelect` ordering, so the current selection is announced
-        // before the field's label. When the consumer named the trigger with `aria-label`, the
-        // trigger also names *itself*: `aria-labelledby` outranks `aria-label` in the accname
-        // algorithm, so without the self-reference their label would simply vanish.
+        // The value first, so a screen reader announces the current selection before the field's
+        // label. When the consumer named the trigger with `aria-label`, the trigger must also name
+        // *itself* here: `aria-labelledby` outranks `aria-label` in the accessible-name algorithm,
+        // so without the self-reference their label would silently vanish.
         const label =
           own ?? (props["aria-label"] != null ? (props.id ?? state.triggerId()) : undefined);
         return label == null ? value : `${value} ${label}`;
       },
-      // The paint gate for the option highlight (`data-active`): the widget's focus lives here, so
-      // this is the only place that can report it. React-aria's `manager.isFocused`.
+      // The paint gate for the option highlight (`data-active`): the widget's DOM focus never leaves
+      // this element, so this is the only place that can report whether the widget is focused.
       get onFocus() {
         return composeEventHandlers<HTMLButtonElement, FocusEvent>(props.onFocus, () =>
           list.focus.setFocused(true),

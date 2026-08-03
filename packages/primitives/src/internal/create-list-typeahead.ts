@@ -9,10 +9,10 @@ export interface CreateListTypeaheadOptions<V = unknown> {
   /** Milliseconds of inactivity before the buffer resets. Default `500`. Reactive. */
   delay?: Accessor<number>;
   /**
-   * Called with the matched index instead of the default `focus.focusIndex`. The seam a future
-   * Select/Combobox kernel intercepts to **select** the match rather than highlight it while its
-   * popup is closed — native `<select>` behavior, react-aria's `onTypeSelect → setSelectedKey`,
-   * Base UI's `onMatch`. A plain listbox never sets this, so its behavior is unchanged.
+   * Called with the matched index instead of the default `focus.focusIndex`. This is the seam a
+   * Select/Combobox overrides to **select** the match rather than merely highlight it while its
+   * popup is closed, which is what a native `<select>` does. A plain listbox never sets this, so its
+   * behavior is unchanged.
    */
   onMatch?: (index: number) => void;
   /**
@@ -38,13 +38,13 @@ export interface CreateListTypeaheadReturn {
 }
 
 /**
- * Type-to-focus over the list's items, layered on a [`createListFocus`](../create-list-focus/create-list-focus.md)
+ * Type-to-focus over the list's items, layered on a [`createListFocus`](create-list-focus.md)
  * instance. Buffers characters, resets after a delay, and matches item `textValue`s
  * case-insensitively (or via a `collator` — diacritic-insensitively too) — moving the active item
  * through `onMatch`, which defaults to `focus.focusIndex` so a match in an unmounted virtualized row
- * scrolls in and focuses just like navigation. Modeled on Angular Aria's `list-typeahead` and Angular
- * CDK's standalone `typeahead`; the matching rules (start point, repeated-letter cycling,
- * leading-space handling) follow react-aria's `useTypeSelect`.
+ * scrolls in and focuses just like navigation. Adapted from Angular Aria's `list-typeahead`, with
+ * the matching rules (start point, repeated-letter cycling, leading-space handling) following React
+ * Aria's `useTypeSelect`.
  *
  * Matching:
  * - **Extend** — typing distinct characters ("b", then "a") searches the full buffer ("ba") from the
@@ -71,10 +71,10 @@ export function createListTypeahead<V = unknown>(
   const matchesQuery = (textValue: string, query: string): boolean => {
     const collator = options.collator?.();
     if (collator) {
-      // The same `slice` react-aria's `ListKeyboardDelegate`/`useFilter` use: it counts UTF-16 code
-      // units, not collation elements, so a query/target pair that normalizes differently (a
-      // decomposed combining mark against a precomposed character) can slice mid-grapheme. Matched
-      // rather than guarded — see `create-list-typeahead.md`.
+      // Slicing by `query.length` counts UTF-16 code units, not collation elements, so a
+      // query/target pair that normalizes differently (a decomposed combining mark against a
+      // precomposed character) can slice mid-grapheme. React Aria's `useFilter` has the same
+      // limitation, and we match it deliberately rather than guard — see `create-list-typeahead.md`.
       return collator.compare(textValue.slice(0, query.length), query) === 0;
     }
     return textValue.toLowerCase().startsWith(query.toLowerCase());
@@ -119,13 +119,13 @@ export function createListTypeahead<V = unknown>(
 
     let index: number;
     if (repeated) {
-      // Same letter repeated → cycle: match one letter, starting after the current item.
+      // Cycling: a repeated letter steps through the items starting with it, one press at a time.
       index = matchFrom(buffer.charAt(0), current + 1);
     } else if (buffer.length === 1) {
-      // First press of a letter → move to the next item beginning with it.
+      // A first press also starts *past* the current item, so it moves rather than re-matching it…
       index = matchFrom(buffer, current + 1);
     } else {
-      // Extending a distinct query → match the whole buffer from the current item.
+      // …while extending a query starts *at* it, so a longer prefix can refine without moving.
       index = matchFrom(buffer, current < 0 ? 0 : current);
     }
 

@@ -17,7 +17,8 @@ export const Icon: Component<AlertIconProps> = (props) => {
     },
     "data-slot": "alert-icon",
     get "aria-hidden"() {
-      // The glyph is decorative by default; a consumer may opt out via `aria-hidden={undefined}`.
+      // Decorative by default — the alert's text carries the meaning. A consumer who renders a
+      // meaningful glyph opts out with `aria-hidden={undefined}`.
       return props["aria-hidden"] ?? "true";
     },
   });

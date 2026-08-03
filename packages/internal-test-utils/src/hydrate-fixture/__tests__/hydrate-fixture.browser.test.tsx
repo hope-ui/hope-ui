@@ -1,11 +1,10 @@
 import probeServerHtml from "virtual:hydration-fixture?id=hydrate-fixture";
 import { describe, expect, it } from "vitest";
 import { hydrateFixture } from "../hydrate-fixture";
-// Genuine keyed server markup (`<div _hk=…><span _hk=…>`), rendered fresh by the hydration-fixture
-// bridge in the `browser` project (see `vitest-hydration-bridge.ts`) from `hydrate-fixture.ssr-entry.tsx`.
-// The helper forbids hand-written `_hk` fixtures, and the bridge is the only in-project source of
-// real ones, so its own success + reuse-failure paths hydrate a dedicated component-free probe tree
-// rather than inventing markup no server would send (or coupling to a component's fixture).
+// Genuine server markup carrying real hydration keys (`<div _hk=…><span _hk=…>`), rendered fresh for
+// this project by the fixture bridge from `hydrate-fixture.ssr-entry.tsx`. Hand-writing `_hk`
+// attributes is not allowed and the bridge is the only source of real ones, so this helper gets its
+// own component-free probe tree instead of inventing markup no server would send.
 import { Tree } from "./hydrate-fixture.ssr-entry";
 
 /**
@@ -58,9 +57,8 @@ describe("hydrateFixture", () => {
   });
 
   it("reuses every server node when the client tree matches the markup", () => {
-    // The success half, against the same genuine fixture the failure case below diverges from: the
-    // matching `Tree` claims the server's `_hk` nodes in place, so the helper's whole-tree reuse
-    // check passes and hands back the hydrated container.
+    // The success half, against the same fixture the failure case below diverges from: a matching
+    // `Tree` claims the server's keyed nodes in place, so the whole-tree reuse check passes.
     const { container, dispose } = hydrateFixture(probeServerHtml, () => <Tree />);
 
     expect(container.querySelector('[data-probe="root"]')).not.toBeNull();
@@ -70,13 +68,11 @@ describe("hydrateFixture", () => {
   });
 
   it("leaves a hydrated delegated handler live, and its replay queue drained on dispose", async () => {
-    // Two things at once, both about the delegated-event path `Tree`'s `onClick` exists to reach.
-    // The handler must survive hydration — a silent client-render fallback would keep working here,
-    // but the reuse check above already rules that out. And `dispose()` has to drain Solid's
-    // hydration-event queue: the `runHydrationEvents()` microtask writes `_$HY.events = null` once
-    // hydration settles, which for a synchronous hydrate-then-dispose lands after the bootstrap is
-    // gone. Un-drained it throws from a microtask — an unhandled error that fails the whole file,
-    // never the assertion below.
+    // Two things at once, both on the delegated-event path `Tree`'s `onClick` exists to reach. The
+    // handler must survive hydration; and `dispose()` must drain Solid's hydration-event queue, since
+    // the microtask that replays it writes `_$HY.events = null` once hydration settles — which, for a
+    // synchronous hydrate-then-dispose, lands after the bootstrap is gone. Undrained, it throws from
+    // inside a microtask: an unhandled error that fails the whole file rather than this assertion.
     const clicks: number[] = [];
     const { container, dispose } = hydrateFixture(probeServerHtml, () => (
       <Tree onProbeClick={() => clicks.push(1)} />
@@ -90,13 +86,11 @@ describe("hydrateFixture", () => {
   });
 
   it("throws when the client tree structurally diverges, shifting the hydration keys", () => {
-    // The failure half. Prepending an element before the matching `Tree` shifts every hydration key
-    // after it — `_hk` is a path through the component tree — so `hydrate()` can't find the server's
-    // nodes and fails loudly (a "Hydration Mismatch … Unable to find DOM nodes for hydration key"),
-    // rather than silently client-rendering a second copy. This is the exact hazard the fixture
-    // system guards against project-wide: inserting a component before `Dialog.Trigger`, even one
-    // that renders nothing, shifts the trigger's key. Without a genuine keyed fixture this path was
-    // unreachable, which is why Phase 1 deferred it to the generation bridge.
+    // The failure half. Solid derives a node's hydration key from its position in the component tree,
+    // so prepending an element shifts every key after it, `hydrate()` cannot find the server's nodes,
+    // and it fails loudly instead of silently client-rendering a second copy. That is the hazard the
+    // whole fixture system guards against: inserting a component before, say, `Dialog.Trigger` — even
+    // one that renders nothing at all — shifts the trigger's key.
     expect(() =>
       hydrateFixture(probeServerHtml, () => (
         <>

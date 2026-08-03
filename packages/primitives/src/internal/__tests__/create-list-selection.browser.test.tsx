@@ -254,8 +254,7 @@ describe("createListSelection — follow focus", () => {
 
 // ─── Object values ──────────────────────────────────────────────────────────────────────────────
 // A value need not be a primitive or a reference-stable object: `itemToValue` maps each value to an
-// identity key compared with `===`, and `isItemEqualToValue` overrides the rule entirely (the Base
-// UI model, replacing the retired Angular `compareWith`).
+// identity key compared with `===`, and `isItemEqualToValue` overrides the rule entirely.
 
 interface Fruit {
   id: number;

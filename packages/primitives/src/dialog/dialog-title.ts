@@ -10,17 +10,17 @@ export interface CreateDialogTitleReturn {
 }
 
 /**
- * The title part: labels the dialog. Registers its `id` on the popup's `aria-labelledby` via
- * `createRegisteredId` (which defers the ancestor-signal write past Solid 2.0's ban on writing
- * an ancestor-owned signal from a descendant's render body). Must be called from the title's own
- * owner scope, so the registration's cleanup is scoped to the title's unmount.
+ * The title part: labels the dialog by registering its `id` on the popup's `aria-labelledby`.
+ * `createRegisteredId` defers that write, because Solid 2.0 throws when a descendant writes an
+ * ancestor-owned signal from its render body. Call it from the title's own reactive scope, so the
+ * registration is undone when the title unmounts.
  */
 export function createDialogTitle(
   state: CreateDialogReturn,
   props: JSX.HTMLAttributes<HTMLHeadingElement>,
 ): CreateDialogTitleReturn {
-  // `withDefaults`, not `props.id ?? id`: an unset `id` must resolve to the generated one, or the
-  // dialog ends up with no `aria-labelledby` and no accessible name.
+  // `withDefaults` so the resolved id travels on the returned props too: an id registered for
+  // `aria-labelledby` that never lands on the element leaves the dialog with no accessible name.
   const generatedId = createUniqueId();
   const merged = withDefaults(props, { id: generatedId });
 

@@ -11,7 +11,7 @@ export interface ComboboxTriggerProps extends CreateComboboxToggleProps {
   /**
    * Renders as a different element/component while keeping the trigger's computed props — the popup
    * ARIA, the localized `aria-label`, the `tabindex="-1"` and the focus-preserving pointerdown all
-   * ride on them. Set `nativeButton={false}` alongside when the target is not a real `<button>`.
+   * ride on them. Pass `nativeButton={false}` alongside when the target is not a real `<button>`.
    */
   render?: RenderProp<ComboboxTriggerElementProps>;
   /** Merged over the recipe's `trigger` slot (applied last), so the consumer's utilities win. */
@@ -23,14 +23,14 @@ export interface ComboboxTriggerProps extends CreateComboboxToggleProps {
 /**
  * The chevron button: a pointer affordance for opening the popup, and nothing else.
  *
- * **It is not the focus owner** — `Combobox.Input` is. Assembling `createComboboxToggle` rather than
- * `createComboboxTrigger` (which is what `Select.Trigger` uses) is the whole difference: this button
- * carries no `role="combobox"`, no `aria-activedescendant` and no keymap, because a second combobox
- * in the same tree would give a screen reader two fields and the keyboard two maps.
+ * **It is not the focus owner** — `Combobox.Input` is. That is the whole difference from
+ * `Select.Trigger`: this button carries no `role="combobox"`, no `aria-activedescendant` and no
+ * keymap, because a second combobox in the same tree would give a screen reader two fields and the
+ * keyboard two maps.
  *
  * It sits **outside the tab order** (`tabindex="-1"`) and never takes focus (`preventDefault()` on
- * `pointerdown`): the input is the widget's single tab stop, and every key this button could offer
- * is already bound there. Both rules are the kernel's — see `combobox-toggle.md`.
+ * `pointerdown`): the input is the widget's single tab stop, and every key this button could offer is
+ * already bound there.
  */
 export const Trigger: Component<ComboboxTriggerProps> = (props) => {
   const ctx = useComboboxContext();

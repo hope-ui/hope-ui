@@ -4,24 +4,22 @@ import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
 import { Dialog } from "../index";
 
-// The single source of truth for Dialog's SSR → hydration round-trip tree, shared by
-// `dialog.ssr.test.tsx` (renders it, inline-snapshots the bytes), `dialog.browser.test.tsx` (passes
-// it to hydrateFixture and drives it open), and the hydration-fixture bridge (renders it server-side
-// to feed the browser test). Reusing one tree is what enforces "structurally identical server and
-// client" — hydration keys are a path through the component tree, so a component inserted before
-// `Dialog.Trigger`, even one that renders nothing, would shift the trigger's key.
+// One tree, three consumers: `dialog.ssr.test.tsx` snapshots its server bytes,
+// `dialog.browser.test.tsx` hydrates it, and the hydration-fixture bridge renders it server-side to
+// feed that browser test. Sharing one definition is what keeps the server and client trees identical
+// — Solid matches their nodes by position, so a component inserted before `Dialog.Trigger`, even one
+// that renders nothing, shifts its key and breaks hydration.
 //
-// `Dialog.Portal` renders nothing server-side and nothing while closed, so the server fixture is
-// just the trigger `<button>`; the Backdrop/Content subtree still matters because it appears on the
-// client once the dialog opens. `Dialog.CloseTrigger` now renders a recipe-styled `CloseButton`, so the
-// tree sits under a `<ThemeProvider>` fed the `hope` preset — a zero-DOM provider (its values live in
-// CSS), so the closed server output is still just the trigger, but the provider shifts `_hk` keys, so
-// it must be present identically everywhere. See __internal__/theming.md.
+// `Dialog.Portal` renders nothing on the server and nothing while closed, so the fixture is just the
+// trigger `<button>`; the Backdrop/Content subtree still matters because it appears on the client
+// once the dialog opens. The `<ThemeProvider>` is required by the styled `Dialog.CloseTrigger`; it
+// emits no DOM of its own, but it *does* shift node positions, so it must be present identically in
+// both halves.
 
 /**
- * `defaultOpen` is optional so the ssr test can also exercise the open server render (its `Portal`
- * `isServer` guard must not crash `renderToStringAsync`, and its portaled content must stay absent
- * from the output). The hydration path uses the default — closed.
+ * `defaultOpen` is optional so the SSR test can also render the open state: its portal must not
+ * crash `renderToStringAsync`, and its portaled content must stay out of the output. The hydration
+ * path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
   return (

@@ -10,33 +10,29 @@ import {
 import { describe, expect, it } from "vitest";
 
 /**
- * Characterization tests for the `solid-js` internals this codebase leans on without any of
- * them being documented, public API. Each one names the code that would break if SolidJS 2.0
- * *stable* changed it.
+ * Characterization tests for the `solid-js` internals this codebase leans on, none of which is
+ * documented, public API. Each block names the code that breaks if SolidJS 2.0 *stable* changes it.
  *
- * They are not testing hope-ui. They exist so the beta→stable migration is a mechanical
- * diff instead of a bug hunt: `@solidjs/web` has already renamed runtime helpers *within* the
- * beta line (`use`→`ref`, `addEventListener`→`addEvent`), and if stable flips any of these,
- * the failure would otherwise surface days later as a dialog that won't label itself, a ref
- * that never fires, or an SSR crash pointing into `@solidjs/web`'s internals.
+ * They do not test hope-ui. They exist so the beta→stable migration is a mechanical diff rather
+ * than a bug hunt: `@solidjs/web` has already renamed runtime helpers *within* the beta line
+ * (`use`→`ref`, `addEventListener`→`addEvent`), and a silent flip here would otherwise surface days
+ * later as a dialog that won't label itself, a ref that never fires, or a crash inside
+ * `@solidjs/web`.
  *
- * This file runs in the **unit** project: `solid-js`'s client build, real effects, deferred
- * signal writes (hence `flush()`). Its siblings pin the same idea against the other builds:
- *
- * - `solid-contract.ssr.test.tsx` — server build. `Dynamic` emits the `_hk` hydration key that
- *   everything `renderElement` renders hydrates against.
- * - `solid-contract.browser.test.tsx` — client build in a real browser. `applyRef` (why no
- *   `mergeRefs` helper is needed).
+ * This file runs in the **unit** project — `solid-js`'s client build, real effects, and signal
+ * writes that only become visible after a `flush()`. Its siblings pin the same idea against the
+ * other builds: `solid-contract.ssr.test.tsx` (server build, and the `_hk` hydration key `Dynamic`
+ * emits) and `solid-contract.browser.test.tsx` (client build in a real browser, `applyRef`).
  *
  * See `__internal__/testing.md` and `__internal__/migration-2.0-stable.md` §2.
  */
 
 describe("solid-js contract", () => {
   describe("merge resolves a key by presence, not by value", () => {
-    // Depended on by: `withDefaults` (packages/primitives/src/defaults/defaults.ts), which
-    // exists *only* because of this. Every `Dialog.Root modal`, `Button type` and
-    // `Dialog.Title id` default routes through it. If stable makes `merge` skip `undefined`
-    // values from later sources, `withDefaults` becomes unnecessary — delete it.
+    // Depended on by `withDefaults` (packages/primitives/src/utils/defaults.ts), which exists
+    // *only* because of this — every `Dialog.Root modal`, `Button type` and `Dialog.Title id`
+    // default routes through it. If stable makes a later source's `undefined` stop winning,
+    // `withDefaults` becomes unnecessary: delete it.
     it("keeps an earlier source's value when a later source omits the key", () => {
       expect(merge({ modal: true }, {}).modal).toBe(true);
     });
@@ -47,12 +43,12 @@ describe("solid-js contract", () => {
   });
 
   describe("createSignal(fn) is the memo overload, not a signal holding a function", () => {
-    // Depended on by: `createControllableState`
+    // Depended on by `createControllableState`
     // (packages/primitives/src/internal/create-controllable-state.ts), which boxes its value in
-    // `{ value: T }` with an `equals` that unwraps via `isEqual`, solely to dodge this.
-    // 2.0 overloads `createSignal` as `<T>(value: Exclude<T, Function>, options?)` and
-    // `<T>(fn: ComputeFunction<T>, options?)`, so a generic `createSignal<T>(someValue)`
-    // silently invokes a function-typed value and stores its return.
+    // `{ value: T }` solely to dodge this: 2.0 overloads `createSignal` as
+    // `<T>(value: Exclude<T, Function>, options?)` and `<T>(fn: ComputeFunction<T>, options?)`, so
+    // a generic `createSignal<T>(someValue)` silently invokes a function-typed value and stores
+    // its return instead.
     it("invokes a function argument and stores its return value", () => {
       const compute = () => "computed";
       const [read] = createSignal(compute);
@@ -70,11 +66,11 @@ describe("solid-js contract", () => {
   });
 
   describe("useContext throws when no Provider is mounted", () => {
-    // Depended on by: `createComponentContext` (packages/primitives/src/create-component-context/create-component-context.ts),
-    // whose `try/catch` silently relies on the throw to reword it as "Dialog sub-components
-    // must be rendered inside a Dialog root component." If stable returns `undefined`
-    // instead, that friendly error stops firing and every sub-component fails later with a
-    // null-deref on `context.open()`.
+    // Depended on by `createComponentContext`
+    // (packages/primitives/src/internal/create-component-context.ts), whose `try/catch` relies on
+    // the throw to reword it as "Dialog sub-components must be rendered inside a Dialog root
+    // component." If stable returns `undefined` instead, that friendly error stops firing and
+    // every sub-component fails later with a null-deref on `context.open()`.
     it("throws for a context created without a default value", () => {
       const NoDefault = createContext<string>(undefined, { name: "NoDefault" });
 
@@ -97,14 +93,13 @@ describe("solid-js contract", () => {
   });
 
   describe("sibling effect ordering", () => {
-    // Depended on by: `createFocusRestore` (packages/primitives/src/focus-restore/), twice.
-    // It must be *created before* `createFocusTrap` so its `document.activeElement` snapshot
-    // precedes the trap's `.focus()` and `createHideOutside`'s `inert` blur; and it must
-    // restore in a `queueMicrotask` so the restore lands after every sibling cleanup, when
-    // the trap's `focusin` listener is detached and the trigger is no longer `inert`.
-    // Focusing synchronously would fire `focusin` into a still-live trap.
-    //
-    // `Dialog.Content` is the only caller today. Popover, Tooltip and Select will all be.
+    // Depended on twice by `createFocusRestore`
+    // (packages/primitives/src/internal/create-focus-restore.ts). It must be *created before*
+    // `createFocusTrap`, so its `document.activeElement` snapshot precedes the trap's `.focus()`
+    // and `createHideOutside`'s `inert` blur; and it must restore inside a `queueMicrotask`, so
+    // the restore lands after every sibling cleanup — once the trap's `focusin` listener is
+    // detached and the trigger is no longer `inert`. Focusing synchronously would fire `focusin`
+    // straight back into a still-live trap.
 
     /** Two sibling effects on one signal, each logging its run and its cleanup. */
     function createOrderedSiblings(): {
@@ -151,9 +146,9 @@ describe("solid-js contract", () => {
 
     it("runs sibling cleanups in creation order when the effects re-run", () => {
       // The path that matters: `open` flips false, both effects re-run, and each runs its own
-      // previous cleanup before its own new body. So the restore's cleanup (created first)
-      // fires while the trap's `focusin` listener is *still attached* — which is precisely
-      // why `createFocusRestore` defers the actual `.focus()` call by a microtask.
+      // previous cleanup before its own new body. So the restore's cleanup (created first) fires
+      // while the trap's `focusin` listener is *still attached* — precisely why
+      // `createFocusRestore` defers the actual `.focus()` call by a microtask.
       const { order, setActive, dispose } = createOrderedSiblings();
       order.length = 0;
 

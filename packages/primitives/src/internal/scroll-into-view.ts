@@ -62,10 +62,10 @@ function scrollArea(element: HTMLElement): { block: Span; inline: Span } {
  * and whatever the scrollbar occupies. Borders and the scrollbar sit *inside* the border box but
  * outside the scrollable area, so leaving them in would tuck the last row under the scrollbar.
  *
- * The physical sides here are correct and must stay physical: this is measured geometry, the same
- * class as the `getBoundingClientRect()` reads `check:rtl-safety` deliberately never flags. Reading
- * direction is handled explicitly instead — the vertical scrollbar occupies the inline *end*, which
- * is the left edge under `rtl`.
+ * The physical sides here are correct and must stay physical: this is measured geometry, not
+ * styling — the same class of read as `getBoundingClientRect()`, which the repo's `check:rtl-safety`
+ * lint deliberately never flags. Reading direction is handled explicitly instead: the vertical
+ * scrollbar occupies the inline *end*, which is the left edge under `rtl`.
  */
 function scrollPort(scrollContainer: HTMLElement): { block: Span; inline: Span } {
   const box = scrollContainer.getBoundingClientRect();
@@ -138,9 +138,9 @@ function scrollDelta(align: ScrollLogicalPosition, area: Span, port: Span): numb
  * native call walks every scrollable ancestor up to the document, so revealing an option inside a
  * floating popup drags the page (and therefore the popup) out from under the reader.
  *
- * It is needed at all because `aria-activedescendant` moves no DOM focus. Roving focus has been
- * hiding that: a real `.focus()` scrolls the element into view by itself, whereas in a Select the
- * browser scrolls nothing and an offscreen option stays offscreen while ARIA calls it active.
+ * It is needed at all because `aria-activedescendant` moves no DOM focus: a real `.focus()` scrolls
+ * its element into view by itself, but a widget that only *names* the active option in ARIA scrolls
+ * nothing, leaving an offscreen option offscreen while a screen reader calls it active.
  */
 export function scrollIntoView(
   scrollContainer: HTMLElement,

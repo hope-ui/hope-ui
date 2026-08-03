@@ -22,29 +22,24 @@ export interface CreateCalendarGridReturn {
 }
 
 /**
- * The view-agnostic grid engine on a `<table role="grid">`. Composes `createGridNavigation` (over the
- * calendar's shared `createListFocus` + `createCollection`) for roving focus + in-scope arrow roving
- * (RTL-aware, skip-disabled) + Home/End + mod+Home/End, and layers the calendar-specific keyboard on
- * top:
+ * The view-agnostic grid engine on a `<table role="grid">`. It composes `createGridNavigation` — which
+ * already handles roving focus, arrow movement inside the visible grid (RTL-aware, skipping disabled
+ * cells), Home/End and mod+Home/End — and layers the calendar-specific keyboard on top:
  *
- * - **Period-crossing** (the crux). On an arrow, `resolveViewArrowMove` computes the target date; if
- *   it stays in the visible scope, the grid's own coordinate roving handles it (day-by-day across
- *   weeks via `colWrap="continuous"`). If it **crosses** the visible month/year/decade, this
- *   intercepts *before* the grid sees it, re-targeting the cursor into the adjacent period
- *   (`setFocusedDate`, which flips the visible scope) — so the grid never itself crosses. Because the
- *   cursor is a single source of truth, there is no `event.target` disambiguation (unlike the Angular
- *   original's two same-element listeners).
- * - **`PageUp`/`PageDown`** page one period; **`Shift+PageUp`/`Down`** page ±1 year in month view
- *   (APG); **`Shift+Arrow`** extends a range (month view + range mode only), stepping past unavailable
- *   days where the range is allowed to contain them; **`Escape`** cancels a range in progress,
- *   consuming the key only when there was one to cancel. `Enter`/`Space` are the cell button's native
- *   activation — not handled here.
- * - **Deferred focus** replaces the Angular `afterNextRender` nudge: after a cross / page / drill, the
- *   target cell is focused once it mounts, via `createListFocus`'s built-in deferral. It is armed only
- *   by user navigation, never on the initial render (so the calendar doesn't steal focus on mount).
+ * - **Period-crossing**, the crux. On an arrow, `resolveViewArrowMove` computes the target date. If it
+ *   stays inside the visible month/year/decade, `createGridNavigation` handles it. If it **crosses**,
+ *   this intercepts *before* the grid sees the event and moves the cursor into the adjacent period
+ *   with `setFocusedDate`, which pulls the visible scope along — so the grid itself never crosses.
+ * - **`PageUp`/`PageDown`** page one period; **`Shift+PageUp`/`Down`** page ±1 year in month view;
+ *   **`Shift+Arrow`** extends a range (month view + range mode only); **`Escape`** cancels a range in
+ *   progress, consuming the key only when there was one to cancel. `Enter`/`Space` are the cell
+ *   button's native activation and are not handled here.
+ * - **Deferred focus**: after a cross / page / drill the target cell does not exist yet, so focusing it
+ *   waits until it mounts. Armed only by user navigation, never on the initial render, so a calendar
+ *   never steals focus on mount.
  *
- * It also owns the grid's own ARIA state (`aria-readonly` / `aria-disabled` / `aria-multiselectable`)
- * and `headerProps` for the weekday `<thead>` — both React Aria's `useCalendarGrid`.
+ * It also owns the grid's ARIA state and `headerProps` for the weekday `<thead>`. Keyboard table:
+ * `__internal__/primitives/calendar/calendar-grid.md` § Keyboard.
  */
 export function createCalendarGrid(
   state: CreateCalendarReturn,
@@ -52,7 +47,8 @@ export function createCalendarGrid(
 ): CreateCalendarGridReturn {
   const isRtl = () => state.direction() === "rtl";
 
-  // Map each registered cell to its (row, col) coordinate from the current view's cell model.
+  // Give each registered cell the (row, col) coordinate the current view's cell model puts it at —
+  // what `createGridNavigation` needs to turn an arrow key into a neighbouring cell.
   const gridCells = createMemo<GridCell<string>[]>(() => {
     const rows = state.cells();
     const posByKey = new Map<string, { row: number; col: number }>();
@@ -75,22 +71,20 @@ export function createCalendarGrid(
     focus: state.listFocus,
     cells: gridCells,
     rowWrap: () => "nowrap",
-    // Day-by-day across weeks (and month-by-month across year rows). Crossing the whole scope is
-    // intercepted below before this ever reaches a grid edge.
+    // `"continuous"` = running off the end of a row continues on the next one, so the arrows move
+    // day-by-day across week boundaries. Leaving the grid entirely is intercepted below.
     colWrap: () => "continuous",
     textDirection: () => state.direction(),
   });
 
   // --- Deferred focus nudge ---
-  // Armed by user navigation (cross / page / view change), then focuses the cell for the *settled*
-  // cursor once it has rendered. `nudge` only arms a flag — it must NOT capture `focusedDate` now,
-  // because the client build defers the `setFocusedDate` write, so the value isn't updated yet. The
-  // effect reads `focusedDate` reactively (only while armed), so it re-runs as the write + re-render
-  // settle, then focuses and disarms.
+  // `nudge` deliberately only raises a flag. It must NOT capture `focusedDate`: a Solid 2.0 signal
+  // write is invisible to a plain read until the next flush, so the caller's `setFocusedDate` has not
+  // landed yet. The effect below reads `focusedDate` reactively instead — and only while armed — so it
+  // re-runs as the write and the re-render settle, then focuses the cell and disarms.
   //
-  // The flag itself lives on the root state, not here: the *cell* arms it too, for the keyboard range
-  // auto-advance (`focusNearestAvailableDate`), and a cell has no reference to this hook. The effect
-  // that consumes it stays here, where the grid's own navigation already relies on it.
+  // The flag lives on the root state rather than here because a *cell* arms it too (the keyboard range
+  // auto-advance) and has no reference to this hook.
   const nudge = () => state.setPendingCursorFocus(true);
   createEffect(
     () => {
@@ -98,10 +92,10 @@ export function createCalendarGrid(
         return undefined; // not armed → don't even track the cursor
       }
       const key = state.focusedDate().toString();
-      // Pick the *focusable* cell for this date. During a period cross the outgoing scope's trailing
-      // outside cell shares the date key transiently — `!disabled()` skips it. Reading `element()`
-      // here (tracked) re-runs this until the real cell has mounted + connected, so we never focus a
-      // detaching node and then stop retrying.
+      // Two cells can hold this date at once: mid-cross, the outgoing month's trailing filler cell
+      // shares the key with the incoming month's real one, and `!disabled()` is what picks the real
+      // one. Reading `element()` inside the tracked compute makes this re-run until that cell has
+      // mounted and connected, so a detaching node is never focused and the retry never gives up.
       const item = state.collection
         .items()
         .find((candidate) => candidate.value() === key && !candidate.disabled());
@@ -111,14 +105,15 @@ export function createCalendarGrid(
       if (!item) {
         return; // the target cell hasn't rendered/connected yet — a later run fires
       }
-      // `listFocus.focus` reads reactive state internally; this is a deliberate imperative move from
-      // inside an effect callback, so it must be untracked.
+      // `listFocus.focus` reads reactive state internally, and this is a one-off imperative move, not
+      // a dependency — untracked so those reads don't re-subscribe this effect.
       untrack(() => state.listFocus.focus(item));
       state.setPendingCursorFocus(false);
     },
   );
 
-  // A view change (drill up/down) re-lands focus on the re-normalized cell — skip the initial run.
+  // A view change (drill up/down) re-lands focus on the re-normalized cell. The `previous === undefined`
+  // test skips the initial run, so mounting a calendar never steals focus.
   createEffect(
     () => state.view(),
     (_view, previous) => {
@@ -144,11 +139,11 @@ export function createCalendarGrid(
     event.preventDefault();
     const delta = arrowDelta(direction, isRtl());
     const step = state.focusedDate().add({ days: delta });
-    // Land on a day the range can actually end on. Stepping *past* an unavailable day (rather than
-    // dead-stopping on it, which used to freeze the cursor entirely) is only sound where the range is
-    // allowed to contain one: a contiguous range would have to swallow every day it skipped, so it
-    // stops at the edge of the anchor's available run instead — which the bounds narrowed around the
-    // anchor already report as unselectable, so both cases fall out of one predicate.
+    // Land on a day the range can actually end on. Stepping *past* an unavailable day is only sound
+    // when the range is allowed to contain one; a contiguous range would have to swallow every day it
+    // skipped, so it stops at the edge of the anchor's available run instead. Both cases fall out of
+    // the one predicate, because the narrowed bounds already report anything past that edge as
+    // unselectable.
     const target = state.allowsNonContiguousRanges()
       ? firstSelectableDateFrom(step, delta > 0 ? 1 : -1, state.isDateSelectable)
       : step;
@@ -176,11 +171,10 @@ export function createCalendarGrid(
     .on("shift+ArrowDown", (event) => shiftArrow(event, "down"))
     .on("shift+ArrowLeft", (event) => shiftArrow(event, "left"))
     .on("shift+ArrowRight", (event) => shiftArrow(event, "right"))
-    // Cancel a range in progress, as React Aria's `useCalendarGrid` does — always a cancel, never the
-    // calendar's `commitBehavior` (that policy is for *walking away*; Escape is an explicit refusal).
-    // With nothing to cancel the event is left entirely alone, so Escape still reaches an enclosing
-    // popover/dialog — and when there *is* a range in progress, propagation stops so the same keypress
-    // doesn't also close the surface the user is still selecting in.
+    // Always a cancel, never the calendar's `commitBehavior`: that policy is for *walking away*, where
+    // Escape is an explicit refusal. With nothing to cancel the event is left entirely alone, so Escape
+    // still reaches an enclosing popover/dialog; with a range in progress, propagation stops so the
+    // same keypress doesn't also close the surface the user is still selecting in.
     .on("Escape", (event) => {
       if (state.anchorDate() === null) {
         return;
@@ -208,7 +202,7 @@ export function createCalendarGrid(
         }
         return;
       }
-      grid.onKeyDown(event); // in-scope roving (it preventDefaults matched keys itself)
+      grid.onKeyDown(event); // stays in scope — it calls `preventDefault()` on the keys it handles
       return;
     }
     if (event.key === "Home" || event.key === "End") {
@@ -218,17 +212,17 @@ export function createCalendarGrid(
     keymap.onKeyDown(event);
   };
 
-  // No `onPointerLeave` handling: the tentative band is derived from the roving cursor, so it must
-  // survive the pointer leaving the grid — clearing it there would erase a band the anchor still owns.
+  // Deliberately no `onPointerLeave`: the tentative band is derived from the roving cursor, so it has
+  // to survive the pointer leaving the grid — clearing it there would erase a band the anchor owns.
   const rest = omit(props, "onKeyDown");
   const elementProps = merge(rest, {
     role: "grid" as const,
     get "aria-labelledby"() {
       return state.headingId();
     },
-    // The grid's own ARIA state, present only when true (each defaults to false in ARIA, so emitting
-    // `"false"` would be noise). `aria-multiselectable` covers both non-single modes: a range and a
-    // multiple-date calendar are equally "more than one cell may be selected".
+    // Emitted only when true — each of these defaults to false in ARIA, so `"false"` would be noise.
+    // `aria-multiselectable` covers both non-single modes: a range and a multiple-date calendar are
+    // equally "more than one cell may be selected".
     get "aria-readonly"() {
       return state.readOnly() ? "true" : undefined;
     },

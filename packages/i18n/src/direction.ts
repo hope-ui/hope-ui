@@ -19,9 +19,8 @@
  */
 
 /*
- * Reading-direction detection, re-expressed for SolidJS. The RTL script set adds `Avst` and
- * `Armi` to the upstream list. This replaces the Angular calendar's `@angular/cdk`
- * `Directionality`.
+ * Reading-direction detection, re-expressed for SolidJS. The RTL script set below adds `Avst` and
+ * `Armi` to the upstream list.
  */
 
 /** The writing direction for a locale. */

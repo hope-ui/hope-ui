@@ -7,8 +7,6 @@ export interface DialogHeaderProps extends JSX.HTMLAttributes<HTMLDivElement> {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 
-// A plain layout container for the title/description (mirrors `alert-content.tsx`). No behavior — just
-// the recipe's `header` slot merged with any consumer `class`, and a `data-slot` marker.
 export const Header: Component<DialogHeaderProps> = (props) => {
   const ctx = useDialogContext();
   const rest = omit(props, "render");

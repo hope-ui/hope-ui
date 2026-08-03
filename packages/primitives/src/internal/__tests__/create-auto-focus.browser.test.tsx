@@ -177,9 +177,9 @@ describe("createAutoFocus", () => {
 });
 
 /**
- * `createFocusTrap` composes this primitive, and creates its listener effect **first**. Both
- * halves of that decision are pinned here rather than in `create-focus-trap.browser.test.tsx`,
- * which stays untouched as the no-behavior-change gate for the extraction.
+ * `createFocusTrap` composes this primitive and creates its own listener effect **first**. Both
+ * halves of that ordering are pinned here; `create-focus-trap.browser.test.tsx` covers the trap's
+ * own behavior and is deliberately unaware of the split.
  */
 describe("createFocusTrap composes createAutoFocus", () => {
   afterEach(() => {
@@ -187,10 +187,9 @@ describe("createFocusTrap composes createAutoFocus", () => {
   });
 
   it("pulls an out-of-container `initialFocus` back inside", async () => {
-    // The one behavioral difference the creation order buys: the `focusin` listener is
-    // already attached when autofocus fires, so a trap whose `initialFocus` points outside
-    // its container refuses it. Correct for a *trap* — and the assertion that goes red if
-    // anyone creates `createAutoFocus` first.
+    // What the creation order buys: the `focusin` listener is already attached when autofocus
+    // fires, so a trap whose `initialFocus` points outside its container refuses it — correct for
+    // a *trap*. This assertion goes red if anyone creates `createAutoFocus` first.
     const [active, setActive] = createSignal(false);
     const [containerRef, setContainerRef] = createSignal<HTMLDivElement>();
     const [outsideRef, setOutsideRef] = createSignal<HTMLButtonElement>();
@@ -219,14 +218,14 @@ describe("createFocusTrap composes createAutoFocus", () => {
   });
 
   it("removes its listeners before autofocus removes the `tabindex` it added", async () => {
-    // Sibling effect cleanups run in *creation* order on a re-run, so listeners-first
-    // reproduces exactly what the single welded effect did before the extraction.
+    // Sibling effect cleanups run in *creation* order on a re-run, so creating the listeners
+    // first also tears them down first.
     //
-    // This asserts the teardown sequence rather than a DOM consequence of it, because
+    // This asserts the teardown sequence itself rather than a DOM consequence of it, because
     // Chromium leaves no consequence to observe: dropping the `tabindex` from the focused
-    // container fires `focusout` only — never `focusin` — so the trap's handler cannot react
-    // even when it is still attached (measured, not assumed; see create-focus-trap.md).
-    // The order is still the right one, and unpinned it would silently revert.
+    // container fires `focusout` only, never `focusin`, so the trap's handler cannot react even
+    // while still attached (measured, not assumed — see `create-focus-trap.md`). The order is
+    // still the right one, and nothing else would notice it silently reverting.
     const teardown: string[] = [];
     const [active, setActive] = createSignal(false);
     const [containerRef, setContainerRef] = createSignal<HTMLDivElement>();

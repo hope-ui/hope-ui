@@ -11,10 +11,9 @@ export interface ListboxSeparatorProps extends JSX.HTMLAttributes<HTMLElement> {
 }
 
 /**
- * A purely visual hairline divider between sections. `createListboxSeparator` owns
- * `role="presentation"` + `aria-hidden` (**not** `role="separator"` — invalid as a `listbox` child,
- * and some assistive tech would report a real separator as an item); this layer adds the recipe
- * `separator` slot + `data-slot`.
+ * A purely visual hairline divider between sections. The primitive gives it `role="presentation"` +
+ * `aria-hidden`, **not** `role="separator"`: a real separator is not a valid `listbox` child, and
+ * some assistive tech would announce it as one of the options.
  */
 export function Separator(props: ListboxSeparatorProps): JSX.Element {
   const ctx = useListboxContext();

@@ -5,19 +5,17 @@ import { merge } from "solid-js";
 import { useCalendarContext } from "./calendar-context";
 
 /**
- * One rendered day cell — a `<td role="gridcell">` wrapping the roving day `<button>`. Internal to
- * `Calendar.Grid` (a consumer can't hand-author 42 reactive cells), so it isn't part of the `Calendar`
- * namespace. Assembles `createCalendarCell`: `cell.props` (the ARIA grid-cell semantics) go on the
- * `<td>`, and `cell.triggerProps` (interaction + every `data-*` day-state paint hook) go on the
- * `<button>`, where the recipe's `cellTrigger` slot reads them. Pure assembly + theme.
+ * One rendered day cell — a `<td role="gridcell">` wrapping the day `<button>`. Internal to
+ * `Calendar.Grid`, since a consumer cannot hand-author 42 reactive cells, so it is not part of the
+ * public `Calendar` namespace. The ARIA grid-cell semantics go on the `<td>`; the interaction and
+ * every `data-*` day-state paint hook go on the `<button>`, where the recipe reads them.
  *
- * The `<td>`/`<button>` are rendered through `renderElement` (not literal tags) for **hydration-key
- * stability**: each spreads a getter-laden props object from the primitive hook, and a getter-spread on
- * a literal host element allocates `_hk` differently under the server (`ssr`) vs client (`dom`) Solid
- * compile, shifting every following key and breaking the round-trip. `renderElement` → `<Dynamic>` (a
- * component call) allocates identically on both — the same reason `Listbox` routes its item element
- * through it. `renderElement` also merges the trigger ref. Static structural tags (`thead`/`tr`/`th`/
- * `tbody`, the group/header `div`) carry no such spread, so `Calendar.Grid` writes those as literals.
+ * Both go through `renderElement` rather than literal tags, for **hydration-key stability**: each
+ * spreads a getter-backed props object from the primitive, and such a spread on a *literal* host
+ * element makes Solid's server and client compilers allocate hydration keys differently, shifting
+ * every following key and breaking the round-trip. Routing through a component call allocates them
+ * identically on both sides. The purely structural tags in `Calendar.Grid` spread nothing, so they
+ * stay literals.
  */
 export function CalendarCell(props: { model: CalendarCellModel }): JSX.Element {
   const ctx = useCalendarContext();
@@ -30,8 +28,8 @@ export function CalendarCell(props: { model: CalendarCellModel }): JSX.Element {
     as: "button",
     props: merge(cell.triggerProps, {
       "data-slot": "calendar-cell-trigger",
-      // class-forwarding-ok: not a public part — `Calendar.Grid` builds every cell from a model, so
-      // there is no consumer `class` to fold in. Style it through `slotClasses.cellTrigger`.
+      // class-forwarding-ok: not a public part — every cell is built from a model, so there is no
+      // consumer `class` to fold in. Style it through `slotClasses.cellTrigger` instead.
       get class(): string {
         return ctx.slots.cellTrigger();
       },

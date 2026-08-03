@@ -5,20 +5,19 @@ import type { CreatePopoverReturn } from "./popover-root";
 
 /**
  * Half the arrow's own size, pulled back so the square straddles the popup's edge. A **CSS string**,
- * never a measured number: the size stays owned by the recipe (the `arrow` slot sets the custom
- * property; `8px` is the fallback for a headless consumer who sets nothing), and the primitive stays
- * out of the CSSOM. Reading the size back would cost an effect, a resize observer and a re-render,
- * to arrive at the number CSS already has.
+ * never a measured number: the size stays owned by the stylesheet, which sets
+ * `--popover-arrow-size` (`8px` is the fallback for a headless consumer who sets nothing). Measuring
+ * it back would cost an effect, a resize observer and a re-render to arrive at a number CSS already
+ * has.
  *
- * **Unprefixed on purpose.** `--hope-*` is the theming package's *semantic token* vocabulary, authored
- * by a preset in `theme.css`; this is a component-local geometry channel between a recipe and this
- * hook, the same role calendar's `--cell-size` plays. The distinction is enforced, not stylistic:
- * `check:recipe-purity` rejects any bracketed arbitrary value naming `--hope-`, so a `--hope-`-named
- * property here would be one no preset recipe could ever set.
+ * **Unprefixed on purpose.** `--hope-*` is the theming package's *semantic token* vocabulary, and
+ * `check:recipe-purity` forbids a recipe from naming one in an arbitrary value — so a `--hope-`
+ * name here would be a property no preset recipe could ever set. This is a component-local channel
+ * between the stylesheet and this hook, like calendar's `--cell-size`.
  *
- * The other half of the agreement is the `arrow` slot, which sets this property *and* sizes its box
- * from it (`packages/presets/src/hope/recipes/popover.ts`, pinned by that recipe's test). Renaming it
- * here means renaming it there.
+ * The other half of the agreement is the `arrow` style rule, which sets this property *and* sizes
+ * its box from it (`packages/presets/src/hope/recipes/popover.ts`, pinned by that recipe's test).
+ * Renaming it here means renaming it there.
  */
 const PIN_OFFSET = "calc(var(--popover-arrow-size, 8px) / -2)";
 
@@ -32,46 +31,37 @@ export interface CreatePopoverArrowReturn {
     "data-align": FloatingAlign;
     "data-uncentered": string | undefined;
   };
-  /** Hand to the arrow element's `ref`. Registering it is what enables floating-ui's `arrow`
-   * middleware, and so what populates the measurements this hook reads. */
+  /** Hand to the arrow element's `ref`. Registering it is what makes the arrow get measured at all,
+   * and so what populates the offsets this hook reads. */
   setRef: (element: HTMLDivElement) => void;
 }
 
 /**
- * The arrow part: the little square that points at the anchor. Carries the *measurements* —
- * `createFloating` writes no styles — while the 45° rotation, the size and the background are the
- * `arrow` slot's, and how a clamped arrow disappears is the recipe's call via `data-uncentered`.
+ * The arrow part: the little square that points at the anchor. It carries only the *measurements* —
+ * the 45° rotation, the size and the background belong to the stylesheet, as does what a clamped
+ * arrow does about it, via `data-uncentered`.
  *
- * ## Render the element unconditionally
+ * **Render the element unconditionally — never gate it on `state.floating.arrow()`.** That is a
+ * deadlock: no element means no arrow measurement is requested, which means `arrow()` stays
+ * `undefined` forever. A late ref is fine, because the element is tracked reactively and the
+ * measurement re-runs once it shows up.
  *
- * **Never gate it on `state.floating.arrow()`.** No element means no `arrowElement` in
- * `createFloating`'s config, which means no `arrow` middleware, which means `arrow()` stays
- * `undefined` forever — the same deadlock as gating the floating element on `isPositioned()`. A late
- * ref is fine: `createFloating` tracks `arrowElement` in its config memo, so the measurement re-runs
- * when the element shows up.
+ * **`data-side` is the popup's side, not the pin edge.** It is identical to the Positioner's and the
+ * Content's, so one style rule can dress the card and its arrow coherently. The pin edge is the
+ * *opposite* of it and lives only in the inline style.
  *
- * ## `data-side` is the popup's side, not the pin edge
- *
- * Identical to the Positioner's and the Content's, so one variant styles the card and its arrow
- * coherently — Base UI's semantics for `PopoverArrowDataAttributes.side` ("which side the popup is
- * positioned relative to the trigger"). The pin edge is the *opposite* of it, and it lives only in
- * the inline style, off `arrow().side`.
- *
- * ## `data-uncentered` starts present
- *
- * It is absent only once a measurement has resolved `centerOffset` to exactly `0`. Deliberate: an
- * unmeasured arrow reads as clamped, so a recipe hiding it starts hidden rather than flashing in a
- * centred position it will not keep.
+ * **`data-uncentered` starts present**, and goes absent only once a measurement resolves the offset
+ * to exactly `0`. Deliberate: an unmeasured arrow reads as clamped, so a rule hiding it starts
+ * hidden rather than flashing in a centred position it will not keep.
  */
 export function createPopoverArrow(
   state: CreatePopoverReturn,
   props: JSX.HTMLAttributes<HTMLDivElement>,
 ): CreatePopoverArrowReturn {
   const elementProps = merge(props, {
-    // Kernel first, consumer last, the same order and for the same reason as the Positioner's: a
-    // consumer's `z-index`, or the `--popover-arrow-size` the pin above reads, must survive.
-    // A string `style` has no merge seam, so it is dropped in favour of the pin — see
-    // `popover-arrow.md`.
+    // Ours first, consumer last, the same order and reason as the Positioner's: a consumer's
+    // `z-index`, or the `--popover-arrow-size` the pin above reads, has to survive. A string `style`
+    // cannot be merged into, so it is dropped in favour of the pin.
     get style(): JSX.CSSProperties {
       const kernel = pinnedStyle(state.floating.arrow());
       const consumer = props.style;
@@ -95,8 +85,8 @@ export function createPopoverArrow(
 }
 
 /**
- * `x` and `y` are mutually exclusive — floating-ui fills in only the axis the placement varies along
- * — so the unused one resolves to `undefined` and the attribute is simply absent.
+ * `x` and `y` are mutually exclusive: only the axis the placement varies along is measured, so the
+ * other resolves to `undefined` and its declaration is simply absent.
  */
 function pinnedStyle(arrow: FloatingArrowState | undefined): JSX.CSSProperties {
   const style: JSX.CSSProperties = {
@@ -104,8 +94,8 @@ function pinnedStyle(arrow: FloatingArrowState | undefined): JSX.CSSProperties {
     left: px(arrow?.x),
     top: px(arrow?.y),
   };
-  // Assigned rather than spelled as a literal key: the pin edge is runtime state, and it must land
-  // *after* the two above, so that the axis floating-ui left empty is the one the pin claims.
+  // Assigned rather than written as a literal key: the pin edge is runtime state, and it has to land
+  // *after* the two above so it claims the axis the measurement left empty.
   style[arrow?.side ?? "top"] = PIN_OFFSET;
   return style;
 }

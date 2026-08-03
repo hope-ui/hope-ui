@@ -10,17 +10,18 @@ export interface CreateListboxGroupLabelReturn {
 }
 
 /**
- * The group-label part: names its `Group`. Registers its `id` on the group's `aria-labelledby` via
- * `createRegisteredId` (which defers the ancestor-signal write past Solid 2.0's ban on writing an
- * ancestor-owned signal from a descendant's render body). Must be called from the label's own owner
- * scope, so the registration's cleanup is scoped to its unmount. Mirrors `createDialogTitle`.
+ * The group-label part: names its `Group` by registering its `id` on the group's `aria-labelledby`.
+ * `createRegisteredId` is what defers that write, because Solid 2.0 forbids a descendant writing an
+ * ancestor-owned signal from its render body. Call it from the label's own owner scope, so the
+ * registration is cleaned up when the label unmounts.
  */
 export function createListboxGroupLabel(
   group: CreateListboxGroupReturn,
   props: JSX.HTMLAttributes<HTMLElement> = {},
 ): CreateListboxGroupLabelReturn {
-  // `withDefaults`, not `props.id ?? id`: an unset `id` must resolve to the generated one, or the
-  // group ends up with no `aria-labelledby` and no accessible name.
+  // `withDefaults` keeps the resolved `id` reactive on the props object it returns, which is what the
+  // registration below reads. Falling back to the generated id is load-bearing: without one the group
+  // gets no `aria-labelledby` and no accessible name at all.
   const generatedId = createUniqueId();
   const merged = withDefaults(props, { id: generatedId });
 

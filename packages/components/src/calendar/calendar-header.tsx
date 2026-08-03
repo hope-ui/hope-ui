@@ -11,13 +11,13 @@ export interface CalendarHeaderProps extends JSX.HTMLAttributes<HTMLDivElement> 
 }
 
 /**
- * A structural layout row for the chrome (prev / heading / next). Purely presentational — no behavior;
- * it only carries the recipe's `header` slot (the flex row) merged with any consumer `class`.
+ * A structural layout row for the chrome (prev / heading / next). Purely presentational: no behavior,
+ * just the recipe's `header` slot merged with any consumer `class`.
  *
- * Rendered through `renderElement` because it spreads the consumer `props` (a Solid getter proxy) and
- * wraps delegated-event children (the nav buttons): a getter-spread on a literal host element allocates
- * `_hk` differently under the server (`ssr`) vs client (`dom`) compile, which schedules a stray
- * hydration-event replay. `renderElement` → `<Dynamic>` (a component call) allocates identically.
+ * It goes through `renderElement` rather than being a literal `<div>` because it spreads the consumer
+ * props (a getter-backed proxy) around children with delegated event handlers. That combination on a
+ * *literal* host element makes Solid's server and client compilers allocate hydration keys
+ * differently, which schedules a stray event replay on hydrate.
  */
 export function Header(props: CalendarHeaderProps): JSX.Element {
   const ctx = useCalendarContext();

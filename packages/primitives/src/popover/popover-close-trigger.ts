@@ -12,11 +12,9 @@ export interface CreatePopoverCloseTriggerReturn {
 /**
  * The close-trigger part: injects the popover's close behavior onto a button, and nothing else.
  *
- * Deliberately **minimal** — no `type="button"`, no accessible name. Those belong to the
- * `CloseButton` component (over the `createButton` primitive) that `@hope-ui/components`'
- * `Popover.CloseTrigger` renders, so each default has a single owner. A headless consumer wiring
- * this onto a bare `<button>` supplies both itself. Same split, and same reason, as
- * `createDialogCloseTrigger`.
+ * Deliberately **minimal** — no `type="button"`, no accessible name. Both belong to the
+ * `CloseButton` component that `Popover.CloseTrigger` renders, so each default has one owner. A
+ * headless consumer wiring this onto a bare `<button>` supplies them itself.
  */
 export function createPopoverCloseTrigger(
   state: CreatePopoverReturn,

@@ -25,10 +25,8 @@ const monthOf = (month: number): DateRange => ({
   start: new CalendarDate(2026, month, 1),
   end: endOfMonth(new CalendarDate(2026, month, 1)),
 });
-/**
- * The middle of the band, which the strategy deliberately does not expose: React Aria derives it, and
- * so does the preset's `data-selection-middle` variant.
- */
+/** The middle of the band, which the strategy deliberately does not expose — the preset's
+ *  `data-selection-middle` variant derives it in CSS the same way. */
 const isMiddle = (state: SelectionState, period: DateRange) =>
   rangeSelection.isSelected(state, period) &&
   !rangeSelection.isSelectionStart(state, period) &&
@@ -38,8 +36,8 @@ describe("rangeSelection.select", () => {
   it("first activate anchors without writing a value", () => {
     const next = rangeSelection.select(empty, d(10));
     expect(next.anchor?.toString()).toBe("2026-01-10");
-    // The degenerate `{date, date}` write is gone: a range in progress lives entirely in the anchor +
-    // the caller's cursor, so a controlled consumer is never holding a value it was not told about.
+    // A range in progress lives entirely in the anchor plus the caller's cursor. Writing a degenerate
+    // `{date, date}` here would hand a controlled consumer a value it was never told about.
     expect(next.value).toBeNull();
   });
 
@@ -82,9 +80,9 @@ describe("rangeSelection.select", () => {
   });
 
   it("extend with nothing to extend anchors at the date itself", () => {
-    // The strategy is total, so it still answers with no anchor *and* no committed range. `activate`
-    // never reaches this: it seeds the range at the roving cursor first, which the strategy — knowing
-    // only a value and an anchor — cannot do (see `calendar-root.md`).
+    // A total function, so it still answers with no anchor *and* no committed range — but `activate`
+    // never reaches this branch: it seeds the range at the roving cursor first, which the strategy
+    // cannot do because it is only ever handed a value and an anchor.
     const opened = rangeSelection.select(empty, d(12), { extend: true });
     expect(opened.anchor?.toString()).toBe("2026-01-12");
     expect(opened.value).toBeNull();
@@ -124,8 +122,8 @@ describe("rangeSelection predicates — the tentative phase", () => {
     expect(rangeSelection.isSelected(forward, on(12))).toBe(true);
     expect(rangeSelection.isSelectionStart(forward, on(10))).toBe(true);
     expect(rangeSelection.isSelectionEnd(forward, on(14))).toBe(true);
-    // The accepted trade-off: one band at a time, so the old range goes dark mid-drag (React Aria's
-    // behavior — see `__internal__/primitives/calendar/utils/range-selection.md`).
+    // The accepted trade-off of one band at a time: the committed range goes dark mid-drag. See
+    // `__internal__/primitives/calendar/utils/range-selection.md` § The one-band model.
     expect(rangeSelection.isSelected(forward, on(2))).toBe(false);
 
     // Reorders when the cursor precedes the anchor.
@@ -158,8 +156,8 @@ describe("rangeSelection predicates — the tentative phase", () => {
 });
 
 describe("rangeSelection predicates over a wide period (year / decade cells)", () => {
-  // Jan 15 → Mar 10: the range starts and ends *mid-month*, so a month cell tested by its first day
-  // alone would leave January dark and hand February the start corner.
+  // Jan 15 → Mar 10 starts and ends *mid-month*, which is what catches a period test done on the
+  // cell's first day alone: that leaves January dark and hands February the start corner.
   const state = stateOf({
     value: { start: new CalendarDate(2026, 1, 15), end: new CalendarDate(2026, 3, 10) },
   });

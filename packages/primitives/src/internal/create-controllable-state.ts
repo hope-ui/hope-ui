@@ -18,14 +18,15 @@ interface Box<T> {
 }
 
 /**
- * The controlled/uncontrolled dance every stateful component needs, modeled on Base UI's
- * `useControlled`. Returns the resolved value and a setter that writes the internal signal
- * only while uncontrolled, but always notifies `onChange`.
+ * Lets a component's state be driven by the consumer through a `value` prop *or* held internally
+ * when no such prop is passed, without every caller writing that branch itself. Modeled on the
+ * `useControlled` hook in Base UI, a React headless component library. Returns the resolved value
+ * and a setter that writes the internal signal only while uncontrolled but always calls `onChange`.
  *
- * Controlled-ness is decided per read, by whether `value()` is `undefined` — not latched at
- * first render. That means a component can go from uncontrolled to controlled mid-life; it
- * also means `undefined` can never be a meaningful controlled value. For a `T` where it
- * would be, model the empty case explicitly (`null`, or a sentinel) rather than `undefined`.
+ * Which mode applies is decided on every read, by whether `value()` is `undefined`, rather than
+ * latched at first render — so a component may switch modes mid-life, and `undefined` can never be
+ * a meaningful controlled value. Where it would be for some `T`, model the empty case as `null` or
+ * a sentinel instead.
  *
  * ```tsx
  * const [open, setOpen] = createControllableState({
@@ -38,12 +39,11 @@ interface Box<T> {
 export function createControllableState<T>(
   options: CreateControllableStateOptions<T>,
 ): readonly [Accessor<T>, (value: T) => void] {
-  // The value is boxed because SolidJS 2.0 overloads `createSignal`: its second overload
-  // takes `Exclude<T, Function>`, and its *third* takes a `ComputeFunction<T>`. So a
-  // function-valued `T` would be silently invoked as a memo compute rather than stored, and
-  // `value()` would return its return value. A generic kernel primitive can't accept that
-  // trap, so the signal holds an object and `equals` unwraps it — reproducing
-  // `createSignal`'s own default reference equality (`isEqual`) on the value inside.
+  // Boxed because SolidJS 2.0 overloads `createSignal`: one overload takes `Exclude<T, Function>`,
+  // another a compute function. A function-valued `T` would therefore be invoked as a memo rather
+  // than stored, and `value()` would return its result. A primitive generic over `T` cannot ship
+  // that trap, so the signal holds an object and `equals` unwraps it — restoring the reference
+  // equality `createSignal` would have applied to the value itself.
   const [box, setBox] = createSignal<Box<T>>(
     { value: options.defaultValue() },
     { equals: (previous, next) => isEqual(previous.value, next.value) },

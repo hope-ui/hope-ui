@@ -27,13 +27,13 @@ export interface CreateTextInputOptions<T extends TextInputElement = HTMLInputEl
    */
   onChange?: (value: string) => void;
   /**
-   * Consumer event handlers, composed consumer-first. Passed as accessors so they're read
-   * reactively inside the prop getters.
+   * Consumer event handlers, composed consumer-first. Accessors rather than plain handlers so the
+   * prop getters re-read them reactively.
    *
-   * **`onInput` is not a cancel channel.** The repo-wide `preventDefault()` veto needs a
-   * cancelable event and the native `input` event is not one, so `defaultPrevented` stays
-   * `false` and the behavior runs anyway. A consumer that must reject a keystroke sets
-   * `onBeforeInput` on the element — cancelable, and never consumed here.
+   * **`onInput` cannot cancel.** Elsewhere a consumer vetoes behavior with `preventDefault()`, but
+   * the native `input` event is not cancelable, so `defaultPrevented` stays `false` and the
+   * behavior runs anyway. To reject a keystroke, set `onBeforeInput` on the element instead — it is
+   * cancelable, and nothing here consumes it.
    */
   onInput?: Accessor<JSX.InputEventHandlerUnion<T, InputEvent> | undefined>;
   onCompositionStart?: Accessor<JSX.EventHandlerUnion<T, CompositionEvent> | undefined>;
@@ -43,8 +43,8 @@ export interface CreateTextInputOptions<T extends TextInputElement = HTMLInputEl
 /** The value + event props `createTextInput` spreads onto the rendered element. */
 export interface TextInputBehaviorProps<T extends TextInputElement = HTMLInputElement> {
   /**
-   * The initial markup value only — deliberately **not** a live binding. See the note on
-   * ownership in `createTextInput`: the reconcile effect owns every subsequent write.
+   * The initial markup value only, deliberately **not** a live binding — the reconcile effect in
+   * `createTextInput` owns every write after this one, for the reasons documented there.
    */
   readonly value: string;
   readonly onInput: JSX.InputEventHandler<T, InputEvent>;
@@ -83,49 +83,41 @@ function captureSelection(input: TextInputElement): TextInputSelection | null {
 }
 
 function applySelection(input: TextInputElement, selection: TextInputSelection): void {
-  // `setSelectionRange` throws `InvalidStateError` on input types that do not support
-  // selection; `selectionStart` reads `null` on exactly those, so this is the type check.
+  // `setSelectionRange` throws `InvalidStateError` on input types with no text cursor, and
+  // `selectionStart` reads `null` on exactly those — so this is the type check.
   if (input.selectionStart == null) {
     return;
   }
-  // Offsets past the end of a shorter new value need no clamping here: "set the selection of a
-  // text control" clamps both to the API value's length (HTML standard).
+  // No clamping needed for offsets past the end of a shorter value: the HTML spec clamps both to
+  // the value's length.
   input.setSelectionRange(selection.start, selection.end, selection.direction);
 }
 
 /**
- * Text-entry value state: the controlled/uncontrolled dance plus the two things a hand-rolled
- * `onInput` gets wrong.
+ * Text-entry value state — whether the consumer drives the value through a prop or lets this hook
+ * hold it — plus the two things a hand-rolled `onInput` gets wrong. Both fixes turn on choosing
+ * *when not to write*, so the DOM value is owned here rather than by a live `value={…}` JSX
+ * binding: `inputProps.value` is a one-time snapshot for the initial markup, and a single reconcile
+ * effect performs every write after it.
  *
- * **The DOM value is owned here, not by a JSX binding.** `inputProps.value` is an untracked
- * snapshot — enough for the server's markup and the hydrated element to agree — and a single
- * reconcile effect performs every write after that. A live `value={…}` binding would take the
- * write out of this file, and both fixes below depend on choosing *when* not to write:
+ * - **IME composition.** Assigning `input.value` mid-composition destroys the candidate buffer, so
+ *   the half-typed CJK word disappears. Nothing is written between `compositionstart` and
+ *   `compositionend`; `onChange` still fires per update, and `isComposing()` gates those out.
+ * - **Caret position.** Assigning a *different* `input.value` moves the caret to the end (HTML
+ *   spec), so a consumer that transforms the text — uppercases it, trims it — teleports the caret
+ *   on every keystroke typed mid-word. The caret is captured on `input` and reapplied after.
  *
- * **IME composition.** Assigning `input.value` while a composition is in progress destroys the
- * candidate buffer: the half-typed CJK word is replaced by whatever the controlled round-trip
- * produced. So no write happens between `compositionstart` and `compositionend`, and the DOM is
- * authoritative for that window. `onChange` still fires per composition update, so a consumer
- * that filters as you type sees the intermediate text; one that shouldn't can gate on
- * `isComposing()`.
- *
- * **Selection preservation.** `input.value = next` moves the caret to the end whenever the new
- * value differs (HTML standard, the `value` setter). That is invisible until a controlled
- * consumer *transforms* what it is handed — uppercase it, trim it — at which point every
- * keystroke in the middle of a word teleports the caret. The caret is therefore captured on
- * `input` and reapplied after the write, clamped to the new length.
- *
- * A reconcile is requested per input event rather than only on value change, so the case where
- * a controlled consumer **rejects** the change (`value` stays put) still snaps the DOM back
- * instead of leaving it out of sync with the value the component reports.
+ * A reconcile is requested per input event rather than per value change, so a consumer *rejecting*
+ * a change still snaps the DOM back instead of drifting from the value reported by `value()`.
+ * Details: __internal__/primitives/internal/create-text-input.md.
  */
 export function createTextInput<T extends TextInputElement = HTMLInputElement>(
   options: CreateTextInputOptions<T> = {},
 ): CreateTextInputReturn<T> {
   const [element, setElement] = createSignal<T>();
   const [isComposing, setIsComposing] = createSignal(false);
-  // Bumped by every write request, so the reconcile effect runs even when the resolved value
-  // did not change — the rejected-change case above.
+  // Bumped by every write request, so the reconcile effect still runs when the resolved value did
+  // not change — the rejected-change case above.
   const [reconcileRequest, setReconcileRequest] = createSignal(0);
 
   const [value, setControlledValue] = createControllableState<string>({
@@ -134,8 +126,8 @@ export function createTextInput<T extends TextInputElement = HTMLInputElement>(
     onChange: (next) => options.onChange?.(next),
   });
 
-  // A one-shot instruction consumed by the next reconcile, not state: nothing renders from it,
-  // and a signal would re-enter the effect that clears it.
+  // A one-shot instruction for the next reconcile, not state: nothing renders from it, and as a
+  // signal it would re-enter the very effect that clears it.
   let pendingSelection: TextInputSelection | null = null;
 
   const write = (next: string, selection: TextInputSelection | null) => {
@@ -170,24 +162,23 @@ export function createTextInput<T extends TextInputElement = HTMLInputElement>(
 
   const handleCompositionEnd = (event: { currentTarget: T }) => {
     setIsComposing(false);
-    // Chrome fires the final `input` before `compositionend` and Safari after, so neither
-    // ordering can be relied on — re-reading the DOM here commits the same text under both.
+    // Chrome fires the final `input` before `compositionend`, Safari after — re-reading the DOM
+    // here commits the same text under either ordering.
     const input = event.currentTarget;
     write(input.value, captureSelection(input));
   };
 
   const inputProps: TextInputBehaviorProps<T> = {
     get value() {
-      // Deliberately untracked: the reconcile effect owns the write (see the doc above), so
-      // this must never make the spread re-run one of its own. It is still a getter rather
-      // than a captured constant, so a remounted element renders the current value.
+      // Untracked so the spread never subscribes to the value and re-runs on the reconcile
+      // effect's own writes. Still a getter, not a constant, so a remounted element gets the
+      // current value.
       return untrack(value);
     },
     get onInput() {
-      // Solid's `onInput` handler type narrows `event.target` to `T`, where
-      // `composeEventHandlers` — generic over plain `Event` — types it as `Element`. The two
-      // are compatible once `T` is a concrete element, but not while it is still a type
-      // parameter, so the round trip is cast here rather than at every call site.
+      // Solid types `event.target` as `T` here, while `composeEventHandlers` is generic over plain
+      // `Event` and types it as `Element`. Those agree for any concrete element but not while `T`
+      // is still a type parameter, so the round trip is cast once here instead of at every call.
       return composeEventHandlers<T, InputEvent>(
         options.onInput?.() as JSX.EventHandlerUnion<T, InputEvent> | undefined,
         handleInput,

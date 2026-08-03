@@ -69,8 +69,8 @@ describe("createComboboxToggle", () => {
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
     expect(toggle.getAttribute("aria-controls")).toBe(listOf(container)?.id);
 
-    // The regression this pins: without the control registered as the kernel's anchor, this button
-    // falls outside `sparedElements` — the capture-phase pointerdown dismisses and this very click
+    // The regression this pins: without the shell registered as the anchor, this button falls
+    // outside the dismissal exclusions — the capture-phase pointerdown dismisses and this very click
     // reopens, so the popup can never be closed by the control that opened it.
     await userEvent.click(toggle);
     await vi.waitFor(() => expect(toggle.getAttribute("aria-expanded")).toBe("false"));
@@ -115,8 +115,9 @@ describe("createComboboxToggle", () => {
     const toggle = toggleOf(container);
 
     expect(toggle.tagName).toBe("DIV");
-    // `createButton` switches to `role`/`tabIndex`/`aria-disabled` and synthesizes activation, but
-    // this hook's own `tabIndex: -1` still wins — the tab-order exclusion is not negotiable.
+    // On a non-`<button>` element `createButton` switches to `role`/`tabIndex`/`aria-disabled` and
+    // synthesizes activation, but this hook's `tabIndex: -1` still wins — the tab-order exclusion is
+    // not negotiable.
     expect(toggle.getAttribute("role")).toBe("button");
     expect(toggle.tabIndex).toBe(-1);
 

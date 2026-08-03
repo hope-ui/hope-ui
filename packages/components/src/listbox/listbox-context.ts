@@ -5,33 +5,31 @@ import type { JSX } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 
 /**
- * The value every Listbox part reads. **Composition, not inheritance**: it *holds* the primitive
- * state as `state` (the item source + focus/selection/navigation/typeahead instances, ids, the
- * pointer fight-guard, `rootProps`, and the form accessors) rather than extending
- * `CreateListboxReturn`, so the styling layer never masquerades as the primitive return. A part
- * passes `ctx.state` into its `createListboxX(state, …)` hook and reads recipe classes off
- * `ctx.slots`. All a11y/behavior lives on `ctx.state`; the component layer contributes only `slots`.
+ * The value every Listbox part reads. It *holds* the headless state under `state` rather than
+ * extending it, so the styling layer never masquerades as the primitive's return value. All
+ * accessibility and behavior live on `state`; this layer contributes only `slots` and `checkIcon`.
  *
- * ## The generic-through-context cast
+ * ## Why `state` is typed at `unknown`
  *
- * The `<V>` item type cannot flow through Solid's context (a context value is a single concrete
- * type). So the context is typed at `CreateListboxReturn<unknown>` and `Listbox.Root<V>` is generic
- * **at its props**, casting its `createListbox<V>(…)` return into the provider. Each part that needs
- * the typed state casts back to `CreateListboxReturn<V>` at its own call site. This is the standard
- * Solid/Kobalte approach — the same one Dialog would use if it were generic.
+ * A Solid context value is a single concrete type, so the `<V>` item type cannot flow through it.
+ * `Listbox.Root<V>` is therefore generic **at its props** and widens its state on the way into the
+ * provider; each part that needs the typed state narrows it back at its own call site.
  */
 export interface ListboxContextValue {
-  /** The primitive listbox state — item source, focus/selection/navigation/typeahead, ids, the
-   * pointer fight-guard, `rootProps`, and the form accessors. Passed straight into each part's hook. */
+  /** The `createListbox` return — item source, focus/selection/navigation/typeahead, ids, the props
+   * for the list element, and the form accessors. Passed straight into each part's own hook. */
   state: CreateListboxReturn<unknown>;
-  /** One ready-to-call class fn per Listbox slot, resolved once on `Root` and shared here. Each takes
-   * the part's own `class`, folded in last through the recipe's tailwind-merge seam. */
+  /** One class function per named slot of the theme's `listbox` recipe, resolved once on `Root`. Each
+   * takes the part's own `class` and folds it in last, through tailwind-merge, so a consumer's
+   * utility wins over the recipe's. */
   slots: Record<ListboxSlot, SlotClassAccessor>;
   /**
-   * The resolved default selection-check glyph (instance `checkIcon` ?? preset `defaultProps.listbox.checkIcon`
-   * ?? hope's built-in check), resolved once on `Root` (the multi-part component keeps its themeable
-   * surface on the root) and flowed here. `Listbox.ItemIndicator` renders this when given no `children`.
-   * An accessor, so each read builds a **fresh** element — never a reused, movable node.
+   * The resolved default selection glyph — instance `checkIcon`, else the preset's, else hope's
+   * built-in check — resolved once on `Root` because a multi-part component keeps its themeable
+   * surface there. `Listbox.ItemIndicator` renders it when given no `children`.
+   *
+   * An accessor, so each read builds a **fresh** element: one shared element would be moved from row
+   * to row rather than appearing in each.
    */
   checkIcon: () => JSX.Element;
 }
@@ -40,11 +38,10 @@ export const [ListboxContext, useListboxContext] =
   createComponentContext<ListboxContextValue>("Listbox");
 
 /**
- * The group scope. A `Listbox.Group` renders its primitive group return here so its
- * `Listbox.GroupLabel` child can register its id onto the group's `aria-labelledby`.
+ * The group scope, so a `Listbox.GroupLabel` can register its id onto its parent group's
+ * `aria-labelledby`.
  */
 export interface ListboxGroupContextValue {
-  /** The primitive group return — its `props` + the label-id registration seam. */
   group: CreateListboxGroupReturn;
 }
 
@@ -52,14 +49,12 @@ export const [ListboxGroupContext, useListboxGroupContext] =
   createComponentContext<ListboxGroupContextValue>("Listbox.Group");
 
 /**
- * The per-item scope. A `Listbox.Item` publishes its selection/active accessors here so its
- * `Listbox.ItemIndicator` child can show/hide the check glyph off `isSelected()` without recomputing
- * anything — behavior stays on the primitive, the indicator is pure presentation.
+ * The per-item scope, so a `Listbox.ItemIndicator` can show or hide itself without recomputing
+ * anything — the primitive decides what is selected, the indicator only paints it.
  */
 export interface ListboxItemContextValue {
-  /** Whether this item is selected — drives the `ItemIndicator`'s `<Show>`. */
   isSelected: Accessor<boolean>;
-  /** Whether this item is the active (highlighted) one. */
+  /** Whether this is the highlighted row (keyboard or hover), which is not the same as selected. */
   isActive: Accessor<boolean>;
 }
 

@@ -28,30 +28,24 @@ export interface CreateComboboxToggleReturn {
  * nothing else.
  *
  * **This is what `Combobox.Trigger` assembles — not `createComboboxTrigger`.** That hook is the
- * `role="combobox"` **focus owner** Select's trigger is; putting it here would give the tree two
- * comboboxes, two `aria-activedescendant`s and two keymaps. The naming follows the *parts*
- * (`Select.Trigger`, `Combobox.Trigger`), which are the same affordance to a user and different
- * elements in the pattern.
+ * `role="combobox"` focus owner Select's trigger is, and putting it here would give the tree two
+ * comboboxes, two `aria-activedescendant`s and two keymaps. The names track the *parts* users see
+ * (`Select.Trigger`, `Combobox.Trigger`), which are the same affordance on different elements.
  *
- * ## It is not in the tab order, and it never takes focus
+ * **It is not in the tab order and never takes focus**, which is two mechanisms:
  *
- * `tabindex="-1"`, because the input is the widget's single tab stop — a second one would make
- * Tabbing through a form of comboboxes take twice as many presses for no reachable behavior (every
- * key this button could offer is already on the input). React Aria spells it
- * `excludeFromTabOrder: true`.
+ * - `tabindex="-1"`, because the input is the widget's single tab stop. A second one doubles the
+ *   presses it takes to cross a form of comboboxes, for behavior already bound to the input.
+ * - Cancelling `pointerdown`, because a click that moved DOM focus here would blur the input, drop
+ *   the option highlight's paint gate, fire the input's blur-commit, and leave
+ *   `aria-activedescendant` sitting on an element that is no longer focused.
  *
- * `preventDefault()` on `pointerdown` is the other half: a click that moved DOM focus here would
- * blur the input, drop the highlight's paint gate, fire the input's blur-commit, and leave
- * `aria-activedescendant` on an element that is no longer focused. React Aria spells that
- * `preventFocusOnPress: true`. The input is re-focused on click anyway, for the case where focus was
- * somewhere else entirely when the button was pressed.
+ * The click handler re-focuses the input anyway, for the case where focus was somewhere else
+ * entirely when the button was pressed.
  *
- * ## It still needs a name
- *
- * A bare chevron is an axe `button-name` violation and unusable by voice control, so it carries a
- * localized `aria-label` (`combobox.triggerLabel`) that a consumer can override. `aria-haspopup` is
- * **explicit** here, unlike on the input: `role="combobox"` implies `listbox` in ARIA 1.2, a
- * `<button>` implies nothing.
+ * A bare chevron has no accessible name (axe `button-name`) and is unusable by voice control, so it
+ * carries a localized `aria-label` a consumer can override. `aria-haspopup` is **explicit** here,
+ * unlike on the input: ARIA 1.2 gives `role="combobox"` an implicit one, a `<button>` none.
  */
 export function createComboboxToggle<V = unknown, M extends SelectionMode = "single">(
   state: CreateComboboxReturn<V, M>,
@@ -60,11 +54,11 @@ export function createComboboxToggle<V = unknown, M extends SelectionMode = "sin
   const { t } = useLocale();
 
   const toggle = () => {
-    // Focus the field first: the pointerdown above kept focus wherever it was, which is the input on
-    // every normal path and somewhere else entirely when the widget was not focused at all.
+    // Focus the field first: the cancelled pointerdown left focus wherever it already was — the
+    // input on every normal path, somewhere else entirely when the widget was not focused at all.
     state.triggerElement()?.focus();
     if (!state.open()) {
-      // A pointer open lands on the selected option — APG, and what `createComboboxTrigger` does.
+      // A pointer open lands on the selected option, as `createComboboxTrigger` does.
       state.setFocusStrategy("selected");
       state.setOpen(true);
       return;
@@ -100,7 +94,7 @@ export function createComboboxToggle<V = unknown, M extends SelectionMode = "sin
         return state.open() ? ("true" as const) : ("false" as const);
       },
       get "aria-controls"() {
-        // Open-gated, like every IDREF in this family: the popup mounts lazily, and naming an
+        // Only while open, like every IDREF in this family: the popup mounts lazily, and naming an
         // element that is not in the DOM is an axe `aria-valid-attr-value` violation.
         return state.open() ? state.popupId() : undefined;
       },

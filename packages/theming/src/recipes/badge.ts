@@ -2,13 +2,12 @@
  * The **Badge** recipe contract — its variant vocabulary, slots, and the resulting `BadgeRecipe`
  * type.
  *
- * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
- * `@hope-ui/components` `Badge` consumes it via `useRecipe("badge")`, and each preset
- * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
- * keeps the registry (`./registry`) a flat list of named recipe types with no shape logic of its own.
+ * A *slot recipe* maps variant props to one class string per named part ("slot"). This file owns only
+ * that shape: `@hope-ui/components`' Badge consumes it via `useRecipe("badge")` and each preset
+ * implements a `tailwind-variants` recipe against it, so neither layer knows the other.
  *
- * Badge is a **static, non-interactive** inline label (a styled `<span>`), so — unlike Button — its
- * recipe has no interaction ladder, no loader, and no chrome content. Its axes are purely visual.
+ * Badge is a **static, non-interactive** inline label, so — unlike Button — its recipe has no
+ * interaction ladder, no loader, and no chrome content. Its axes are purely visual.
  */
 import type { SlotRecipeFn } from "../slot-recipe";
 
@@ -47,12 +46,11 @@ export interface BadgeRecipeVariants {
 
 /**
  * The curated Badge props a preset may default app-wide via `ComponentOverride.defaultProps`. Badge
- * has **no** non-variant themeable props (no chrome content, no durable behavioral policy), so this
- * is an exact, empty extension of {@link BadgeRecipeVariants}. It exists for **contract uniformity**
- * with Button: every component's contract file exports a `…ThemeableProps` that the components layer
- * can `extends`, and the [`themeable-props-registry`](../themeable-props-registry.md)
- * carries a `badge` entry — so the mechanism stays identical across components even where the
- * curated surface happens to equal the recipe variants.
+ * has **no** non-variant themeable props, so this is an exact, empty extension of
+ * {@link BadgeRecipeVariants}. It exists for **contract uniformity**: every component exports a
+ * `…ThemeableProps` and carries a registry entry, so the mechanism stays identical across components
+ * even where the curated surface happens to equal the recipe variants. See
+ * [`themeable-props-registry`](../themeable-props-registry.md).
  */
 export interface BadgeThemeableProps extends BadgeRecipeVariants {}
 

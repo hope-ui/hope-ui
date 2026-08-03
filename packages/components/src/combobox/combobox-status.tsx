@@ -28,12 +28,11 @@ export interface ComboboxStatusProps extends Omit<ComboboxStatusElementProps, "c
 /**
  * The result count, both **shown** and **announced**.
  *
- * Filtering is the one thing a combobox does that a screen reader cannot observe: focus does not
- * move, the input's text is the user's own, and the list silently gets shorter. `createComboboxStatus`
- * owns both channels — the `role="status"` live region this element *is* (which announces every count
- * change while the popup stays open) and a `createAnnounce` call for the one moment that region
- * cannot cover, the frame it mounts in. See `combobox-status.md` for why that split is necessary and
- * why it does not double-announce.
+ * Filtering is the one thing a combobox does that a screen reader cannot observe: focus does not move,
+ * the input's text is the user's own, and the list silently gets shorter. Two channels cover it — the
+ * `role="status"` live region this element *is*, which announces every count change while the popup
+ * stays open, plus a separate one-shot announcement for the frame the region mounts in, which a live
+ * region cannot announce for itself.
  *
  * Like `Combobox.Empty`, it lives in the card **beside** `Combobox.List` — `role="listbox"` may only
  * contain options and groups.
@@ -43,9 +42,9 @@ export interface ComboboxStatusProps extends Omit<ComboboxStatusElementProps, "c
  */
 export const Status: Component<ComboboxStatusProps> = (props) => {
   const ctx = useComboboxContext();
-  // The kernel hook types its props over `HTMLElement` while this part's public surface names the
-  // real `<div>`, and `ref` is the one key that won't line up between them. Cast at this seam, per
-  // CLAUDE.md — widening the public surface instead would push a cast onto every consumer.
+  // The behavior hook types its props over `HTMLElement` while this part's public surface names the
+  // real `<div>`, and `ref` is the one key that won't line up. Cast here rather than widening the
+  // public surface, which would push a cast onto every consumer.
   const status = createComboboxStatus(
     ctx.state,
     omit(props, "render", "class", "children") as unknown as JSX.HTMLAttributes<HTMLElement>,

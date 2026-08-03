@@ -32,8 +32,9 @@ export interface CreateListFocusOptions<V = unknown> {
   /** Whether the whole list is disabled: nothing focusable, container `tabindex=-1`. Default `false`. */
   disabled?: Accessor<boolean>;
   /**
-   * Whether disabled items are skipped by focus/navigation. Default `true`. Set `false` for menus,
-   * where APG keeps disabled items focusable (so they can be read) but not actionable.
+   * Whether disabled items are skipped by focus/navigation. Default `true`. Set `false` for menus:
+   * the ARIA Authoring Practices Guide (APG) keeps a disabled menu item focusable, so a screen
+   * reader can still read it, while it stays non-actionable.
    */
   skipDisabled?: Accessor<boolean>;
   /** The container element, as a signal accessor. Used to restore DOM focus in activedescendant mode. */
@@ -70,7 +71,8 @@ export interface CreateListFocusReturn<V = unknown> {
    * Whether the widget currently holds focus. This is the **paint gate**, not a focus mover: it never
    * moves DOM focus, it only records whether the widget is focused so the highlight can be shown only
    * while it is. `createListbox` drives it from the container's focus-in/out, and a Select whose focus
-   * owner is its own input drives it directly (react-aria's `manager.isFocused`; zag's `focused`).
+   * owner is its own input drives it directly. Two other accessibility libraries spell the same flag
+   * `manager.isFocused` (React Aria) and `focused` (Zag).
    */
   isFocused: Accessor<boolean>;
   /** Set the focused flag. See {@link isFocused} — the caller owns focus tracking; this only records it. */
@@ -78,12 +80,9 @@ export interface CreateListFocusReturn<V = unknown> {
 
   /**
    * Make the item at `index` active and bring it into view (`options.scroll`, default `true`).
-   * In roving mode this also moves real DOM focus to the item — **deferred until the item's element
-   * exists**, which is exactly what a virtualized row (mounted only after `scrollIndexIntoView`)
-   * and the activedescendant path both need; that native `.focus()` is also what scrolls a mounted
-   * row in, so roving asks the source only for rows that do not exist yet. In activedescendant mode
-   * nothing moves DOM focus, so **every** row is scrolled in — otherwise a mounted-but-clipped
-   * option sits offscreen while `aria-activedescendant` names it.
+   * Roving mode also moves real DOM focus there, deferred until the item's element exists so a row
+   * that mounts only once scrolled to (virtualization) still gets focused. Which rows get scrolled
+   * differs per mode for a non-obvious reason — see `__internal__/primitives/internal/create-list-focus.md`.
    */
   focusIndex(index: number, options?: FocusMoveOptions): void;
   /** Make `item` active. See {@link focusIndex}. */
@@ -114,19 +113,16 @@ export interface CreateListFocusReturn<V = unknown> {
 }
 
 /**
- * The **foundation** of the list-navigation kernel: it owns the active item and the
- * `roving | activedescendant` switch, and nothing else. `createListNavigation`,
- * `createListTypeahead` and `createListSelection` each take one of these and layer their own
- * concern on top — the same way Angular Aria's `ListNavigation`/`ListSelection`/`ListTypeahead`
- * each inject one `ListFocus`. Modeled on Angular's `list-focus` (its reasoning and public surface,
- * adapted — not its code).
+ * Owns the active item and the `roving | activedescendant` switch, and nothing else.
+ * `createListNavigation`, `createListTypeahead` and `createListSelection` each take one of these and
+ * layer their own concern on top, mirroring the same split in Angular Aria (Angular's signal-based
+ * accessibility behaviors), whose `list-focus` this adapts — its reasoning and public surface, not
+ * its code.
  *
- * The one hard-won detail is that **real `.focus()` is deferred until the item's element exists**.
- * A roving list normally focuses a mounted element synchronously, but a virtualized list navigates
- * to rows that are not in the DOM yet: `focusIndex` scrolls the row into view and an effect focuses
- * it once it mounts. Activedescendant mode never moves DOM focus at all, so it shares the same
- * "the element may be absent" plumbing. That shared deferral is why this primitive, not each
- * component, owns focus.
+ * The load-bearing detail: **real `.focus()` is deferred until the item's element exists**, because
+ * a virtualized list navigates to rows that are not in the DOM yet, and activedescendant mode never
+ * moves DOM focus at all. One deferral serves both, which is why focus lives here rather than in
+ * each component. Full rationale: `__internal__/primitives/internal/create-list-focus.md`.
  */
 export function createListFocus<V = unknown>(
   options: CreateListFocusOptions<V>,
@@ -205,19 +201,13 @@ export function createListFocus<V = unknown>(
     },
   );
 
-  // Roving + virtualization focus recovery. In roving mode DOM focus sits on the active option, but a
-  // virtualized source unmounts that option when it scrolls out of the window — by PageDown, the mouse
-  // wheel, or dragging the scrollbar (all of which change scroll without changing the active index).
-  // The browser then drops focus to `<body>`, and because the container's key handler only sees events
-  // that *bubble up from a focused descendant*, keyboard navigation would silently die. When the very
-  // element roving last focused disappears **and** focus fell back to `<body>` as a result, pull focus
-  // to the container so keydowns keep arriving; the next arrow/typeahead re-homes onto a mounted option.
-  //
-  // Tightly gated so it never *steals* focus: only the element we actually focused, only when a
-  // navigation isn't already mid-flight (that path re-focuses the target itself via `pendingFocus`),
-  // and only when focus truly landed on `<body>` (not when the user moved it elsewhere). It is a no-op
-  // over a fully-mounted source (nothing unmounts) and in activedescendant mode (focus lives on the
-  // container).
+  // Roving focus recovery. A virtualized source unmounts the focused option when it scrolls out of the
+  // window (mouse wheel, scrollbar drag — neither changes the active index); the browser then drops
+  // focus to `<body>` and keyboard navigation silently dies, because the container's key handler only
+  // sees events bubbling up from a focused descendant. Pulling focus back to the container keeps
+  // keydowns arriving, and the next arrow/typeahead re-homes onto a mounted option. The guards below
+  // are what stop it *stealing* focus: our own element, no navigation mid-flight, and focus really
+  // on `<body>` rather than somewhere the user put it.
   createEffect(
     () => activeItem()?.element(),
     (element) =>
@@ -246,19 +236,12 @@ export function createListFocus<V = unknown>(
       return;
     }
 
-    // Bring the row into view. Which rows need it is exactly the difference between the two modes:
-    //
-    // - **activedescendant** — every row. Nothing moves DOM focus, so a *mounted but clipped* option
-    //   would sit offscreen while `aria-activedescendant` names it, with every test green. That is
-    //   the failure Select would ship, and roving mode has been hiding it all along.
-    // - **roving** — only a row that does not exist yet (virtualized, outside the window), so the
-    //   deferred `.focus()` below has an element to land on. Once it is mounted, that native
-    //   `.focus()` scrolls it in *and computes the offset from the real scrollport*, which is
-    //   strictly better than a source can: asking the source too would land a second, coarser scroll
-    //   on top of the browser's exact one, clipping the active row (measured: 6px, the virtualizer
-    //   aligning against the border box while the port excludes the border and the padding).
-    //
-    // Sources align `"nearest"`, so even the activedescendant path is a no-op for a visible row.
+    // Which rows need scrolling is exactly the difference between the two modes. Activedescendant
+    // moves no DOM focus, so every row must be scrolled or a mounted-but-clipped option sits offscreen
+    // while `aria-activedescendant` names it — a failure no test can see. Roving asks the source only
+    // for a row that does not exist yet: once mounted, the native `.focus()` below scrolls it in from
+    // the real scrollport, and a second, coarser source scroll on top of that clips the row (measured
+    // at 6px). Sources align `"nearest"`, so a fully visible row is never scrolled either way.
     if (scroll && (focusMode() === "activedescendant" || items()[clamped]?.element() == null)) {
       options.source.scrollIndexIntoView?.(clamped);
     }

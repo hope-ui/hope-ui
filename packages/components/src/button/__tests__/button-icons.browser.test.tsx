@@ -3,20 +3,17 @@ import { expectNoA11yViolations, hydrateFixture } from "@hope-ui/internal-test-u
 import { describe, expect, it } from "vitest";
 import { Tree } from "./button-icons.ssr-entry";
 
-// Regression: a Button with an **icon component** in its `<Show>`-gated decorator slots must hydrate
-// cleanly. Before the fix, a component read inside a `<Show>`-gated slot span computed a hydration
-// key one off from the server's, so `hydrate()` looked up a `<span>` where it expected the icon's
-// `<svg>` (`Hydration tag mismatch ... expected <svg> but found <span>`). `hydrateFixture` asserts the
-// full contract — silent hydration, no node added/dropped, every server node reused — so a silent
-// client-render fallback (which would look fine visually) still fails the test. `ssrFixture` is
-// genuine server HTML rendered fresh by the hydration-fixture bridge from the same `Tree`. See
-// __internal__/solid-2.0-notes.md and __internal__/testing.md.
+// Regression: an icon *component* inside a `<Show>`-gated decorator slot used to land one position
+// off from the server's, so hydration looked up a `<span>` where the icon's `<svg>` should have been
+// ("Hydration tag mismatch … expected <svg> but found <span>"). The cause was the `<Show>` gate
+// reading the raw prop, which builds and discards a component; Button now resolves those props once
+// with `children()`. `hydrateFixture` fails on a silent client-render fallback too, which would
+// otherwise look perfectly fine on screen.
 
 describe("Button (icon components) hydration", () => {
   it("hydrates component decorators in place, without a mismatch or a second render", () => {
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
-    // Both decorator slots survived hydration with their icon component intact.
     expect(container.querySelectorAll('[data-slot="button-start-decorator"] svg').length).toBe(1);
     expect(container.querySelectorAll('[data-slot="button-end-decorator"] svg').length).toBe(1);
 

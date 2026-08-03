@@ -60,15 +60,14 @@ describe("createComboboxPositioner", () => {
 
     const positioner = positionerOf(container) as HTMLElement;
     const triggerWidth = triggerOf(container).getBoundingClientRect().width;
-    // floating-ui's `size` middleware reports whole pixels, so this is "the trigger's width", not a
-    // byte-equal rect read.
+    // The measurement reports whole pixels, so this is "the trigger's width", not an exact rect.
     const anchorWidth = Number.parseFloat(positioner.style.getPropertyValue("--anchor-width"));
     expect(Math.abs(anchorWidth - triggerWidth)).toBeLessThan(1);
     expect(positioner.style.getPropertyValue("--anchor-height")).toBeTruthy();
     expect(positioner.style.getPropertyValue("--available-width")).toBeTruthy();
     expect(positioner.style.getPropertyValue("--available-height")).toBeTruthy();
-    // Unprefixed on purpose: these name the anchor, not the component — the same vocabulary
-    // `Popover.Positioner` publishes.
+    // Unprefixed on purpose: the names describe the anchor, not the component, and
+    // `Popover.Positioner` publishes the same four.
     expect(positioner.style.getPropertyValue("--hope-anchor-width")).toBe("");
     dispose();
   });
@@ -105,9 +104,9 @@ describe("createComboboxPositioner", () => {
     });
     await waitForPositioned(merged.state);
     const positioner = positionerOf(merged.container) as HTMLElement;
-    // Consumer last — the documented escape valve for pre-positioned behavior…
+    // Consumer last, so their `z-index` survives…
     expect(positioner.style.zIndex).toBe("50");
-    // …without losing the kernel's positioning, which has to win or the popup paints at 0,0.
+    // …without losing the computed position, which has to win or the popup paints at 0,0.
     expect(positioner.style.position).toBeTruthy();
     merged.dispose();
 
@@ -126,10 +125,10 @@ describe("createComboboxPositioner", () => {
   });
 
   it("stays visible inside an enclosing hide-outside layer", async () => {
-    // A Select opened inside a modal Dialog is a layer that appears *after* the modal, so the
-    // modal's MutationObserver would hide it — leaving a popup that paints on top, undimmed and
-    // legible, yet `inert`: out of the accessibility tree and transparent to hit testing.
-    // `createKeepVisible` registers the positioner into the enclosing layer's spared set.
+    // A Select opened inside a modal Dialog appears *after* the modal, so the modal's observer would
+    // hide it — leaving a popup that paints on top, undimmed and legible, yet `inert`: out of the
+    // accessibility tree and transparent to clicks. `createKeepVisible` registers the positioner into
+    // the enclosing layer's exempt set, which covers its whole subtree.
     function EnclosingModal(): JSX.Element {
       const [ref, setRef] = createSignal<HTMLElement>();
       createHideOutside({ active: () => true, target: ref, spare: () => [] });
@@ -148,7 +147,7 @@ describe("createComboboxPositioner", () => {
       </>
     ));
 
-    // The trigger is outside the enclosing layer, so it *is* hidden — that is the layer working.
+    // The trigger sits outside the enclosing layer, so it *is* hidden — that is the modal working.
     await vi.waitFor(() => expect(triggerOf(container).hasAttribute("inert")).toBe(true));
 
     state.setOpen(true);
@@ -184,8 +183,10 @@ describe("createComboboxPositioner", () => {
     const { container, state, dispose } = mountHarness({ options: { defaultOpen: true } });
     await waitForPositioned(state);
     await expectNoA11yViolations(container, {
-      // Undecidable by construction: axe returns `aria-valid-attr-value` as *incomplete* for any
-      // element carrying both `aria-haspopup` and `aria-controls`, without resolving the IDREF.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `combobox-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

@@ -21,20 +21,19 @@
 import { type Accessor, createEffect, untrack } from "solid-js";
 
 /**
- * Whether a dismissal reaches the layers **below** the one that handled it. The option's name and
- * shape are Base UI's (`useDismiss`); the defaults are not.
+ * Whether a dismissal reaches the layers **below** the one that handled it. The name and shape are
+ * those of `useDismiss` in Base UI (MUI's headless component library); the defaults are not.
  *
- * Both members default to `false` — only the topmost layer dismisses, which is React Aria's
- * `useOverlay` semantics and what a Popover-in-Dialog needs: one Escape closes one layer. Base UI
- * defaults asymmetrically (`escapeKey: false`, `outsidePress: true`), and hope-ui deliberately does
- * not follow that: an outside press that bubbled would make a single click on a modal's backdrop
- * close the modal *and* the layer above it, which is the exact breakage the layer stack exists to
- * end. A bare boolean sets both.
+ * Both members default to `false`, so only the topmost layer dismisses — what a Popover opened
+ * inside a Dialog needs: one Escape closes one layer. Base UI defaults asymmetrically
+ * (`escapeKey: false`, `outsidePress: true`) and hope-ui deliberately does not follow it: an outside
+ * press that bubbled would make a single click on a modal's backdrop close the modal *and* the layer
+ * above it, the exact breakage the layer stack exists to end. A bare boolean sets both.
  */
 export type DismissBubbles = boolean | { escapeKey?: boolean; outsidePress?: boolean };
 
 export interface CreateDismissableOptions {
-  /** Whether the dismissable layer is currently active. */
+  /** Whether the layer is currently open and should listen for a dismissal. */
   active: Accessor<boolean>;
   /** The container element that defines "inside" for outside-pointerdown detection. */
   ref: Accessor<HTMLElement | null | undefined>;
@@ -46,12 +45,12 @@ export interface CreateDismissableOptions {
   dismissOnOutsidePointerDown?: boolean;
   /**
    * Elements that must not count as "outside", subtrees included — for pointerdown *and*
-   * focus-out. The layer's own trigger above all: without this, a pointerdown on it dismisses in
-   * the capture phase and its own `click` reopens, so the layer can never be closed by clicking
-   * the control that opened it. Doesn't apply to Escape, which is keyboard-global and has no
-   * "outside".
+   * focus-out. The layer's own trigger above all: without it, a pointerdown on the trigger
+   * dismisses in the capture phase and the trigger's own `click` reopens, so the layer can never be
+   * closed by clicking the control that opened it. Escape ignores this list; it is keyboard-global
+   * and has no "outside".
    *
-   * Layers opened *above* this one need no entry here — they are handled by the stack.
+   * Layers opened *above* this one need no entry here — the stack already handles them.
    */
   exclude?: Accessor<Element[]>;
   /**
@@ -75,15 +74,15 @@ function bubblesFor(
 }
 
 /**
- * The stack of active layers, topmost last, stored on `document` under a cross-realm shared symbol
- * rather than at module scope — the same argument `create-hide-outside.ts` makes for its own
- * stack. Nothing forces a consumer to have one installed copy of `@hope-ui/primitives`, and two
- * module-scope stacks each believing they own the topmost layer is an unreproducible field bug:
- * one Escape would close a Dialog straight through the Popover above it.
+ * The stack of active layers, topmost last, stored on `document` under a `Symbol.for` key — a symbol
+ * from the global registry, so every copy of this module resolves the same one — rather than at
+ * module scope. Nothing forces a consumer to install a single copy of `@hope-ui/primitives`, and two
+ * module-scope stacks each believing they own the topmost layer is an unreproducible field bug: one
+ * Escape would close a Dialog straight through the Popover above it.
  *
- * A **separate** stack from hide-outside's, and they must stay that way: a Dialog with
- * `dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape.
- * React Aria keeps `visibleOverlays` and `observerStack` apart for the same reason.
+ * A **separate** stack from the one in `create-hide-outside.ts`, and they must stay that way: a
+ * Dialog with `dismissOnEscape: false` still participates in hide-outside ordering but must never
+ * win Escape.
  */
 const DISMISS_STACK = Symbol.for("hope-ui.dismiss-stack");
 
@@ -109,18 +108,19 @@ function getDismissStack(): DismissLayer[] {
 
 /**
  * Calls `onDismiss` on Escape keydown, outside pointerdown and/or outside focus while `active`.
- * Gated entirely inside `createEffect`, so it never touches `document` during SSR.
+ * Every listener is attached from inside `createEffect`, which never runs on the server, so this
+ * never touches `document` during server rendering.
  *
- * Focus-out listens for `focusin`, not `focusout`: it fires on the element focus *arrived* at, so
- * focus falling to `<body>` (an element removed or made non-focusable while focused) can't be
- * mistaken for a deliberate move to another control.
+ * Focus-out listens for `focusin`, not `focusout`: `focusin` fires on the element focus *arrived*
+ * at, so focus falling back to `<body>` — an element removed or made unfocusable while focused —
+ * can't be mistaken for a deliberate move to another control.
  *
  * ## Nested layers
  *
  * Every active layer pushes onto a `document`-keyed stack, topmost last, and two rules follow:
  *
- * - **Escape and outside pointerdown dismiss the topmost layer only.** Without the gate both a
- *   Dialog and the Popover opened inside it close on one Escape. `bubbles` opts back in, per
+ * - **Escape and outside pointerdown dismiss the topmost layer only.** Without that gate, one
+ *   Escape closes both a Dialog and the Popover opened inside it. `bubbles` opts back in, per
  *   event channel.
  * - **Nothing inside a layer opened _above_ this one is "outside".** A pointerdown on a Popover's
  *   card is not an outside press for the Dialog underneath, and focus landing there is not focus
@@ -129,38 +129,36 @@ function getDismissStack(): DismissLayer[] {
  * **Focus-out deliberately gets no topmost gate.** The layers-above clause already covers nesting,
  * and focus that genuinely leaves the whole chain should close all of it, not just the top.
  *
- * **Stack position is activation order, not mount order.** The push happens inside the effect body,
- * after the `active`/`ref` guard, so a mounted-but-closed layer is simply absent and reopening it
- * puts it on top. One consequence worth knowing, which React Aria's `visibleOverlays` shares: the
- * effect is keyed on `[active(), ref()]`, so swapping the container element *while active* re-runs
- * it and moves that layer to the top.
+ * Position in the stack is *activation* order, not mount order: a mounted-but-closed layer is simply
+ * absent, and re-opening one — or swapping its container element while active — puts it on top.
  *
  * ## Two deliberate divergences from React Aria's `useOverlay`
  *
- * - **Escape stays document-level.** React Aria scopes it to the overlay element through
- *   `useKeyboard`, so it only fires with focus inside; here it is a document listener gated on
- *   being topmost. Element-scoping it would mean returning keyboard props from every part hook in
- *   every family — a change to the whole surface for behavior the stack already provides.
- * - **One phase, not two.** React Aria snapshots the topmost layer at pointerdown and *decides* at
- *   `click`, because those two events can have different targets. hope-ui dismisses at the start of
- *   the interaction, so "topmost at the snapshot" and "topmost now" are the same instant. That
- *   equivalence rests on a dispatch not being reorderable underneath itself, which is pinned by
+ * - **Escape stays document-level.** React Aria — Adobe's headless accessibility hooks, and what
+ *   this file derives from — scopes it to the overlay element, so it fires only with focus inside.
+ *   Here it is a document listener gated on being topmost, because element-scoping would mean
+ *   returning keyboard props from every part hook in every family, for behavior the stack already
+ *   provides.
+ * - **One phase, not two.** React Aria snapshots the topmost layer at `pointerdown` and *decides* at
+ *   `click`, because those two events can have different targets. Dismissing at the start of the
+ *   interaction instead makes "topmost at the snapshot" and "topmost now" the same instant — an
+ *   equivalence that rests on a dispatch not being reorderable underneath itself, pinned by
  *   `solid-contract.browser.test.tsx` § *a signal write from one document listener cannot unhook
  *   the next one mid-dispatch*.
  */
 export function createDismissable(options: CreateDismissableOptions): void {
   createEffect(
-    // Track both `active()` and `ref()` — see the identical comment in `create-focus-trap.ts`
-    // for why `ref` must be a real signal accessor tracked here, not read untracked
-    // inside the effect callback.
+    // Solid 2.0 effects take two functions: the first declares what to track, the second reacts.
+    // `ref()` has to be tracked alongside `active()` — the container is conditionally rendered, so
+    // reading it only in the second function would see it as `undefined` forever.
     () => [options.active(), options.ref()] as const,
     ([active, container]) => {
       if (!active || !container) {
         return;
       }
 
-      // Pushed here, after the guard, so the stack orders layers by *activation* — see this
-      // primitive's doc.
+      // Pushed after the guard, not before it, so the stack is ordered by activation rather than
+      // by mount.
       const stack = getDismissStack();
       const layer: DismissLayer = { container };
       stack.push(layer);
@@ -175,17 +173,16 @@ export function createDismissable(options: CreateDismissableOptions): void {
         );
       };
 
-      // The single definition of "outside", shared by both handlers so the two can't drift apart.
-      // `exclude` is read here rather than tracked in the compute above: the elements it names
-      // register from their own effects, so tracking it would tear down and reattach these
-      // document listeners on every ref change.
+      // One definition of "outside", shared by both handlers so the two can't drift apart.
       //
-      // `untrack`, and not because a handler is usually reached from a real DOM dispatch — it
-      // isn't always. A layer above a modal makes the whole chain synchronous: `createAutoFocus`
-      // calls `.focus()` from inside its effect callback, that dispatches `focusin`, the modal's
-      // focus trap refocuses its own container, and *that* dispatch lands here — still inside the
-      // effect. Left implicit the read trips `STRICT_READ_UNTRACKED`; it is deliberate, so it is
-      // spelled, exactly as `createAutoFocus` spells its `initialFocus` sample.
+      // `exclude` is read here rather than tracked in the dependency function above: the elements it
+      // names register from their own effects, so tracking it would tear down and reattach these
+      // document listeners on every ref change. The `untrack` — read without subscribing — is not
+      // decoration either, because a handler is not always reached from a real user gesture. Above a
+      // modal the whole chain runs synchronously: `createAutoFocus` calls `.focus()` from its effect
+      // callback, that dispatches `focusin`, the focus trap refocuses its own container, and *that*
+      // dispatch lands here, still inside the effect, where an implicit read would emit Solid's
+      // `[STRICT_READ_UNTRACKED]` warning.
       const isOutside = (target: Node | null) => {
         if (target === null || container.contains(target)) {
           return false;
@@ -242,8 +239,8 @@ export function createDismissable(options: CreateDismissableOptions): void {
         document.removeEventListener("pointerdown", handlePointerDown, true);
         document.removeEventListener("focusin", handleFocusIn);
 
-        // Guarded, because `splice(-1, 1)` on a miss would drop whichever layer happens to be
-        // topmost. React Aria's `visibleOverlays` cleanup carries the same guard.
+        // Guarded, because `indexOf` returning -1 would make `splice(-1, 1)` drop whichever layer
+        // happens to be topmost instead.
         const position = stack.indexOf(layer);
         if (position !== -1) {
           stack.splice(position, 1);

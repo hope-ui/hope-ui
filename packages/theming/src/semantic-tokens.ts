@@ -1,43 +1,27 @@
 /**
  * The **semantic color vocabulary** — the design-system-agnostic set of role names every
- * `@hope-ui/presets/*` preset implements, so a preset is a different set of values behind the same
- * tokens. Components and recipes reference these names (as Tailwind utilities like `bg-primary`,
- * `text-foreground`, `text-on-primary`); a preset supplies the values as `--hope-<token>` CSS
- * variables (see `@hope-ui/presets/hope`).
+ * `@hope-ui/presets/*` preset implements, so that swapping presets swaps the values behind unchanged
+ * names. Recipes reference the names as Tailwind utilities (`bg-primary`, `text-foreground`,
+ * `text-on-primary`); a preset supplies the values as `--hope-<token>` CSS variables (see
+ * `@hope-ui/presets/hope`). This array is the runtime source of truth, checked against a theme's CSS
+ * by `checkSemanticTokenConformance` in `@hope-ui/theming/conformance`.
  *
- * **Name by identity, not context.** A token carries `role + variant + state` and nothing about
- * *where* it happens to sit. Every `(role × variant × state)` a recipe paints is its own **flat**
- * token — no borrowing a sibling variant's token, no `--hope-{component}-*` tokens. The interaction
- * ladder is explicit: `-hovered` / `-pressed` per variant (press is a colorable state). This is why
- * the label color of the soft/outline/ghost/link variants is `{role}-emphasis` (the role's legible
- * *content* color) rather than the old `on-{role}-soft` (which named a fill context those variants
- * don't render).
- *
- * **Tailwind-ergonomic naming.** The names read cleanly *after* a Tailwind property prefix and no
- * token is ever a bare CSS property — so there is no `text-text`, `border-border`, or `ring-ring`
- * doubling. The foreground is carried by three conventions:
- * - **Standard text** on neutral surfaces uses the `foreground*` ramp → `text-foreground`,
- *   `text-foreground-muted`, …
- * - **Role content** (soft/outline/ghost/link label, inline role text) uses `{role}-emphasis` →
- *   `text-primary-emphasis`, and its interactive link ladder `text-{role}-link-hovered/-pressed`.
- * - **On-color text** that must stay readable on a colored solid fill, the inverse surface, or a
- *   collection state uses the `on-*` prefix → `text-on-primary`, `text-on-inverse`, `text-on-selected`.
- *   `on-{role}-inverted` is the content color for the `inverted` variant's own solid fill
- *   (`{role}-inverted`) — a real fill context, unlike the removed `on-{role}-soft` (soft renders no
- *   solid fill), which is why this `on-*` name is justified where that one wasn't.
- *
- * Icons fold into these same text tokens (currentColor) — there is no separate `icon` family.
- *
- * **Recipe purity.** Recipes reference *finished* tokens only — never `color-mix`, an alpha modifier
- * (`bg-x/50`), or a magic value. A derived color (e.g. the focus halo, the scrim) is authored as its
- * own token in the preset's `theme.css`, where the preset owns the raw scale.
- *
- * `SEMANTIC_COLOR_TOKENS` is the runtime source of truth (used by `checkSemanticTokenConformance`
- * in `@hope-ui/theming/conformance` to prove a theme's CSS defines every `--hope-<token>` var).
+ * Three rules govern what may be added; the full rationale is in `__internal__/theming.md`
+ * § Semantic token vocabulary.
+ * - **Name by identity, not context.** A token is `role + variant + state` and says nothing about
+ *   where it sits. Every `(role × variant × state)` a recipe paints gets its own flat token — never a
+ *   sibling variant's, never a per-component one.
+ * - **Foregrounds split three ways.** `foreground*` is standard text on neutral surfaces;
+ *   `{role}-emphasis` is a role's own legible content (the soft/outline/ghost/link label); the `on-*`
+ *   prefix is reserved for text sitting on a colored fill (`on-primary`, `on-inverse`, `on-selected`).
+ *   Icons fold into these same text tokens through `currentColor` — there is no `icon` family.
+ * - **Recipes reference finished tokens only** — never `color-mix`, an alpha modifier (`bg-x/50`), or
+ *   a magic value. A derived color such as the focus halo or the scrim is itself a token, authored in
+ *   the preset's `theme.css` where the preset owns the raw scale.
  */
 export const SEMANTIC_COLOR_TOKENS = [
-  // ── Surfaces (elevation), used as `bg-*`. Never a doubled `bg-bg`. `-raised` carries its own
-  // hovered/pressed ladder (the `default`-variant button's interaction states).
+  // Surfaces are an elevation concept, used as `bg-*` — hence `surface`, never a doubled `bg-bg`.
+  // `-raised` carries its own hovered/pressed ladder (a `default`-variant button's interaction states).
   "surface",
   "surface-raised",
   "surface-raised-hovered",
@@ -46,23 +30,22 @@ export const SEMANTIC_COLOR_TOKENS = [
   "surface-sunken",
   "surface-inverse",
 
-  // ── Standard text ramp (on neutral surfaces), used as `text-*`.
+  // Standard text ramp, for neutral surfaces; used as `text-*`.
   "foreground",
   "foreground-muted",
   "foreground-subtle",
   "foreground-disabled",
 
-  // ── On-state text: readable on the inverse surface and on the collection-state fills. `text-on-*`.
+  // Text that must stay readable on the inverse surface and on the collection-state fills below.
   "on-inverse",
   "on-active",
   "on-selected",
 
-  // ── primary — full rest/hovered/pressed ladder per variant. `{role}` is both the solid fill and
-  // the full-strength role border; the role border is two-tier — `-line` (strong) and `-subtle-line`
-  // (soft) — both complete across all 6 roles; `-emphasis` is the role's content color; `-link-*` is
-  // the link text ladder (rest = `-emphasis`); `on-{role}` sits on the fill. `{role}-inverted*` is the
-  // `inverted` variant's own fill ladder (its rest/hovered/pressed), paired with `on-{role}-inverted`
-  // for the content that sits on it — the swap of `solid`, but on dedicated tokens (no borrowing).
+  // Each of the six roles below repeats this exact shape, with a rest/hovered/pressed ladder per
+  // variant. `{role}` is the solid fill; `-line` (strong) and `-subtle-line` (soft) are its two border
+  // tiers; `-emphasis` is its content color, and `-link-*` the link ladder that starts from it;
+  // `on-{role}` is the content sitting on the fill. `{role}-inverted*` is the `inverted` variant's own
+  // fill ladder with `on-{role}-inverted` over it — `solid` swapped, on tokens of its own.
   "primary",
   "primary-hovered",
   "primary-pressed",
@@ -84,8 +67,6 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-primary",
   "on-primary-inverted",
 
-  // ── neutral — now carries the two-tier role border like the chromatic roles: `-line` (strong) is
-  // backfilled here and `-subtle-line` (soft) is new; otherwise identical in shape.
   "neutral",
   "neutral-hovered",
   "neutral-pressed",
@@ -107,7 +88,6 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-neutral",
   "on-neutral-inverted",
 
-  // ── success
   "success",
   "success-hovered",
   "success-pressed",
@@ -129,7 +109,6 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-success",
   "on-success-inverted",
 
-  // ── info
   "info",
   "info-hovered",
   "info-pressed",
@@ -151,7 +130,6 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-info",
   "on-info-inverted",
 
-  // ── warning
   "warning",
   "warning-hovered",
   "warning-pressed",
@@ -173,7 +151,6 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-warning",
   "on-warning-inverted",
 
-  // ── danger
   "danger",
   "danger-hovered",
   "danger-pressed",
@@ -195,31 +172,28 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-danger",
   "on-danger-inverted",
 
-  // ── Neutral borders, used as `border-*`. Emphasis levels only; no bare `border` token.
+  // Neutral borders, used as `border-*`. Emphasis levels only — a bare `border` token would double up.
   "subtle",
   "strong",
 
-  // ── Collection-state fills, used as `bg-*`. `active` = transient (hover / roving / activedescendant);
-  // `selected` = persistent (chosen). Each pairs with its `on-*` text above.
+  // Collection-state fills, used as `bg-*`, each paired with its `on-*` text above. `active` is
+  // transient (hovered, or the item the keyboard is on); `selected` is persistent (actually chosen).
   "active",
   "selected",
 
-  // ── Disabled state has no fill token: hope-ui dims a disabled control via the `opacity-disabled`
-  // axis (see SEMANTIC_OPACITY_TOKENS) rather than swapping to a dedicated background color. The
-  // disabled *label* still has its own text token (`foreground-disabled`, in the ramp above).
+  // There is deliberately no disabled *fill* token: a disabled control is dimmed through the
+  // `opacity-disabled` axis (see SEMANTIC_OPACITY_TOKENS), not by swapping its background. Its label
+  // still has a text token of its own, `foreground-disabled` in the ramp above.
 
-  // ── Systemic: focus indicator (`ring-focus` / `border-focus`), its translucent halo
-  // (`ring-focus-halo`, a preset-authored derived color), and modal dimming (`bg-scrim`).
+  // Systemic: the focus indicator (`ring-focus`/`border-focus`), its translucent halo (`ring-focus-halo`,
+  // a color the preset derives), and modal dimming (`bg-scrim`).
   "focus",
   "focus-halo",
   "scrim",
 
-  // ── Surface-adaptive interaction wash (part of the surface family): the hover/press tint
-  // (`bg-surface-adaptive-hovered` / `bg-surface-adaptive-pressed`) a control with no rest background
-  // of its own — an icon-only button such as CloseButton — lays over whatever surface it sits on. A
-  // preset authors these as *finished* tokens derived from `currentColor`, so the control defers to
-  // its surface rather than asserting a colorScheme. Focus is not special-cased — such a control uses
-  // the shared `focus-halo` ring.
+  // The hover/press tint a control with no rest background of its own — an icon-only button such as
+  // CloseButton — lays over whatever surface it sits on. A preset derives these from `currentColor`,
+  // so such a control takes its color from its surroundings instead of picking a role.
   "surface-adaptive-hovered",
   "surface-adaptive-pressed",
 ] as const;
@@ -228,11 +202,11 @@ export const SEMANTIC_COLOR_TOKENS = [
 export type SemanticColorToken = (typeof SEMANTIC_COLOR_TOKENS)[number];
 
 /**
- * The **opacity axis** — a separate contract from the color vocabulary. Tailwind v4.3.2 has no
- * `--opacity-*` theme namespace, so these are not exposed via `@theme inline` like colors are;
- * a preset defines the `--hope-opacity-*` variable and the shared `_base/_opacity.css` layer wires
- * each to a custom `@utility` (`opacity-disabled` → `opacity: var(--hope-opacity-disabled)`). They
- * exist so a recipe never hardcodes a magic opacity (`opacity-90`): the dim is a knob the preset owns.
+ * The **opacity axis** — a separate contract from the color vocabulary only because Tailwind v4 has no
+ * `--opacity-*` theme namespace: a preset defines `--hope-opacity-*` and a shared base layer wires
+ * each to a custom `@utility` (`opacity-disabled` → `opacity: var(--hope-opacity-disabled)`), instead
+ * of the `@theme inline` route colors take. They exist so a recipe never hardcodes a magic opacity
+ * such as `opacity-90` — how far to dim is a knob the preset owns.
  */
 export const SEMANTIC_OPACITY_TOKENS = ["opacity-disabled", "opacity-loading"] as const;
 
@@ -240,12 +214,10 @@ export const SEMANTIC_OPACITY_TOKENS = ["opacity-disabled", "opacity-loading"] a
 export type SemanticOpacityToken = (typeof SEMANTIC_OPACITY_TOKENS)[number];
 
 /**
- * hope's CSS custom-property namespace. Every semantic token (color *and* opacity) is delivered as
- * a `--hope-<name>` variable the base layers read (`bg-primary` → `var(--hope-primary)`;
- * `opacity-disabled` → `var(--hope-opacity-disabled)`). This is the single source of truth for that
- * prefix, shared by the conformance checks that assert a theme declares each var and the preset
- * renderer that emits token overrides — so the namespace can never drift between "what we require"
- * and "what we emit".
+ * hope's CSS custom-property namespace. Every semantic token, color and opacity alike, ships as a
+ * `--hope-<name>` variable (`bg-primary` → `var(--hope-primary)`). Both the conformance checks that
+ * require a variable and the code that emits one read the prefix from here, so "what we require" and
+ * "what we emit" cannot drift apart.
  */
 export const HOPE_VAR_PREFIX = "--hope-";
 
@@ -255,9 +227,9 @@ export function hopeVar(name: string): string {
 }
 
 /**
- * The shape a theme's color values satisfy: every semantic token mapped to a value. Themes ship
- * these as `--hope-<token>` CSS variables rather than a JS object, but the type stays the canonical
- * description of the vocabulary (and lets a JS tool assert completeness against it).
+ * The shape a theme's color values satisfy: every semantic token mapped to a value. Themes ship these
+ * as CSS variables rather than a JS object, but the type remains the canonical description of the
+ * vocabulary, and lets a JS tool assert completeness against it.
  */
 export type SemanticColorContract = Record<SemanticColorToken, string>;
 

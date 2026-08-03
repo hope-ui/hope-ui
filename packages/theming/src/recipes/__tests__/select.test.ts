@@ -11,14 +11,14 @@ const _variants: SelectRecipeVariants = {
 };
 void _variants;
 
-// `SelectThemeableProps` is the curated surface a preset may default app-wide: the variants **plus**
-// the two chrome glyphs, each a factory. A strict superset by construction, so a bare variants object
-// is still assignable to it — but not the reverse, unlike Listbox/Popover, because of the glyphs.
+// The curated surface a preset may default app-wide: the variants **plus** the two chrome glyphs.
+// A superset, so a bare variants object is assignable to it but not the reverse — unlike Listbox and
+// Popover, which add no glyphs.
 const _variantsAreThemeable = (v: SelectRecipeVariants): SelectThemeableProps => v;
 void _variantsAreThemeable;
 
 // Both glyphs are factories, never bare elements: a preset value is one object shared by every
-// instance, so a built node would move between them.
+// instance, so an already-built DOM node would *move* between them.
 const _glyphs: SelectThemeableProps = {
   size: "sm",
   chevronIcon: () => null,

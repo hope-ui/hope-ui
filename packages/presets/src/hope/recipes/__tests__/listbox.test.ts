@@ -24,7 +24,6 @@ describe("hope listbox recipe", () => {
 
   it("renders a plain in-flow list with no popup chrome by default (standalone-first)", () => {
     const root = listboxRecipe({}).root();
-    // Structural only: legible content color, a scroll container, and no container focus ring.
     expect(root).toContain("text-foreground");
     expect(root).toContain("overflow-y-auto");
     expect(root).toContain("outline-none");
@@ -40,14 +39,15 @@ describe("hope listbox recipe", () => {
 
   it("highlights the row on data-active only — never hover or a bare focus background", () => {
     const item = listboxRecipe({}).item();
-    // The transient highlight is the shared active state (keyboard + pointer write one index), so it
-    // is styled by the registered data-active: variant alone.
+    // Keyboard and pointer write one shared active index, so the highlight is styled by the registered
+    // `data-active:` variant alone.
     expect(item).toContain("data-active:bg-active");
     expect(item).toContain("data-active:text-on-active");
-    // A hover:/bare-focus background would let the cursor paint a second highlight — deliberately absent.
+    // A `hover:` or bare-focus background would let the cursor paint a second highlight the moment it
+    // lagged that index by a frame — deliberately absent.
     expect(item).not.toContain("hover:");
     expect(item).not.toContain("focus:bg-");
-    // `relative` anchors the absolute indicator; the row is non-selectable text.
+    // `relative` anchors the absolute indicator.
     expect(item).toContain("relative");
     expect(item).toContain("select-none");
     // Logical, so the gutter mirrors with the locale instead of stranding the glyph on the label.
@@ -69,7 +69,7 @@ describe("hope listbox recipe", () => {
 
   it("scales the row glyphs with the size, in step with the row", () => {
     // A row's leading icon and the selected-row check share one glyph box per size — the same scale
-    // `select.ts` and `combobox.ts` use, since these are the same rows.
+    // `select.ts` and `combobox.ts` use, since all three are the same rows.
     const expected: Record<ListboxSize, string> = {
       sm: "[&_svg]:size-3.5",
       md: "[&_svg]:size-4",
@@ -94,14 +94,12 @@ describe("hope listbox recipe", () => {
   });
 
   it("scales row density and panel min width per size, each size self-contained", () => {
-    // sm: tighter row + narrower panel.
     const sm = listboxRecipe({ size: "sm" });
     expect(sm.item()).toContain("text-xs");
     expect(sm.item()).toContain("gap-1 ");
     expect(sm.item()).toContain("rounded-sm");
     expect(sm.root()).toContain("min-w-32");
 
-    // lg: roomier row + wider panel.
     const lg = listboxRecipe({ size: "lg" });
     expect(lg.item()).toContain("text-base");
     expect(lg.item()).toContain("gap-2");

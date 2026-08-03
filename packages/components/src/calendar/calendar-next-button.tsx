@@ -12,13 +12,8 @@ export interface CalendarNextButtonProps extends JSX.ButtonHTMLAttributes<HTMLBu
 }
 
 /**
- * The next-period navigation button — the mirror of `PrevButton`. Assembles `createCalendarNext`
- * (aria-label default, `disabled`/`data-disabled` boundary reflection, paging `onClick`) into a styled
- * ghost icon button. Pure assembly + theme.
- *
- * The glyph is **built in**: with no `children`, it renders `ctx.nextIcon()` — the resolved default
- * chevron (instance `nextIcon` ?? preset `defaultProps.calendar.nextIcon` ?? hope's built-in). A
- * consumer `children` overrides it per instance (single read of `props.children`; `??` short-circuits).
+ * The next-period navigation button — the mirror of `PrevButton`, including the single-read `children`
+ * rule documented there.
  */
 export function NextButton(props: CalendarNextButtonProps): JSX.Element {
   const ctx = useCalendarContext();

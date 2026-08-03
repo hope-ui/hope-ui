@@ -1,44 +1,41 @@
 /*
  * @hope-ui/presets/hope — Button slot recipe.
  *
- * The `tailwind-variants` slot recipe the `@hope-ui/components` `Button` reads through
- * `useRecipe("button")`. It encodes hope's "vega on your tokens" look & feel: shadcn/ui's vega
- * button metrics (reserved 1px transparent border, 1px press nudge, 3px translucent focus ring,
- * uniform 8px radius) painted entirely through hope's semantic `--hope-*` tokens.
+ * A *slot recipe*: `tv` (tailwind-variants) maps variant props to one class string per named part
+ * ("slot"), and `@hope-ui/components`' Button reads it through `useRecipe("button")`. It encodes
+ * hope's "vega on your tokens" look: shadcn/ui's vega button metrics (reserved 1px border, 1px press
+ * nudge, 3px translucent focus ring, uniform 8px radius) painted through hope's `--hope-*` tokens.
  *
  * ── Why every class is a literal string ─────────────────────────────────────────────────────────
- * The consumer's Tailwind build discovers which utilities to generate by scanning this file
- * (`@source "./recipes"` in `tailwind.css`), and a scanner only sees *literal* candidates. So the
- * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
- * `COLOR_CLASSES` and assembled into `compoundVariants`.
+ * The consumer's Tailwind build only emits utilities it can find by scanning this file (`@source
+ * "./recipes"`), and a scanner sees *literal* candidates only. So the per-color utilities cannot be
+ * built with `bg-${role}` template strings — they are written out in `COLOR_CLASSES` and assembled
+ * into `compoundVariants`, entries that apply only when several variants match at once.
  *
- * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
- * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`). Every
- * interaction state is a *finished* token too, so the recipe computes no color — no `color-mix`, no
- * alpha modifier, no magic opacity — and a preset redefining a shade changes the painted result
- * predictably (recipe purity, enforced by `pnpm check:recipe-purity`). The hover wash is guarded
- * against the pressed state (`hover:not-data-pressed:bg-primary-hovered`) so the two never fight.
- * Interaction *triggers* stay Tailwind's own `hover:`/`focus-visible:` plus hope's
- * `data-pressed`/`data-disabled`/`aria-busy` variants.
+ * ── Recipe purity ───────────────────────────────────────────────────────────────────────────────
+ * `bg-primary` resolves `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`).
+ * Every interaction state is a *finished* token too, so this recipe computes no color — no
+ * `color-mix`, no alpha modifier (`bg-x/50`), no magic opacity — and a preset redefining a shade
+ * changes the painted result predictably. Derived colors (the focus halo) are authored as tokens in
+ * `theme.css` instead. Enforced by `pnpm check:recipe-purity`. Interaction *triggers* stay Tailwind's
+ * own `hover:`/`focus-visible:` plus hope's `data-pressed`/`data-disabled`/`aria-busy` variants.
  */
 
 import type { ButtonColorScheme, ButtonSize, ButtonVariant } from "@hope-ui/theming";
-// The variant vocabulary is owned by `@hope-ui/theming`; `hopeRecipes` (in `./index`) checks the
-// finished recipe against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
 
 /*
- * Per-color, per-variant fills. Every (role × variant × state) is its own finished token; nothing is
- * computed and nothing is borrowed from a sibling variant — `inverted` gets its own
- * `{role}-inverted*` ladder rather than reusing solid's `on-{role}`/`{role}`.
- *
- * The soft/outline/ghost/link label is `{role}-emphasis`, the role's legible *content* color, so
- * neutral & warning read correctly in both themes rather than looking disabled.
+ * Every (role × variant × state) is its own finished token; nothing is computed and nothing is
+ * borrowed from a sibling variant — `inverted` gets its own `{role}-inverted*` ladder rather than
+ * reusing solid's `on-{role}`/`{role}`. The soft/outline/ghost/link label is `{role}-emphasis`, the
+ * role's legible *content* color, so neutral & warning read correctly in both themes rather than
+ * looking disabled.
  *
  * The filled variants (solid/inverted/soft) carry a border MATCHING their fill and tracking it across
  * states, so the base's reserved 1px edge continues the fill instead of showing a transparent gap to
  * the page background — and the base's `border-color` transition animates it in step. `ghost`/`link`
- * stay borderless; `focus-visible:border-focus` still wins on focus.
+ * stay borderless; `focus-visible:border-focus` still wins on focus. Each hover wash is guarded
+ * against the pressed state (`hover:not-data-pressed:`) so the two never fight.
  */
 const COLOR_CLASSES: Record<
   ButtonColorScheme,
@@ -140,12 +137,11 @@ const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColorScheme[]
 /*
  * ── Horizontal padding lives in compoundVariants, never on the `size` base ──────────────────────
  * So no button ever carries two competing `px-*` classes for tailwind-merge to resolve, and nothing
- * depends on variant declaration order: a text button gets its `px-*` from the (size × iconOnly:false)
- * compound; an icon-only button gets no `px-*` at all (it's square and centered). The `:has()`-scoped
- * decorator overrides (the `has-...:ps` and `pe` inline-padding utilities) stay on the `size` base —
- * a different modifier, so they never twMerge against these. `link` is excluded from these compounds: it
- * owns `px-0.5` in the `variant` map, so a link button matches no padding compound and there is never
- * a px-vs-px conflict. Every value is a literal (Tailwind's `@source` scan needs literal candidates).
+ * depends on variant declaration order: a text button takes its `px-*` from the (size × iconOnly:
+ * false) compound, and an icon-only button gets none at all (it is square and centered). `link` is
+ * excluded from these compounds because it owns `px-0.5` in the `variant` map, so it matches no
+ * padding compound and there is never a px-vs-px conflict. The `:has()`-scoped decorator overrides
+ * stay on the `size` base — a different modifier, so they never twMerge against these.
  */
 const TEXT_PADDING_VARIANTS: Array<Exclude<ButtonVariant, "link">> = [
   "default",
@@ -162,8 +158,8 @@ const SIZE_PADDING: Record<ButtonSize, string> = {
   lg: "px-3.5",
   xl: "px-4",
 };
-// The icon-only button's icon lands in the `label` slot (as `children`), which has no
-// `[&_svg]:size-*` otherwise — size it here, per button size. Full literals so they're scannable.
+// The icon-only button's icon lands in the `label` slot (as `children`), which carries no
+// `[&_svg]:size-*` otherwise.
 const ICON_ONLY_LABEL_SVG: Record<ButtonSize, string> = {
   xs: "[&_svg]:size-4",
   sm: "[&_svg]:size-4.5",
@@ -174,15 +170,14 @@ const ICON_ONLY_LABEL_SVG: Record<ButtonSize, string> = {
 const BUTTON_SIZES: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
 
 const paddingCompoundVariants = [
-  // Text buttons: per-size horizontal padding, for every non-link chrome variant.
   ...BUTTON_SIZES.map((size) => ({
     iconOnly: false,
     variant: TEXT_PADDING_VARIANTS,
     size,
     class: { root: SIZE_PADDING[size] },
   })),
-  // Icon-only buttons: `aspect-square` + the size's fixed `h-*` yields a square (width computes from
-  // height under border-box); no `px-*`, so the icon centers via the root's `justify-center`.
+  // `aspect-square` + the size's fixed `h-*` yields a square (width computes from height under
+  // border-box); no `px-*`, so the icon centers via the root's `justify-center`.
   ...BUTTON_SIZES.map((size) => ({
     iconOnly: true,
     size,
@@ -196,36 +191,32 @@ const paddingCompoundVariants = [
  */
 export const buttonRecipe = tv({
   slots: {
-    // The bare `border` reserves a 1px border WIDTH so solid↔outline never shifts by a pixel; the
-    // border COLOR is supplied by every variant (filled variants match their own fill across states,
-    // `default`/`outline` carry a real edge, `ghost`/`link` stay transparent), so the reserved edge is
-    // a clean, fill-matched line rather than a transparent gap to the page background — no
-    // `bg-clip-padding` needed. The `border-color` transition below animates it alongside the fill.
+    // The bare `border` reserves a 1px border WIDTH so solid↔outline never shifts by a pixel; every
+    // variant supplies the COLOR (see `COLOR_CLASSES`), so the reserved edge is a fill-matched line
+    // rather than a transparent gap to the page background — no `bg-clip-padding` needed.
     root: [
       "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none",
       "select-none border outline-none",
       // Transition `translate`, NOT `transform`: Tailwind v4 compiles `translate-y-px` (the pressed
-      // sink) to the standalone `translate` CSS property, so `transition-transform` would never animate
-      // the sink — it would snap. Colors/border/shadow round out the list.
+      // sink) to the standalone `translate` CSS property, so `transition-transform` would never
+      // animate the sink — it would snap.
       "transition-[color,background-color,border-color,box-shadow,translate] duration-150 ease-out",
-      // Focus halo is the finished `focus-halo` token (a preset-authored translucent color), not an
-      // alpha modifier over `focus` — recipes never compute (recipe-purity rule).
+      // `focus-halo` is a finished preset-authored translucent token, not an alpha modifier over
+      // `focus` — recipes never compute a color (recipe purity).
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo",
       "data-pressed:translate-y-px",
-      // Two dim-only state axes, styled identically bar the opacity token. `createButton` emits
-      // `data-disabled` for both native (`:disabled`) and non-native (`aria-disabled`) buttons; the
-      // component sets `aria-busy` while loading. Neither swaps color — each just neutralises chrome
-      // (no cursor/pointer/shadow) and dims via a finished opacity token: `opacity-disabled` for
-      // disabled, `opacity-loading` for loading. Both are preset-owned knobs (hope dims disabled to
-      // 0.4 and leaves loading at full opacity — the loader arc conveys it), never a magic `opacity-90`.
+      // Two dim-only state axes, identical bar the opacity token. `createButton` emits `data-disabled`
+      // for both native (`:disabled`) and non-native (`aria-disabled`) buttons; the component sets
+      // `aria-busy` while loading. Neither swaps color — each neutralises chrome and dims through a
+      // finished opacity token, so both stay preset-tunable knobs rather than a magic `opacity-90`.
       "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled",
       "aria-busy:cursor-progress aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading",
     ],
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
     endDecorator: "inline-flex shrink-0 items-center justify-center",
-    // Loader styling lives here (not in the component JSX) so the utilities are scanned. The default
-    // loader is a single Lucide arc, targeted as the `svg` inside this slot — no per-part hooks.
+    // Loader styling lives here rather than in the component's JSX so Tailwind's `@source` scan can
+    // see the utilities. The default loader is one Lucide arc, targeted as the `svg` inside this slot.
     loader: [
       "pointer-events-none inline-flex items-center justify-center",
       "[&_svg]:origin-center [&_svg]:animate-spin",
@@ -233,9 +224,9 @@ export const buttonRecipe = tv({
     ],
   },
   variants: {
-    // `size` before `variant` so `link`'s `h-auto` / `px-0.5` win the tailwind-merge conflict over the
-    // fixed height. Heights step an even +4 (24/28/32/36/40); radius tracks size off the shadcn scale —
-    // xs/sm cap at a `min()` of `--radius-md` so they never over-round, md+ use `rounded-lg`.
+    // Declared before `variant` so `link`'s `h-auto`/`px-0.5` win the tailwind-merge conflict over the
+    // fixed height. Heights step an even +4 (24/28/32/36/40); xs/sm cap their radius at a `min()` of
+    // `--radius-md` so they never over-round.
     size: {
       xs: {
         root: [
@@ -287,36 +278,35 @@ export const buttonRecipe = tv({
       true: { root: "w-full" },
       false: { root: "" },
     },
-    // Typed axis with no classes of its own — the square metrics (and the removal of horizontal
-    // padding) live entirely in `paddingCompoundVariants` above, keyed by (size × iconOnly), so
-    // nothing relies on tailwind-merge out-ordering a base `px-*`.
+    // A typed axis with no classes of its own — the square metrics (and the *removal* of horizontal
+    // padding) live entirely in `paddingCompoundVariants`, so nothing relies on tailwind-merge
+    // out-ordering a base `px-*`.
     iconOnly: {
       true: {},
       false: {},
     },
     variant: {
-      // shadcn's outline button: surface fill, subtle gray border, faint shadow — color-independent
-      // (ignores `color`); rest → hover → press walk the `surface-raised` elevation ladder. (Slot
-      // recipes need `{ root }` objects, not bare strings — a bare string applies to no slot.)
+      // shadcn's outline button: color-independent neutral chrome, walking the `surface-raised`
+      // elevation ladder from rest → hover → press. (A slot recipe needs `{ root }` objects here, not
+      // bare strings — a bare string applies to no slot at all.)
       default: {
         root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
       },
       solid: { root: "" },
-      // Color (fill + on-content + wash) lives per-role in `COLOR_CLASSES.inverted`, like `solid`.
       inverted: { root: "" },
       soft: { root: "" },
       outline: { root: "bg-transparent" },
-      // Borderless: `ghost`/`link` set `border-transparent` explicitly now that the base carries no
-      // border color (the bare `border` there would otherwise default to `currentColor`).
+      // `border-transparent` is explicit because the base carries no border color, and a bare `border`
+      // would otherwise paint in `currentColor`.
       ghost: { root: "bg-transparent border-transparent" },
-      // Layout only; the color ladder + underline live per-role in `COLOR_CLASSES.link`.
+      // Layout only; the color ladder and underline live per-role in `COLOR_CLASSES.link`.
       link: {
         root: "h-auto bg-transparent border-transparent px-0.5 py-0.5",
       },
     },
-    // `colorScheme` carries no base classes of its own — every fill is variant×colorScheme-specific
-    // and lives in `compoundVariants`. It's declared here (with empty slots) so it's a real, typed
-    // variant the compound entries can match on, rather than an untyped prop.
+    // No base classes of its own — every fill is variant×colorScheme-specific and lives in
+    // `compoundVariants`. Declared here with empty slots so it is a real, typed variant those entries
+    // can match on, rather than an untyped prop.
     colorScheme: {
       primary: {},
       neutral: {},
@@ -326,9 +316,9 @@ export const buttonRecipe = tv({
       info: {},
     },
     // Layout only — the component mounts/unmounts the loader slot via `<Show>`, so there is no
-    // "hidden"/"none" member here. It passes `loaderPlacement: undefined` when not loading.
+    // "hidden"/"none" member here; it passes `loaderPlacement: undefined` when not loading.
     loaderPlacement: {
-      // center = overlay: label + decorators keep their width but go invisible, loader fills & centers.
+      // Overlay: label + decorators keep their width but go invisible, so the button never resizes.
       center: {
         label: "opacity-0",
         startDecorator: "opacity-0",

@@ -46,7 +46,7 @@ describe("hope badge recipe", () => {
     const solid = badgeRecipe({ variant: "solid", colorScheme: "danger" }).root();
     expect(solid).toContain("bg-danger");
     expect(solid).toContain("text-on-danger");
-    // The reserved border matches the fill, so the chip has no transparent gap to the page bg.
+    // The reserved border matches the fill, so the chip shows no transparent gap to the page behind it.
     expect(solid).toContain("border-danger");
   });
 
@@ -54,9 +54,9 @@ describe("hope badge recipe", () => {
     const inverted = badgeRecipe({ variant: "inverted", colorScheme: "primary" }).root();
     expect(inverted).toContain("bg-primary-inverted");
     expect(inverted).toContain("text-on-primary-inverted");
-    // Its reserved border matches the inverted fill on its own `-inverted` family.
     expect(inverted).toContain("border-primary-inverted");
-    // It no longer reuses solid's tokens as the swap — it paints its own `-inverted` family.
+    // It paints its own `-inverted` family rather than reusing solid's tokens as the swap, so the two
+    // stay independently tunable.
     expect(inverted).not.toContain("bg-on-primary");
     expect(inverted).not.toContain("text-primary ");
   });
@@ -65,7 +65,7 @@ describe("hope badge recipe", () => {
     const soft = badgeRecipe({ variant: "soft", colorScheme: "primary" }).root();
     expect(soft).toContain("bg-primary-soft");
     expect(soft).toContain("text-primary-emphasis");
-    // soft's border matches its own fill (`-soft`), not the darker `-subtle-line` the subtle variant uses.
+    // soft's border matches its own fill, not the darker `-subtle-line` the `subtle` variant uses.
     expect(soft).toContain("border-primary-soft");
     expect(soft).not.toContain("border-primary-subtle-line");
   });
@@ -90,14 +90,14 @@ describe("hope badge recipe", () => {
     expect(root).toContain("bg-surface-raised");
     expect(root).toContain("text-foreground");
     expect(root).toContain("border-neutral-subtle-line");
-    // The role color rides the dot slot, never the root.
+    // The role color rides the `dot` slot, never the root.
     expect(dot.dot()).toContain("bg-success");
     expect(root).not.toContain("bg-success");
   });
 
   it("reserves a fill-matched 1px border on every variant so none shifts a pixel (no transparent gap)", () => {
-    // The reserved border is now a real, fill-matched color — never a transparent gap to the page bg,
-    // so `bg-clip-padding` is gone too.
+    // The reserved border is a real, fill-matched color rather than a transparent gap to the page
+    // background, so `bg-clip-padding` is unnecessary.
     const solid = badgeRecipe({ variant: "solid", colorScheme: "primary" }).root();
     expect(solid).toMatch(/(?:^|\s)border(?:\s|$)/); // the 1px width utility from the base
     expect(solid).toContain("border-primary");
@@ -118,14 +118,14 @@ describe("hope badge recipe", () => {
     const circle = badgeRecipe({ shape: "circle", size: "md" }).root();
     expect(circle).toContain("rounded-full");
     expect(circle).toContain("aspect-square");
-    // shape wins the padding merge over size (declared after it): circle drops the size px.
+    // `shape` is declared after `size`, so it wins the padding merge and `circle` drops the size's `px`.
     expect(circle).toContain("px-0");
     expect(circle).not.toContain("px-2.5");
   });
 
   it("tightens the decorator-side padding optically per size (matching Button), only when a decorator is mounted", () => {
-    // Each size drops the decorator side one 2px step below its symmetric text-edge `px`, gated on the
-    // decorator part being present (`has-data-[slot=badge-{start,end}-decorator]:`).
+    // Each size drops the decorator side one step below its symmetric text-edge `px`, gated on that
+    // part actually being mounted via the `data-slot` attribute it renders with.
     const steps = {
       xs: "1",
       sm: "1.5",
@@ -136,7 +136,7 @@ describe("hope badge recipe", () => {
       const root = badgeRecipe({ size }).root();
       expect(root).toContain(`has-data-[slot=badge-start-decorator]:ps-${step}`);
       expect(root).toContain(`has-data-[slot=badge-end-decorator]:pe-${step}`);
-      // The gate is `has-data-`, so a decorator-less badge never pays the tighter padding.
+      // The gate means a decorator-less badge never pays the tighter padding.
       expect(root).not.toMatch(/(?:^|\s)ps-\d/);
       expect(root).not.toMatch(/(?:^|\s)pe-\d/);
     }

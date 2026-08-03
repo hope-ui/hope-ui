@@ -11,13 +11,12 @@ export interface PopoverPortalProps {
 // Lifts the layer out of the trigger's stacking/overflow context, so a popover inside a scroll
 // container or a `transform`ed ancestor isn't clipped by it.
 //
-// **No primitive hook**, unlike `Dialog.Portal`: that one exists only to own the `ModalBackdrop`
-// registration, and a non-modal popover has no backdrop, no scroll lock and no hide-outside. Nothing
-// to register, so nothing for a kernel hook to do.
+// **No primitive hook**, unlike `Dialog.Portal`: that one exists only to register the modal backdrop,
+// and a non-modal popover has no backdrop, no scroll lock and no background-hiding to register.
 export const Portal: Component<PopoverPortalProps> = (props) => {
   // @solidjs/web's Portal throws server-side ("Portal is not supported on the server") rather than
-  // degrading gracefully, so this must never render it during SSR. `isServer` is a fixed
-  // per-environment constant, so a plain `if` (not `<Show>`) — there's no reactive branch.
+  // degrading, so it must never be reached during SSR. `isServer` is a build-time constant, so a
+  // plain `if` is correct here — there is no reactive branch for `<Show>` to track.
   if (isServer) {
     return null;
   }

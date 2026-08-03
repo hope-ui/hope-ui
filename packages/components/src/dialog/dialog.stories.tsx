@@ -5,10 +5,9 @@ import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Dialog, type DialogPlacement, type DialogScrollBehavior, type DialogSize } from ".";
 
 /**
- * `Dialog` ships its own visual identity (the hope `dialog` recipe), so these stories use the parts
- * as a consumer would — no hand-positioning. The global `withHopeTheme` decorator
- * (`.storybook/preview.tsx`) provides the preset, and Storybook's Tailwind build compiles the recipe
- * utilities. Opening a dialog zooms+fades it in; closing reverses it.
+ * Dialog ships its own visual identity, so these stories use the parts exactly as a consumer would,
+ * with no hand-positioning. The preset comes from the global `withHopeTheme` decorator in
+ * `.storybook/preview.tsx`, and Storybook's Tailwind build compiles the classes it emits.
  */
 const meta = {
   title: "Components/Dialog",
@@ -20,9 +19,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Renders a hope `Button` as the `Dialog.Trigger` via its `render` prop. Solid types a native
- * button's `disabled` wider than `Button` does (`boolean | ""` vs `boolean`), so the spread is cast —
- * the same bridge `Dialog.CloseTrigger` makes when it spreads onto `CloseButton`.
+ * Renders a hope `Button` as the trigger. The cast bridges one type gap: Solid types a native
+ * button's `disabled` as `boolean | ""`, while `Button` accepts only `boolean`.
  */
 function buttonTrigger(label: string) {
   return (p: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => (
@@ -170,8 +168,8 @@ export const WithoutCloseButton: Story = {
 };
 
 /**
- * The APG alert dialog pattern for a destructive confirmation: `role="alertdialog"` (set on `Root`,
- * threaded to `Content`), no corner ✕, and the two footer actions as the only exits.
+ * The WAI-ARIA alert dialog pattern for a destructive confirmation: `role="alertdialog"` (set on
+ * `Root`, applied to `Content`), no corner ✕, and the two footer actions as the only way out.
  */
 export const AlertDialog: Story = {
   name: "role='alertdialog' (destructive confirmation)",
@@ -210,8 +208,8 @@ export const AlertDialog: Story = {
 
 /**
  * A realistic form dialog. The fields live in a `<form>` in the body; the footer's Save button is
- * linked to it via the `form` attribute, so it submits from outside the `<form>` element. The first
- * field receives focus on open (the focus trap's first-focusable default), and Tab cycles the card.
+ * linked to it via the `form` attribute, so it submits from outside the `<form>` element. On open,
+ * focus moves to the first focusable element and then cycles within the card.
  */
 export const WithForm: Story = {
   name: "With a form",
@@ -270,9 +268,8 @@ export const WithForm: Story = {
 };
 
 /**
- * A non-dismissible dialog: `closeOnEscape={false}` + `closeOnInteractOutside={false}` (both set on
- * `Root`, forwarded to the primitive's dismiss layer). Neither Escape nor a scrim click closes it —
- * only a footer button does.
+ * A non-dismissible dialog: `closeOnEscape={false}` + `closeOnInteractOutside={false}`, both set on
+ * `Root`. Neither Escape nor a scrim click closes it — only a footer button does.
  */
 export const NonDismissible: Story = {
   name: "Non-dismissible (closeOnEscape/closeOnInteractOutside false)",

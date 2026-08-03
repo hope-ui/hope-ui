@@ -8,8 +8,9 @@ import {
 } from "../calendar-root";
 import type { CalendarValue } from "../utils/selection";
 
-// The state machine injects nothing DOM-ish (the announcer no-ops without `document`), so it drives
-// entirely in a `createRoot`. `flush()` wraps writes because solid-js's *client* build defers them.
+// Nothing here touches the DOM (the announcer no-ops without `document`), so the whole state machine
+// drives inside a `createRoot`. Writes are wrapped in `flush()` because a Solid 2.0 signal write is
+// invisible to a plain read until the next flush.
 function setup(options: CreateCalendarOptions = {}): {
   api: CreateCalendarReturn;
   dispose: () => void;
@@ -25,10 +26,8 @@ function setup(options: CreateCalendarOptions = {}): {
 
 const iso = (date: DateValue) => date.toString();
 
-/**
- * The middle of the band, derived exactly as a recipe derives it — there is deliberately no
- * `isRangeMiddle` on the return, matching React Aria's attribute vocabulary.
- */
+/** The middle of the band, derived exactly as a recipe derives it in CSS — there is deliberately no
+ *  `isRangeMiddle` predicate on the return. */
 const isMiddle = (api: CreateCalendarReturn, date: CalendarDate) =>
   api.isSelected(date) && !api.isSelectionStart(date) && !api.isSelectionEnd(date);
 
@@ -138,8 +137,9 @@ describe("createCalendar — cursor constraining", () => {
   });
 
   it("clamps an out-of-range defaultFocusedValue on mount, before it seeds the visible month", () => {
-    // Read without a flush: the visible month here comes from the seed, not from the scope effect —
-    // the month grid is a variable 4–6 rows, so a post-mount correction would be a hydration mismatch.
+    // Deliberately read without a flush: the visible month must already be right from the seed, not
+    // corrected afterwards by the scope effect. A month grid is a variable 4–6 rows, so a post-mount
+    // correction changes the row count and hydration fails.
     const { api, dispose } = setup({
       defaultFocusedValue: new CalendarDate(2025, 12, 5),
       min: new CalendarDate(2026, 1, 10),
@@ -159,7 +159,8 @@ describe("createCalendar — cursor constraining", () => {
   });
 
   it("re-clamps the cursor when the bounds narrow after mount", () => {
-    // Its own root: `setup` spreads its options, which would flatten the reactive `min` getter.
+    // Its own root rather than `setup`, which spreads its options and would flatten the getter into a
+    // one-time value.
     const [min, setMin] = createSignal(new CalendarDate(2026, 1, 1));
     let api!: CreateCalendarReturn;
     let dispose!: () => void;
@@ -179,8 +180,9 @@ describe("createCalendar — cursor constraining", () => {
   });
 
   it("keeps a clamped year/decade cursor on a cell that exists", () => {
-    // The clamp is day-level, so it must be re-floored to the view's granularity — otherwise the
-    // cursor sits on min's *day* and no rendered month/year cell matches it under `isSameDay`.
+    // The clamp is day-level, so it has to be re-floored to the view's granularity. Otherwise the
+    // cursor sits on min's *day* and no rendered month/year cell matches it under `isSameDay` — the
+    // calendar renders with no tab stop at all.
     const { api, dispose } = setup({ min: new CalendarDate(2026, 3, 10) });
     flush(() => api.setView("year"));
     flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 1)));
@@ -262,9 +264,8 @@ describe("createCalendar — selection", () => {
   });
 
   it("range: a new range in progress replaces the committed one in the paint", () => {
-    // The one accepted user-visible regression of the one-band model, and the point of it: while a new
-    // range is being dragged the old one goes dark, because the band always shows what the next
-    // activate would produce. React Aria behaves the same way.
+    // Looks like a bug, is the design: while a new range is being dragged the committed one goes dark,
+    // because the band always shows what the next activate would produce.
     const { api, dispose } = setup({
       selectionMode: "range",
       defaultValue: { start: new CalendarDate(2026, 1, 4), end: new CalendarDate(2026, 1, 6) },
@@ -284,9 +285,8 @@ describe("createCalendar — selection", () => {
   });
 
   it("range: leaves `value` untouched until the range completes", () => {
-    // The controlled-consumer bug the one-band model closes: hope-ui used to write a degenerate
-    // `{date, date}` on the first activate, so `createControllableState` held a value the owner was
-    // never told about for the whole duration of a range selection.
+    // Pins the controlled-consumer contract: nothing may be written to `value` between the two clicks
+    // of a range, or a controlled owner holds a value it was never told about for the whole selection.
     const onValueChange = vi.fn();
     const { api, dispose } = setup({ selectionMode: "range", onValueChange });
 
@@ -465,7 +465,7 @@ describe("createCalendar — abandoning a range in progress", () => {
     const onValueChange = vi.fn();
     const { api, dispose } = setup({ ...committed, onValueChange });
     flush(() => api.activate(new CalendarDate(2026, 1, 10)));
-    // Nothing is written to `value` while a range is in progress, so there is no snapshot to keep and
+    // Nothing is written to `value` while a range is in progress, so there is no snapshot to take and
     // nothing to restore — the committed range simply never left.
     expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-02");
 
@@ -509,8 +509,9 @@ describe("createCalendar — abandoning a range in progress", () => {
   });
 
   it("commitSelection abandons rather than leave a range in progress on an unselectable cursor", () => {
-    // Only reachable with the contiguity narrowing off: otherwise the bounds keep the cursor inside
-    // the anchor's available run, so it can never land on an unavailable day.
+    // `allowsNonContiguousRanges` is what makes this state reachable at all: with the narrowing on,
+    // the bounds keep the cursor inside the anchor's available run and it can never land on an
+    // unavailable day.
     const onValueChange = vi.fn();
     const { api, dispose } = setup({
       ...range,
@@ -582,7 +583,7 @@ describe("createCalendar — the selection paint", () => {
 
   it("cuts an unavailable day out of a committed range", () => {
     const { api, dispose } = setup({ ...committedRange, isDateDisabled: (d) => d.day === 15 });
-    // The interior paints as it always did…
+    // The interior paints normally…
     expect(api.isSelected(new CalendarDate(2026, 1, 12))).toBe(true);
     expect(isMiddle(api, new CalendarDate(2026, 1, 12))).toBe(true);
     // …but the unavailable day is not selectable, so it must not read as selected either.
@@ -604,8 +605,8 @@ describe("createCalendar — the selection paint", () => {
   });
 
   it("keeps the band continuous across the month boundary", () => {
-    // The outside-scope filler days are non-focusable but not `isCellDisabled`, so they stay painted —
-    // otherwise a range straddling two months would render with a hole at the seam.
+    // The leading/trailing filler days are non-focusable but not `isCellDisabled`, so they stay
+    // painted — otherwise a range straddling two months renders with a hole at the seam.
     const { api, dispose } = setup({
       selectionMode: "range",
       defaultValue: { start: new CalendarDate(2025, 12, 28), end: new CalendarDate(2026, 1, 5) },
@@ -626,8 +627,8 @@ describe("createCalendar — the selection paint", () => {
   });
 
   it("paints nothing when the whole calendar is disabled", () => {
-    // React Aria parity: `disabled` is the first arm of `isCellDisabled`, and `isSelected` is false
-    // for every cell-disabled day — a disabled calendar shows no selection at all.
+    // `disabled` is the first arm of `isCellDisabled`, and no cell-disabled day paints — so a disabled
+    // calendar shows no selection at all, while still holding the value.
     const { api, dispose } = setup({ disabled: true, defaultValue: new CalendarDate(2026, 1, 20) });
     expect(api.selectionValue()).not.toBeNull(); // the value itself is untouched
     expect(api.isSelected(new CalendarDate(2026, 1, 20))).toBe(false);
@@ -644,8 +645,8 @@ describe("createCalendar — the selection paint in year / decade view", () => {
   };
 
   it("lights every month the range passes through, not only the ones it starts on", () => {
-    // A year cell stands for the whole month, so membership is an overlap test. Tested by its first day
-    // alone — as it used to be — January stayed dark for a range beginning on the 15th.
+    // A year cell stands for a whole month, so membership has to be an overlap test. Testing its first
+    // day alone leaves January dark for a range beginning on the 15th.
     const { api, dispose } = setup(spanningRange);
     flush(() => api.setView("year"));
     expect(api.isSelected(monthCell(1))).toBe(true);
@@ -696,8 +697,8 @@ describe("createCalendar — the selection paint in year / decade view", () => {
   });
 
   it("carries the tentative band up under the same overlap rule", () => {
-    // A range anchored in month view survives a drill up, so its preview has to follow the same rule as
-    // the committed paint — otherwise the band would skip the month its own anchor sits in.
+    // A range anchored in month view survives a drill up, so its preview has to follow the same rule
+    // as the committed paint — otherwise the band skips the very month its anchor sits in.
     const { api, dispose } = setup({ selectionMode: "range" });
     flush(() => api.activate(new CalendarDate(2026, 1, 15)));
     flush(() => api.setFocusedDate(new CalendarDate(2026, 3, 10)));
@@ -776,8 +777,8 @@ describe("createCalendar — contiguous ranges", () => {
   });
 
   it("keeps the outright refusal outside an anchored run", () => {
-    // No anchor ⇒ no narrowing ⇒ no clamp: an out-of-range activation is still a no-op, not a commit
-    // at `max`. Only the narrowing this option introduces is clamped away.
+    // No anchor ⇒ no narrowing ⇒ no clamp, so an out-of-range activation stays a no-op rather than
+    // becoming a commit at `max`. Only the narrowing itself is ever clamped away.
     const { api, dispose } = setup({ ...contiguousRange, max: new CalendarDate(2026, 1, 25) });
     flush(() => api.activate(new CalendarDate(2026, 1, 26)));
     expect(api.selectionValue()).toBeNull();
@@ -835,8 +836,8 @@ describe("createCalendar — contiguous ranges", () => {
   });
 
   it("releases the bounds when selectionMode leaves range mid-selection", () => {
-    // Nothing clears `anchorDate` on a mode switch, so gating only on the anchor would leave the
-    // calendar clamped to a five-day window in a mode that has no ranges at all.
+    // Nothing clears `anchorDate` on a mode switch, so gating the narrowing on the anchor alone would
+    // leave the calendar clamped to a few days for good, in a mode that has no ranges at all.
     // Its own root: `setup` spreads its options, which would flatten the reactive getter.
     const [selectionMode, setSelectionMode] = createSignal<"range" | "single">("range");
     let api!: CreateCalendarReturn;
@@ -942,8 +943,8 @@ describe("createCalendar — whole-calendar disabled", () => {
   });
 
   it("keeps isCellDisabled to the calendar's own bounds, not the visible scope", () => {
-    // The outside-month filler days are non-focusable, but not `isCellDisabled`: they keep their
-    // `data-outside-month` tint instead of being repainted dim.
+    // The filler days from the adjacent month are non-focusable but not `isCellDisabled`, so they keep
+    // their own `data-outside-month` tint instead of being repainted dim.
     const { api, dispose } = setup({ min: new CalendarDate(2026, 1, 10) });
     const nextMonth = new CalendarDate(2026, 2, 3);
     expect(api.isOutsideVisibleScope(nextMonth)).toBe(true);

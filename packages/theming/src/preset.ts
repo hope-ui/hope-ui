@@ -1,45 +1,42 @@
 /**
  * The **preset machinery** — the pure, DOM-free core of hope-ui's preset theming API.
  *
- * A `Preset` is the single object `ThemeProvider` consumes: it owns everything the runtime needs —
- * the `recipes` (a {@link RecipeRegistry}) **plus** typed `components` overrides. `RecipeRegistry`
- * is demoted to an internal building block (the type of a preset's `recipes` field). Consumers
- * derive a preset with {@link definePreset}: extend an existing preset (normally `hope`) with typed
- * overrides, or bootstrap a *root* preset from a raw recipe map.
+ * A `Preset` is the single object `ThemeProvider` consumes: the `recipes` map (a
+ * {@link RecipeRegistry}) plus typed per-component overrides. Consumers derive one with
+ * {@link definePreset} — extending an existing preset (normally `hope`), or bootstrapping a *root*
+ * preset from a raw recipe map.
  *
- * Semantic token *values* are **not** part of this API — a preset authors them in CSS (as `--hope-*`
- * custom properties; see `@hope-ui/presets/hope`'s `theme.css`), so `ThemeProvider` renders no DOM.
- * This module is types + two pure functions (`definePreset`, `isPreset`) only — no DOM, no Solid
- * runtime (that is `../theme-context`).
+ * Semantic token *values* are **not** part of this API: a preset authors them in CSS as `--hope-*`
+ * custom properties (see `@hope-ui/presets/hope`'s `theme.css`), which is why `ThemeProvider` renders
+ * no DOM. This module is types plus two pure functions — no DOM, no Solid runtime (that is
+ * `./theme-context`).
  *
- * **No module-scope state** (constraint #6): the only module constant is the brand symbol, resolved
- * through the cross-realm global registry (`Symbol.for`), so a preset built by one installed copy of
- * `@hope-ui/theming` is recognized by another.
+ * Nothing here holds state at module scope. A consumer can end up with two installed copies of this
+ * package, and two copies of one mutable value each believing it is the only one is an unreproducible
+ * bug. The single constant is the brand symbol, taken from `Symbol.for` so both copies resolve to the
+ * *same* symbol.
  */
 import type { ClassValue } from "tailwind-variants";
 import type { RecipeRegistry } from "./recipe-registry";
 import type { ThemeablePropsRegistry } from "./themeable-props-registry";
 
 /**
- * The variant props a registered recipe accepts — extracted straight from the recipe's own
- * signature. `NonNullable` drops the `| undefined` from the optional first parameter. It is the
- * variants-only floor for {@link ThemeablePropsOf} (the surface a preset may default), and the input
- * type the recipe function itself understands.
+ * The variant props a registered recipe accepts, read straight off the recipe's own signature —
+ * `NonNullable` drops the `| undefined` its optional first parameter carries. This is what the recipe
+ * function itself understands, and the variants-only floor for {@link ThemeablePropsOf}.
  */
 export type RecipeVariantsOf<K extends keyof RecipeRegistry> = NonNullable<
   Parameters<RecipeRegistry[K]>[0]
 >;
 
 /**
- * {@link RecipeVariantsOf} with **every key required to be present** — each value may still be
- * `undefined`. This (not the all-optional `RecipeVariantsOf`) is what {@link useSlots}' `variantsProps`
- * demands and what a `slotClasses` function receives, so a component can never *silently omit* a
- * variant: an omitted key would make the recipe fall back to its `defaultVariants` **and** hand a
- * `slotClasses` function `undefined` for that key — both without any diagnostic. Requiring presence
- * (while still allowing an explicit `undefined` value, e.g. Button's `loaderPlacement` when it is not
- * loading) turns "forgot a variant" into a compile error at the `useSlots` call site. The mapping over
- * `keyof Required<…>` is deliberately non-homomorphic: it makes every key present without stripping
- * `undefined` from the value (which `Required<…>` would).
+ * {@link RecipeVariantsOf} with **every key required to be present**, though a value may still be
+ * `undefined` (Button's `loaderPlacement` while it is not loading). `useSlots` demands this shape, and
+ * a `slotClasses` function receives it, so that forgetting a variant is a compile error at the
+ * `useSlots` call site rather than a silent fallback to the recipe's `defaultVariants`.
+ *
+ * Mapping over `keyof Required<…>` rather than using `Required<…>` itself is deliberate: it makes
+ * every key present without also stripping `undefined` from the values.
  */
 export type CompleteVariantsOf<K extends keyof RecipeRegistry> = {
   [P in keyof Required<RecipeVariantsOf<K>>]: RecipeVariantsOf<K>[P];
@@ -48,13 +45,11 @@ export type CompleteVariantsOf<K extends keyof RecipeRegistry> = {
 /**
  * The props a preset may default app-wide for component `K` via `ComponentOverride.defaultProps`: its
  * opted-in themeable props if it registers a {@link ThemeablePropsRegistry} entry (recipe variants +
- * durable behavioral policy + chrome content), otherwise just its recipe variants.
+ * durable behavioral policy + chrome content), otherwise just its recipe variants. Always a superset
+ * of {@link RecipeVariantsOf}, since a registered `…ThemeableProps` type extends its `…RecipeVariants`.
  *
- * A **superset of {@link RecipeVariantsOf}** by construction (a registered `…ThemeableProps` type
- * `extends` its `…RecipeVariants`), so the rename from the old variants-only `defaultVariants` loses
- * nothing. The `K extends keyof ThemeablePropsRegistry ? … : RecipeVariantsOf<K>` fallback is
- * load-bearing: `ThemeablePropsRegistry` is intentionally non-exhaustive, so a component that hasn't
- * opted in still resolves to a valid (variants-only) surface, keeping the feature incremental.
+ * The fallback arm is load-bearing: `ThemeablePropsRegistry` is deliberately non-exhaustive, so a
+ * component that hasn't opted in still resolves to a valid variants-only surface.
  */
 export type ThemeablePropsOf<K extends keyof RecipeRegistry> =
   K extends keyof ThemeablePropsRegistry ? ThemeablePropsRegistry[K] : RecipeVariantsOf<K>;
@@ -69,14 +64,13 @@ export type SlotClasses<K extends keyof RecipeRegistry> = Partial<
 >;
 
 /**
- * A preset's global `slotClasses` for a component: either a static per-slot record (the common,
- * fully-Tailwind-scannable case) or a function of the component's {@link CompleteVariantsOf} — every
- * recipe variant, each key guaranteed present (see that type), which are the only axis a global slot
- * class can meaningfully branch on. (Chrome content isn't style; runtime state like `disabled`/
- * `loading` is reached through the recipe's `data-*`/`aria-*` Tailwind variants in the class strings
- * themselves — no function argument needed.) Slot *keys* stay recipe-owned ({@link SlotClasses}).
- * **Only the function form's literal class *substrings* are Tailwind-scannable** — a constructed string
- * (`` `px-${n}` ``) is never generated.
+ * A preset's global `slotClasses` for a component: either a static per-slot record (the common case,
+ * and the one Tailwind can scan whole) or a function of the component's {@link CompleteVariantsOf}.
+ * Variants are the only axis worth branching on — runtime state such as `disabled`/`loading` is
+ * handled by the recipe's own `data-*`/`aria-*` Tailwind variants inside the class strings.
+ *
+ * Either way, Tailwind only generates CSS for class names it can find as **literal substrings**, so a
+ * constructed name (`` `px-${n}` ``) yields no CSS at all.
  */
 export type SlotClassesInput<K extends keyof RecipeRegistry> =
   | SlotClasses<K>
@@ -85,12 +79,11 @@ export type SlotClassesInput<K extends keyof RecipeRegistry> =
 /** A preset's per-component overrides: app-wide default props and global slot classes. */
 export interface ComponentOverride<K extends keyof RecipeRegistry> {
   /**
-   * Overrides the component's props app-wide — typed to its {@link ThemeablePropsOf} (recipe variants
-   * + durable behavioral policy + chrome content). Merged in at `instance ?? preset ?? builtin`
-   * precedence by `useDefaults`. A superset of the old variants-only `defaultVariants`.
+   * Overrides the component's props app-wide, typed to its {@link ThemeablePropsOf}. `useDefaults`
+   * merges these at `instance ?? preset ?? builtin` precedence.
    */
   defaultProps?: Partial<ThemeablePropsOf<K>>;
-  /** Global per-slot classes, folded in before per-instance `slotClasses` (see the provider phase). */
+  /** Global per-slot classes, folded in before a per-instance `slotClasses` (see `useSlots`). */
   slotClasses?: SlotClassesInput<K>;
 }
 
@@ -103,17 +96,17 @@ export interface PresetConfig {
 }
 
 /**
- * The brand key. Runtime value is `Symbol.for("hope-ui.preset")` — resolved through the cross-realm
- * global symbol registry, so two installed copies of `@hope-ui/theming` agree on it (constraint #6).
- * A `const` initialized directly from `Symbol.for` has type `unique symbol`, which is what lets it be
- * an interface property key while staying nominal.
+ * The brand key. `Symbol.for` looks the symbol up in a process-global registry instead of minting a
+ * fresh one, so two installed copies of `@hope-ui/theming` brand with the same symbol and each
+ * recognizes the other's presets. A `const` initialized directly from `Symbol.for` gets the type
+ * `unique symbol`, which is what lets it be an interface property key while staying nominal.
  */
 const PRESET_BRAND = Symbol.for("hope-ui.preset");
 
 /**
- * A resolved preset — the object `ThemeProvider` consumes. Branded (see {@link PRESET_BRAND}) so it
- * is distinguishable at runtime from a bare `RecipeRegistry`. `components` is always a present object
- * (possibly empty). Token *values* are not carried here — a preset authors them in CSS.
+ * A resolved preset — the object `ThemeProvider` consumes. Branded (see {@link PRESET_BRAND}) so it is
+ * distinguishable at runtime from a bare `RecipeRegistry`. `components` is always present, possibly
+ * empty. Token *values* are not carried here; a preset authors them in CSS.
  */
 export interface Preset {
   readonly [PRESET_BRAND]: true;
@@ -125,12 +118,11 @@ export interface Preset {
 type AnyComponentOverride = ComponentOverride<keyof RecipeRegistry>;
 
 /**
- * Merge two component-override maps **per component, per field** (config wins): `defaultProps` is
- * deep-merged per key (so overriding one default keeps the base's others — every themeable prop is a
- * top-level value, primitive or factory function, never a nested object, so a shallow `{ ...b, ...o }`
- * replaces one key wholesale while keeping the rest), while `slotClasses` is replaced wholesale
- * (config's if present, else base's — the function form cannot be deep-merged, so both forms follow
- * one predictable rule).
+ * Merge two component-override maps **per component, per field**, the override winning. `defaultProps`
+ * merges key by key, so overriding one default keeps the base's others; a shallow spread suffices
+ * because every themeable prop is a top-level value (primitive or factory function), never a nested
+ * object. `slotClasses` is replaced wholesale — its function form can't be merged, and one predictable
+ * rule for both forms beats two.
  */
 function mergeComponentOverrides(
   base: PresetComponentOverrides,
@@ -165,11 +157,10 @@ function mergeComponentOverrides(
 }
 
 /**
- * Derive a preset. `base` is normally a `Preset` (e.g. `hope`); theme authors bootstrap a **root**
- * preset by passing a raw `RecipeRegistry` (the one place a registry is passed directly). `config`
- * deep-merges over the base, config winning **per component, per field**. Recipes always come from
- * `base` (a config never carries recipes). Token *values* are not part of the config — a preset
- * authors them in CSS (`--hope-*` custom properties; see `@hope-ui/presets/hope`).
+ * Derive a preset. `base` is normally an existing `Preset` such as `hope`; passing a raw
+ * `RecipeRegistry` bootstraps a **root** preset, and is the one place a registry is passed directly.
+ * `config` merges over the base per component and per field. Recipes always come from `base` — a
+ * config never carries recipes, and never carries token values (those are authored in CSS).
  */
 export function definePreset(base: Preset | RecipeRegistry, config?: PresetConfig): Preset {
   const baseIsPreset = isPreset(base);
@@ -183,7 +174,10 @@ export function definePreset(base: Preset | RecipeRegistry, config?: PresetConfi
   };
 }
 
-/** Whether `value` is a `Preset` — checks the cross-realm brand (constraint #6). */
+/**
+ * Whether `value` is a `Preset`. Checks the {@link PRESET_BRAND} key, so a preset built by another
+ * installed copy of this package still passes.
+ */
 export function isPreset(value: unknown): value is Preset {
   return (
     typeof value === "object" &&

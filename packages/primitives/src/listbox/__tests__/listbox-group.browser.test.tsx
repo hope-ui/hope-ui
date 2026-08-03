@@ -30,7 +30,7 @@ describe("createListboxGroup", () => {
     const groups = [...container.querySelectorAll<HTMLElement>('[role="group"]')];
     expect(groups).toHaveLength(2);
 
-    // `createRegisteredId` publishes each label id on settle, so the linkage lands after mount.
+    // The label id is published after mount, not during render, so the linkage lands a tick late.
     await vi.waitFor(() => {
       for (const group of groups) {
         const labelledby = group.getAttribute("aria-labelledby");

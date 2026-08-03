@@ -10,7 +10,7 @@ export interface ComboboxEmptyProps extends ComboboxEmptyElementProps {
   render?: RenderProp<ComboboxEmptyElementProps>;
   /** Merged over the recipe's `empty` slot (applied last), so the consumer's utilities win. */
   class?: string;
-  /** What to say when nothing matched. Read **exactly once**, on the one branch that renders. */
+  /** What to say when nothing matched. */
   children?: JSX.Element;
 }
 
@@ -20,15 +20,12 @@ export interface ComboboxEmptyProps extends ComboboxEmptyElementProps {
  * It lives in the card **beside** `Combobox.List`, never inside it: `role="listbox"` may only contain
  * options and groups, so a message in there would be invalid ARIA and would be counted as an option.
  *
- * Purely presentational, with **no primitive part hook** and no ARIA of its own. In particular it is
- * not a live region — `Combobox.Status` is, and two regions announcing the same fact would say it
- * twice. This element is what a *sighted* user reads; the announcement is `Status`'s job.
- *
- * It renders nothing at all when there are matches, rather than staying mounted and empty, because
- * carrying no ARIA means there is nothing for an assistive technology to lose track of.
+ * It carries no ARIA of its own, and in particular is **not** a live region — `Combobox.Status` is,
+ * and two regions announcing the same fact would say it twice. This element is what a *sighted* user
+ * reads; announcing is `Status`'s job.
  *
  * **It only ever appears because `Combobox.Root` defaults `allowsEmptyCollection` to `true`.** On the
- * kernel's own default an empty collection refuses to open, and this part would be unreachable.
+ * behavior layer's own default an empty option set refuses to open, and this part is unreachable.
  */
 export const Empty: Component<ComboboxEmptyProps> = (props) => {
   const ctx = useComboboxContext();

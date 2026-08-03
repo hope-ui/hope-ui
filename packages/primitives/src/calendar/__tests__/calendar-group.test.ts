@@ -9,9 +9,9 @@ import {
   createCalendar,
 } from "../calendar-root";
 
-// The container ref is never handed over here, so the outside-pointer effect stays dormant and the
-// hook never reaches for `window` — which is what lets this run in the DOM-less `unit` project at all.
-// Only the props surface and the guards that fire *before* any DOM read are testable here: which of
+// This file never hands over the container ref, so the outside-pointer effect stays dormant and the
+// hook never reaches for `window` — which is what lets it run in the DOM-less `unit` project at all.
+// Only the props surface and the guards that fire *before* any DOM read are reachable here. Which of
 // the three `commitBehavior` outcomes runs, and when, is decided against real focus in
 // `calendar-group.browser.test.tsx`.
 function setup(
@@ -37,8 +37,8 @@ function setup(
   return { api, props: groupProps, dispose };
 }
 
-/** One returned attribute. `JSX.HTMLAttributes` carries no `data-*` index signature, so the state
- * hooks are only readable through the bag the props object actually is. */
+/** Read one returned attribute. `JSX.HTMLAttributes` declares no `data-*` index signature, so the
+ *  state hooks are only reachable by casting the props object back to a plain record. */
 const attribute = (props: JSX.HTMLAttributes<HTMLElement>, name: string): unknown =>
   (props as Record<string, unknown>)[name];
 
@@ -79,8 +79,8 @@ describe("createCalendarGroup — container props", () => {
 });
 
 describe("createCalendarGroup — focus leaving the calendar", () => {
-  // The container these stand in for is already gone, so the deferred decision below always bails on
-  // `isConnected` — nothing here can reach `document`, which does not exist in this project.
+  // Stands in for a container that has already been removed, so the deferred decision always bails on
+  // `isConnected` before it can reach `document` — which does not exist in the `unit` project.
   const detachedContainer = { isConnected: false, contains: () => false };
 
   it("is inert with no range in progress — it never even looks at where focus went", () => {
@@ -101,8 +101,8 @@ describe("createCalendarGroup — focus leaving the calendar", () => {
     const { api, props, dispose } = setup({}, { onFocusOut: consumerHandler });
     flush(() => api.activate(new CalendarDate(2026, 1, 10)));
 
-    // `composeEventHandlers` stops at a `preventDefault()`, the family's cancel channel — so the
-    // internal handler never runs, and the `null` container it would have read is never touched.
+    // `composeEventHandlers` stops at a `preventDefault()`, so the internal handler never runs — and
+    // the `null` container it would have read is never touched.
     const handler = props.onFocusOut as (event: FocusEvent) => void;
     const event = { defaultPrevented: false, currentTarget: null } as unknown as FocusEvent;
     Object.assign(event, {

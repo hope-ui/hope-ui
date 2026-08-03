@@ -9,13 +9,12 @@ import {
   createPopover,
 } from "../popover-root";
 
-// A *browser* test, like all eight of Dialog's: the root hook owns `createPresence` (effects + rAF)
-// and `createFloating` (`getComputedStyle`, `computePosition`, `autoUpdate`), none of which exist in
-// the node environment. Behavior belongs in the kernel, so the test environment follows the design.
+// A browser test, like the rest of the family: the root hook drives `requestAnimationFrame`,
+// `getComputedStyle` and a real layout measurement, none of which exist in the node environment.
 //
-// Geometry is pinned in px and never derived from content — font metrics differ between the local
-// Chromium and CI's headless shell. Assertions are rect *relationships* with a 1px tolerance, the
-// convention `create-floating.browser.test.tsx` states.
+// Geometry is pinned in px and never derived from content: font metrics differ between the local
+// Chromium and CI's headless shell. So the assertions compare rect *relationships* with a 1px
+// tolerance.
 const SIDE_OFFSET = 8;
 const CONTENT_WIDTH = 120;
 const CONTENT_HEIGHT = 60;
@@ -40,9 +39,10 @@ const CUSTOM_ANCHOR_STYLE: JSX.CSSProperties = {
 };
 
 /**
- * The shape `createPopoverAnchor` will take in Phase 6: a descendant publishing its element into the
- * root's signal, and — the half this test is here for — *clearing* it on unmount.
- * `createRegisteredElement` defers the write past Solid 2.0's `[REACTIVE_WRITE_IN_OWNED_SCOPE]` ban.
+ * A stand-in for `createPopoverAnchor`: a descendant publishing its element into the root's signal
+ * and — the half this test is here for — *clearing* it on unmount. `createRegisteredElement` defers
+ * the write, because Solid 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` when a descendant writes an
+ * ancestor-owned signal during render.
  */
 function HarnessAnchor(props: { state: CreatePopoverReturn }) {
   const [element, setElement] = createSignal<HTMLElement>();
@@ -64,17 +64,17 @@ interface HarnessProps {
 }
 
 /**
- * Stands in for the part hooks Phase 5/6 will add: it renders the elements the root's signals expect
- * and wires their refs, so the anchor chain can be asserted against real rects rather than accessor
- * identity. The positioner is gated on the shared presence, as `Popover.Positioner` will be.
+ * Renders the elements the root's signals expect and wires their refs, so the anchor chain can be
+ * asserted against real rects rather than accessor identity. The positioner is gated on the shared
+ * presence, exactly as `Popover.Positioner` is.
  */
 function PopoverHarness(props: HarnessProps) {
   const popover = createPopover(props.options);
   props.onReady(popover);
 
-  // Spread rather than written attribute-by-attribute, which is both what `createPopoverContent` will
-  // hand back and what keeps the linter from judging `aria-labelledby` against a `role` it can only
-  // see as a dynamic expression.
+  // Spread rather than written attribute-by-attribute: that is what `createPopoverContent` hands
+  // back, and it keeps the linter from judging `aria-labelledby` against a `role` it can only see as
+  // a dynamic expression.
   const contentProps = {
     get role() {
       return popover.role();
@@ -182,9 +182,8 @@ describe("createPopover", () => {
     expect(popover().role()).toBe("dialog");
     expect(popover().closeOnEscape()).toBe(true);
     expect(popover().closeOnInteractOutside()).toBe(true);
-    // Popover's default, and deliberately *not* the kernel's: `createDismissable`'s
-    // `dismissOnFocusOutside` defaults `false` so Dialog is untouched. A non-modal layer is the case
-    // the option exists for, so the flip happens here.
+    // Popover's default, and deliberately *not* `createDismissable`'s, which is `false` so Dialog is
+    // untouched. A non-modal layer is the case the option exists for, so the flip happens here.
     expect(popover().closeOnFocusOutside()).toBe(true);
     dispose();
   });
@@ -252,8 +251,8 @@ describe("createPopover", () => {
 
   it("exposes a shared content presence: exited + unmounted while closed", () => {
     const { popover, dispose } = mountPopover();
-    // Created eagerly while closed, so its first run observes `open === false` — the property that
-    // lets `Popover.Content` animate in (a lazily-created presence would latch to `entered`).
+    // Created while closed, so its first run observes `open === false` — which is what lets
+    // `Popover.Content` animate in. A presence created inside the content would latch to `entered`.
     expect(popover().contentPresence.mounted()).toBe(false);
     expect(popover().contentPresence.status()).toBe("exited");
     expect(popover().contentElement()).toBeUndefined();
@@ -266,9 +265,9 @@ describe("createPopover", () => {
     headless.dispose();
 
     const { popover, container, dispose } = mountHarness({});
-    // The single exclusion a Popover needs: without it a pointerdown on the trigger dismisses in the
-    // capture phase and the trigger's own `click` reopens, so the layer could never be closed by
-    // clicking the control that opened it.
+    // The single dismissal exclusion a Popover needs: without it a pointerdown on the trigger
+    // dismisses in the capture phase and the trigger's own `click` reopens, so the layer could never
+    // be closed by clicking the control that opened it.
     expect(popover().dismissExclusions()).toEqual([elementOf(container, "trigger")]);
     dispose();
   });
@@ -289,13 +288,13 @@ describe("createPopover", () => {
     expectAnchoredTo(container, "trigger");
 
     // A `Popover.Anchor` mounting *after* the trigger. The chain is a derived accessor over two
-    // signals, so `createFloating`'s attach effect re-runs and `autoUpdate` re-points at it.
+    // signals, so the positioning attach effect re-runs and its observers re-point at the new one.
     flush(() => setWithCustomAnchor(true));
     expect(popover.anchorElement()).toBe(elementOf(container, "anchor"));
     await vi.waitFor(() => expectAnchoredTo(container, "anchor"));
 
-    // ...and unmounting while the layer is open must hand positioning back rather than strand it on
-    // a detached element.
+    // …and unmounting while the layer is open must hand positioning back rather than strand it on a
+    // detached element.
     flush(() => setWithCustomAnchor(false));
     expect(popover.customAnchorElement()).toBeUndefined();
     expect(popover.anchorElement()).toBe(elementOf(container, "trigger"));

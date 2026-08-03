@@ -3,34 +3,34 @@ import { createPopoverCloseTrigger } from "@hope-ui/primitives/popover";
 import { type Component, merge, omit } from "solid-js";
 import { usePopoverContext } from "./popover-context";
 
-// `Popover.CloseTrigger` is a `CloseButton` with the popover's close wiring — so it inherits
-// `size`/`icon`/`render`/`class`/`slotClasses`/native attrs for free, and shows the themed X by
-// default. **Opt-in**: unlike `Dialog.Content`, `Popover.Content` never auto-renders one. Because it
-// renders a recipe-styled `CloseButton`, it **requires a `<ThemeProvider>`** ancestor, like every
-// other styled component.
+// A `CloseButton` with the popover's close wiring, so it inherits `size`/`icon`/`render`/`class`/
+// `slotClasses`/native attributes for free and shows the themed X by default. **Opt-in**: unlike
+// `Dialog.Content`, `Popover.Content` never auto-renders one. Rendering a recipe-styled `CloseButton`
+// means this **requires a `<ThemeProvider>`** ancestor.
 export interface PopoverCloseTriggerProps extends CloseButtonProps {}
 
 export const CloseTrigger: Component<PopoverCloseTriggerProps> = (props) => {
   const ctx = usePopoverContext();
-  // The primitive owns only the close `onClick` (composed behind the consumer's, so their
-  // `preventDefault()` cancels the close). The label + visual + `type` default come from `CloseButton`.
+  // The primitive owns only the close `onClick`, composed *behind* the consumer's so their
+  // `preventDefault()` cancels the close. Label, visual and `type` come from `CloseButton`.
   const close = createPopoverCloseTrigger(ctx.state, omit(props, "render", "class"));
 
   const elementProps = merge(close.props, {
     get class(): string {
-      // Placement from the popover recipe's `closeTrigger` slot, merged with any consumer `class`
-      // (which wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's chrome.
+      // Placement from the popover recipe's `closeTrigger` slot; the consumer's `class` goes *into*
+      // the slot function so tailwind-merge can let it win, never concatenated outside it.
       return ctx.slots.closeTrigger(props.class);
     },
-    // Re-scope CloseButton's root marker to this part (overrides its `close-button` default).
+    // Re-scopes CloseButton's own `data-slot="close-button"` marker to this part.
     "data-slot": "popover-close-trigger",
   });
 
-  // `close.props` is typed as the primitive's `JSX.ButtonHTMLAttributes` (the hook can't reference the
-  // component's `CloseButtonProps` without a layering cycle), which widens `disabled` to Solid's
-  // `boolean | ""`. It still carries the consumer's `size`/`icon`/etc. at runtime, so cast back to the
-  // component surface for the spread. `render` is passed to `CloseButton` directly (not through the
-  // spread) — it is read synchronously to build the element, so a reactive spread-read would trip
-  // `STRICT_READ_UNTRACKED`.
+  // `close.props` is typed as plain `JSX.ButtonHTMLAttributes` (a primitive cannot reference a
+  // component's props without a dependency cycle), which widens `disabled` to Solid's `boolean | ""`.
+  // At runtime it still carries the consumer's `size`/`icon`/…, hence the cast back.
+  //
+  // `render` is handed to `CloseButton` as its own prop rather than through the spread: it is read
+  // synchronously while building the element, and a reactive read there trips Solid 2.0's
+  // `STRICT_READ_UNTRACKED` guard.
   return <CloseButton {...(elementProps as CloseButtonProps)} render={props.render} />;
 };

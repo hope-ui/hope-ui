@@ -31,41 +31,35 @@ export function getFocusableElements(container: HTMLElement): HTMLElement[] {
 }
 
 /**
- * Moves focus into a container when `active` turns true: `initialFocus`, else the first
- * focusable descendant, else the container itself under a temporary `tabindex="-1"` that is
- * removed again on deactivation. Gated entirely inside `createEffect`, so it naturally never
- * runs during SSR (no DOM access happens outside the effect).
+ * Moves focus into a container when `active` turns true: `initialFocus` if given, else the first
+ * focusable descendant, else the container itself under a temporary `tabindex="-1"` that is removed
+ * again on deactivation. Every DOM access sits inside the effect, so none of it runs on the server.
  *
- * **Focusing in and trapping focus are separate concerns**, which is why this is its own
- * primitive rather than half of `createFocusTrap`. A non-modal overlay (Popover, Tooltip, a
- * non-modal Dialog) wants focus moved into it *without* Tab being caged there.
- * `createFocusTrap` composes this one; see `create-focus-trap.md` for the creation order that
- * composition depends on.
+ * **Moving focus in and trapping it there are separate concerns**, which is why this is its own
+ * primitive rather than half of `createFocusTrap`. A non-modal overlay — a popover, a tooltip —
+ * wants focus moved into it *without* Tab being caged there. `createFocusTrap` composes this one, in
+ * a creation order documented in __internal__/primitives/internal/create-focus-trap.md.
  *
- * Restoring focus on deactivation is a third concern again — `createFocusRestore`, which must
- * be created *before* this one so its `document.activeElement` snapshot precedes the `.focus()`
- * below.
+ * Restoring focus afterwards is a third concern, `createFocusRestore`, which must be created
+ * *before* this one so its snapshot of the previously focused element predates the `.focus()` below.
  */
 export function createAutoFocus(options: CreateAutoFocusOptions): void {
   createEffect(
-    // Track both `active()` and `ref()` in the compute function. `ref` must be a real
-    // signal accessor (not a closure over a plain `let`): when the container is only
-    // created as a reactive consequence of the same `active`/`present` signal flipping
-    // (e.g. gated behind a `<Show>`), a *sibling* effect elsewhere may create/assign it
-    // *after* this effect's first run for that change — a plain untracked `ref()` read
-    // would permanently miss it, since `active` (its only dependency) won't change
-    // again. Tracking `ref()` too means this effect reruns once the signal-backed ref
-    // actually updates, regardless of firing order relative to that sibling effect.
+    // Both signals belong in this first function — only it tracks — and `ref` must be a real signal
+    // accessor, not a closure over a plain `let`. When the container is itself created by the same
+    // flag flipping (gated behind a `<Show>`), a sibling effect may assign the ref only *after* this
+    // one has run for that change; a non-tracking read would then miss it forever, since `active`
+    // never changes again. Tracking `ref()` re-runs this effect whatever the firing order.
     () => [options.active(), options.ref()] as const,
     ([active, container]) => {
       if (!active || !container) {
         return;
       }
 
-      // Sampled, not tracked: `initialFocus` names where focus goes *on this activation*.
-      // Tracking it would re-run the whole activation block — stealing focus back — every
-      // time a signal-backed target ref reassigned. Left untracked implicitly it trips
-      // `STRICT_READ_UNTRACKED` for any consumer passing a real accessor, so it is spelled.
+      // Sampled rather than tracked: `initialFocus` says where focus goes *on this activation*, and
+      // subscribing would re-run the whole block — stealing focus back — every time a signal-backed
+      // target ref were reassigned. `untrack` is spelled out because leaving the read bare warns
+      // `STRICT_READ_UNTRACKED` for any consumer that passes a real accessor.
       const initial =
         untrack(() => options.initialFocus?.()) ?? getFocusableElements(container)[0] ?? container;
       let addedTabIndex = false;

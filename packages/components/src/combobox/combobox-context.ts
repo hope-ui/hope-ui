@@ -6,64 +6,57 @@ import type { JSX } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 
 /**
- * The value every Combobox part reads. **Composition, not inheritance**: it *holds* the combobox
- * kernel as `state` rather than extending `CreateComboboxReturn`, exactly as `Select` does — a part
- * passes `ctx.state` into its `createComboboxX` hook and reads recipe classes off `ctx.slots`.
+ * The value every Combobox part reads. It **holds** the headless `createCombobox` return as `state`
+ * rather than extending it, exactly as Select's does: a part feeds `ctx.state` to its own
+ * `createComboboxX` hook and reads recipe classes off `ctx.slots`.
  *
- * What it carries that Select's does not is the **text half**: the root-owned `createTextInput`, the
- * commit/revert policy the kernel's input hook calls out to, and the typing hook that drives the
- * filter. All four exist here rather than in the kernel because the kernel owns no text value — see
- * `__internal__/primitives/combobox/combobox-root.md`.
+ * What it carries that Select's does not is the **text half** — the text-entry state, the
+ * commit/revert policy the input hook calls out to, and the typing hook that drives the filter. All of
+ * it lives at this layer because the behavior layer deliberately owns no text value.
  *
- * ## The generic-through-context cast
- *
- * The `<V>` item type cannot flow through Solid's context (a context value is a single concrete
- * type). So the context is typed at `CreateComboboxReturn<unknown>` and `Combobox.Root<V, M, G>` is
- * generic **at its props**, casting its `createCombobox<V, M, G>(…)` return into the provider. Each
- * part that needs the typed state casts back at its own call site — `Combobox.Item` is the only one
- * that does.
+ * A Solid context value is one concrete type, so the item type `<V>` cannot flow through it. The
+ * context is typed at `CreateComboboxReturn<unknown>`, `Combobox.Root<V, M, G>` is generic at its
+ * props and casts on the way in, and each part casts back at its own call site — `Combobox.Item` is
+ * the only one that needs to.
  */
 export interface ComboboxContextValue {
-  /** The combobox kernel — open state, `state.list` (the **filtered** option set + focus/selection/
-   *  navigation), the ids, the element registries, the floating layer, the shared presence. */
+  /** The behavior layer — open state, `state.list` (the **filtered** option set plus
+   *  focus/selection/navigation), the generated ids, the element refs, popup positioning. */
   state: CreateComboboxReturn<unknown>;
-  /** One ready-to-call class fn per Combobox slot, resolved once on `Root` and shared here. Each
-   *  takes the part's own `class`, folded in last through the recipe's tailwind-merge seam. */
+  /** One class fn per Combobox slot, resolved once on `Root`. Each takes the part's own `class` and
+   *  folds it in last, through the recipe's tailwind-merge seam. */
   slots: Record<ComboboxSlot, SlotClassAccessor>;
   /**
-   * The root-owned text-entry state. It lives on `Root` rather than on `Combobox.Input` because
-   * `inputValue` is a root-level prop **and** because the filter derives from it — a value created
-   * inside the lazily-assembled input part would not exist when `Root`'s `items` memo first runs.
-   * `Combobox.Input` hands it straight to `createComboboxInput`.
+   * The text-entry state. It is created on `Root`, not on `Combobox.Input`, because `inputValue` is a
+   * root-level prop **and** because the filter derives from it: a value created inside the lazily
+   * mounted input part would not exist yet when `Root`'s `items` memo first runs.
    */
   textInput: CreateTextInputReturn<HTMLInputElement>;
   /**
    * Accept the current suggestion — the highlighted option if there is one, else the typed text if
-   * `allowsCustomValue`, else nothing. Bound by the kernel to Enter, Tab and blur. **Idempotent**:
-   * Tab fires it and blur fires it again.
+   * `allowsCustomValue`, else nothing. Bound to Enter, Tab and blur, so it must be **idempotent**:
+   * Tab fires it and the blur right after fires it again.
    */
   commit: () => void;
-  /** Restore the field to the last committed text. Bound by the kernel to Escape. */
+  /** Restore the field to the last committed text. Bound to Escape. */
   revert: () => void;
   /**
-   * The user typed. Wired onto the input ahead of the text primitive's own write, so it runs once
-   * per keystroke: it drops "show every option" (the state a chevron-open leaves behind) and, under
-   * the default `menuTrigger: "input"`, opens the popup.
+   * The user typed. Wired onto the input ahead of the text state's own write, so it runs once per
+   * keystroke: it drops "show every option" (the state a chevron-open leaves behind) and, under the
+   * default `menuTrigger: "input"`, opens the popup.
    */
   onUserInput: () => void;
   /**
-   * The field took focus. Wired onto the input behind the kernel's own focus tracking; it opens the
-   * popup only under `menuTrigger: "focus"`, and does nothing under the other two.
+   * The field took focus. Opens the popup only under `menuTrigger: "focus"`; a no-op otherwise.
    */
   onUserFocus: () => void;
   /**
    * `Combobox.Root`'s **filtered** entries, in the shape the consumer passed them: items for a flat
-   * list, group entries when `groupToItems` is set. `Combobox.List` iterates exactly this.
+   * list, group entries once `groupToItems` is set. `Combobox.List` iterates exactly this.
    *
-   * It rides the context rather than being re-derived from `state.list` because the kernel's item
-   * source is *flattened* into navigation order — `state.list.indexed.items()` has no group
-   * boundaries left in it, which is precisely what the kernel needs and precisely what
-   * `Combobox.List` must not iterate.
+   * It rides the context instead of being re-derived from `state.list` because the behavior layer
+   * *flattens* its copy into navigation order: `state.list.indexed.items()` has no group boundaries
+   * left in it.
    */
   items: Accessor<readonly unknown[]>;
   /**
@@ -77,8 +70,8 @@ export interface ComboboxContextValue {
 
   /**
    * The resolved trigger chevron (instance `chevronIcon` ?? preset `defaultProps.combobox.chevronIcon`
-   * ?? hope's built-in chevron-down), resolved once on `Root`. An accessor, so each read builds a
-   * **fresh** element, never a reused, movable node.
+   * ?? hope's built-in). An accessor, so every read builds a fresh element rather than reusing one
+   * node that would then be moved.
    */
   chevronIcon: () => JSX.Element;
   /** The resolved selection-check glyph, same chain and same reasoning. */
@@ -91,11 +84,10 @@ export const [ComboboxContext, useComboboxContext] =
   createComponentContext<ComboboxContextValue>("Combobox");
 
 /**
- * The group scope. A `Combobox.Group` renders its primitive group return here so its
+ * The group scope: a `Combobox.Group` publishes its behavior-layer return here so its
  * `Combobox.GroupLabel` child can register its id onto the group's `aria-labelledby`.
  */
 export interface ComboboxGroupContextValue {
-  /** The primitive group return — its `props` + the label-id registration seam. */
   group: CreateListboxGroupReturn;
 }
 
@@ -103,15 +95,13 @@ export const [ComboboxGroupContext, useComboboxGroupContext] =
   createComponentContext<ComboboxGroupContextValue>("Combobox.Group");
 
 /**
- * The per-item scope. A `Combobox.Item` publishes its selection/active accessors here so its
- * `Combobox.ItemIndicator` child can show/hide the check glyph off `isSelected()` without
- * recomputing anything — behavior stays on the primitive, the indicator is pure presentation.
+ * The per-item scope: a `Combobox.Item` publishes these so its `Combobox.ItemIndicator` child can show
+ * or hide the check glyph without recomputing anything of its own.
  */
 export interface ComboboxItemContextValue {
-  /** Whether this item is selected — drives the `ItemIndicator`'s `<Show>`. */
   isSelected: Accessor<boolean>;
-  /** Whether this item is the active (highlighted) one. In activedescendant mode no option ever
-   *  holds DOM focus, so this is the only signal a row has that the keyboard is on it. */
+  /** Whether this is the highlighted row. Focus never leaves the input — the highlight travels as
+   *  `aria-activedescendant` — so this is the only signal a row has that the keyboard is on it. */
   isActive: Accessor<boolean>;
 }
 

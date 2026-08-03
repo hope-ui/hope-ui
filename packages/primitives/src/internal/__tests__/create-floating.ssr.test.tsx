@@ -3,11 +3,11 @@ import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { createFloating, type SideOrLogical } from "../create-floating";
 
-// `internal/` primitives are exempt from the SSR Definition-of-Done item — that one is
-// components-only. This file exists anyway because `createFloating` is the first `internal/`
-// primitive with a third-party, browser-targeted package in its module graph: a module-scope
-// `document`/`window` touch anywhere in `@floating-ui/dom` throws at *import* time under a
-// SolidStart server, and nothing else in the suite would notice until production.
+// An SSR test is only required of components, not of `internal/` primitives. This one exists
+// anyway because `createFloating` is the first primitive here with a browser-targeted third-party
+// package in its module graph: a module-scope `document`/`window` touch anywhere inside
+// `@floating-ui/dom` throws at *import* time on a server, and nothing else in the suite would
+// notice until production.
 
 function Tip(props: { side?: SideOrLogical } = {}) {
   // No ref effect runs on the server, so both accessors stay `undefined` — which is exactly the

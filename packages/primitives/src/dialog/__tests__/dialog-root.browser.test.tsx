@@ -3,16 +3,14 @@ import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { type CreateDialogOptions, type CreateDialogReturn, createDialog } from "../dialog-root";
 
-// `createDialog` is the root state hook. It is a *browser* test (not node-unit) because the hook now
-// owns the shared overlay presence — `createPresence` sets up a `createEffect` and, on open, schedules
-// `requestAnimationFrame`, neither of which exists in the node environment. Presence is a11y/behavior,
-// so it belongs on the state hook (not the styling layer); the test environment follows the design.
+// A browser test rather than a node one because the root hook owns the shared presence, and
+// `createPresence` schedules a `requestAnimationFrame` on open — which node has no version of.
 //
-// `mount()` supplies the reactive owner (so the presence effect is owned + disposed) and renders
-// nothing. The state writes run *after* mount returns — i.e. outside the render body — so they don't
-// trip Solid 2.0's `[REACTIVE_WRITE_IN_OWNED_SCOPE]` guard (which is why a bare `createRoot` wrapping
-// the writes is wrong here). `flush(() => …)` because the client build defers writes to a microtask
-// (see controllable.test.ts).
+// `mount()` supplies the reactive owner that owns and disposes that effect, and renders nothing.
+// The state writes below run *after* mount returns, outside any render body, so they don't trip
+// Solid 2.0's `[REACTIVE_WRITE_IN_OWNED_SCOPE]` guard — which is why wrapping them in a bare
+// `createRoot` would be wrong. Each is inside `flush(() => …)` because the client build defers a
+// signal write to a microtask, so a plain read straight after would still see the old value.
 function mountDialog(options?: CreateDialogOptions) {
   let dialog!: CreateDialogReturn;
   const { container, dispose } = mount(() => {
@@ -130,8 +128,8 @@ describe("createDialog", () => {
   });
 
   it("renders no DOM of its own", async () => {
-    // `createDialog` is a headless state hook — it renders nothing. Runs the DoD's baseline axe pass
-    // on the only tree there is (the empty mount container), which is trivially clean.
+    // The axe pass runs on the only tree there is — the empty container — and is trivially clean.
+    // It stays because every browser test in this repo owes one.
     const { container, dispose } = mountDialog();
     expect(container.childNodes.length).toBe(0);
     await expectNoA11yViolations(container);

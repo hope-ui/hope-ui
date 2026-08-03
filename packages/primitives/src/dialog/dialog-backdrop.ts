@@ -14,17 +14,18 @@ export interface CreateDialogBackdropReturn {
 }
 
 /**
- * The optional visible-backdrop part. Owns its own presence and spares its element from the
- * popup's `createHideOutside` — an `inert` element is transparent to hit testing, so a backdrop
- * that hid itself would silently stop blocking the pointer and lose its hover/transition/pointer
- * handlers.
+ * The optional visible-backdrop part. Owns its own presence (it mounts eagerly, so it cannot hit
+ * the skipped-enter-animation problem `createDialog`'s shared presence exists to avoid) and spares
+ * its element from the popup's `createHideOutside`: an `inert` element is transparent to hit
+ * testing, so a backdrop that let itself be marked would silently stop blocking the pointer and
+ * lose its hover and pointer handlers.
  */
 export function createDialogBackdrop(
   state: CreateDialogReturn,
   props: JSX.HTMLAttributes<HTMLDivElement>,
 ): CreateDialogBackdropReturn {
-  // Signal-backed ref for the same reason as the popup's — `createPresence` reads it on the exit
-  // edge, and `createRegisteredElement` reacts to it. See `create-focus-trap.ts`.
+  // A signal, not a plain ref: `createPresence` reads it on the exit edge and
+  // `createRegisteredElement` reacts to it, so both need to see the moment it is set.
   const [ref, setRef] = createSignal<HTMLDivElement>();
 
   const presence = createPresence({ present: state.open, ref });

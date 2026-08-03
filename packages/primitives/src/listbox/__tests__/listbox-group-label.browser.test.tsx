@@ -44,7 +44,8 @@ describe("createListboxGroupLabel", () => {
     const generatedId = labelEl(container).id;
     expect(generatedId).toBeTruthy();
 
-    // `createRegisteredId` defers the write to `onSettled`, so the linkage lands after mount.
+    // `createRegisteredId` defers the write until after mount (Solid 2.0 forbids a descendant writing
+    // an ancestor's signal during render), so the linkage lands a tick late.
     await vi.waitFor(() => {
       expect(group.labelId()).toBe(generatedId);
       expect(groupEl(container).getAttribute("aria-labelledby")).toBe(generatedId);

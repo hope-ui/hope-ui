@@ -68,7 +68,7 @@ export interface CreateVirtualCollectionReturn<V = unknown> extends IndexedItemS
 /**
  * The **virtualized item source**: a thin SolidJS reactive binding over
  * [`@tanstack/virtual-core`](https://tanstack.com/virtual), satisfying the same
- * [`ItemSource`](../create-collection/create-collection.md) seam as `createCollection`. It is what makes a 10k-row
+ * [`ItemSource`](create-collection.md) seam as `createCollection`. It is what makes a 10k-row
  * listbox navigable: `items()` reflects the **full** data set (so navigation, typeahead and
  * `aria-setsize`/`aria-posinset` see every row), while each item's `element` accessor resolves only
  * for the mounted window, and `scrollIndexIntoView` maps to the virtualizer's `scrollToIndex`.
@@ -78,8 +78,8 @@ export interface CreateVirtualCollectionReturn<V = unknown> extends IndexedItemS
  * We adopt `@tanstack/virtual-core` (framework-agnostic, no Solid version coupling) and write this
  * binding by hand, rather than depending on `@tanstack/solid-virtual` (compiled for Solid 1.x). The
  * core is an **optional** peerDependency, so a consumer who never virtualizes keeps a zero-dep
- * `@hope-ui/primitives` install. Reference: react-aria's virtualizer + TanStack Virtual's own
- * framework adapters.
+ * `@hope-ui/primitives` install. Shaped after TanStack Virtual's own framework adapters and React
+ * Aria's virtualizer.
  *
  * Client-only: it measures the DOM, so it does nothing meaningful during SSR (no effects run, no
  * scroll element resolves), and hydration is not a concern for the virtualized path.
@@ -87,17 +87,16 @@ export interface CreateVirtualCollectionReturn<V = unknown> extends IndexedItemS
 export function createVirtualCollection<V = unknown>(
   options: CreateVirtualCollectionOptions<V>,
 ): CreateVirtualCollectionReturn<V> {
-  // Mounted row elements, keyed by index, so `items()[index].element()` is defined exactly for the
-  // rendered slice. Shared with `createDataCollection`, which registers rows the same way.
+  // Shared with `createDataCollection`: a rendered row publishes its element here on mount, keyed by
+  // index, so `items()[index].element()` is defined for exactly the rendered slice.
   const { elements, registerElement, unregisterElement } = createElementRegistry();
 
-  // The rendered window, held as plain state the virtualizer's `onChange` writes into. `onChange`
-  // fires re-entrantly from deep inside the virtualizer's own memoized graph (`getVirtualItems` →
-  // `maybeNotify` → `onChange`), which can land while a Solid computation is on the stack — a write
-  // there trips `[REACTIVE_WRITE_IN_OWNED_SCOPE]`. `ownedWrite: true` is the framework-sanctioned
-  // marker for a signal deliberately bridged from an external imperative library's callbacks (the
-  // runtime uses it for its own bridge signals); `equals: false` because the window object is
-  // rebuilt in place on every scroll.
+  // The rendered window, written by the virtualizer's `onChange`. That callback fires re-entrantly
+  // from inside the virtualizer's own memoized graph (`getVirtualItems` → `maybeNotify` →
+  // `onChange`), so it can land while a Solid computation is on the stack, where a write trips
+  // `[REACTIVE_WRITE_IN_OWNED_SCOPE]`. `ownedWrite: true` is the sanctioned marker for a signal
+  // bridged from an external imperative library's callbacks — Solid's own runtime uses it for the
+  // same purpose. `equals: false` because the window object is rebuilt in place on every scroll.
   const [rendered, setRendered] = createSignal<{ items: VirtualItem[]; total: number }>(
     { items: [], total: 0 },
     { equals: false, ownedWrite: true },
@@ -119,22 +118,22 @@ export function createVirtualCollection<V = unknown>(
     onChange: () => sync(),
   });
 
-  // The initial read is deliberately untracked — the effect below owns reactivity. Constructing the
+  // Read without subscribing (`untrack`) — the effect below owns reactivity. Constructing the
   // virtualizer touches no DOM (it observes lazily in `_willUpdate`), so this is SSR-safe.
   const virtualizer = new Virtualizer(untrack(resolveOptions));
   onCleanup(virtualizer._didMount());
 
-  // Re-push options whenever `count`/`scrollElement` change. Both are tracked in the compute
-  // (a bare `resolveOptions()` there would read `count` but *not* `scrollElement`, whose access is
-  // buried in a `getScrollElement` closure). `_willUpdate` is where the core attaches its
+  // Re-push options whenever `count`/`scrollElement` change. Both are read explicitly in the compute
+  // because a bare `resolveOptions()` there would track `count` but *not* `scrollElement`, whose
+  // access is buried in a `getScrollElement` closure. `_willUpdate` is where the core attaches its
   // scroll/resize observers once the scroll element first exists (and re-attaches if it swaps), so
   // this effect is also what starts the virtualizer observing.
   createEffect(
     () => [options.count(), options.scrollElement()] as const,
     () =>
-      // The whole body is a deliberate untracked read: `count`/`scrollElement` are already tracked
-      // in the compute above, and the virtualizer's own methods (`_willUpdate` calls the
-      // `getScrollElement` closure) would otherwise re-read them untracked inside this effect.
+      // The body is untracked on purpose: the compute above already subscribes to both signals, and
+      // the virtualizer re-reads them internally (`_willUpdate` calls the `getScrollElement`
+      // closure), which would otherwise be flagged as an untracked read inside an effect.
       untrack(() => {
         virtualizer.setOptions(resolveOptions());
         virtualizer._willUpdate();

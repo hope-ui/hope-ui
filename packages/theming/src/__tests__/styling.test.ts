@@ -40,8 +40,8 @@ describe("tv", () => {
   });
 
   it("resolves conflicting hope semantic fills via the registered color scale", () => {
-    // The shared twMergeConfig registers hope's semantic tokens as colors, so two fills in the
-    // same slot collapse to the last (a base fill overridden by a variant fill).
+    // The shared config registers hope's semantic tokens as colors, so two fills on one slot collapse
+    // to the last — here a variant's fill overriding the base's.
     const chip = tv({
       base: "bg-primary",
       variants: { tone: { danger: "bg-danger" } },

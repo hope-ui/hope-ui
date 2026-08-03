@@ -67,8 +67,7 @@ describe("withDefaults", () => {
     expect(reads).toBe(1);
   });
 
-  // The `merge` behavior this primitive exists to work around — a key resolved by presence,
-  // not by value — is pinned in `__tests__/solid-contract.test.ts`, alongside every other
-  // undocumented SolidJS internal this codebase leans on. If stable changes it, that file
-  // goes red first and `withDefaults` becomes unnecessary.
+  // The `merge` behavior this primitive works around — a key resolved by presence, not by value —
+  // is pinned in `src/__tests__/solid-contract.test.ts`. If SolidJS 2.0 stable changes it, that
+  // file goes red first and `withDefaults` becomes unnecessary.
 });

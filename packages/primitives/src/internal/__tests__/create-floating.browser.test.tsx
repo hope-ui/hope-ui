@@ -782,9 +782,9 @@ describe("createFloating", () => {
 
   it("drops a computePosition resolution that lands after dispose", async () => {
     // `mount()` cannot police this window: `dispose()` is what raises Solid's diagnostics, so a
-    // write emitted *after* it has nobody to report it. A console spy plus an unhandled-rejection
-    // listener are what stand in — the `computePosition` promise carries no `.catch()`, matching
-    // the Vue/React ports, so the `generation`/`disposed` guard is the only thing holding.
+    // write emitted *after* it has nobody left to report it. A console spy and an
+    // unhandled-rejection listener stand in. The `computePosition` promise deliberately carries no
+    // `.catch()`, so the primitive's own `generation`/`disposed` guard is all that holds here.
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const rejections: string[] = [];
     const recordRejection = (event: PromiseRejectionEvent) => rejections.push(String(event.reason));

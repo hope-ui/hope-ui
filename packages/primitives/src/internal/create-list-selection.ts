@@ -30,19 +30,17 @@ export interface CreateListSelectionOptions<V> {
    */
   shouldFollowFocus?: Accessor<boolean>;
   /**
-   * Maps a value to its **identity key** — the Base UI `itemToValue` model. Two values are equal
-   * when their keys are `===` (see {@link isItemEqualToValue}), so object values need not be
-   * reference-stable: a fresh `{ id, name }` each render, or a controlled value straight from a
-   * server, still matches the registered item when it maps to the same key. Default: identity
-   * (`(value) => value`), i.e. plain `===` — fine for primitive values. Consumers with object
-   * values pass e.g. `(fruit) => fruit.id`. `createListbox` threads its own `itemToValue` through
-   * here.
+   * Maps a value to its **identity key**, borrowing the `itemToValue` model from Base UI (the
+   * headless React library). Two values are equal when their keys are `===` (see
+   * {@link isItemEqualToValue}), so object values need not be reference-stable: a fresh
+   * `{ id, name }` each render, or a controlled value straight from a server, still matches the
+   * registered item when it maps to the same key. Default: identity (`(value) => value`), i.e. plain
+   * `===`, which is fine for primitive values; with object values pass e.g. `(fruit) => fruit.id`.
    */
   itemToValue?: (value: V) => unknown;
   /**
    * Full override of the equality rule, for shapes `itemToValue` can't express. Defaults to
-   * `(a, b) => itemToValue(a) === itemToValue(b)`. When given, `itemToValue` is ignored. Base UI's
-   * `isItemEqualToValue`, replacing the Angular-idiom `compareWith` this primitive used to expose.
+   * `(a, b) => itemToValue(a) === itemToValue(b)`. When given, `itemToValue` is ignored.
    */
   isItemEqualToValue?: (a: V, b: V) => boolean;
 }
@@ -51,12 +49,12 @@ export interface CreateListSelectionReturn<V> {
   /** The current selection, in no particular order. */
   value: Accessor<V[]>;
   /**
-   * Replace the whole selection in **one** write — the controllable state's own setter. Every other
-   * mutation here is expressed in terms of an item, and should stay that way; this exists for the
-   * one shape they cannot express, a *native* control handing back an arbitrary set in a single
-   * gesture (`HiddenSelect`'s `<select>` change from autofill, and its form-reset restore). It has
-   * to be one write: a Solid 2.0 signal write is not visible to a plain read until the next flush,
-   * so `deselectAll()` followed by N × `select()` would each read the pre-write value.
+   * Replace the whole selection in **one** write. Every other mutation here is expressed in terms of
+   * an item and should stay that way; this exists for the one shape they cannot express, a *native*
+   * control handing back an arbitrary set in a single gesture (`HiddenSelect`'s `<select>` change
+   * from autofill, and its form-reset restore). It has to be one write: in Solid 2.0 a signal write
+   * is invisible to a plain read until the next flush, so `deselectAll()` followed by N × `select()`
+   * would each read the pre-write value.
    */
   setValue(value: V[]): void;
   /** Whether `item` is selected. */
@@ -64,7 +62,8 @@ export interface CreateListSelectionReturn<V> {
   /**
    * The lowest index in `focus.items()` that is selected, or `-1` when nothing is. This is the row a
    * list should enter on — `createListbox` threads it into `createListFocus`'s `entryIndex` so Tab
-   * lands on the selected option (APG), and a future Select opens on it.
+   * lands on the selected option, as the ARIA Authoring Practices Guide (APG) requires, and a future
+   * Select opens on it.
    */
   firstSelectedIndex(): number;
   /** Add `item` to the selection (single mode replaces). Sets the range anchor. */
@@ -93,7 +92,7 @@ export interface CreateListSelectionReturn<V> {
   setAnchor(index: number): void;
 }
 
-/** The inclusive integer range between two indices, in ascending order. Pure; unit-tested. */
+/** The inclusive integer range between two indices, in ascending order. */
 export function selectionRange(fromIndex: number, toIndex: number): number[] {
   const low = Math.min(fromIndex, toIndex);
   const high = Math.max(fromIndex, toIndex);
@@ -105,23 +104,21 @@ export function selectionRange(fromIndex: number, toIndex: number): number[] {
 }
 
 /**
- * Selection state layered on a [`createListFocus`](../create-list-focus/create-list-focus.md) instance:
- * single/multiple, explicit or follow-focus, with Shift range extension. Modeled on Angular Aria's
- * `list-selection`; the behavior checklist (select-on-focus, Ctrl+A, Shift-extend from an anchor)
- * is cross-checked against react-aria's `useSelectableCollection`/`useSelectableItem`.
+ * Selection state layered on a [`createListFocus`](create-list-focus.md) instance: single/multiple,
+ * explicit or follow-focus, with Shift range extension. Adapted from Angular Aria's
+ * `list-selection`, with the behavior checklist (select-on-focus, Ctrl+A, Shift-extend from an
+ * anchor) cross-checked against React Aria's `useSelectableCollection`/`useSelectableItem`.
  *
- * Object values are supported through the Base UI `itemToValue` model: pass `itemToValue` (map to
- * an identity key compared with `===`) or a full `isItemEqualToValue` override, so values need not
- * be reference-stable.
+ * Object values need not be reference-stable: pass `itemToValue` to map each value to an identity
+ * key compared with `===`, or `isItemEqualToValue` to override equality outright.
  */
 export function createListSelection<V>(
   options: CreateListSelectionOptions<V>,
 ): CreateListSelectionReturn<V> {
   const { focus } = options;
   const mode = () => options.selectionMode?.() ?? "single";
-  // `itemToValue` maps to an identity key; the default equality is `key(a) === key(b)`. An explicit
-  // `isItemEqualToValue` wins outright (Base UI's precedence). Resolved once — these are config, not
-  // reactive inputs.
+  // An explicit `isItemEqualToValue` wins outright over `itemToValue`. Resolved once, because these
+  // are configuration rather than reactive inputs.
   const itemToValue = options.itemToValue ?? ((value: V) => value);
   const areEqual =
     options.isItemEqualToValue ?? ((a: V, b: V) => itemToValue(a) === itemToValue(b));

@@ -13,27 +13,22 @@ import { type Accessor, createSignal, For, merge, omit } from "solid-js";
 import { CheckIcon } from "../icons";
 import { ListboxContext, type ListboxContextValue } from "./listbox-context";
 
-// The list element is a generic `<div role="listbox">`, not a `<ul>` — the valid-HTML decision
-// explained on `Root` below — so its attribute surface is the generic one, with no `<ul>`-specific
-// keys to inherit.
+// The list element is a `<div role="listbox">`, not a `<ul>` — see the valid-HTML note on `Root` —
+// so there are no `<ul>`-specific attributes to inherit.
 type ListboxRootElementProps = JSX.HTMLAttributes<HTMLDivElement>;
 
 /**
- * `ListboxRootProps` = the primitive's `CreateListboxOptions<V, G>` (the `items` data, value/
- * selection/focus/orientation + the native-form fields) **plus** the themeable `size` axis
- * (`ListboxThemeableProps`, owned by `@hope-ui/theming`) **plus** the remaining native `<div>`
- * attributes (so the list can be named with `aria-label`/`aria-labelledby`, styled with `style`,
- * etc.) and the per-instance props below. The list element is a generic `<div role="listbox">` (not
- * a `<ul>`) so that groups/separators — and, in virtual mode, the sizer — nest as valid HTML; see
- * the element-tag note on `Root` below.
+ * `ListboxRootProps` = the `createListbox` options (the `items` data, value/selection/focus/
+ * orientation, the native-form fields) **plus** the themeable `size` axis **plus** the remaining
+ * native `<div>` attributes (`aria-label`, `style`, `data-*`, …) and the per-instance props below.
  *
  * `<V>` is your item type and `<G>` the shape of an `items` **entry**. They are the same for a flat
  * list; with `groupToItems` set, `items` holds group entries and `<G>` is inferred from it.
  *
- * `CreateListboxOptions` keys are `Omit`-ted from the native attributes so a native
- * `onChange`/`value`/`id`/`name`/`form`/`disabled` never clashes with the primitive's own (e.g. the
- * primitive's `onChange: (value: V[]) => void` vs the DOM change handler). Extending
- * `ListboxThemeableProps` keeps the recipe variants and this surface in lockstep by construction.
+ * The `createListbox` option keys are `Omit`-ted from the native attributes so a DOM
+ * `onChange`/`value`/`id`/`name`/`form`/`disabled` can never clash with the option of the same name
+ * (the option's `onChange: (value: V[]) => void` is not the DOM change handler). Extending
+ * `ListboxThemeableProps` keeps the style recipe's variants and this surface in lockstep.
  */
 export interface ListboxRootProps<V = unknown, G = V>
   extends CreateListboxOptions<V, G>,
@@ -47,10 +42,12 @@ export interface ListboxRootProps<V = unknown, G = V>
   slotClasses?: SlotClasses<"listbox">;
   /**
    * Renders the list container as a different element/component while keeping Root's computed props
-   * (`role="listbox"`, the ARIA, the roving `tabindex`, the keymap). **Not** the same thing as the
+   * (`role="listbox"`, the ARIA, the tab stop, the keyboard handling). **Not** the same thing as the
    * per-row `children` callback below — this re-targets the container, that one builds a row.
-   * The internal ref is merged into the single function ref `renderElement` passes down; in virtual
-   * mode that ref *is* the scroll container, so a target ignoring function refs breaks windowing.
+   *
+   * Your element receives a single function `ref` with the component's own ref merged in. In virtual
+   * mode that element *is* the scroll container, so a target that ignores function refs silently
+   * breaks windowing.
    */
   render?: RenderProp<ListboxRootElementProps>;
   /** Merged over the recipe's `root` slot (applied last), so the consumer's utilities win. */
@@ -74,51 +71,40 @@ export interface ListboxRootProps<V = unknown, G = V>
 }
 
 /**
- * The Listbox root. Calls `createListbox` once for the shared state (item source + focus/selection/
- * navigation/typeahead, ids, the pointer fight-guard, `rootProps`, and the form accessors), resolves
- * the recipe variants via `useDefaults` + `useSlots`, and puts the state + slot class fns on context
- * (composition — `ctx.state` + `ctx.slots`, not an extended state).
+ * The Listbox root. Calls `createListbox` once for the state every part shares (the item source,
+ * focus/selection/navigation/typeahead, ids, the form accessors), resolves the theme recipe, and
+ * publishes both on context.
  *
- * **Options are data.** `items` is required and holds the whole option set; the rows are rendered by
- * the `children` callback, once per entry. Nothing self-registers, so the option list exists (and
- * typeahead, selection and form values work over it) whether or not a row is mounted — the property a
- * Select is built on.
+ * **Options are data.** `items` is required and holds the whole option set; rows come from the
+ * `children` callback, once per entry. Nothing self-registers, so the option list — and typeahead,
+ * selection and submitted form values over it — exists whether or not a row is mounted. That is the
+ * property a Select is built on.
  *
- * **The list element is a `<div role="listbox">` in both modes** — not a `<ul>`. This is the
- * **valid-HTML decision**: a `<ul>` may contain only `<li>`/`<script>`/`<template>`, and an `<li>` is
- * valid only inside `<ul>`/`<ol>`/`<menu>`. A grouped listbox (`ul > div[role=group] > li[role=option]`),
- * a separator (`ul > div[role=presentation]`), and virtual mode's sizer (`ul > div > div[role=option]`)
- * all violate that. So every part is a **role-based generic element** — `<div role="listbox">` over
- * `<div role="group">` / `<div role="presentation">` / `<div role="option">` — where the ARIA `role`
- * (not the tag) carries the semantics, exactly as the browser-tested primitive harnesses do, and as
- * every mainstream listbox (Radix, React Aria, Ariakit) does. `role` overrides native element
- * semantics for assistive tech, so nothing is lost by dropping `<ul>`/`<li>`, and the markup validates
- * at every nesting.
+ * **The list element is a `<div role="listbox">` in both modes, never a `<ul>`**, because the `<ul>`
+ * markup would be *invalid*: a `<ul>` may contain only `<li>`/`<script>`/`<template>`, and an `<li>`
+ * is valid only directly inside `<ul>`/`<ol>`/`<menu>`. Groups, separators and virtual mode's sizer
+ * all sit between the list and its options and would each break that. So every part is a generic
+ * element carrying an ARIA `role` instead — `role` overrides native element semantics for assistive
+ * tech, so nothing is lost, and the markup validates at any nesting.
  *
- * **Data mode (default).** Renders the `<div role="listbox">` (the standalone convenience binding
- * from `rootProps`, wired to the primitive via `setListboxElement`) over a `<For>` of `items`.
+ * **Data mode (default)** renders that element over a `<For>` of `items`. **Virtual mode**, selected
+ * by passing `estimateSize`, makes the same element the **scroll container**, holding one sizer
+ * `<div>` of the full scroll height inside which only the visible window of rows mounts. Virtual mode
+ * is flat lists only — no `Group`/`GroupLabel`/`Separator`.
  *
- * **Virtual mode.** Selected by `estimateSize` (`state.virtual` is then the `createVirtualCollection`
- * windowing seam). The same `<div role="listbox">` becomes the **scroll container**, holding a single
- * **sizer** `<div>` of the full scroll height (`state.virtual.totalSize()`) inside which only the
- * windowed `virtualItems()` mount. Flat lists only — no `Group`/`GroupLabel`/`Separator`.
+ * In both modes, setting `name` appends a hidden native form control so the listbox submits with a
+ * `<form>`, autofills, honours `required` and survives a form `reset`. It is a **sibling of the list
+ * element, never inside it**: neither an `<input>` nor a `<select>` is a valid `listbox` child.
  *
- * In **both** modes, **followed by** — when `name` is set — the kernel's `HiddenSelect`, so the
- * listbox submits with a form, autofills, honours `required` and survives a form `reset`. It is a
- * **sibling of the list element, never inside it** (neither an `<input>` nor a `<select>` is a valid
- * `listbox` child), and it owns every decision about what to submit; this layer only hands it the
- * state and the element to focus when a blocked submit reports the field invalid.
- *
- * `Listbox.Root<V, G>` is generic **at its props**; the generics cannot flow through Solid context, so
- * the `createListbox` return is cast to `CreateListboxReturn<unknown>` for the provider (see
- * `listbox-context.ts`). Because it reads a recipe, a `Listbox.Root` **requires a `<ThemeProvider>`**
- * ancestor fed a preset, like every other styled component.
+ * `Listbox.Root<V, G>` is generic **at its props** only — a Solid context value is a single concrete
+ * type, so the state is widened on the way in and narrowed back at each part (see
+ * `listbox-context.ts`). Reading a recipe means it **requires a `<ThemeProvider>`** ancestor fed a
+ * preset, like every other styled component.
  */
 export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Element {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
-  // The `checkIcon` factory defaults to hope's built-in check; a preset's `defaultProps.listbox` swaps
-  // it app-wide (and a per-`Listbox.Root` `checkIcon` prop wins over that).
+  // `useDefaults` resolves each key with `??` across three layers: instance prop, then the preset's
+  // per-component `defaultProps`, then the built-ins below. So a preset can swap the selection check
+  // glyph app-wide while a per-instance `checkIcon` still wins over it.
   const merged = useDefaults({
     recipe: "listbox",
     props,
@@ -128,36 +114,37 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
     },
   });
 
-  // `useSlots` returns one ready-to-call class fn per slot, each folding the override chain: recipe
-  // base → preset `slotClasses` → instance `slotClasses` → `class` (root slot only). `size` is the
-  // whole styling axis; passing the complete variant set every call is what `CompleteVariantsOf`
-  // requires (an omitted variant would silently fall back to the recipe's `defaultVariants`).
+  // One class function per named slot of the theme's `listbox` recipe, each folding the override
+  // chain: recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root slot only).
+  // Every variant must be passed on every call: an omitted one silently falls back to the recipe's
+  // own default rather than to this instance's.
   const slots = useSlots({
     recipe: "listbox",
     variantsProps: () => ({ size: merged.size }),
     slotClasses: () => merged.slotClasses,
   });
 
-  // `createListbox` reads only its own option keys off `merged` (items/value/selection/focus/name/…)
-  // — the defaulted `size` and the per-instance class props ride along harmlessly. Pass `merged`, not
-  // raw `props`: `useDefaults` exposes its defaults as getters over `props`, so `merged` stays just as
-  // lazy and reactive (the controllable-state getters stay live) while being the single source of
-  // truth. Cast into the provider — the generics cannot flow through Solid context.
+  // Pass `merged`, never raw `props`: `useDefaults` returns a *new object of getters* rather than a
+  // copy, so `props.size` still reads `undefined` for a defaulted key while `merged.size` reads `md`.
+  // Getters also keep everything lazy and reactive. `createListbox` picks off only the option keys it
+  // knows; `size` and the class props ride along harmlessly.
   const state = createListbox<V, G>(merged);
-  // The parts read behavior off `state`, classes off `slots`, and — when the `ItemIndicator` is given
-  // no `children` — its default glyph off `checkIcon`. An accessor (via `runIfFunction`), so each read
-  // builds a fresh glyph element from the resolved factory (instance ?? preset ?? built-in check).
+  // `checkIcon` is an *accessor*, so each read builds a fresh glyph element — a single shared element
+  // would be moved from row to row instead of appearing in each.
   const context: ListboxContextValue = {
     state: state as unknown as CreateListboxReturn<unknown>,
     slots,
     checkIcon: () => runIfFunction(merged.checkIcon),
   };
 
-  // The passthrough native attributes: everything not consumed as a `createListbox` option, a recipe
-  // variant/override, or the explicitly-rendered `class`/`children`. `aria-label`/`style`/`data-*`
-  // survive here; `state.rootProps` (spread after) owns `role`/`aria-*`/`tabindex`/`onKeyDown`/`id`.
-  // `dir` is omitted here and written explicitly below, so that making this list exhaustive over the
-  // option keys — a natural tidy-up — can't silently split the layout from the keyboard.
+  // The native attributes to forward: everything not consumed as a `createListbox` option, a recipe
+  // input, or the explicitly-rendered `class`/`children`. `aria-label`/`style`/`data-*` survive here;
+  // `state.rootProps`, merged after, owns `role`/`aria-*`/`tabindex`/`onKeyDown`/`id`.
+  //
+  // This list is hand-kept, and a key missing from it lands in the DOM as a junk attribute with
+  // nothing else failing. `dir` is dropped here and re-added explicitly below, so that "make this
+  // list exhaustive over the option keys" — the natural tidy-up — cannot silently split the layout
+  // from the keyboard. See the `dir` getter for why.
   const rest = omit(
     merged,
     "dir",
@@ -190,21 +177,17 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
     "id",
   );
 
-  // Virtual mode is chosen exactly as the primitive chooses it — `estimateSize` present — and never
-  // switches for the instance's lifetime, so it is read once here (the getters ride along on
-  // `merged`). It decides only what the `children` callback is invoked *over*: the windowed slice,
-  // or every `items` entry. The list element is a `<div role="listbox">` either way (see the
-  // valid-HTML note in the JSDoc).
+  // Virtual mode is selected exactly as the primitive selects it — `estimateSize` present — and never
+  // switches for an instance's lifetime, so reading it once is safe. It changes only what the
+  // `children` callback is invoked *over*: the visible window, or every `items` entry.
   const virtualized = merged.estimateSize != null;
 
-  // The rows. One `children` call per entry in both modes — flat/grouped over `items`, windowed over
-  // `virtualItems()` inside a **sizer** `<div>` of the full scroll height, each row positioned
-  // absolutely at its `virtualItem.start`. A **function child invoked per row is not the multi-read
-  // component-valued-prop shape**, so it needs no `children()` — the only hydration hazard is
-  // windowing itself, handled by the relaxed SSR strategy (no strict round-trip; see
-  // `listbox-virtual.ssr.test.tsx`). Declared as a nested component so its `<For>` gets its own owner,
-  // and rendered **under the provider** (via the `children` getter below) so each row's
-  // `Listbox.Item` resolves `useListboxContext()`.
+  // The rows. A nested component, not inline JSX, for two reasons: its `<For>` gets a reactive scope
+  // of its own, and it is rendered *under* the context provider (through the `children` getter
+  // below), which is what lets each row's `Listbox.Item` read the context at all.
+  //
+  // A function invoked once per row is not the "component-valued prop read more than once" shape, so
+  // it needs no `children()` call to stabilise hydration.
   function ListboxRows(): JSX.Element {
     const renderRow = merged.children ?? (() => undefined);
     if (!virtualized) {
@@ -228,33 +211,30 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
     );
   }
 
-  // The list element — a `<div role="listbox">` in both modes (the scroll container in virtual mode),
-  // assembled via `renderElement` (like every other component's host elements — Dialog, Calendar).
-  // A literal element with a dynamic child does **not** hydrate: spreading the getter-laden `rootProps`
-  // onto a literal element and giving it a reactive child shifts the children's hydration keys one
-  // level between server and client. `renderElement` → `<Dynamic>` allocates the keys identically on
-  // both. `rest` (consumer passthrough) is merged first, then `state.rootProps` so the primitive's
-  // a11y-owned attrs (incl. `role="listbox"`) win, then the recipe `class` / `data-slot` / children.
-  // `setListboxElement` wires the element to the primitive as its scroll container (`rootProps` omits
-  // `ref`; `renderElement` also merges any consumer `ref`) — and is also what the dev direction
-  // warning measures the applied layout against.
+  // Merge order is the precedence: the consumer's forwarded attributes first, then `state.rootProps`
+  // so the accessibility attributes the primitive owns (`role="listbox"` and friends) win, then this
+  // layer's class and markers.
+  //
+  // The element itself goes through `renderElement` rather than being written as a literal `<div>`.
+  // Spreading a getter-backed props object onto a *literal* host element and giving it a reactive
+  // child makes Solid's server and client compilers allocate the children's hydration keys one level
+  // apart, so hydration silently fails to adopt them. Routing through a component call allocates them
+  // identically on both sides.
   const elementProps = merge(rest, state.rootProps, {
     get class(): string {
       return slots.root(merged.class);
     },
     "data-slot": "listbox",
     // `dir` is the one `createListbox` option that is also a real HTML attribute, and the two halves
-    // of RTL travel down different channels: the recipe's logical utilities (`ps-`/`pe-`/`end-`) mirror
-    // from the DOM, the arrow keys from `state.direction()`. So the consumer's `dir` must reach the
-    // element, or `<Listbox.Root dir="rtl">` navigates right-to-left across a row the browser still
-    // lays out left-to-right.
+    // of right-to-left support arrive by different routes: the CSS mirrors itself from the DOM's
+    // direction, while the arrow keys are remapped from the resolved direction in JS. So a consumer's
+    // `dir` must reach the element, or `<Listbox.Root dir="rtl">` navigates right-to-left across a
+    // row the browser still lays out left-to-right.
     //
-    // `merged.dir`, never `state.direction()`: the latter falls back to the locale, and a
-    // locale-derived `dir="ltr"` would override an inherited `dir="rtl"` from an ancestor. Base UI and
-    // React Aria both draw the line here too — neither writes a locale-derived `dir` on a
-    // non-portaled component (React Aria writes one only on Popover/Toast, which portal out of the
-    // cascade's reach). An app declares direction where the browser can see it; the provider only
-    // tells the keymap. `createTextDirectionWarning` says so out loud in dev when the two disagree.
+    // `merged.dir`, never the resolved direction: that one falls back to the locale, and a
+    // locale-derived `dir="ltr"` would override a `dir="rtl"` inherited from an ancestor. An app
+    // declares direction where the browser can see it; a locale provider only tells the keyboard
+    // mapping. When the two disagree, the primitive warns in dev rather than papering over it.
     get dir() {
       return merged.dir;
     },
@@ -263,10 +243,10 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
     },
   });
 
-  // The list element goes two places: to the primitive (its scroll container, and what the dev
-  // direction warning measures) and to `HiddenSelect`, which focuses it when a blocked submit
-  // reports the field invalid — a hidden control cannot take that focus itself. `CreateListboxReturn`
-  // exposes only the setter, so the second consumer needs its own signal.
+  // The list element is needed in two places: by the primitive (as its scroll container) and by
+  // `HiddenSelect`, which focuses it when a blocked submit reports the field invalid — a visually
+  // hidden control cannot take that focus itself. The primitive exposes only a setter, so the second
+  // consumer needs a signal of its own.
   const [listElement, setListElement] = createSignal<HTMLElement | null>();
   const setElement = (element: HTMLDivElement) => {
     state.setListboxElement(element);
@@ -275,26 +255,25 @@ export function Root<V = unknown, G = V>(props: ListboxRootProps<V, G>): JSX.Ele
 
   return (
     <ListboxContext value={context}>
-      {/* Generics on the element's own type, so a consumer's `render` callback receives div-shaped
-      props and `render={(p) => <div {...p} />}` compiles without a cast — the surface Button/Badge/
-      Alert expose. `setListboxElement` takes the wider `HTMLElement` and stays assignable. */}
+      {/* Typed over the element this actually renders, so a consumer's
+      `render={(p) => <div {...p} />}` compiles with no cast. Only the `ref` parameter type differs
+      from the primitive's wider `HTMLElement`, hence the props cast below. */}
       {renderElement<ListboxRootElementProps, HTMLDivElement>({
         as: "div",
         render: merged.render,
         props: elementProps as unknown as ListboxRootElementProps,
         ref: setElement,
       })}
-      {/* Native form submission, opt-in via `name`. The kernel's `HiddenSelect` renders the real
-      control — a clipped `<select>` while the option set is small enough for browser autofill to be
-      worth it, one `<input>` per value past that — carrying `name`/`form`/`required`/`disabled`,
-      writing an autofilled choice back into the selection, and restoring the default selection on
-      the form's `reset`. It is a **sibling** of the list element, never inside it: neither an
-      `<input>` nor a `<select>` is a valid `listbox` child. `triggerRef` is the list element, the
-      visible control focus lands on when a blocked submit reports the field invalid. */}
+      {/* Native form submission, opt-in via `name`. `HiddenSelect` renders the real control — a
+      visually clipped `<select>` while the option set is small enough for browser autofill to be
+      worth it, one `<input>` per value past that — and owns every decision about what to submit.
+      A **sibling** of the list element, never inside it: neither an `<input>` nor a `<select>` is a
+      valid `listbox` child. */}
       <HiddenSelect state={state} triggerRef={listElement} />
     </ListboxContext>
   );
 }
 
-// Re-export the recipe vocabulary so consumers can import it from the component's subpath.
+// Re-exported so a consumer never has to reach into `@hope-ui/theming` for a type this component's
+// own props use.
 export type { ListboxSize };

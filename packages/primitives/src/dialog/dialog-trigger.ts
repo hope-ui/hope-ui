@@ -11,10 +11,9 @@ export interface CreateDialogTriggerReturn {
 }
 
 /**
- * The trigger part: opens the dialog and advertises it to assistive technology. Owns the
- * `aria-*` wiring and the open handler; the consumer's own `onClick` runs first, so
- * `event.preventDefault()` cancels the open (the trigger only ever opens — never toggles,
- * matching Base UI).
+ * The trigger part: opens the dialog and advertises it to assistive technology. The consumer's own
+ * `onClick` runs first, so `event.preventDefault()` cancels the open. It only ever opens, never
+ * toggles: close through `createDialogCloseTrigger` or by controlling `open` yourself.
  */
 export function createDialogTrigger(
   state: CreateDialogReturn,

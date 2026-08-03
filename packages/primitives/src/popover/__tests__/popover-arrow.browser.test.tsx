@@ -13,18 +13,17 @@ import {
 import { createPopoverTitle } from "../popover-title";
 import { createPopoverTrigger } from "../popover-trigger";
 
-// Geometry is pinned in px and never derived from content — font metrics differ between the local
-// Chromium and CI's headless shell, which also runs with a real ~15px scrollbar gutter. Assertions
-// are rect *relationships* with a 1px tolerance, the convention `create-floating.browser.test.tsx`
-// states.
+// Geometry is pinned in px and never derived from content: font metrics differ between the local
+// Chromium and CI's headless shell, which also runs with a real ~15px scrollbar gutter. So the
+// assertions compare rect *relationships* with a 1px tolerance.
 const ARROW_SIZE = 8;
 const CONTENT_HEIGHT = 60;
 
 /**
- * The arrow's size reaches the element the way it will in production — through the `arrow` slot, here
- * stood in for by a consumer `style` object, which also exercises the kernel-first/consumer-last
- * merge. `--popover-arrow-size` is what the pin offset reads; setting it here proves the custom
- * property is a real seam and not decoration.
+ * The arrow's size reaches the element the way it will in production — from the stylesheet, here
+ * stood in for by a consumer `style` object, which also exercises the ours-first/consumer-last merge.
+ * `--popover-arrow-size` is what the pin offset reads, so setting it here proves the custom property
+ * is a real seam and not decoration.
  */
 const ARROW_PROPS: JSX.HTMLAttributes<HTMLDivElement> = {
   style: {
@@ -71,8 +70,8 @@ function Harness(props: HarnessProps) {
           <div
             data-testid="content"
             {...content.props}
-            // `relative`'s stand-in: the arrow is absolutely positioned inside the content at the
-            // component layer, so the content has to be its offset parent here too (risk A2).
+            // Stands in for `position: relative` on the styled card: the arrow is absolutely
+            // positioned inside the content, so the content has to be its offset parent here too.
             style={{
               position: "relative",
               width: `${props.contentWidth}px`,
@@ -126,7 +125,7 @@ const CENTRED_TRIGGER: JSX.CSSProperties = {
 
 /**
  * Jammed against the viewport's inline start and much narrower than the popup, so `shift` slides the
- * layer back into view and the anchor's centre ends up outside the span the arrow may occupy —
+ * layer back into view and the anchor's centre ends up outside the span the arrow may occupy.
  * `arrowPadding` then clamps it, which is exactly what a non-zero `centerOffset` reports.
  */
 const CLAMPED_TRIGGER: JSX.CSSProperties = {
@@ -162,9 +161,8 @@ describe("createPopoverArrow", () => {
     const { container, state, dispose } = mountHarness(CENTRED);
 
     // THE DEADLOCK GUARD. Gating the element on `arrow()` is self-defeating: no element means no
-    // `arrowElement` in `createFloating`'s config, means no `arrow` middleware, means `arrow()` stays
-    // `undefined` forever. Asserted *before* awaiting the measurement, because after it the two are
-    // indistinguishable.
+    // arrow measurement is requested, which means `arrow()` stays `undefined` forever. Asserted
+    // *before* awaiting the measurement, because afterwards the two cases look identical.
     expect(state().floating.arrow()).toBeUndefined();
     const arrow = elementOf(container, "arrow");
     expect(state().arrowElement()).toBe(arrow);
@@ -181,15 +179,15 @@ describe("createPopoverArrow", () => {
     await vi.waitFor(() => expect(below.state().floating.arrow()).toBeDefined());
     const belowArrow = elementOf(below.container, "arrow");
 
-    // Base UI's semantics: `data-side` is where the *popup* sits relative to the trigger, identical
-    // to the Positioner's and the Content's, so one variant styles the card and its arrow
-    // coherently. The pin edge is the opposite of it and lives only in the style.
+    // `data-side` is where the *popup* sits relative to the trigger, identical to the Positioner's
+    // and the Content's, so one style rule can dress the card and its arrow coherently. The pin edge
+    // is the opposite of it and lives only in the inline style.
     expect(belowArrow.getAttribute("data-side")).toBe("bottom");
     expect(belowArrow.getAttribute("data-align")).toBe("center");
     expect(belowArrow.style.top).toBe("calc(var(--popover-arrow-size, 8px) / -2)");
     expect(belowArrow.style.left).toMatch(/^\d+(\.\d+)?px$/);
-    // The pin is a CSS string, never a measured number: the size stays the recipe's, and the
-    // primitive stays out of the CSSOM. Resolved, it is half the arrow back over the popup's edge.
+    // The pin is a CSS string, never a measured number: the size stays the stylesheet's, and this
+    // hook never reads the CSSOM. Resolved, it is half the arrow back over the popup's edge.
     expectWithinOnePixel(
       belowArrow.getBoundingClientRect().top,
       elementOf(below.container, "content").getBoundingClientRect().top - ARROW_SIZE / 2,
@@ -225,7 +223,7 @@ describe("createPopoverArrow", () => {
     expect(clamped.state().floating.arrow()?.centerOffset).not.toBe(0);
     expect(elementOf(clamped.container, "arrow").getAttribute("data-uncentered")).toBe("");
     // …and it really cannot point honestly: clamped away from the anchor's centre by more than the
-    // 1px the centred case is held to.
+    // 1px tolerance the centred case is held to.
     expect(
       Math.abs(
         centerX(elementOf(clamped.container, "arrow").getBoundingClientRect()) -
@@ -243,8 +241,8 @@ describe("createPopoverArrow", () => {
     await vi.waitFor(() => expect(state().floating.arrow()).toBeDefined());
     const arrow = elementOf(container, "arrow");
 
-    // Kernel first, consumer last — the Positioner's order, for the same reason: the size custom
-    // property the pin above reads has to survive, and so does a `z-index`.
+    // Ours first, consumer last — the Positioner's order, for the same reason: the size custom
+    // property the pin reads has to survive, and so does a `z-index`.
     expect(arrow.style.getPropertyValue("--popover-arrow-size")).toBe(`${ARROW_SIZE}px`);
     expect(arrow.style.width).toBe(`${ARROW_SIZE}px`);
     expect(arrow.style.position).toBe("absolute");
@@ -263,10 +261,10 @@ describe("createPopoverArrow", () => {
     // `visibility: hidden` intermediate and return an `incomplete` nobody can act on.
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     await expectNoA11yViolations(container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check).
-      // The IDREF itself is pinned in `popover-trigger.browser.test.tsx`.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `popover-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

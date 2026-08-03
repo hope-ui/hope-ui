@@ -14,10 +14,9 @@ import {
 import { createPopoverTitle } from "../popover-title";
 import { createPopoverTrigger } from "../popover-trigger";
 
-// Geometry is pinned in px and never derived from content — font metrics differ between the local
-// Chromium and CI's headless shell, which also runs with a real ~15px scrollbar gutter. Assertions
-// are rect *relationships* with a 1px tolerance, the convention `create-floating.browser.test.tsx`
-// states.
+// Geometry is pinned in px and never derived from content: font metrics differ between the local
+// Chromium and CI's headless shell, which also runs with a real ~15px scrollbar gutter. So the
+// assertions compare rect *relationships* with a 1px tolerance.
 const SIDE_OFFSET = 8;
 const CONTENT_WIDTH = 120;
 const CONTENT_HEIGHT = 60;
@@ -45,8 +44,8 @@ function PopupTitle(props: { state: CreatePopoverReturn }) {
   return <h2 {...title.props}>Popover title</h2>;
 }
 
-/** Its own component, so the registration's cleanup is scoped to the anchor's unmount — which is the
- * half of this hook the handover-back test exists for. */
+/** Its own component, so the registration's cleanup is scoped to the anchor's unmount — the half
+ * of this hook the handover-back test exists for. */
 function HarnessAnchor(props: {
   state: CreatePopoverReturn;
   anchorProps?: JSX.HTMLAttributes<HTMLDivElement>;
@@ -160,9 +159,9 @@ describe("createPopoverAnchor", () => {
     expect(state.customAnchorElement()).toBe(elementOf(container, "anchor"));
     await vi.waitFor(() => expectAnchoredTo(container, "anchor"));
 
-    // The `unregister` half, and the reason this hook uses `createRegisteredElement` rather than
-    // just registering: without the clear, `anchorElement()` keeps naming a detached element and the
-    // open layer strands wherever it last was.
+    // The unregister half, and the reason this hook uses `createRegisteredElement` rather than just
+    // registering: without the clear, `anchorElement()` keeps naming a detached element and the open
+    // layer strands wherever it last was.
     flush(() => setWithAnchor(false));
     expect(state.customAnchorElement()).toBeUndefined();
     await vi.waitFor(() => expectAnchoredTo(container, "trigger"));
@@ -181,9 +180,9 @@ describe("createPopoverAnchor", () => {
   });
 
   it("is deliberately NOT dismiss-excluded: clicking it closes the popover", async () => {
-    // `exclude` fixes the trigger's toggle race, and nothing else. An Anchor is a bare wrapper a
-    // consumer may put around a whole section, so exempting it would turn that region into a dead
-    // zone where outside-click silently stops working. See `popover-root.md`.
+    // The dismissal exclusion exists to fix the trigger's toggle race, and nothing else. An Anchor
+    // is a bare wrapper a consumer may put around a whole section, so exempting it would turn that
+    // region into a dead zone where outside-click silently stops working.
     const { container, state, dispose } = mountHarness({ options: OPEN_OPTIONS, withAnchor: true });
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
 
@@ -216,10 +215,10 @@ describe("createPopoverAnchor", () => {
     // `visibility: hidden` intermediate and return an `incomplete` nobody can act on.
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     await expectNoA11yViolations(container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check).
-      // The IDREF itself is pinned in `popover-trigger.browser.test.tsx`.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `popover-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

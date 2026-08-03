@@ -6,24 +6,22 @@ import { type Accessor, For, Show } from "solid-js";
 import { Select } from "../index";
 
 // The single source of truth for Select's SSR → hydration round-trip tree, shared by
-// `select.ssr.test.tsx` (renders it, inline-snapshots the bytes), `select.browser.test.tsx` (passes it
-// to `hydrateFixture` and drives it open), and the hydration-fixture bridge (renders it server-side to
-// feed the browser test). Reusing one tree is what enforces "structurally identical server and client"
-// — hydration keys are a path through the component tree, so a component inserted before
-// `Select.Trigger`, even one that renders nothing, would shift the trigger's key.
+// `select.ssr.test.tsx` (renders it, inline-snapshots the bytes), `select.browser.test.tsx` (hydrates
+// it and drives it open), and the bridge that renders it server-side to feed that browser test.
 //
-// **The closed server render is the trigger plus the hidden `<select>`, and that is the whole point.**
-// `Select.Portal` renders nothing server-side and the popup renders nothing while closed, so no option
-// row reaches the server — yet every `<option>` does, because the option set is **data**. That is what
-// browser autofill matches against and what makes `required` block a submit before anything is opened.
+// **Sharing one tree is the point.** Solid matches server and client nodes by position, walking the
+// component tree to assign each one a hydration key, so inserting *any* component before
+// `Select.Trigger` — even one that renders nothing — shifts the trigger's key and breaks hydration.
+// Two hand-written copies of this tree would drift into exactly that. The `<ThemeProvider>` counts as
+// such a component and must therefore appear identically on both sides, even though it renders no DOM.
 //
-// The tree exercises the **grouped** mode end-to-end: `items` holds the group entries, `groupToItems`
-// flattens them into navigation order, and `Select.List`'s per-entry callback renders a `Group` (with
-// its `GroupLabel` and a nested `<For>` of the group's own items) plus a `Separator` between groups.
-// `name` is set so the hidden field is part of the round-trip, and a `defaultValue` pre-selects one
-// row so the tree includes a rendered `ItemIndicator` once opened and a `selected` `<option>` on the
-// server. The whole tree sits under a `<ThemeProvider>` fed the `hope` preset (a zero-DOM provider —
-// its token values live in CSS), which must be present identically everywhere because it shifts `_hk`.
+// **The closed server render is the trigger plus the hidden `<select>`.** `Select.Portal` renders
+// nothing server-side and the popup renders nothing while closed, so no option *row* reaches the
+// server — yet every `<option>` does, because the option set is **data**. That is what browser
+// autofill matches against, and what lets `required` block a submit before anything has been opened.
+//
+// The tree exercises the **grouped** mode end to end, sets `name` so the hidden field is part of the
+// round-trip, and pre-selects a row with `defaultValue` so the output carries a `selected` `<option>`.
 //
 // The trigger's `aria-label` is not decoration: a nameless `role="combobox"` is an axe
 // `aria-input-field-name` violation, and the popup's `role="listbox"` inherits its name from it.
@@ -70,9 +68,9 @@ function FruitItem(props: { fruit: Fruit }): JSX.Element {
 }
 
 /**
- * `defaultOpen` is optional so the ssr test can also exercise the open server render (the `Portal`'s
- * `isServer` guard must not crash `renderToStringAsync`, and no portaled row may reach the output).
- * The hydration path uses the default — closed.
+ * `defaultOpen` is optional so the ssr test can also exercise the *open* server render: the `Portal`'s
+ * `isServer` guard must not crash `renderToStringAsync`, and no portaled row may reach the output. The
+ * hydration path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
   return (

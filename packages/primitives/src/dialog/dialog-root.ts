@@ -8,34 +8,28 @@ import {
 import { withDefaults } from "../utils";
 
 /**
- * The shared state kernel of a dialog — the one call at the root of the tree. It owns open
- * state, the popup/title/description ids, and the spared-element registry, and it renders **no
- * JSX and no host element**. The per-part hooks (`createDialogTrigger`, `createDialogContent`,
- * `createDialogBackdrop`, `createDialogPortal`, `createDialogCloseTrigger`, `createDialogTitle`,
- * `createDialogDescription`) each take this state plus their own props and own the rest — their
- * effects, their id/element registration, and their consumer-prop precedence. `Dialog.Root` calls
- * this once and shares the return on context; a headless consumer holds it and threads it into
- * whichever part hooks it needs.
+ * The shared state kernel of a dialog — one call at the root of the tree. It owns open state, the
+ * popup/title/description ids and the spared-element registry, and renders **no JSX and no host
+ * element**. Each part hook (`createDialogTrigger`, `createDialogContent`, …) takes this state plus
+ * its own props and owns the rest: its effects, its id/element registration, its prop precedence.
  *
- * Owns the **shared overlay presence** (`contentPresence`) and the content element ref
- * (`contentElement`), because these are the one piece of dialog behavior that must be created
- * *eagerly* (while closed) and shared across parts. `Dialog.Content` is mounted lazily — only once
- * open — so a presence created inside `createDialogContent` would see `present` already `true` on
- * its first run and latch straight to `"entered"`, skipping the enter animation. Created here, its
- * first run observes `open === false`, so opening drives `entering → entered`. Both the content and
- * the (transition-less) positioner consume this one presence; `createDialogBackdrop` keeps its own
- * (the backdrop is mounted eagerly, so per-part is correct there). Mirrors Ark UI's split.
+ * It also owns the single *shared* content presence — the state that keeps an element mounted
+ * through its exit animation — and the content element ref, because presence must be created
+ * **eagerly**, while the dialog is still closed. `Dialog.Content` mounts only once open, so a
+ * presence created inside `createDialogContent` would see `present` already `true` on its first run
+ * and latch straight to `"entered"`, skipping the enter animation. Content and positioner share
+ * this one; the backdrop mounts eagerly, so `createDialogBackdrop` keeps its own.
  *
- * Deliberately does **not** own the focus/dismiss/hide-outside/scroll effect **stack**, nor the
- * per-part refs those effects read: those belong to the part that renders the element
- * (`createDialogContent`), so each effect lives in that element's own scope and tears down when it
- * unmounts. This split mirrors React Aria's `useDialog`/`useOverlay*` decomposition (its public
- * surface and a11y reasoning, not its code).
+ * It deliberately does **not** own the focus/dismiss/hide-outside/scroll effect stack — those
+ * belong to `createDialogContent`, so each effect lives in the content element's own scope and
+ * tears down when it unmounts.
  *
- * Call it **once**, inside a reactive owner scope (a component body, or a `createRoot`).
+ * Call it **once**, inside a reactive owner scope (a component body, or a `createRoot`). Full
+ * rationale: `__internal__/primitives/dialog/dialog-root.md`.
  */
 
-/** The dialog's ARIA role. `alertdialog` is the APG destructive-confirmation pattern. */
+/** The dialog's ARIA role. `alertdialog` is the ARIA Authoring Practices Guide's pattern for a
+ * destructive confirmation. */
 export type DialogRole = "dialog" | "alertdialog";
 
 export interface CreateDialogOptions {
@@ -69,11 +63,8 @@ export interface CreateDialogOptions {
    * `createDialogContent` to `createDismissable`'s `bubbles`.
    */
   bubbles?: DismissBubbles;
-  /**
-   * ARIA role — `"dialog"` (default) or `"alertdialog"` (the APG destructive-confirmation pattern).
-   * An accessibility concern, so it lives on the state hook (not the styling layer): `createDialogContent`
-   * reads it for the surface's `role` attribute.
-   */
+  /** ARIA role — `"dialog"` (default) or `"alertdialog"`. Read by `createDialogContent` for the
+   * surface's `role` attribute. */
   role?: DialogRole;
 }
 
@@ -130,9 +121,8 @@ export interface CreateDialogReturn {
 }
 
 export function createDialog(options: CreateDialogOptions = {}): CreateDialogReturn {
-  // `withDefaults`, not `merge({ modal: true }, options)`: `merge` resolves by key *presence*, so
-  // a wrapper forwarding an unset `modal`/`defaultOpen` (the key present with value `undefined`)
-  // would silently beat the default. See `withDefaults`' doc.
+  // `withDefaults`, never `merge({ modal: true }, options)`: `merge` resolves by key *presence*, so
+  // a wrapper forwarding an unset `modal` would silently beat the default. See `withDefaults`' doc.
   const merged = withDefaults(options, {
     defaultOpen: false,
     modal: true,
@@ -150,14 +140,16 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   const isModal = () => open() && modal();
   const closeOnEscape = () => merged.closeOnEscape;
   const closeOnInteractOutside = () => merged.closeOnInteractOutside;
-  // No `withDefaults` entry: "neither channel bubbles" is what an absent `bubbles` already means to
-  // `createDismissable`, so a default here would only restate it.
+  // No `withDefaults` entry: an absent `bubbles` already means "neither channel" to
+  // `createDismissable`.
   const bubbles = () => merged.bubbles;
   const role = () => merged.role;
 
-  // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
-  // so a consumer-pinned id can't be registered server-side. This is the only `createUniqueId`
-  // the root consumes, and it fixes the trigger's SSR hydration key — see the fixtures README.
+  // The generated id is the server-visible fallback: `createRegisteredId` runs in an effect, and
+  // effects never run during SSR, so a consumer-pinned id cannot be registered server-side.
+  // Keep it the root's only `createUniqueId` call and keep it here: Solid matches server and client
+  // nodes positionally, and reserving another id ahead of it shifts the trigger's hydration key
+  // (`_hk`) on one side only. See `__internal__/testing.md`.
   const generatedPopupId = createUniqueId();
   const [customPopupId, setCustomPopupId] = createSignal<string | undefined>();
   const popupId = () => customPopupId() ?? generatedPopupId;
@@ -172,9 +164,9 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   const removeSparedElement = (element: Element) =>
     setSparedElements((previous) => previous.filter((candidate) => candidate !== element));
 
-  // The content element + the ONE shared overlay presence. Created after `createUniqueId` above so
-  // the trigger's SSR hydration key is unaffected by the id `createPresence` reserves. Eager
-  // (created while `open` is `false`) so opening drives `entering → entered` — see this hook's doc.
+  // Keep this after the `createUniqueId` above: anything created ahead of it can change which id
+  // the popup gets, and the trigger's hydration key with it. Created eagerly — while `open` is
+  // still `false` — so opening drives `entering → entered`; see this hook's doc.
   const [contentElement, setContentElement] = createSignal<HTMLElement>();
   const contentPresence = createPresence({ present: open, ref: contentElement });
 

@@ -3,10 +3,9 @@ import { composeEventHandlers } from "@hope-ui/primitives/utils";
 import { type Component, merge, omit } from "solid-js";
 import { useAlertContext } from "./alert-context";
 
-// `Alert.CloseTrigger` is a `CloseButton` with the alert's dismiss wiring — so it inherits
-// `size`/`icon`/`render`/`class`/`slotClasses`/native attrs for free and shows the themed X by
-// default. Because it renders a recipe-styled `CloseButton`, any closable Alert **requires a
-// `<ThemeProvider>`** ancestor (see `Alert.md`).
+// A `CloseButton` with the alert's dismiss wiring bolted on, so it inherits
+// `size`/`icon`/`render`/`class`/`slotClasses` and the native attributes for free. Rendering a styled
+// `CloseButton` is also why any closable Alert requires a `<ThemeProvider>` ancestor.
 export interface AlertCloseTriggerProps extends CloseButtonProps {}
 
 export const CloseTrigger: Component<AlertCloseTriggerProps> = (props) => {
@@ -15,22 +14,22 @@ export const CloseTrigger: Component<AlertCloseTriggerProps> = (props) => {
 
   const elementProps = merge(rest, {
     get onClick() {
-      // Composed in FRONT of the consumer's, so their `event.preventDefault()` cancels the close (the
-      // cancel channel in `composeEventHandlers`). Mirrors `createDialogCloseTrigger`.
+      // The consumer's handler runs *first*, so their `event.preventDefault()` cancels the close.
       return composeEventHandlers<HTMLButtonElement, MouseEvent>(props.onClick, () =>
         ctx.setOpen(false),
       );
     },
     get class(): string {
-      // Placement from the alert recipe's `closeTrigger` slot, merged with any consumer `class` (which
-      // wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's own chrome.
+      // The consumer's class goes *into* the slot function, never concatenated after it: only then
+      // does tailwind-merge see both strings and let the consumer's utility win a conflict.
       return ctx.slots.closeTrigger(props.class);
     },
-    // Re-scope CloseButton's root marker to this part (overrides its `close-button` default).
+    // Overrides the `close-button` marker `CloseButton` sets on itself.
     "data-slot": "alert-close-trigger",
   });
 
-  // `render` is passed to `CloseButton` directly (not through the spread) — it is read synchronously to
-  // build the element, so a reactive spread-read would trip `STRICT_READ_UNTRACKED`. Mirrors `Dialog.CloseTrigger`.
+  // `render` is handed over separately rather than through the spread: `CloseButton` reads it
+  // synchronously to build the element, and Solid flags a reactive read outside a tracking scope
+  // (`STRICT_READ_UNTRACKED`) when it comes from a spread.
   return <CloseButton {...(elementProps as CloseButtonProps)} render={props.render} />;
 };

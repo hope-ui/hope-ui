@@ -2,9 +2,9 @@ import axe from "axe-core";
 
 export interface A11yCheckOptions {
   /**
-   * axe rule ids whose `incomplete` results this call accepts. Every entry needs a comment
-   * at the call site explaining why the rule cannot be judged there — an accepted
-   * `incomplete` is a documented gap, not a passing check.
+   * axe rule ids whose `incomplete` results this call accepts. Every entry needs a comment at the call
+   * site explaining why that rule cannot be judged there: an accepted `incomplete` is a documented
+   * gap, not a check that passed.
    */
   allowIncomplete?: readonly string[];
 }
@@ -22,18 +22,17 @@ function summarize(results: readonly axe.Result[]): string {
 }
 
 /**
- * Runs axe-core against a mounted container and throws with a readable summary if any
- * violation is found. Every component's browser test should call this at least once so
- * a baseline a11y check happens by default, not as an opt-in.
+ * Runs axe-core against a mounted container and throws with a readable summary on any violation.
+ * Every component's browser test should call it at least once, so a baseline a11y check is the
+ * default rather than an opt-in.
  *
- * It also fails on axe's **`incomplete`** results — the rules axe ran but could not decide,
- * and flags for human review. They were being dropped on the floor entirely. The whole
- * browser suite reports zero of them today, so the strict default costs nothing and catches
- * the next one.
+ * It fails on axe's `incomplete` results too — rules axe ran but could not decide, and flags for a
+ * human. Those are easy to drop on the floor; the whole browser suite reports zero of them today, so
+ * treating them as failures costs nothing and catches the first one that appears.
  *
- * When axe genuinely cannot judge a rule in a headless test — `color-contrast` against an
- * unresolvable background is the usual one — name the rule in `allowIncomplete` with a
- * reason, rather than silencing the category.
+ * Where axe genuinely cannot judge a rule in a headless test (`color-contrast` against a background it
+ * can't resolve is the usual one), name that rule in `allowIncomplete` with a reason at the call site,
+ * rather than silencing the whole category.
  */
 export async function expectNoA11yViolations(
   container: Element,

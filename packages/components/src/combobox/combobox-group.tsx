@@ -21,14 +21,12 @@ export interface ComboboxGroupProps extends ComboboxGroupElementProps {
  * A `role="group"` section that names itself from its `Combobox.GroupLabel`. Rendered from
  * `Combobox.List`'s per-entry callback once `groupToItems` is set on `Combobox.Root`.
  *
- * `createListboxGroup` is reused **unchanged** — it takes props only, no state, so there is nothing
- * for the combobox kernel to adapt. It owns the `role` + `aria-labelledby` + the label-id
- * registration seam (published on `ComboboxGroupContext` for the label child); this layer adds the
- * recipe `group` slot + `data-slot`.
+ * `createListboxGroup` owns the `role`, the `aria-labelledby` and the id-registration seam its label
+ * child uses; this layer adds the recipe `group` slot.
  *
- * **Under a filter, a group is rendered only if something in it survived** — `Combobox.Root` drops
- * the empty ones — so a heading never outlives its last row. Iterate the callback's **third
- * argument**, not your own `category.products`; see `Combobox.List`.
+ * **Under a filter, a group is rendered only if something in it survived** — `Combobox.Root` drops the
+ * empty ones — so a heading never outlives its last row. Iterate the callback's **third argument**,
+ * not your own `category.products`; see `Combobox.List`.
  */
 export const Group: Component<ComboboxGroupProps> = (props) => {
   const ctx = useComboboxContext();

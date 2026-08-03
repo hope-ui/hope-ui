@@ -14,9 +14,8 @@ import type {
 const _variants: PopoverRecipeVariants = { size: "lg" };
 void _variants;
 
-// `PopoverThemeableProps` is the curated surface a preset may default app-wide. Popover carries no
-// non-variant chrome content, so it is exactly the recipe variants — a strict superset by
-// construction, so a bare variants object is still assignable to it (and vice versa).
+// Popover carries no non-variant chrome content, so the themeable surface is exactly the recipe
+// variants and the two are mutually assignable.
 const _variantsAreThemeable = (v: PopoverRecipeVariants): PopoverThemeableProps => v;
 void _variantsAreThemeable;
 const _themeableAreVariants = (v: PopoverThemeableProps): PopoverRecipeVariants => v;
@@ -36,8 +35,8 @@ describe("popover recipe contract", () => {
     ];
 
     expect(sizes).toHaveLength(3);
-    // Seven, not ten: `Popover.Root` renders no element and `Trigger`/`Anchor` render the consumer's,
-    // so none of the three carries a slot — see the contract's `PopoverSlot` doc comment.
+    // Seven, not ten: `Popover.Root` renders no element and `Trigger`/`Anchor` render the *consumer's*,
+    // so none of the three carries a slot. See the contract's `PopoverSlot` doc comment.
     expect(slots).toHaveLength(7);
   });
 });

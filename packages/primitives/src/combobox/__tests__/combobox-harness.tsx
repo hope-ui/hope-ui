@@ -19,12 +19,11 @@ import {
   createComboboxValue,
 } from "../index";
 
-// Shared test support for the combobox kernel. Lives under `__tests__/` so `check:coverage-parity`
-// treats it as test support, not a source file needing its own test/doc.
+// Shared test support. Lives under `__tests__/` so `check:coverage-parity` treats it as test
+// support, not a source file needing its own test and doc.
 //
-// This is the `SelectListbox` shape from `listbox-harness.tsx`, grown up: DOM focus lives on an
-// external `role="combobox"` owner, the popup mounts lazily, and every prop on every element comes
-// from a kernel hook. It exists so the kernel can be driven end-to-end *before* any component does.
+// Every prop on every element comes from a `createCombobox*` hook, so these primitives can be driven
+// end-to-end before any component assembles them.
 
 /** Array access that asserts presence — under `noUncheckedIndexedAccess`, `list[i]` is `T | undefined`. */
 export function nth<T>(list: ArrayLike<T>, index: number): T {
@@ -36,8 +35,8 @@ export function nth<T>(list: ArrayLike<T>, index: number): T {
 }
 
 /**
- * `Açaí` is load-bearing, not decoration: it is what proves the collator folds diacritics, so a
- * `acai` query matches it where `toLowerCase()` never would.
+ * `Açaí` is load-bearing: it is what proves typeahead's locale-aware string comparison folds
+ * diacritics, so an `acai` query matches it where `toLowerCase()` never would.
  */
 export const FRUITS = ["Apple", "Banana", "Cherry", "Date", "Açaí"];
 
@@ -45,23 +44,22 @@ export const FRUITS = ["Apple", "Banana", "Cherry", "Date", "Açaí"];
  * Clear of every edge, so neither `flip` nor `shift` has anything to react to — and deliberately
  * **away from the top-left**, where a `mount()`ed tree renders in normal flow.
  *
- * The physical Playwright cursor is per-page and persists across test files, so wherever a
- * `userEvent.click` here leaves it, the *next* file's tree mounts underneath it — and Chrome fires
- * `mouseenter` on whatever element the layout puts under a stationary pointer. That is a real
- * cross-file coupling: parked at (160, 120), these tests made `calendar-cell`'s range hover preview
- * (`onMouseEnter` → `highlightDate`) fire on mount, moving `focusedDate` off the day the test had
- * just clicked. Keeping the cursor out of the flow region is mitigation, not a cure — see this
- * folder's note in the phase summary. The viewport is Vitest's default 414 × 896, so this has to
- * stay inside it — a trigger `userEvent` cannot reach fails every test here.
+ * Playwright's cursor is physical and per-page, so it survives into the *next* test file, which then
+ * mounts its tree underneath it — and Chrome fires `mouseenter` on whatever the layout puts under a
+ * stationary pointer. Parked at (160, 120), these tests once made `calendar-cell`'s hover preview
+ * fire on mount and move the focused date off the day that test had just clicked. Keeping the cursor
+ * out of the flow region is mitigation, not a cure.
+ *
+ * Must stay inside Vitest's default 414 × 896 viewport: a trigger `userEvent` cannot reach fails
+ * every test in this folder.
  */
 const TRIGGER_STYLE: JSX.CSSProperties = { position: "fixed", top: "620px", left: "40px" };
 
 /**
- * The control shell's style. Opaque on purpose: a `position: fixed` element over an unpainted page
- * leaves axe unable to resolve what is behind its text, and `color-contrast` comes back
- * **incomplete** — which `expectNoA11yViolations` fails on, correctly. Giving it a real background
- * and colour makes the check decidable instead of suppressing it, and this package compiles no CSS
- * of its own so nothing else would.
+ * Opaque on purpose. A `position: fixed` element over an unpainted page leaves axe unable to resolve
+ * what is behind its text, so `color-contrast` comes back **incomplete** — which
+ * `expectNoA11yViolations` fails on, correctly. A real background and colour makes the check
+ * decidable rather than suppressed; this package compiles no CSS, so nothing else would supply one.
  */
 const CONTROL_STYLE: JSX.CSSProperties = {
   ...TRIGGER_STYLE,
@@ -70,14 +68,13 @@ const CONTROL_STYLE: JSX.CSSProperties = {
 };
 
 /**
- * The two gutter buttons are **sized and empty**, which is both halves of what they need.
+ * The gutter buttons are **sized and empty**, and need to be both.
  *
- * *Sized*, because a childless `<button>` — and especially a childless `<div role="button">` — is
+ * *Sized*, because a childless `<button>` — especially a childless `<div role="button">` — is
  * zero-height, and Playwright's click waits forever for an element that is never "visible and
- * stable". *Empty*, because the real parts render an SVG glyph: giving these a text glyph instead
- * would put text over a `position: fixed` ancestor this package paints no CSS for, and axe returns
- * `color-contrast` as **incomplete** for it — a fact about the harness, not about the hooks. Their
- * accessible name comes from `aria-label`, which is what the hooks actually own.
+ * stable". *Empty*, because a text glyph over a `position: fixed` ancestor this package paints no
+ * CSS for makes axe report `color-contrast` as **incomplete**. Their accessible name comes from
+ * `aria-label`, which is the part the hooks actually own.
  */
 const GUTTER_BUTTON_STYLE: JSX.CSSProperties = { width: "20px", height: "20px" };
 
@@ -103,8 +100,8 @@ export interface ComboboxHarnessProps<V> {
 export function ComboboxHarness<V>(props: ComboboxHarnessProps<V>): JSX.Element {
   const labelOf = (value: V) => props.labelOf?.(value) ?? String(value);
 
-  // `merge`, never a spread: a spread reads every getter once, so a test controlling `open` or
-  // `value` through `props.options` would freeze at its first value.
+  // `merge`, never a spread: a spread reads every getter once, so a test driving `open` or `value`
+  // through `props.options` would freeze at whatever the first read returned.
   const overrides: Omit<CreateComboboxOptions<V, SelectionMode>, "items"> = props.options ?? {};
   const state = createCombobox<V, SelectionMode>(
     merge(overrides, {
@@ -130,9 +127,9 @@ export function ComboboxHarness<V>(props: ComboboxHarnessProps<V>): JSX.Element 
     return selected.length === 0 ? "Pick a fruit" : selected.map(labelOf).join(", ");
   };
 
-  // A nested component, so `createComboboxValue` — and the id it registers upward — is scoped to the
-  // part actually rendering, exactly as `Select.Value` will be. Called from the harness body instead,
-  // a `withoutValue` tree would still publish a `valueId` for an element that does not exist.
+  // A nested component, so the id `createComboboxValue` registers upward is scoped to the part that
+  // actually renders — exactly as `Select.Value` will be. Called from the harness body instead, a
+  // `withoutValue` tree would still publish a `valueId` for an element that does not exist.
   function ValuePart(): JSX.Element {
     const value = createComboboxValue(state, props.valueProps ?? {});
     return (
@@ -153,9 +150,8 @@ export function ComboboxHarness<V>(props: ComboboxHarnessProps<V>): JSX.Element 
       <Show
         when={props.triggerAs !== "div"}
         fallback={
-          // Re-targeting a different tag is the case that casts, at the call site — the shape
-          // `renderAsAnchor` uses in the Button tests. The kernel types its props over the element
-          // the trigger normally *is*.
+          // Re-targeting a different tag is the case that casts, and it casts at the call site: the
+          // hook types its props over the element the trigger normally *is*.
           <div
             data-testid="trigger"
             style={TRIGGER_STYLE}
@@ -198,16 +194,12 @@ export function ComboboxHarness<V>(props: ComboboxHarnessProps<V>): JSX.Element 
   );
 }
 
-// ─── The input-focus-owner harness (the Combobox shape) ──────────────────────────────────────────
+// The same state with the focus owner swapped: `role="combobox"` on an `<input>` instead of a
+// `<button>`, no typeahead, and the chevron/clear buttons beside it — so both personalities can be
+// driven side by side against one `createCombobox`.
 //
-// The same kernel with the focus owner swapped: `role="combobox"` on an `<input>` instead of a
-// `<button>`, no typeahead, and the chevron/clear buttons beside it. It renders `Combobox`'s parts
-// (`createComboboxInput` / `createComboboxToggle` / `createComboboxClear` / `createComboboxStatus`)
-// against the same `createCombobox` state, so the kernel's two personalities can be driven
-// side by side.
-//
-// The text value is created **here**, not inside the input part — the same place `Combobox.Root`
-// creates it, because the kernel owns no text value and the filter derives from it.
+// The text value is created **here**, not inside the input part, which is where `Combobox.Root`
+// creates it too: these primitives own no text value, and the filter derives from it.
 
 export interface ComboboxInputHarnessProps<V> {
   values: V[];
@@ -236,10 +228,10 @@ export function ComboboxInputHarness<V>(props: ComboboxInputHarnessProps<V>): JS
 
   const overrides: Omit<CreateComboboxOptions<V, SelectionMode>, "items"> = props.options ?? {};
   const state = createCombobox<V, SelectionMode>(
-    // `modal: false` first, so a test can still override it: `merge` resolves by key *presence*, and
-    // the overrides come second. It is what `Combobox.Root` passes, and it matters here — the kernel
-    // defaults to `true`, and `createHideOutside` would mark the harness's own outside button
-    // `inert`, so every Tab/blur assertion would silently be testing nothing.
+    // `modal: false` first, so a test can still override it — `merge` resolves by key presence and
+    // the overrides come second. It is what `Combobox.Root` passes, and it matters here: modality
+    // would mark the harness's own outside button `inert` (unfocusable, unclickable), so every
+    // Tab/blur assertion below would silently be testing nothing.
     merge({ modal: false }, overrides, {
       get items() {
         return props.values;
@@ -296,7 +288,7 @@ export function ComboboxInputHarness<V>(props: ComboboxInputHarnessProps<V>): JS
   }
 
   // A nested component, so the announcer's effect is scoped to the part that actually renders —
-  // exactly as `Combobox.Status` is, and which is what makes "announces once per open" observable.
+  // exactly as `Combobox.Status` is, and what makes "announces once per open" observable at all.
   function StatusPart(): JSX.Element {
     const status = createComboboxStatus(state, {});
     return (
@@ -312,7 +304,7 @@ export function ComboboxInputHarness<V>(props: ComboboxInputHarnessProps<V>): JS
   return (
     <>
       {/* The shell `Combobox.Control` is: the positioning anchor, and the outer edge of "not
-          outside" for dismissal. The ref is cast because the kernel types it over `HTMLElement`. */}
+          outside" for dismissal. The ref is cast because the hook types it over `HTMLElement`. */}
       <div
         data-testid="control"
         style={CONTROL_STYLE}
@@ -394,8 +386,6 @@ export function activeLabelForInput(container: Element): string | undefined {
   }
   return optionsOf(container).find((option) => option.id === id)?.dataset.value;
 }
-
-// ─── Queries ──────────────────────────────────────────────────────────────────────────────────────
 
 export const triggerOf = (container: Element) =>
   container.querySelector('[data-testid="trigger"]') as HTMLButtonElement;

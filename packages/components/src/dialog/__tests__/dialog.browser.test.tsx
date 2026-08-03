@@ -8,29 +8,21 @@ import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Dialog } from "../index";
 
-// `Dialog.CloseTrigger` now renders a recipe-styled `CloseButton` (an icon-only X, self-labelled
-// `common.close` → accessible name "Close"), so any tree that renders it must sit under a
-// `<ThemeProvider>` fed the `hope` preset. It is a zero-DOM provider (its token values live in CSS).
-// The Close button is still located by its accessible name — `getByRole("button", { name: "Close" })`
-// — which the default `aria-label` keeps stable, so the interaction assertions are unchanged.
+// `Dialog.CloseTrigger` renders a styled `CloseButton`, so every tree here needs a `<ThemeProvider>`.
+// The provider emits no DOM of its own (the preset's values live in CSS). The close button is always
+// located by its accessible name, which its default `aria-label` keeps as "Close".
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
 
-// Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
-// `.html`). `Tree` is the same tree `dialog.ssr.test.tsx` inline-snapshots and the bridge renders,
-// so the hydration input and the client tree cannot structurally diverge. The interaction tests
-// below keep their own richer `FullDialog` (testids + positioning) — they `mount()`, they don't hydrate.
+// Real server HTML, rendered in-process by the hydration-fixture bridge from the same `Tree` that
+// `dialog.ssr.test.tsx` snapshots — so the hydration input and the client tree cannot diverge. The
+// interaction tests below use their own richer `FullDialog` instead; they mount, they don't hydrate.
 import { Tree } from "./dialog.ssr-entry";
 
 /**
- * Structurally identical to `Dialog.ssr.test.tsx`'s `FullDialog`, which produces the fixture
- * the hydration tests below consume. Hydration keys are allocated by walking the component
- * tree, so inserting a component before `Dialog.Trigger` here — even one that renders nothing
- * — shifts the trigger's key and fails hydration.
- *
- * The extra props on `Backdrop`/`Popup` are safe: both live inside `Dialog.Portal`, which
- * renders nothing server-side and nothing at all while closed.
+ * The tree the interaction tests drive. The extra props on Backdrop/Content are safe here: both sit
+ * inside `Dialog.Portal`, which renders nothing on the server and nothing at all while closed.
  */
 function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
   return (
@@ -38,10 +30,9 @@ function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
       <Dialog.Root onOpenChange={props.onOpenChange}>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          {/* Backdrop/Popup given real positioning/dimensions here so real clicks land where a
-          consumer's own CSS would put them in practice — a `position: fixed` backdrop otherwise paints
-          above a non-positioned (static) Popup regardless of DOM order, which would make Popup's own
-          content unclickable. */}
+          {/* Positioned inline, because there is no Tailwind build in this project to apply the
+          recipe's own positioning. A `position: fixed` backdrop paints above a static Content
+          regardless of DOM order, which would make the card's own content unclickable. */}
           <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
           {/* No explicit CloseTrigger — `Content` auto-renders one (showCloseButton defaults true). */}
           <Dialog.Positioner>
@@ -57,10 +48,9 @@ function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
 }
 
 /**
- * A dialog with real page content behind it, so pointer-blocking and aria-hiding are
- * observable. The popup is pinned to the bottom-right so it never sits over the background
- * button — otherwise a hit test can't distinguish "blocked by `ModalBackdrop`" from
- * "covered by the popup".
+ * A dialog with real page content behind it, so pointer-blocking and aria-hiding are observable. The
+ * card is pinned to the bottom-right so it never overlaps the background button — otherwise a hit
+ * test could not tell "blocked by the modal layer" apart from "covered by the card".
  */
 function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () => void }) {
   return (
@@ -85,9 +75,8 @@ function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () =
 }
 
 /**
- * What a real mouse click at the centre of `element` would actually hit. A synthetic
- * `element.click()` bypasses hit testing entirely and would happily fire through a backdrop,
- * so it can't answer the question this file needs to ask.
+ * What a real mouse click at the centre of `element` would actually hit. `element.click()` skips hit
+ * testing entirely and fires straight through a backdrop, so it cannot answer that question.
  */
 function topmostElementOver(element: Element): Element | null {
   const rect = element.getBoundingClientRect();
@@ -112,13 +101,12 @@ describe("Dialog", () => {
     await expect.element(trigger).toHaveAttribute("aria-haspopup", "dialog");
     await expect.element(trigger).toHaveAttribute("aria-expanded", "false");
 
-    // No `aria-controls` while closed: `Popup` isn't in the DOM, and an IDREF that resolves
-    // to nothing is an invalid attribute value per ARIA (axe: `aria-valid-attr-value`).
+    // No `aria-controls` while closed: the content isn't in the DOM, and an id reference that
+    // resolves to nothing is invalid per ARIA (axe flags it as `aria-valid-attr-value`).
     expect(trigger.element().hasAttribute("aria-controls")).toBe(false);
 
-    // Grab the raw element *before* opening. Once a modal dialog is open,
-    // `createHideOutside` puts the trigger inside an `aria-hidden` subtree, so a
-    // role-based locator correctly stops matching it — it's no longer in the a11y tree.
+    // Grab the raw element *before* opening: once modal, everything outside the dialog is marked
+    // `aria-hidden`, so a role-based locator correctly stops matching the trigger.
     const triggerElement = trigger.element();
     await userEvent.click(trigger);
 
@@ -146,8 +134,8 @@ describe("Dialog", () => {
   });
 
   it("has no baseline accessibility violations while closed", async () => {
-    // The closed state is where the dangling `aria-controls` IDREF used to live, and nothing
-    // ever ran axe against it.
+    // The closed state is where the dangling `aria-controls` reference used to live, unnoticed
+    // because nothing ever ran axe against it.
     const { dispose } = mount(() => <FullDialog />);
     await expect.element(page.getByRole("button", { name: "Open dialog" })).toBeInTheDocument();
     await expectNoA11yViolations(document.body);
@@ -172,19 +160,17 @@ describe("Dialog", () => {
   });
 
   it("exposes createPresence's status as `data-presence` on Popup and Backdrop", async () => {
-    // The house convention for every component composing `createPresence` — a consumer's
-    // exit-transition CSS keys off it. Not `data-status`: see create-presence.md.
+    // The attribute name is a promise to consumers: their exit-transition CSS selects on it. Every
+    // component with an enter/exit animation spells it `data-presence`, never `data-status`.
     const { dispose } = mount(() => <FullDialog />);
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
     const dialog = page.getByRole("dialog").element();
     const backdrop = page.getByTestId("backdrop").element();
 
-    // `entering` first, then `entered` once the browser has painted the entering frame (a double
-    // rAF — see create-presence.md), which is what makes the enter CSS transition actually fire.
-    // Popup and Backdrop are *independent* `createPresence` instances, so their flips to `entered`
-    // aren't guaranteed to land in the same tick — wait for both rather than asserting one off the
-    // other's timing.
+    // The status goes `entering` first and only reaches `entered` after the browser has painted that
+    // frame, which is what makes the CSS transition actually run. Content and Backdrop track their
+    // own status independently, so wait for both rather than timing one off the other.
     await vi.waitFor(() => {
       expect(dialog.getAttribute("data-presence")).toBe("entered");
       expect(backdrop.getAttribute("data-presence")).toBe("entered");
@@ -235,8 +221,8 @@ describe("Dialog", () => {
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
     await expect.element(page.getByRole("button", { name: "Close" })).toHaveFocus();
 
-    // Only the Close button is focusable inside the popup, so Tab should cycle back
-    // to it rather than escaping to the trigger or backdrop.
+    // The close button is the only focusable element inside, so Tab must cycle back to it rather
+    // than escaping to the trigger or the backdrop.
     await userEvent.keyboard("{Tab}");
     await expect.element(page.getByRole("button", { name: "Close" })).toHaveFocus();
 
@@ -288,12 +274,10 @@ describe("Dialog", () => {
     void container;
   });
 
-  // ---- prop precedence: internal values must never silently discard the consumer's ----
-
   it("stays modal when a wrapper forwards an unset `modal` prop", async () => {
-    // Regression: `merge({ modal: true }, props)` resolves by key *presence*, so
-    // `<Dialog.Root modal={props.modal}>` with `modal` unset silently produced a
-    // non-modal dialog — no focus trap, no scroll lock, no aria-modal.
+    // Regression: Solid's `merge` resolves by key *presence*, so `<Dialog.Root modal={props.modal}>`
+    // with `modal` unset passed an explicit `undefined` that beat the default — silently producing a
+    // non-modal dialog with no focus containment, no scroll lock and no `aria-modal`.
     function Wrapper(props: { modal?: boolean }) {
       return (
         <Themed>
@@ -315,7 +299,7 @@ describe("Dialog", () => {
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
 
     await expect.element(page.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
-    // Modal implies the focus trap ran: focus moved into the popup.
+    // Focus moving inside is the observable proof that the modal path ran.
     await expect.element(page.getByRole("button", { name: "Close" })).toHaveFocus();
 
     dispose();
@@ -343,21 +327,17 @@ describe("Dialog", () => {
     dispose();
   });
 
-  // ---- `modal={false}`: dismissable and focus-restoring, but never inert ----
-
   it("restores focus to the trigger on Escape when modal={false}", async () => {
-    // The finding-5 regression. Focus restore used to live inside `createFocusTrap`'s
-    // cleanup, and a non-modal dialog never activates the trap — so Escape closed the
-    // dialog and stranded keyboard focus on `<body>`, in violation of the APG pattern
-    // `Dialog.md`'s keyboard table promises. Restore is now `createFocusRestore`, gated on
-    // `open()` alone.
+    // Regression: focus restoration used to live in the focus-containment cleanup, which a
+    // non-modal dialog never runs — so Escape closed the dialog and stranded keyboard focus on
+    // `<body>`. It is now driven by the open state alone, independent of modality.
     const { dispose } = mount(() => <DialogWithBackground modal={false} />);
 
     const trigger = page.getByRole("button", { name: "Open dialog" });
     await userEvent.click(trigger);
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
-    // Nothing traps focus here, so move it into the popup the way tabbing would.
+    // Nothing moves focus here, so put it inside the way tabbing would.
     const close = page.getByRole("button", { name: "Close" });
     (close.element() as HTMLElement).focus();
     await expect.element(close).toHaveFocus();
@@ -376,11 +356,10 @@ describe("Dialog", () => {
     await userEvent.click(trigger);
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
-    // No trap: focus stays on the trigger rather than jumping into the popup.
+    // Focus stays on the trigger rather than jumping into the dialog.
     await expect.element(trigger).toHaveFocus();
-    // No scroll lock.
     expect(document.body.style.overflow).toBe("");
-    // No hide-outside: the page behind stays in the accessibility tree and the focus order.
+    // The page behind stays in the accessibility tree and in the focus order.
     expect(container.getAttribute("aria-hidden")).toBeNull();
     expect(container.hasAttribute("inert")).toBe(false);
 
@@ -405,26 +384,25 @@ describe("Dialog", () => {
     dispose();
   });
 
-  // ---- `modal` (the default): the page behind is inert to pointer and to AT ----
-
   it("hides the page behind from assistive technology and the focus order while modal", async () => {
     const { container, dispose } = mount(() => <DialogWithBackground />);
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
-    // `aria-modal="true"` alone has known VoiceOver/Safari gaps, so `createHideOutside` marks
-    // everything outside the popup: `aria-hidden` for the accessibility tree, `inert` for the
-    // focus order and hit testing. The popup itself stays reachable.
+    // `aria-modal="true"` alone has known VoiceOver/Safari gaps, so everything outside the dialog is
+    // marked twice over: `aria-hidden` for the accessibility tree, and `inert` (which removes an
+    // element from the focus order and from hit testing) for input. The dialog stays reachable.
     expect(container.getAttribute("aria-hidden")).toBe("true");
     expect(container.hasAttribute("inert")).toBe(true);
     expect(page.getByRole("dialog").element().getAttribute("aria-hidden")).toBeNull();
     expect(page.getByRole("dialog").element().hasAttribute("inert")).toBe(false);
 
-    // The trigger is inside the hidden subtree, so it leaves the accessibility tree entirely.
+    // The trigger sits in the hidden subtree, so it leaves the accessibility tree entirely.
     expect(page.getByRole("button", { name: "Open dialog" }).query()).toBeNull();
 
-    // And `inert` takes the background out of the focus order, which `aria-hidden` never does.
+    // `inert` takes the background out of the focus order, which `aria-hidden` alone never does —
+    // which is why neither attribute is sufficient on its own.
     const background = page.getByTestId("background-button").element() as HTMLElement;
     background.focus();
     expect(document.activeElement).not.toBe(background);
@@ -438,9 +416,9 @@ describe("Dialog", () => {
   });
 
   it("spares both backdrops from `inert`, so they keep working", async () => {
-    // An `inert` element is transparent to hit testing. A `ModalBackdrop` that hid itself
-    // would silently stop blocking the pointer, and a consumer's `Dialog.Backdrop` would lose
-    // its hover styles and pointer handlers.
+    // An `inert` element is transparent to hit testing, so the pointer-blocking layer marking
+    // itself inert would silently stop blocking, and a consumer's `Dialog.Backdrop` would lose its
+    // hover styles and pointer handlers.
     const { dispose } = mount(() => (
       <Themed>
         <Dialog.Root defaultOpen>
@@ -466,10 +444,9 @@ describe("Dialog", () => {
   });
 
   it("blocks the pointer from reaching the page behind a modal dialog, with no Backdrop", async () => {
-    // The finding-6 regression. `Dialog.Backdrop` is optional and `aria-modal` doesn't stop
-    // a mouse, so a modal dialog with no Backdrop let a click land on a background button —
-    // the click fires before `createFocusTrap`'s `focusin` handler can yank focus back.
-    // `Dialog.Portal` now always renders the kernel's `ModalBackdrop` when modal.
+    // Regression: `Dialog.Backdrop` is optional and `aria-modal` does not stop a mouse, so a modal
+    // dialog without one let clicks land on the page behind — the click fires before the focus
+    // handler can pull focus back. `Dialog.Portal` now always renders its own blocking layer.
     const onBackgroundClick = vi.fn();
     const { dispose } = mount(() => <DialogWithBackground onBackgroundClick={onBackgroundClick} />);
 
@@ -487,14 +464,12 @@ describe("Dialog", () => {
   });
 
   it("keeps a consumer Backdrop hit-testable above the internal one", async () => {
-    // `ModalBackdrop` is `Portal`'s *first* child, so a consumer's optional `Dialog.Backdrop`
-    // still paints and hit-tests above it — its hover styles, transitions and pointer handlers
-    // all keep working. Rendering it inside `Popup` (where Base UI puts theirs) would cover
-    // the consumer's and silently swallow them.
+    // The blocking layer is `Portal`'s *first* child, so a consumer's `Dialog.Backdrop` paints and
+    // hit-tests above it and keeps its hover styles, transitions and pointer handlers. Rendering
+    // the blocking layer last would silently swallow all of them.
     //
-    // `onPointerDown`, not `onClick`: `createDismissable` closes the dialog on a capture-phase
-    // `pointerdown`, which unmounts the Backdrop before `click` is ever dispatched. That's
-    // true with or without a `ModalBackdrop` — see Dialog.md.
+    // `onPointerDown`, not `onClick`: dismissal listens on a capture-phase `pointerdown`, which
+    // unmounts the Backdrop before a `click` is ever dispatched to it.
     const onBackdropPointerDown = vi.fn();
     const { dispose } = mount(() => (
       <Themed>
@@ -543,7 +518,7 @@ describe("Dialog", () => {
     dispose();
   });
 
-  // ---- composeEventHandlers: `preventDefault()` is the consumer's cancel channel ----
+  // A consumer's `preventDefault()` is the documented way to cancel an open or a close.
 
   it("lets a consumer's onClick cancel the open with preventDefault", async () => {
     const { dispose } = mount(() => (
@@ -596,9 +571,9 @@ describe("Dialog", () => {
       <Themed>
         <Dialog.Root defaultOpen>
           <Dialog.Portal>
-            {/* Positioned, because a modal dialog always renders a `position: fixed`
-            `ModalBackdrop` and a `position: static` popup paints beneath it. See Dialog.md.
-            `showCloseButton={false}` so the only Close button is the explicit one under test. */}
+            {/* Positioned, because a modal dialog always renders a `position: fixed` blocking layer
+            and a static card paints beneath it. `showCloseButton={false}` so the only Close button
+            in the tree is the explicit one under test. */}
             <Dialog.Positioner>
               <Dialog.Content showCloseButton={false} style={{ position: "fixed" }}>
                 <Dialog.Title>Title</Dialog.Title>
@@ -623,8 +598,8 @@ describe("Dialog", () => {
     const close = page.getByRole("button", { name: "Close" });
     await expect.element(close).toBeInTheDocument();
 
-    // `ModalBackdrop` covers the viewport, but the popup renders after it and is positioned,
-    // so it paints (and hit-tests) above.
+    // The blocking layer covers the viewport, but the card renders after it and is positioned, so
+    // it paints — and hit-tests — above.
     expect(topmostElementOver(close.element())).toBe(close.element());
     await userEvent.click(close);
     expect(page.getByRole("dialog").query()).toBeNull();
@@ -633,9 +608,9 @@ describe("Dialog", () => {
   });
 
   it("keeps a consumer-supplied aria-labelledby when no Dialog.Title is rendered", async () => {
-    // Regression: `aria-labelledby` came from `context.titleId()`, which is `undefined`
-    // with no Title mounted — and `merge` let that `undefined` erase the consumer's value,
-    // leaving the dialog with no accessible name at all.
+    // Regression: the internal `aria-labelledby` is `undefined` when no Title is mounted, and
+    // `merge` let that `undefined` erase the consumer's value — leaving the dialog unnamed. An
+    // internal value must fall back to the consumer's, never overwrite it.
     const { dispose } = mount(() => (
       <Themed>
         <Dialog.Root>
@@ -726,10 +701,9 @@ describe("Dialog", () => {
     const trigger = page.getByRole("button", { name: "Open dialog" });
     const triggerElement = trigger.element();
 
-    // `Popup` registers its id with `Root` on mount — before it ever renders a DOM node — so
-    // the very first `aria-controls` the trigger emits already names the consumer's id, even
-    // though the trigger renders before the portal. (The attribute itself only appears on
-    // open; while closed it would be a dangling IDREF.)
+    // `Content` registers its id with `Root` on mount, before it renders any DOM, so the first
+    // `aria-controls` the trigger emits already names the consumer's id even though the trigger
+    // renders before the portal. The attribute appears only on open; closed, it would dangle.
     await userEvent.click(trigger);
     expect(triggerElement.getAttribute("aria-controls")).toBe("my-popup");
     await expect.element(page.getByRole("dialog")).toHaveAttribute("id", "my-popup");
@@ -755,20 +729,18 @@ describe("Dialog", () => {
 
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
     expect(consumerRef).toBe(page.getByRole("dialog").element());
-    // The internal ref still works: Escape only closes if createDismissable got the element.
+    // `renderElement` collapses the internal ref and the consumer's into one, so the consumer's
+    // must not have replaced it: Escape only closes if the dismiss layer still got the element.
     await userEvent.keyboard("{Escape}");
     expect(page.getByRole("dialog").query()).toBeNull();
 
     dispose();
   });
 
-  // ---- styled layer: recipe slots, showCloseButton, dismissal toggles (from Root) ----
-
   /**
-   * A full styled dialog with the structural parts, so the recipe slots are all exercised. The
-   * recipe's positioning classes have no CSS in the test environment (there is no Tailwind here — the
-   * other tests position inline for the same reason), so `Content` is positioned inline to keep it —
-   * and its corner Close button — above the pointer-blocking `ModalBackdrop`.
+   * A full styled dialog, so every recipe slot is exercised. There is no Tailwind build in this
+   * project, so the recipe's positioning classes resolve to nothing; `Content` is positioned inline
+   * to keep it — and its corner Close button — above the pointer-blocking layer.
    */
   function StyledDialog(props: { showCloseButton?: boolean }) {
     return (
@@ -812,20 +784,19 @@ describe("Dialog", () => {
     ]) {
       expect(document.querySelector(`[data-slot="${slot}"]`)).toBeTruthy();
     }
-    // The auto CloseTrigger renders a `CloseButton` re-scoped to the `dialog-close-trigger` slot.
+    // The auto close button re-scopes CloseButton's own `close-button` marker to this slot, so the
+    // generic one must not leak through alongside it.
     expect(document.querySelector('[data-slot="dialog-close-trigger"]')).toBeTruthy();
-    // …and no longer leaks CloseButton's generic root marker.
     expect(document.querySelector('[data-slot="close-button"]')).toBeNull();
 
     await expectNoA11yViolations(document.body);
     dispose();
   });
 
-  // A part's `class` goes *through* its slot fn (`ctx.slots.content(props.class)`), so it lands inside
-  // the recipe's own `{ class }` seam and `tv`'s tailwind-merge drops the conflicting recipe utility.
-  // Concatenating it after the fact (`cx(slots.content(), props.class)`) leaves both `rounded-xl` and
-  // `rounded-none` on the element, with the winner decided by stylesheet order — the docs promise the
-  // consumer's utility wins, so pin that here and not just on the root slot.
+  // A part's `class` must be passed *into* its slot function — `ctx.slots.content(props.class)` — so
+  // tailwind-merge sees both strings and drops the conflicting recipe utility. Concatenating after
+  // the fact (`cx(slots.content(), props.class)`) type-checks fine but ships both `rounded-xl` and
+  // `rounded-none`, with the winner decided by stylesheet order. The docs promise the consumer wins.
   it("lets a non-root part's class win the conflict with its recipe slot", async () => {
     const { dispose } = mount(() => (
       <Themed>
@@ -888,7 +859,7 @@ describe("Dialog", () => {
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
     await userEvent.keyboard("{Escape}");
-    // A frame for the (suppressed) dismiss path before asserting the dialog survived.
+    // Give the (suppressed) dismiss path a frame to run before asserting the dialog survived.
     await new Promise((resolve) => requestAnimationFrame(resolve));
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
     dispose();
@@ -919,21 +890,22 @@ describe("Dialog", () => {
 });
 
 describe("Dialog hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a
-  // nested SSR server and `dialog.ssr.test.tsx` inline-snapshots that same render, so they agree
-  // byte-for-byte. Rendering it here would be worthless — the client build's `renderToStringAsync`
-  // returns `undefined`. Reusing `Tree` (rather than a hand-kept-identical copy) keeps the client
-  // tree structurally identical to the server's: hydration keys are a path through the tree, so
-  // inserting anything before `Dialog.Trigger` — even a component that renders nothing — would shift
-  // the trigger's key. `hydrateFixture` proves hydration was silent and reused every server node.
+  // `ssrFixture` is real server HTML: the bridge renders `Tree` through a nested SSR server, and
+  // `dialog.ssr.test.tsx` snapshots that same render, so the two agree byte for byte. It cannot be
+  // produced here — under the client build `renderToStringAsync` returns `undefined`.
+  //
+  // Both halves import the *same* `Tree` rather than keeping two copies in sync by hand, because
+  // Solid matches server and client nodes by position: inserting anything before `Dialog.Trigger`,
+  // even a component that renders nothing, shifts its key and breaks hydration. `hydrateFixture`
+  // asserts hydration was silent and reused every server node, so a fallback re-render still fails.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     dispose();
   });
 
   it("leaves the hydrated trigger interactive, and mounts the portal client-side", async () => {
-    // The whole point of `Dialog.Portal`'s `isServer` guard: portaled content is absent from
-    // the SSR HTML, and appears on the client only once the dialog opens.
+    // The whole point of `Dialog.Portal`'s server guard: portaled content is absent from the server
+    // HTML and appears on the client only once the dialog opens.
     const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     expect(page.getByRole("dialog").query()).toBeNull();
 

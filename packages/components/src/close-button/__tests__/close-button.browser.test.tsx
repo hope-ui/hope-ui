@@ -7,14 +7,12 @@ import type { JSX } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { CloseButton, type CloseButtonProps } from "../close-button";
-// Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
-// `.html`). `Tree` is the same tree `close-button.ssr.test.tsx` inline-snapshots and the bridge
-// renders — one source of truth, so the hydration input and the client tree cannot diverge.
+// Real server HTML, rendered in-process by the hydration-fixture bridge from the same `Tree` that
+// `close-button.ssr.test.tsx` snapshots — so the hydration input and the client tree cannot diverge.
 import { Tree } from "./close-button.ssr-entry";
 
-// CloseButton reads styling through `useSlots`/`useRecipe`, so every render sits under a
-// `<ThemeProvider>` fed the `hope` preset. `hope`'s token overrides are empty (values live in CSS), so
-// the provider stays on the zero-DOM branch. See __internal__/theming.md.
+// CloseButton reads its styling from the theme, so every render needs a `<ThemeProvider>`. The
+// `hope` preset authors its values in CSS, so the provider emits no DOM of its own.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -29,9 +27,9 @@ function CustomIcon(): JSX.Element {
 }
 
 /**
- * Renders CloseButton as an anchor. Passed as a **direct** `render` prop, never via a spread object: a
- * spread-backed prop reads reactively, and the component reads `render` synchronously to build the
- * element, which would trip `STRICT_READ_UNTRACKED` for a value that is structural and never changes.
+ * Renders CloseButton as an anchor. Passed as a **direct** prop, never through a spread object: a
+ * spread-backed prop is read reactively, and the component reads `render` synchronously to build its
+ * element, which Solid flags as `STRICT_READ_UNTRACKED`.
  */
 const renderAsAnchor: NonNullable<CloseButtonProps["render"]> = (p) => (
   <a href="/close" {...(p as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} />
@@ -48,7 +46,8 @@ describe("CloseButton", () => {
     const button = container.querySelector('[data-slot="close-button"]');
     expect(button?.tagName).toBe("BUTTON");
     expect(button?.getAttribute("type")).toBe("button");
-    // The glyph is a component wrapped in the host icon-slot span.
+    // The glyph is a component, and it must stay wrapped in a host span rather than being the
+    // button's first child directly — that wrapper is what keeps it hydratable.
     const iconSlot = button?.querySelector('[data-slot="close-button-icon"]');
     expect(iconSlot).not.toBeNull();
     expect(iconSlot?.querySelector("svg")).not.toBeNull();
@@ -67,7 +66,7 @@ describe("CloseButton", () => {
     expect(cls).toContain("size-6"); // sm default
     expect(cls).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
     expect(cls).toContain("data-pressed:bg-surface-adaptive-pressed");
-    // Focus is the shared halo ring, the same indicator every other focusable control uses.
+    // The same focus indicator every other focusable control in the library uses.
     expect(cls).toContain("focus-visible:ring-focus-halo");
     dispose();
   });
@@ -132,11 +131,10 @@ describe("CloseButton", () => {
   });
 
   it("falls back to a preset's defaultProps aria-label, but a per-instance one still wins", async () => {
-    // The label fallback resolves through `merged` (instance ?? preset ?? localized `common.close`),
-    // NOT raw `props` — so a preset-level default beats the localized "Close". `aria-label` is a
-    // *behavioral* default outside the curated themeable surface (`CloseButtonThemeableProps` is
-    // size + icon only), so the literal is cast; `useDefaults` folds it in via its runtime
-    // `as Partial<P>` merge. A `props`-based fallback would ignore it and read "Close" here.
+    // The fallback must read the *merged* props, not the raw ones, or a preset-level default is
+    // invisible to it and every button here would read "Close". The cast is needed because
+    // `aria-label` sits outside the curated themeable surface (which is `size` + `icon` only), while
+    // `useDefaults` still folds it in at runtime.
     const withAriaLabel = definePreset(hope, {
       components: {
         closeButton: {
@@ -155,9 +153,7 @@ describe("CloseButton", () => {
     ));
 
     const buttons = container.querySelectorAll('[data-slot="close-button"]');
-    // No instance aria-label → the preset default wins over the localized "Close".
     expect(buttons[0]?.getAttribute("aria-label")).toBe("Preset dismiss");
-    // A per-instance aria-label still beats the preset default.
     expect(buttons[1]?.getAttribute("aria-label")).toBe("Instance dismiss");
     await expectNoA11yViolations(container);
     dispose();
@@ -171,7 +167,7 @@ describe("CloseButton", () => {
     ));
 
     const iconSlot = container.querySelector('[data-slot="close-button-icon"]');
-    // Exactly one glyph, and it is the consumer's (distinct marker).
+    // Exactly one glyph: the consumer's must replace the built-in X, not render alongside it.
     expect(iconSlot?.querySelectorAll("svg").length).toBe(1);
     expect(iconSlot?.querySelector("svg[data-custom-icon]")).not.toBeNull();
     dispose();
@@ -210,7 +206,8 @@ describe("CloseButton", () => {
       </Themed>
     ));
 
-    // A non-native element switches to role="button" + tabIndex via createButton.
+    // A non-native element gets `role="button"` and a `tabIndex` instead, so it still announces and
+    // behaves as a button.
     const anchor = container.querySelector("a");
     expect(anchor?.getAttribute("role")).toBe("button");
     expect(anchor?.getAttribute("aria-label")).toBe("Close");
@@ -247,7 +244,8 @@ describe("CloseButton", () => {
   });
 
   it("applies a preset's defaultProps (an app-wide default icon via a factory)", async () => {
-    // A preset supplies the app-wide glyph as a factory (reuse-safe). The built-in X is the fallback.
+    // The app-wide glyph is a factory so each instance builds its own node; the built-in X is the
+    // fallback when a preset supplies none.
     const withDefaultIcon = definePreset(hope, {
       components: { closeButton: { defaultProps: { size: "lg", icon: () => <CustomIcon /> } } },
     });
@@ -259,19 +257,16 @@ describe("CloseButton", () => {
     ));
 
     const button = container.querySelector('[data-slot="close-button"]');
-    // preset size default applied ...
     expect(button?.className).toContain("size-8");
-    // ... and the preset's factory glyph, not the built-in X.
     expect(button?.querySelector("svg[data-custom-icon]")).not.toBeNull();
     dispose();
   });
 
   it("resolves the currentColor-derived wash per element (bundled Chromium)", () => {
-    // The browser project doesn't compile Tailwind, so `bg-surface-adaptive-hovered` carries no style
-    // here. Assert instead the *mechanism* the token relies on: the exact `color-mix` value
-    // `--hope-surface-adaptive-hovered` expands to, applied to two elements with different inherited
-    // `color`, must resolve to two different, real background colors that track each element's color.
-    // This is what makes CloseButton surface-adaptive with no colorScheme.
+    // There is no Tailwind build in this project, so the wash utility carries no style here. What is
+    // asserted instead is the CSS mechanism it relies on: the exact `color-mix` value the token
+    // expands to, applied to two elements with different inherited `color`, must resolve to two
+    // different real colors. That is the whole basis of being surface-adaptive with no colorScheme.
     const wash = "color-mix(in oklab, currentColor 10%, transparent)";
     const { container, dispose } = mount(() => (
       <>
@@ -291,29 +286,27 @@ describe("CloseButton", () => {
       container.querySelector('[data-testid="wash-on-black"]') as HTMLElement,
     ).backgroundColor;
 
-    // Each resolves to a real, non-empty color (the bundled Chromium supports color-mix + currentColor).
+    // Both resolve to a real color, which also confirms the bundled Chromium supports `color-mix`
+    // with `currentColor` at all.
     expect(onWhite).not.toBe("");
     expect(onBlack).not.toBe("");
     expect(onWhite).not.toBe("rgba(0, 0, 0, 0)");
-    // And the two differ, because currentColor differs (white vs black surface).
+    // And they differ, because the inherited `currentColor` differs.
     expect(onWhite).not.toBe(onBlack);
     dispose();
   });
 });
 
 describe("CloseButton hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a nested
-  // SSR server (server solid builds) and `close-button.ssr.test.tsx` inline-snapshots that same render,
-  // so the two agree byte-for-byte. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
-  // `hydrateFixture` hydrates that HTML rather than re-rendering it. It proves hydration was silent and
-  // reused every node — the component-in-slot path (built-in X *and* a custom-icon component) that used
-  // to break under the `@solidjs/web` beta. See __internal__/solid-2.0-notes.md.
+  // `ssrFixture` is real server HTML: the bridge renders `Tree` through a nested SSR server, and
+  // `close-button.ssr.test.tsx` snapshots that same render, so the two agree byte for byte. This
+  // covers the component-in-slot path — a glyph is always a component, built-in or custom — which is
+  // the shape that used to mis-hydrate. `hydrateFixture` also fails a silent fallback re-render.
   it("hydrates both close buttons in place, without a mismatch or a second render", () => {
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
-    // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
+    // The provider must stay DOM-free: an injected `<style>` is not something the reuse check sees.
     expect(container.querySelector("style")).toBeNull();
-    // Both glyph components survived hydration inside their icon-slot spans (default + custom).
     expect(container.querySelectorAll('[data-slot="close-button-icon"] svg').length).toBe(2);
     expect(container.querySelector("svg[data-custom-icon]")).not.toBeNull();
     dispose();

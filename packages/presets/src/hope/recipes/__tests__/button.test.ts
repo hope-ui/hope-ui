@@ -64,27 +64,25 @@ describe("hope button recipe", () => {
     expect(solidPrimary).toContain("border-primary");
     expect(solidPrimary).toContain("hover:not-data-pressed:border-primary-hovered");
     expect(solidPrimary).toContain("data-pressed:border-primary-pressed");
-    // Inverted is the swap of solid on its own dedicated tokens (fill `{role}-inverted`, content
-    // `on-{role}-inverted`), never borrowing solid's `on-{role}`/`{role}`; it carries its own wash.
+    // Inverted is the swap of solid on its own dedicated `-inverted` tokens, never borrowing solid's
+    // `on-{role}`/`{role}`, so the two stay independently tunable.
     const invertedPrimary = buttonRecipe({ variant: "inverted", colorScheme: "primary" }).root();
     expect(invertedPrimary).toContain("bg-primary-inverted");
     expect(invertedPrimary).toContain("text-on-primary-inverted");
     expect(invertedPrimary).toContain("hover:not-data-pressed:bg-primary-inverted-hovered");
     expect(invertedPrimary).toContain("data-pressed:bg-primary-inverted-pressed");
-    // Border matches the inverted fill and tracks it across states.
     expect(invertedPrimary).toContain("border-primary-inverted");
     expect(invertedPrimary).toContain("hover:not-data-pressed:border-primary-inverted-hovered");
     expect(invertedPrimary).toContain("data-pressed:border-primary-inverted-pressed");
     expect(invertedPrimary).not.toContain("bg-on-primary");
     expect(invertedPrimary).not.toContain("text-primary ");
-    // Soft label is the role's content color (`-emphasis`, renamed from `on-{role}-soft`); its fill
-    // has its own (pressed-guarded) hovered ladder + pressed token instead of a computed mix.
+    // The soft label is the role's legible *content* color (`-emphasis`), and its fill walks its own
+    // hovered/pressed tokens rather than a computed mix.
     const softSuccess = buttonRecipe({ variant: "soft", colorScheme: "success" }).root();
     expect(softSuccess).toContain("bg-success-soft");
     expect(softSuccess).toContain("text-success-emphasis");
     expect(softSuccess).toContain("hover:not-data-pressed:bg-success-soft-hovered");
     expect(softSuccess).toContain("data-pressed:bg-success-soft-pressed");
-    // Border matches the soft fill and tracks it across states.
     expect(softSuccess).toContain("border-success-soft");
     expect(softSuccess).toContain("hover:not-data-pressed:border-success-soft-hovered");
     expect(softSuccess).toContain("data-pressed:border-success-soft-pressed");
@@ -113,9 +111,9 @@ describe("hope button recipe", () => {
   });
 
   it("reserves a 1px border width on every variant and keeps ghost/link borderless (no transparent gap on fills)", () => {
-    // The base carries no border COLOR now, so every variant owns one. Filled variants match their
-    // fill; ghost/link opt out explicitly with `border-transparent`; the 1px width is always present
-    // so nothing shifts a pixel between bordered and borderless variants.
+    // The base carries no border COLOR, so every variant owns one: filled variants match their fill,
+    // ghost/link opt out explicitly. The 1px WIDTH is always present, so nothing shifts a pixel
+    // between a bordered and a borderless variant.
     for (const variant of VARIANTS) {
       expect(buttonRecipe({ variant, colorScheme: "primary" }).root()).toMatch(
         /(?:^|\s)border(?:\s|$)/,
@@ -131,14 +129,13 @@ describe("hope button recipe", () => {
     expect(buttonRecipe({ variant: "solid", colorScheme: "primary" }).root()).not.toContain(
       "border-transparent",
     );
-    // The reserved-border no longer needs `bg-clip-padding` (the border is a real, opaque color).
+    // The border is a real opaque color, so the reserved edge needs no `bg-clip-padding`.
     expect(buttonRecipe({ variant: "solid", colorScheme: "primary" }).root()).not.toContain(
       "bg-clip-padding",
     );
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {
-    // Exercise every colored fill and assert the rendered class string is free of computed color.
     for (const variant of ["solid", "inverted", "soft", "outline", "ghost", "link"] as const) {
       for (const colorScheme of COLOR_SCHEMES) {
         const root = buttonRecipe({ variant, colorScheme }).root();
@@ -169,14 +166,13 @@ describe("hope button recipe", () => {
 
   it("dims the disabled state via opacity only — no color swap, single data-disabled axis", () => {
     const root = buttonRecipe({ variant: "solid", colorScheme: "primary" }).root();
-    // Disabled neutralises chrome (cursor/pointer/shadow) and dims to the opacity token — it no
-    // longer swaps the fill/text/border to dedicated disabled colors.
+    // Disabled neutralises chrome (cursor/pointer/shadow) and dims through the opacity token, rather
+    // than swapping the fill/text/border to dedicated disabled colors.
     expect(root).toContain("data-disabled:opacity-disabled");
     expect(root).toContain("data-disabled:cursor-not-allowed");
     expect(root).toContain("data-disabled:pointer-events-none");
     expect(root).toContain("data-disabled:shadow-none");
-    // The old color-swap treatment is gone: no fill token, no muted-text token, and the outline
-    // variant no longer drops its role border to `border-subtle`.
+    // So: no disabled fill token, no muted-text token, and outline keeps its role border.
     expect(root).not.toContain("data-disabled:bg-disabled");
     expect(root).not.toContain("data-disabled:text-foreground-disabled");
     expect(buttonRecipe({ variant: "outline" }).root()).not.toContain(

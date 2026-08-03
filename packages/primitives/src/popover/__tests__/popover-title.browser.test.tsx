@@ -19,8 +19,8 @@ const TRIGGER_STYLE: JSX.CSSProperties = {
   left: "300px",
 };
 
-/** Its own component, so `createRegisteredId`'s cleanup is scoped to the title's unmount rather than
- * the popup's — the reason this hook must be called from the title's own owner scope. */
+/** Its own component, so the registration's cleanup is scoped to the title's unmount rather than the
+ * popup's — the reason this hook must be called from the title's own owner scope. */
 function PopupTitle(props: {
   state: CreatePopoverReturn;
   titleProps?: JSX.HTMLAttributes<HTMLHeadingElement>;
@@ -81,8 +81,8 @@ const OPEN: CreatePopoverOptions = { defaultOpen: true };
 
 describe("createPopoverTitle", () => {
   it("gives the popup its accessible name: a generated id, registered and pointed at", async () => {
-    // Phase 5's content test could only assert the consumer half of this — with no Title mounted the
-    // fallback resolved to `undefined`. This closes the loop.
+    // The other half of `popover-content.browser.test.tsx`'s labelling test, which could only assert
+    // the consumer's own value because no Title was mounted there.
     const { container, state, dispose } = mountHarness({ options: OPEN });
     const title = elementOf(container, "title");
 
@@ -93,8 +93,8 @@ describe("createPopoverTitle", () => {
   });
 
   it("uses a consumer id and registers that one instead", async () => {
-    // `withDefaults`, not `props.id ?? generated`: an unset id that failed to resolve would leave the
-    // popup with no accessible name at all, which for `role="dialog"` is an axe violation.
+    // An unset id has to resolve to the generated one, or the popup ends up with no accessible name
+    // at all — an axe `aria-dialog-name` violation on a `role="dialog"` surface.
     const { container, state, dispose } = mountHarness({
       options: OPEN,
       titleProps: { id: "custom-title" },
@@ -112,7 +112,7 @@ describe("createPopoverTitle", () => {
       contentProps: { "aria-labelledby": "elsewhere" },
     });
 
-    // The title still registers — the content's own value simply outranks it, because the internal
+    // The title still registers; the content's own value simply outranks it, because the internal
     // getter is a `??` fallback rather than an overwrite.
     await vi.waitFor(() => expect(state().titleId()).toBe(elementOf(container, "title").id));
     expect(elementOf(container, "content").getAttribute("aria-labelledby")).toBe("elsewhere");
@@ -138,10 +138,10 @@ describe("createPopoverTitle", () => {
     // `visibility: hidden` intermediate and return an `incomplete` nobody can act on.
     await vi.waitFor(() => expect(state().floating.isPositioned()).toBe(true));
     await expectNoA11yViolations(container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check).
-      // The IDREF itself is pinned in `popover-trigger.browser.test.tsx`.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The IDREF itself is pinned in
+      // `popover-trigger.browser.test.tsx`.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

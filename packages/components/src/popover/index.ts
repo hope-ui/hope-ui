@@ -1,12 +1,11 @@
-// The `Popover` compound component — a styled, themeable layer over the `createPopover` primitive
-// hook family. Each part lives in its own `popover-<part>.tsx` file (a shared `popover-context.ts`
-// carries the context that distributes the primitive state + the recipe slot fns); this barrel is the
-// one place the namespace object is assembled — the component's single subpath export. Mirrors
-// `src/dialog/`.
+// The `Popover` compound component — a styled, themeable layer over the headless `createPopover`
+// hook family in `@hope-ui/primitives`. This barrel is the one place the namespace object is
+// assembled, and the component's single published entry point.
 //
-// **Non-modal.** Nothing here traps focus, locks scroll, hides the page or blocks the pointer: the
-// layer composes `createFloating` + `createDismissable` + `createPresence` + `createFocusRestore`
-// directly, never Dialog's modal machinery. A `modal` mode is later work.
+// **Non-modal.** Nothing here traps focus, locks scroll, hides the page from assistive tech or blocks
+// the pointer. It composes the positioning, dismissal, enter/exit-animation and focus-restore
+// primitives directly rather than going through Dialog's modal machinery. A `modal` mode is later
+// work.
 import { Anchor } from "./popover-anchor";
 import { Arrow } from "./popover-arrow";
 import { CloseTrigger } from "./popover-close-trigger";

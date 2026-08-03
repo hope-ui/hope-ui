@@ -2,28 +2,21 @@
  * The **Calendar** recipe contract — its variant vocabulary, slots, and the resulting `CalendarRecipe`
  * type.
  *
- * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
- * `@hope-ui/components` `Calendar` consumes it via `useRecipe("calendar")`, and each preset
- * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
- * keeps the registry (`../recipe-registry`) a flat list of named recipe types with no shape logic of
- * its own.
+ * A *slot recipe* maps variant props to one class string per named part ("slot"). This file owns only
+ * that shape: `@hope-ui/components`' Calendar consumes it via `useRecipe("calendar")` and each preset
+ * implements a `tailwind-variants` recipe against it, so neither layer knows the other.
  *
- * Calendar is a **neutral date surface** — a `role="group"` wrapping a navigation header over a
- * `role="grid"` of day cells — so like Dialog/Listbox it carries **no** color axis. The only accents
- * are the selection (painted with the `primary` / `on-primary` tokens, the way shadcn/Nova selects a
- * day) and the range band + tentative hover band (the `selected` / `on-selected` tokens), neither of
- * which is a variant. Its single axis is `size` — the density scale (the day-cell box, its text, and
- * the navigation buttons) a consumer sets once on `Calendar.Root`, the same way `button`/`badge`/
- * `listbox` scale sizes.
+ * Calendar is a **neutral date surface**, so like Dialog and Listbox it carries **no** color axis. The
+ * only accents are the selection (`primary`/`on-primary` tokens) and the range band
+ * (`selected`/`on-selected`), neither of which is a variant. Its single axis is `size` — the density
+ * scale a consumer sets once on `Calendar.Root`.
  *
- * The day-cell state (today / outside-month / selected / band endpoints / disabled) is styled by the
- * preset's **registered `data-*` custom variants** — the canonical
- * `data-today`/`data-outside-month`/`data-selected`/`data-selection-start`/`data-selection-end`/
- * `data-disabled` hooks `createCalendarCell` emits, plus the derived `data-selection-middle` — never a
- * `hover:` / bare `:focus` background, so pointer and keyboard share one visual state. Range mode
+ * Day-cell state (today / outside-month / selected / band endpoints / disabled) is styled by the
+ * preset's registered `data-*` variants, keyed off the attributes `createCalendarCell` emits, never a
+ * `hover:` or bare `:focus` background — so pointer and keyboard share one visual state. Range mode
  * paints a single band (tentative while anchored, committed when idle), which is why there is one
- * selection vocabulary rather than a separate tentative-highlight set. Every color is a finished `--hope-*` token (recipe
- * purity). See `theming.md`.
+ * selection vocabulary rather than a separate tentative-highlight set. Every color is a *finished*
+ * `--hope-*` design token, never one the recipe computes ("recipe purity" — see `theming.md`).
  */
 import type { JSX } from "@solidjs/web";
 import type { SlotRecipeFn } from "../slot-recipe";
@@ -42,18 +35,15 @@ export interface CalendarRecipeVariants {
 
 /**
  * The curated Calendar props a preset may default app-wide via `ComponentOverride.defaultProps`: the
- * recipe variants **plus** the two navigation glyphs. A strict superset of {@link CalendarRecipeVariants}
- * by construction (`extends`), so it registers in `ThemeablePropsRegistry` and
- * `ThemeablePropsOf<"calendar">` widens the variants-only surface without dropping anything.
+ * recipe variants **plus** the two navigation glyphs.
  *
  * Each glyph is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset value is one
- * object shared by every instance, and a Solid `JSX.Element` is an already-built node that would
- * *move* if reused, so a factory (called per instance) is what lets a preset swap the app-wide nav
- * icons without two calendars fighting over one node. Mirrors CloseButton's `icon`. Calendar is a
- * multi-part component, so its themeable surface stays on the **root** (no per-part themeable props):
- * `Calendar.Root` resolves these through `runIfFunction` and flows them to the `PrevButton` /
- * `NextButton` parts via context, where they are the default child. The **per-instance** override is
- * that part's own `children`.
+ * object shared by every instance, and a Solid `JSX.Element` is an already-built DOM node that would
+ * *move* if reused, so calling a factory per instance is what keeps two calendars from fighting over
+ * one node. Calendar is a multi-part component, so its themeable surface stays on the **root**:
+ * `Calendar.Root` resolves these through `runIfFunction` and flows them to the `PrevButton`/
+ * `NextButton` parts via context, where they are the default child. The per-instance override is that
+ * part's own `children`.
  */
 export interface CalendarThemeableProps extends CalendarRecipeVariants {
   /** App-wide default previous-period glyph, as a factory. Falls back to hope's built-in chevron. */

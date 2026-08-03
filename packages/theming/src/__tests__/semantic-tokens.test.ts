@@ -17,19 +17,17 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
 
   it("includes the surfaces, text ramp, on-state, role ladders, borders, collections and systemic tokens", () => {
     const has = (t: SemanticColorToken) => expect(SEMANTIC_COLOR_TOKENS).toContain(t);
-    // Surfaces incl. the raised interaction ladder.
     has("surface");
     has("surface-raised");
     has("surface-raised-hovered");
     has("surface-raised-pressed");
     has("surface-inverse");
-    // Text ramp + on-state.
     has("foreground");
     has("foreground-muted");
     has("on-inverse");
     has("on-active");
     has("on-selected");
-    // Role fills + the full per-variant interaction ladder (renamed `-hover` → `-hovered`).
+    // Role fills, each with a rest/hovered/pressed ladder per variant.
     has("primary");
     has("primary-hovered");
     has("primary-pressed");
@@ -41,19 +39,18 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("primary-outline-pressed");
     has("primary-ghost-hovered");
     has("primary-ghost-pressed");
-    // The `inverted` variant's own fill ladder + on-content (the swap of solid, on dedicated tokens).
     has("primary-inverted");
     has("primary-inverted-hovered");
     has("primary-inverted-pressed");
     has("on-primary-inverted");
     has("warning-inverted");
     has("on-warning-inverted");
-    // Role content color + link ladder (renamed `on-{role}-soft` → `{role}-emphasis`).
+    // A role's own content color, and the link ladder that starts from it.
     has("primary-emphasis");
     has("warning-emphasis");
     has("primary-link-hovered");
     has("primary-link-pressed");
-    // Two-tier role border, complete across all 6 roles: `-line` (strong) + `-subtle-line` (soft).
+    // The role border's two tiers: `-line` is the strong one, `-subtle-line` the soft one.
     has("primary-line");
     has("warning-line");
     has("neutral-line");
@@ -63,20 +60,16 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("info-subtle-line");
     has("warning-subtle-line");
     has("danger-subtle-line");
-    // On-solid-fill content.
     has("on-primary");
     has("on-danger");
-    // Neutral borders (renamed `subtle-outline`/`strong-outline` → `subtle`/`strong`).
     has("subtle");
     has("strong");
-    // Collection-state fills.
     has("active");
     has("selected");
-    // Systemic (incl. the focus halo). No disabled *fill* token — disabled dims via the opacity axis.
     has("focus");
     has("focus-halo");
     has("scrim");
-    // Surface-adaptive interaction wash (currentColor-derived).
+    // The wash a control with no background of its own lays over whatever surface it sits on.
     has("surface-adaptive-hovered");
     has("surface-adaptive-pressed");
   });
@@ -99,7 +92,7 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
 
   it("has no `disabled` fill token (a disabled control dims via the `opacity-disabled` axis)", () => {
     expect(SEMANTIC_COLOR_TOKENS as readonly string[]).not.toContain("disabled");
-    // The disabled *label text* keeps its ramp token, though.
+    // The disabled *label* still has a token of its own, in the text ramp.
     expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain("foreground-disabled");
   });
 

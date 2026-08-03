@@ -7,8 +7,8 @@ export interface DialogBodyProps extends JSX.HTMLAttributes<HTMLDivElement> {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 
-// The main content region. Takes the slack (`flex-1`) and, under `scrollBehavior="inside"`, gets the
-// `overflow-y-auto` so the header/footer stay pinned while the body scrolls (both from the recipe).
+// Under `scrollBehavior="inside"` this is the element the recipe makes scrollable, which is what
+// keeps the header and footer pinned while long content moves between them.
 export const Body: Component<DialogBodyProps> = (props) => {
   const ctx = useDialogContext();
   const rest = omit(props, "render");

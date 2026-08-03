@@ -163,9 +163,9 @@ describe("createListbox — horizontal orientation and RTL", () => {
   });
 
   it("swaps ArrowLeft and ArrowRight under dir=rtl", async () => {
-    // The visual order is mirrored, so the key that points at the *screen* edge nearest the list's
-    // start must move toward the list's start. Untreaded, this walked the list backwards for every
-    // Arabic/Hebrew/Farsi reader with no test noticing.
+    // The visual order is mirrored, so the key pointing at the *screen* edge nearest the list's start
+    // has to move toward the list's start. Untested, this walks the list backwards for every
+    // Arabic/Hebrew/Farsi reader while every other test stays green.
     const { container, dispose } = await mountHorizontalAtBanana(horizontal({ dir: "rtl" }));
 
     await userEvent.keyboard("{ArrowRight}");
@@ -177,7 +177,7 @@ describe("createListbox — horizontal orientation and RTL", () => {
   });
 
   it("resolves the direction from the locale when no dir prop is given", async () => {
-    // The `dir` prop is only the escape hatch; the default source of truth is `useLocale()`, so an
+    // `dir` is only the escape hatch — the default source of truth is `useLocale()`, so wrapping in an
     // `I18nProvider` alone has to flip the arrows.
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
@@ -237,17 +237,17 @@ describe("createListbox — highlight follows focus", () => {
       />
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
-    // Nothing highlighted before the widget has focus (the reported second bug).
+    // Nothing may be highlighted before the widget has focus.
     expect(activeValues(container)).toEqual([]);
 
     await userEvent.tab(); // enters on the roving tab stop (Apple)
     await vi.waitFor(() => expect(activeValues(container)).toEqual(["Apple"]));
     await expect.element(nth(options(container), 0)).toHaveFocus();
 
-    // Focus leaves the list — the highlight must not linger (the reported first bug).
+    // …and the highlight must not linger once focus leaves.
     (document.activeElement as HTMLElement).blur();
     await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
-    expect(state.focus.activeIndex()).toBe(0); // active index retained across blur
+    expect(state.focus.activeIndex()).toBe(0); // only the paint gate closed, not the position
     dispose();
   });
 
@@ -383,8 +383,8 @@ describe("createListbox — external focus owner (Select shape)", () => {
 
     input.focus();
     await vi.waitFor(() => expect(state.focus.isFocused()).toBe(true));
-    // Focusing the input sets the flag but does NOT run the entry rule (zag's `INPUT.FOCUS`): the
-    // list opens un-highlighted until the first arrow/typeahead.
+    // Focusing the input opens the highlight gate but must NOT run the entry rule, so the list stays
+    // un-highlighted until the first arrow key or typeahead.
     expect(state.focus.activeIndex()).toBe(-1);
     expect(activeValues(container)).toEqual([]);
 
@@ -524,8 +524,8 @@ describe("createListbox — typeahead and disabled", () => {
   });
 
   it("hands a match to `onTypeaheadMatch` instead of the highlight, when one is given", async () => {
-    // The seam a composed widget intercepts — `createCombobox` uses it to *select* the match while
-    // its popup is shut, where there is no row to highlight. A standalone listbox never sets it.
+    // The seam a composed widget intercepts: `createCombobox` uses it to *select* the match while its
+    // popup is shut, where there is no mounted row to highlight.
     const onTypeaheadMatch = vi.fn();
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
@@ -576,8 +576,8 @@ describe("createListbox — grouped data source", () => {
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
-    // `groupToItems`' only job: `items()` is the flat run arrow keys and typeahead traverse. The
-    // group's *label* never reaches the kernel — it is rendered from the consumer's own key.
+    // `groupToItems`' only job: `items()` is the flat run arrow keys and typeahead traverse. A group's
+    // *label* never reaches the primitive at all — the consumer renders it from its own data.
     expect(state.indexed.items().map((item) => item.textValue())).toEqual([
       "Lemon",
       "Lime",
@@ -611,9 +611,9 @@ describe("createListbox — grouped data source", () => {
   });
 
   it("resolves a row from its item regardless of how deep it sits in the tree", async () => {
-    // Each option lives inside its group's own `<For>`, two levels below the listbox — and still
-    // registers under the right flat index, which is what `indexOfValue` buys and what makes the
-    // inner iteration a plain `<For>` rather than library chrome.
+    // Each option lives inside its group's own `<For>`, two levels below the listbox, and still
+    // registers under the right flat index. That is what `indexOfValue` buys, and what lets the inner
+    // iteration stay a plain `<For>` instead of a library-provided component.
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
       <GroupedListbox
@@ -698,7 +698,7 @@ describe("createListbox — virtual source mode", () => {
     state.focus.focusIndex(0);
     await vi.waitFor(() => expect(state.focus.activeIndex()).toBe(0));
 
-    // Default page is 10, so two PageDowns reach index 20 — offscreen for a ~10-row viewport.
+    // A page is 10 rows by default, so two PageDowns reach index 20 — offscreen in a ~10-row viewport.
     await userEvent.keyboard("{PageDown}{PageDown}");
     await vi.waitFor(() => expect(state.focus.activeIndex()).toBe(20));
     await vi.waitFor(() => expect(container.querySelector('[data-index="20"]')).not.toBeNull());
@@ -721,9 +721,10 @@ describe("createListbox — virtual source mode", () => {
       .element(container.querySelector<HTMLElement>('[data-index="0"]') as HTMLElement)
       .toHaveFocus();
 
-    // Scroll far down by hand — a wheel/scrollbar gesture, NOT keyboard nav — so the focused row 0
-    // unmounts. Without recovery the browser drops focus to <body> and keyboard nav dies (the
-    // container's key handler only sees events bubbling up from a focused descendant).
+    // Scroll far down by hand — a wheel/scrollbar gesture, NOT keyboard navigation — so the focused
+    // row 0 unmounts underneath the user. Without recovery the browser drops focus to <body> and the
+    // keyboard dies entirely: the container's key handler only sees events bubbling up from a focused
+    // descendant.
     list.scrollTop = 4000;
     list.dispatchEvent(new Event("scroll"));
 

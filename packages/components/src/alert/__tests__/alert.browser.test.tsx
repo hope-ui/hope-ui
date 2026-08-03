@@ -6,14 +6,14 @@ import type { JSX } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Alert, type AlertProps } from "..";
-// Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
-// `.html`). `Tree` is the same tree `alert.ssr.test.tsx` inline-snapshots and the bridge renders —
-// one source of truth, so the hydration input and the client tree cannot structurally diverge.
+// Real server HTML, rendered in-process by the hydration-fixture bridge from the same `Tree` that
+// `alert.ssr.test.tsx` snapshots — so the hydration input and the client tree cannot diverge.
 import { Tree } from "./alert.ssr-entry";
 
-// Alert reads styling through `useSlots`/`useRecipe`, so every render sits under a `<ThemeProvider>`
-// fed the `hope` preset. `hope`'s token overrides are empty (values live in CSS), so the provider
-// stays on the zero-DOM branch and the fixture is byte-identical. See __internal__/theming.md.
+// Alert reads its styling from the theme, so every render needs a `<ThemeProvider>`. The `hope`
+// preset authors its values in CSS, so the provider emits no DOM — but it still occupies a position
+// in the tree, and Solid matches server and client nodes by position, so both halves of the
+// hydration round-trip must wrap identically.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -27,7 +27,11 @@ function CustomIcon(): JSX.Element {
   );
 }
 
-/** Renders Alert as a different element. Passed as a **direct** `render` prop (never via a spread). */
+/**
+ * Renders Alert as a different element. Passed as a **direct** prop, never through a spread object:
+ * a spread-backed prop is read reactively, and Alert reads `render` synchronously to build its
+ * element, which Solid flags as `STRICT_READ_UNTRACKED`.
+ */
 const renderAsSection: NonNullable<AlertProps["render"]> = (p) => (
   <section {...(p as unknown as JSX.HTMLAttributes<HTMLElement>)} />
 );
@@ -56,7 +60,6 @@ describe("Alert", () => {
     ));
 
     const alert = container.querySelector('[data-slot="alert"]');
-    // Icon span holds the built-in status glyph (a component nested in a host span).
     const iconSlot = alert?.querySelector('[data-slot="alert-icon"]');
     expect(iconSlot?.querySelector("svg")).not.toBeNull();
     expect(alert?.querySelector('[data-slot="alert-content"]')).not.toBeNull();
@@ -78,9 +81,8 @@ describe("Alert", () => {
     const alert = container.querySelector('[data-slot="alert"]');
     const title = alert?.querySelector('[data-slot="alert-title"]');
     const description = alert?.querySelector('[data-slot="alert-description"]');
-    // The auto path reuses `Alert.Title`/`Alert.Description`, which register their ids via
-    // `createRegisteredId` (onSettled), so the link appears just after mount — the same deferral as the
-    // compound path below; wait for the reactive attributes to catch up.
+    // The auto-composed form reuses the same parts as the compound one, and they register their ids
+    // *after* the render pass — so the links appear a tick after mount either way.
     await vi.waitFor(() => {
       expect(alert?.getAttribute("aria-labelledby")).toBe(title?.id);
       expect(alert?.getAttribute("aria-describedby")).toBe(description?.id);
@@ -116,7 +118,7 @@ describe("Alert", () => {
     expect(alert?.querySelector('[data-slot="alert-title"]')?.className).toContain(
       "text-danger-emphasis",
     );
-    // The description inherits the body's `text-foreground`; it carries no role color of its own.
+    // The description deliberately carries no role color — it inherits the body's foreground.
     expect(alert?.querySelector('[data-slot="alert-description"]')?.className).not.toContain(
       "text-danger-emphasis",
     );
@@ -133,7 +135,8 @@ describe("Alert", () => {
     const cls = container.querySelector('[data-slot="alert"]')?.className ?? "";
     expect(cls).toContain("bg-danger");
     expect(cls).toContain("text-on-danger");
-    // The reserved border matches the fill, so the solid surface reaches the outer edge cleanly.
+    // Every variant reserves a border, so `solid` must colour it to match its own fill — otherwise
+    // the surface stops short of the outer edge.
     expect(cls).toContain("border-danger");
     dispose();
   });
@@ -191,8 +194,7 @@ describe("Alert", () => {
 
     const alert = container.querySelector('[data-slot="alert"]');
     const title = alert?.querySelector('[data-slot="alert-title"]');
-    // The parts register their ids via `createRegisteredId` (onSettled), so the link appears just
-    // after mount; wait for the reactive attribute to catch up.
+    // The parts register their ids after the render pass, so the link appears a tick after mount.
     await vi.waitFor(() => {
       expect(alert?.getAttribute("aria-labelledby")).toBe(title?.id);
       expect(title?.id).toBeTruthy();
@@ -219,6 +221,7 @@ describe("Alert", () => {
     ));
 
     const iconSlot = container.querySelector('[data-slot="alert-icon"]');
+    // Exactly one glyph: the consumer's must replace the built-in, not render alongside it.
     expect(iconSlot?.querySelectorAll("svg").length).toBe(1);
     expect(iconSlot?.querySelector("svg[data-custom-icon]")).not.toBeNull();
     dispose();
@@ -242,9 +245,8 @@ describe("Alert", () => {
     const alerts = container.querySelectorAll('[data-slot="alert"]');
     const success = alerts[0];
     const danger = alerts[1];
-    // success uses the preset's factory glyph ...
     expect(success?.querySelector('[data-slot="alert-icon"] svg[data-custom-icon]')).not.toBeNull();
-    // ... danger keeps its built-in (the partial override left it alone), a non-custom glyph.
+    // The untouched role must keep its built-in glyph — overriding one must not clear the rest.
     const dangerIcon = danger?.querySelector('[data-slot="alert-icon"] svg');
     expect(dangerIcon).not.toBeNull();
     expect(dangerIcon?.hasAttribute("data-custom-icon")).toBe(false);
@@ -269,8 +271,8 @@ describe("Alert", () => {
     await userEvent.click(page.getByRole("button", { name: "Close" }));
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    // No authored CSS transition is compiled in the browser project, so exit is immediate: the alert
-    // unmounts and `onExitComplete` fires.
+    // There is no Tailwind build here, so no exit transition is actually applied and the unmount is
+    // immediate.
     await vi.waitFor(() => {
       expect(container.querySelector('[data-slot="alert"]')).toBeNull();
     });
@@ -292,8 +294,8 @@ describe("Alert", () => {
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Close" }));
-    // The consumer's handler ran first and cancelled the close, so neither the callback fired nor did
-    // the alert unmount.
+    // The consumer's handler runs first and cancels the close, so neither the callback fires nor
+    // does the alert unmount.
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(container.querySelector('[data-slot="alert"]')).not.toBeNull();
     dispose();
@@ -308,11 +310,10 @@ describe("Alert", () => {
 
     const close = container.querySelector('[data-slot="alert-close-trigger"]');
     expect(close).not.toBeNull();
-    // The generic CloseButton root marker is re-scoped away.
     expect(container.querySelector('[data-slot="close-button"]')).toBeNull();
-    // Placement from the alert `closeTrigger` slot ...
+    // Both must survive together: the alert slot contributes placement, and CloseButton's own recipe
+    // still contributes its chrome underneath.
     expect(close?.className).toContain("ms-auto");
-    // ... and CloseButton's own recipe chrome is still present.
     expect(close?.className).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
     dispose();
   });
@@ -330,10 +331,10 @@ describe("Alert", () => {
     dispose();
   });
 
-  // Each compound part declares the native `<div>`/`<span>` attributes, `class` among them, but until
-  // every part routed its own `class` through its slot fn (`ctx.slots.icon(props.class)`) the computed
-  // class getter simply won the `merge` and the consumer's string vanished — silently, with green tests
-  // and a passing typecheck. Assert it on the element, never on the props type.
+  // Regression: every part declared `class` in its props type, but five of them computed the class
+  // from their slot without passing `props.class` into it — so the computed getter won the merge and
+  // the consumer's string vanished. Type-checked, all tests green, docs promising the opposite.
+  // Hence the assertion is on the *element*, never on the props type.
   it("merges each part's own class onto that part's slot", async () => {
     const { container, dispose } = mount(() => (
       <Themed>
@@ -359,7 +360,7 @@ describe("Alert", () => {
     ]) {
       expect(container.querySelector(`[data-slot="${slot}"]`)?.className).toContain(consumerClass);
     }
-    // The recipe's own classes survive the merge — the consumer's `class` is folded in, not swapped in.
+    // The consumer's class is folded in, not swapped in: non-conflicting recipe classes survive.
     expect(container.querySelector('[data-slot="alert-content"]')?.className).toContain("flex");
     await expectNoA11yViolations(container);
     dispose();
@@ -399,20 +400,18 @@ describe("Alert", () => {
 });
 
 describe("Alert hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a nested
-  // SSR server (server solid builds) and `alert.ssr.test.tsx` inline-snapshots that same render, so the
-  // two agree byte-for-byte. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
-  // `hydrateFixture` hydrates that HTML rather than re-rendering it — the component-in-slot (status
-  // glyph + CloseButton) auto-composed path. See __internal__/solid-2.0-notes.md.
+  // `ssrFixture` is real server HTML: the bridge renders `Tree` through a nested SSR server, and
+  // `alert.ssr.test.tsx` snapshots that same render, so the two agree byte for byte. The tree is the
+  // auto-composed form, which is the interesting one — it nests components inside slots (the status
+  // glyph, the close button), the shape that used to mis-hydrate.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
-    // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
+    // The provider must stay DOM-free: an injected `<style>` is not something the reuse check sees.
     expect(container.querySelector("style")).toBeNull();
     expect(container.querySelector('[data-slot="alert-title"]')?.textContent).toBe(
       "Update available",
     );
-    // The status glyph survived hydration inside its host icon span, and the close button hydrated too.
     expect(container.querySelector('[data-slot="alert-icon"] svg')).not.toBeNull();
     expect(container.querySelector('[data-slot="alert-close-trigger"]')).not.toBeNull();
     dispose();

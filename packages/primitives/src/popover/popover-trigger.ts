@@ -14,22 +14,18 @@ export interface CreatePopoverTriggerReturn {
 }
 
 /**
- * The trigger part: toggles the popover and advertises it to assistive technology. Owns the `aria-*`
- * wiring, the toggle handler and the trigger's registration on the root state.
+ * The trigger part: toggles the popover and advertises it to assistive technology. The consumer's
+ * own `onClick` runs first, so `event.preventDefault()` cancels the toggle.
  *
- * ## Two deliberate differences from `createDialogTrigger`
+ * Two deliberate differences from `createDialogTrigger`:
  *
- * **It toggles, where Dialog's only ever opens.** A non-modal layer must close by clicking the
- * control that opened it, which is only reachable because `createDismissable` can `exclude` the
- * trigger: without that exclusion the capture-phase pointerdown dismisses and the trigger's own
- * `click` immediately reopens. The two halves are one feature — see `state.dismissExclusions` and
- * `createPopoverContent`.
- *
- * **It returns a `setRef`.** Dialog's trigger registers nothing; Popover's element is the default
- * anchor (`state.anchorElement`, until a `Popover.Anchor` overrides it) *and* the one element
- * dismissal must not treat as outside.
- *
- * The consumer's own `onClick` runs first, so `event.preventDefault()` cancels the toggle.
+ * - **It toggles, where Dialog's only ever opens.** A non-modal layer has to close by clicking the
+ *   control that opened it, and that only works because the trigger is excluded from dismissal —
+ *   otherwise the capture-phase pointerdown dismisses and the trigger's own `click` immediately
+ *   reopens. The two halves are one feature; see `createPopoverContent`.
+ * - **It returns a `setRef`.** Dialog's trigger registers nothing; this element is the default
+ *   positioning anchor (until a `Popover.Anchor` overrides it) *and* the one element dismissal must
+ *   not treat as outside.
  */
 export function createPopoverTrigger(
   state: CreatePopoverReturn,
@@ -47,8 +43,8 @@ export function createPopoverTrigger(
       return state.open() ? ("true" as const) : ("false" as const);
     },
     get "aria-controls"() {
-      // Only while open. `aria-controls` naming an element that isn't in the DOM is an invalid
-      // IDREF (axe `aria-valid-attr-value`), so it's omitted when closed.
+      // Only while open: the popup mounts lazily, and an `aria-controls` naming an element that is
+      // not in the DOM is an invalid IDREF (axe `aria-valid-attr-value`).
       return state.open() ? state.popupId() : undefined;
     },
     get onClick() {

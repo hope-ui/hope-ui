@@ -1,17 +1,15 @@
 /**
- * The conformance kit — the runtime half of the drift gate (`@hope-ui/theming/conformance`).
+ * The conformance kit — the runtime half of the theming drift gate (`@hope-ui/theming/conformance`).
  *
- * A theme author runs it in a test against their `tailwind-variants` recipe functions. It
- * complements the compile-time `satisfies RecipeRegistry` check (which the author writes in their
- * own source): `satisfies` proves the *types* line up; this proves the *functions* actually produce
- * a class for every slot at every variant combination the author cares about. Neither can prove
- * *mapping correctness* (that a given variant renders as this theme's intended style) — that stays
- * the job of per-theme visual/story tests.
+ * A theme author runs it in a test against their recipe functions (a recipe maps props to class
+ * names). It complements the compile-time `satisfies RecipeRegistry` check they write in their own
+ * source: `satisfies` proves the *types* line up, this proves the functions actually produce a class
+ * for every slot at every variant combination. Neither can prove a variant renders the way the theme
+ * *intended* — that stays the job of visual/story tests.
  *
- * It is **generic**: the kit knows nothing about any specific component. The author passes the
- * recipe plus the prop combinations and slots to exercise — those are the component's own decisions,
- * not this package's. No test-runner dependency: it returns a result (or throws, via
- * `assertSlotRecipeConformance`) so the author wraps it in whatever `it(...)` they use.
+ * The kit knows nothing about any specific component: the author passes the recipe plus the prop
+ * combinations and slots to exercise. It depends on no test runner, returning a result (or throwing,
+ * from the `assert*` forms) for the author to wrap in whatever `it(...)` they use.
  */
 
 import { hopeVar, SEMANTIC_COLOR_TOKENS, SEMANTIC_OPACITY_TOKENS } from "./semantic-tokens";
@@ -32,13 +30,11 @@ export interface SlotRecipeExpectation<Variants> {
   /** Every slot the recipe must produce a non-empty class for (a single-part component → `["root"]`). */
   slots: readonly string[];
   /**
-   * Slots the recipe declares but leaves **intentionally unstyled** by default (e.g. a description
-   * that only inherits the root's text metrics). Each must still be a *declared* slot — the recipe
-   * resolves it to a class **function** — so the component can safely call `ctx.slots.<slot>()`, but
-   * that function may produce no class (tailwind-variants collapses an empty `""` slot base to
-   * `undefined`). Such a slot is therefore exempt from the non-empty requirement `slots` enforces. Use
-   * this instead of dropping the slot from the expectation entirely, which would stop verifying it
-   * exists at all.
+   * Slots the recipe declares but leaves **intentionally unstyled** (e.g. a description that only
+   * inherits the root's text metrics). Each is still checked for *existing* as a callable slot, so a
+   * component can call `ctx.slots.<slot>()` safely, but is exempt from the non-empty class that
+   * `slots` requires. List them here rather than dropping them from the expectation, which would stop
+   * verifying they exist at all.
    */
   unstyledSlots?: readonly string[];
 }
@@ -61,14 +57,13 @@ export function checkSlotRecipeConformance<Variants>(
   for (const props of expectation.cases) {
     const result = recipe(props);
     for (const slot of expectation.slots) {
-      // A slot resolves to a class *function* (tailwind-variants) — call it for its class string.
+      // tailwind-variants resolves each slot to a *function*; calling it yields the class string.
       if (!isNonEmptyString(result?.[slot]?.())) {
         errors.push(`slot "${slot}" produced no class for props ${JSON.stringify(props ?? {})}`);
       }
     }
-    // Unstyled slots need only be *declared* (a callable slot). Their class may be empty — an empty
-    // tailwind-variants slot base resolves to `undefined` — but the slot must exist so the component
-    // can call it. A non-string, non-nullish result would mean the slot isn't a real class function.
+    // An unstyled slot need only exist and be callable: tailwind-variants resolves an empty slot base
+    // to `undefined`, so no class is fine. Anything else non-string means it isn't a class function.
     for (const slot of expectation.unstyledSlots ?? []) {
       const slotFn = result?.[slot];
       if (typeof slotFn !== "function") {
@@ -105,28 +100,25 @@ export function assertSlotRecipeConformance<Variants>(
 
 /**
  * The physical Tailwind utilities a recipe must not emit, each paired with the logical utility that
- * replaces it. hope-ui supports RTL from day one, which is a property of the classes a preset emits
- * rather than a per-component flag: `pr-8` reserves a gutter on the right in every locale, while
- * `pe-8` reserves it on the side the text *ends* — the same edge in `ltr`, the mirrored one in
- * `rtl`. A physical utility does not fail loudly; it mis-paints for every RTL reader while the
- * variant matrix stays green.
+ * replaces it. A layout must mirror for right-to-left languages, and that is a property of the classes
+ * a preset emits, not a per-component flag: `pr-8` reserves a gutter on the right in every locale,
+ * while `pe-8` reserves it on the side the text *ends* — the same edge in LTR, the mirrored one in
+ * RTL. A physical utility never fails loudly; it mis-paints for every RTL reader while the variant
+ * matrix stays green.
  *
- * Absent by design, because Tailwind v4's axis shorthands are **already logical**: `px-*`
- * (`padding-inline`), `mx-*`, `inset-x-*`, `border-x-*`, `space-x-*`, `divide-x-*`. Also absent:
- * `origin-left`/`origin-right`, since `transform-origin` has no portable logical keyword and there
- * would be no replacement to name.
+ * Deliberately absent: Tailwind v4's axis shorthands (`px-*`, `mx-*`, `inset-x-*`, `border-x-*`,
+ * `space-x-*`, `divide-x-*`) are already logical, and `origin-left`/`origin-right` have no portable
+ * logical keyword to name as a replacement.
  *
- * Each `test` matches a WHOLE base utility with its variant chain already stripped, so `^-?pr-`
- * matches `pr-8` and `-pr-2` but not `pre-wrap`, and `^border-l(-|$)` matches `border-l` and
- * `border-l-4` but not `border-blue-500`.
+ * Each `test` matches a whole base utility with its variant chain already stripped, so `^-?pr-` hits
+ * `pr-8` and `-pr-2` but not `pre-wrap`, and `^border-l(-|$)` hits `border-l` and `border-l-4` but not
+ * `border-blue-500`.
  *
- * The repo-side static scan (`scripts/check-rtl-safety.mjs`, `pnpm check:rtl-safety`) applies the
- * same table to source files; a drift guard in
- * `packages/presets/src/hope/__tests__/hope.test.ts` fails if the two diverge. It lives there rather
- * than in this package's own tests because reading the script off disk is a repo-layout dependency,
- * and `@hope-ui/theming` is the contract layer — it must stay agnostic of where it is checked out.
- * This runtime half is what reaches a *third-party* preset and the classes a recipe only assembles
- * at call time through `compoundVariants`.
+ * `scripts/check-rtl-safety.mjs` applies the same table statically to this repo's own source and keeps
+ * its own copy of it; a drift guard in `packages/presets/src/hope/__tests__/hope.test.ts` fails if the
+ * two diverge (it lives there because reading a script off disk assumes a repo layout, and this
+ * contract package must not). This runtime half is what reaches a *third-party* preset, and the
+ * classes a recipe only assembles at call time from `compoundVariants`.
  */
 export const PHYSICAL_UTILITIES: ReadonlyArray<{
   test: RegExp;
@@ -184,25 +176,24 @@ function splitVariants(candidate: string): { variants: string; base: string } {
 
 /**
  * An `rtl:`/`ltr:`-scoped utility is a deliberate manual flip (`ltr:pr-8 rtl:pl-8`) — the one shape
- * where a physical class is the correct answer, and the escape hatch for a rule a logical property
- * cannot express (hope's calendar mirrors its chevrons with `rtl:[&_svg]:rotate-180`).
+ * where a physical class is correct, and the escape hatch for a rule no logical property can express
+ * (hope's calendar mirrors its chevrons with `rtl:[&_svg]:rotate-180`).
  *
- * Exported for the same reason as {@link PHYSICAL_UTILITIES}: the script half keeps its own copy,
- * and the drift guard compares the two by `.source`. An exemption that diverges between the halves
- * is the same silent split as a rule-table entry that does.
+ * Exported for the same reason as {@link PHYSICAL_UTILITIES}: the static script keeps its own copy and
+ * the drift guard compares the two by `.source`. An exemption that diverges between the two halves
+ * splits the rule just as silently as a table entry would.
  */
 export const DIRECTION_SCOPED = /(^|:)(rtl|ltr):/;
 
 /**
- * `data-side` reports where a floating layer LANDED after `flip` — measured geometry, a physical
- * fact — so a physical response under that scope is the matching answer, not a defect
- * (`__internal__/theming.md` § The governing rule). A recipe that genuinely needs "the side nearest
- * where the text starts" still layers `ltr:`/`rtl:` on top, which {@link DIRECTION_SCOPED} covers.
+ * `data-side` reports where a floating layer *landed* after flipping — measured geometry, a physical
+ * fact — so a physical class under that scope is the matching answer, not a defect (see
+ * `__internal__/theming.md` § RTL-aware recipes). A recipe that really wants "the side nearest where
+ * the text starts" layers `ltr:`/`rtl:` on top, which {@link DIRECTION_SCOPED} covers.
  *
- * Scoped to `_base/_variants.css`'s registered variant names, the vocabulary `createFloating`
- * emits. The arbitrary form (`data-[side=bottom]:`) is deliberately NOT matched.
- *
- * Exported alongside {@link DIRECTION_SCOPED}, for the drift guard.
+ * Limited to the registered variant names `createFloating` emits; the arbitrary form
+ * (`data-[side=bottom]:`) is deliberately not matched. Exported for the drift guard, like
+ * {@link DIRECTION_SCOPED}.
  */
 export const MEASURED_SIDE_SCOPED = /(^|:)data-side-(top|right|bottom|left):/;
 
@@ -271,16 +262,15 @@ export function assertLogicalPropertyConformance<Variants>(
 }
 
 /**
- * Checks that a theme's CSS defines a `--hope-<token>` variable for every semantic color token in
- * `tokens` (default: the full {@link SEMANTIC_COLOR_TOKENS} vocabulary). A theme is chosen at the
- * consumer's Tailwind build time and every recipe/component references these tokens as utilities
- * (`bg-primary` → `var(--hope-primary)`); a token the preset forgot to define compiles to an
- * unresolved `var()` and silently breaks styling. This is the CSS-side analogue of the recipe
- * axis's {@link checkSlotRecipeConformance}: once tokens live in CSS rather than a TS object the
- * compile-time `satisfies` guarantee is gone, so a preset runs this against its `tailwind.css`.
+ * Checks that a theme's CSS defines a `--hope-<token>` CSS variable for every semantic color token in
+ * `tokens` (default: the whole {@link SEMANTIC_COLOR_TOKENS} vocabulary). Recipes reference these
+ * tokens through utilities (`bg-primary` → `var(--hope-primary)`), so one the preset forgot compiles
+ * to an unresolved `var()` and silently drops the style. Tokens live in CSS rather than a TS object,
+ * which puts them out of reach of the compile-time `satisfies` check — hence this runtime pass over
+ * the preset's `tailwind.css`.
  *
- * It asserts only that each token is *declared* (its light/`:root` value); dark overrides are a
- * per-preset concern and not every token changes between modes.
+ * Only *declaration* is asserted (the light/`:root` value); dark overrides are per-preset, and not
+ * every token changes between modes.
  */
 export function checkSemanticTokenConformance(
   cssText: string,
@@ -288,8 +278,8 @@ export function checkSemanticTokenConformance(
 ): ConformanceResult {
   const errors: string[] = [];
   for (const token of tokens) {
-    // The `:` anchor stops a prefix token (`focus`) from matching a longer one
-    // (`focus-halo`), or `primary` from matching `primary-soft`.
+    // The trailing `:` stops a shorter token from matching a longer one that starts with it —
+    // `focus` against `focus-halo`, or `primary` against `primary-soft`.
     const declared = new RegExp(`${hopeVar(token)}\\s*:`).test(cssText);
     if (!declared) {
       errors.push(`semantic token "${hopeVar(token)}" is not defined in the theme CSS`);
@@ -312,13 +302,11 @@ export function assertSemanticTokenConformance(cssText: string, tokens?: readonl
 }
 
 /**
- * The opacity-axis analogue of {@link checkSemanticTokenConformance}: checks that a theme's CSS
- * defines a `--hope-<token>` variable for every semantic opacity token in `tokens` (default: the
- * full {@link SEMANTIC_OPACITY_TOKENS} axis). Opacity is a separate contract from color — Tailwind
- * v4.3.2 has no `--opacity-*` theme namespace, so the values reach utilities through the shared
- * `_base/_opacity.css` `@utility` layer rather than `@theme inline` — but the CSS-side completeness
- * requirement is the same: a token the preset forgot to define compiles its `@utility` to an
- * unresolved `var()`. The `--hope-` namespace is shared, so it reuses the same `--hope-<token>:` regex.
+ * The opacity-axis analogue of {@link checkSemanticTokenConformance}, defaulting to the whole
+ * {@link SEMANTIC_OPACITY_TOKENS} axis. Opacity is a separate contract from color only because
+ * Tailwind v4 has no `--opacity-*` theme namespace, so these values reach utilities through a shared
+ * `@utility` layer instead of `@theme inline`; the completeness requirement and the `--hope-`
+ * namespace (hence the same regex) are identical.
  */
 export function checkOpacityTokenConformance(
   cssText: string,

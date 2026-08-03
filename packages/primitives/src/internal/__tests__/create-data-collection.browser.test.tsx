@@ -21,15 +21,14 @@ function nth<T>(list: ArrayLike<T>, index: number): T {
 /**
  * Publish a row's element under its index — what every row of a data-driven list does.
  *
- * Deliberately **not** `createRegisteredElement`: the index is reactive here (a row moves when the
- * data does), and reading it inside that hook's `register` callback is an untracked read of a
- * reactive value — `[STRICT_READ_UNTRACKED]`, which `mount()` fails the test on. Tracking both the
- * ref and the index in the effect's compute is what makes a row that changes position re-register
- * under its new one.
+ * Deliberately **not** `createRegisteredElement`: the index is reactive here, since a row moves when
+ * the data does, and reading it inside that hook's `register` callback is an untracked read of a
+ * reactive value (`[STRICT_READ_UNTRACKED]`, which `mount()` fails the test on). Tracking both the
+ * ref and the index in the effect's compute is what re-registers a row that changed position.
  *
  * The teardown addresses the **element**, never the index this run registered under: a reorder
- * re-runs every moved row one after another, so by then another row may already own that index, and
- * clearing it would delete their live element. See `unregisterElement`.
+ * re-runs every moved row one after another, so by then another row may already own that index and
+ * clearing it would delete their live element.
  */
 function registerRow(
   source: IndexedItemSource,

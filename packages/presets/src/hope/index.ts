@@ -1,19 +1,15 @@
 /*
  * @hope-ui/presets/hope — the public JS entry for hope-ui's default preset.
  *
- * This is the JS half of the hope preset (the CSS half is `@import "@hope-ui/presets/hope/tailwind.css"`).
- * Two things are exported:
- *   - `hope` — the `Preset` a SolidJS app passes to `<ThemeProvider preset={hope}>`; `@hope-ui/components`
- *     then reads each component's recipe out with `useRecipe(...)`. Built with `definePreset` over the
- *     raw recipe map.
- *   - `hopeRecipes` — the raw `RecipeRegistry` map, kept for bootstrapping (it's what `definePreset`
- *     derives `hope` from) and for the conformance tests. The internal recipe map lives under `./recipes`.
+ * This is the JS half; the CSS half is `@import "@hope-ui/presets/hope/tailwind.css"`. An app passes
+ * `hope` to `<ThemeProvider preset={hope}>`, and `@hope-ui/components` reads each component's recipe
+ * out with `useRecipe(...)`. `hopeRecipes` is the same map before `definePreset` wraps it, exported
+ * for bootstrapping and for the conformance tests.
  *
- * hope is a **zero-DOM preset**: its semantic token *values* are authored in CSS (`./theme.css` —
- * `--hope-*` custom properties as `var(--color-*)` references, imported by `./tailwind.css`), not in
- * TypeScript. So `<ThemeProvider preset={hope}>` renders no markup of its own — no runtime token
- * `<style>`. The shared `_base/_theme-map.css` maps those `--hope-*` names into clean Tailwind
- * utilities (`bg-primary`, …).
+ * hope is a **zero-DOM preset**: its semantic token *values* are authored in CSS (`./theme.css`, as
+ * `--hope-*` custom properties), not in TypeScript, so `<ThemeProvider preset={hope}>` renders no
+ * markup at all — no runtime token `<style>`. `_base/_theme-map.css` then maps those `--hope-*` names
+ * onto plain Tailwind utilities (`bg-primary`, …).
  */
 import { definePreset } from "@hope-ui/theming";
 import { hopeRecipes } from "./recipes";

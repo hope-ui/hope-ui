@@ -9,25 +9,21 @@ import { Combobox, type ComboboxSize } from ".";
  * narrows `items` as you type.
  *
  * **Every tree here names its input** with `aria-label` or an `aria-labelledby` pointing at the
- * consumer's own `<label>`. There is no `Label` part (that is a future `Field`'s job), and a nameless
- * `role="combobox"` is an axe `aria-input-field-name` violation — as is the `role="listbox"` popup,
- * which inherits its name from the input.
+ * consumer's own `<label>`. There is no `Label` part, and a nameless `role="combobox"` is an axe
+ * `aria-input-field-name` violation — as is the `role="listbox"` popup, which inherits its name.
  *
  * **DOM focus never leaves the input.** No option is ever focused; the highlight is
  * `aria-activedescendant` plus the row's `data-active`. `Combobox.Trigger` — the chevron — is
  * deliberately **outside the tab order**, so Tab moves past the whole widget in one press.
  *
- * **There is no typeahead.** The input *is* the search buffer; a second one competing with it would
- * be a bug. That is the one behavior Select has and Combobox drops.
- *
- * The global `withHopeTheme` decorator (`.storybook/preview.tsx`) provides the preset; Storybook's
- * Tailwind build compiles the recipe utilities.
+ * **There is no typeahead.** The input *is* the search buffer, so a second jump-to-letter buffer
+ * competing with it would be a bug. That is the one behavior Select has and Combobox drops.
  */
 const meta = {
   title: "Components/Combobox",
   component: Combobox.Root,
-  // `items` is a required prop, so Storybook's story type demands `args`. Every story below renders
-  // its own tree, so this is only here to satisfy that requirement.
+  // `items` is required, so Storybook's story type demands `args`. Every story renders its own tree,
+  // so this only exists to satisfy that.
   args: { items: [] },
 } satisfies Meta<typeof Combobox.Root>;
 
@@ -48,7 +44,7 @@ const FRUITS: Fruit[] = [
   { id: 5, name: "Elderberry", disabled: true },
   { id: 6, name: "Fig" },
   // Accented on purpose: typing its plain-ASCII spelling ("acai") exercises the collator-backed
-  // filter (`sensitivity: "base"`), which `toLowerCase().includes()` could never match.
+  // filter, which folds diacritics as well as case — `toLowerCase()` folds only case.
   { id: 7, name: "Açaí" },
   { id: 8, name: "Café au lait melon" },
 ];
@@ -175,7 +171,7 @@ export const StartsWith: Story = {
 
 /**
  * A query that matches nothing leaves the popup **open** on `Combobox.Empty` — the reason
- * `Combobox.Root` flips the kernel's `allowsEmptyCollection` default to `true`. Type `zzz`.
+ * `Combobox.Root` defaults `allowsEmptyCollection` to `true`. Type `zzz`.
  */
 export const NoMatches: Story = {
   render: () => (
@@ -418,7 +414,7 @@ export const AsyncSearch: Story = {
 
 /**
  * `render` re-targets an element while keeping its computed props. The chevron becomes a `<div>` —
- * `nativeButton={false}` is what switches `createButton` to `tabIndex`/`aria-disabled` and
+ * `nativeButton={false}` is what swaps the native button behavior for `tabIndex`/`aria-disabled` plus
  * synthesized keyboard activation. The popup ARIA, the `aria-label` and the focus-preserving
  * pointerdown all still ride on it.
  */

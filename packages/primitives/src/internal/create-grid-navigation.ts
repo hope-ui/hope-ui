@@ -27,8 +27,9 @@ export interface GridCell<V> {
 export interface CreateGridNavigationOptions<V> {
   /**
    * The shared focus instance, over the **flat cell items**. Grid navigation reuses it for the
-   * roving⇆activedescendant switch and the defer-focus-until-mounted plumbing; it just computes 2D
-   * targets and calls `focus.focus(cell.item)`.
+   * roving⇆activedescendant switch (whether DOM focus moves onto each cell or stays on the container
+   * with `aria-activedescendant` naming the cell) and for the defer-focus-until-mounted plumbing; it
+   * only computes 2D targets and calls `focus.focus(cell.item)`.
    */
   focus: CreateListFocusReturn<V>;
   /** The 2D layout: every cell with its coordinates and spans. Reactive. */
@@ -68,8 +69,9 @@ export interface CreateGridNavigationReturn {
  * 2D navigation over a row/cell collection, layered on one `createListFocus`. Handles Up/Down/
  * Left/Right with per-axis wrap (`nowrap`/`loop`/`continuous`), `firstInRow`/`lastInRow` and grid
  * `first`/`last`, RTL, skip-disabled, and cell spans. The vertical edges fire `onNavigateBefore`/
- * `onNavigateAfter`, which a calendar uses to flip months (Astryx's `useGridFocus` pattern) while
- * the parent re-renders and sets the new active cell. Modeled on Angular Aria's `private/grid`.
+ * `onNavigateAfter`, which a calendar uses to flip months while the parent re-renders and sets the
+ * new active cell — the pattern Astryx's `useGridFocus` uses. Adapted from `private/grid` in Angular
+ * Aria (Angular's signal-based accessibility behaviors).
  *
  * Because it drives the shared focus, the roving⇆activedescendant switch and defer-focus-until-the-
  * element-exists behavior come for free from `createListFocus` — a grid over a

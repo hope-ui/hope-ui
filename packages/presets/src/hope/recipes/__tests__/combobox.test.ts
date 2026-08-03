@@ -59,8 +59,8 @@ describe("hope combobox recipe", () => {
     // The widget dims as one — the component writes `data-disabled` here, not on each descendant.
     expect(control).toContain("data-disabled:opacity-disabled");
     expect(control).toContain("data-disabled:pointer-events-none");
-    // A `<div>`, not a button: the kernel writes `data-pressed` on the chevron button only, and a
-    // text field's affordance is the caret rather than a wash.
+    // A `<div>`, not a button: the kernel writes `data-pressed` on the gutter buttons only, and a text
+    // field's affordance is the caret rather than a wash.
     expect(control).not.toContain("data-pressed:");
     // `select-none` here would reach the input's own text.
     expect(control).not.toContain("select-none");
@@ -77,9 +77,9 @@ describe("hope combobox recipe", () => {
     expect(input).toContain("flex-1");
     // The empty state is the native pseudo-element, which is why there is no placeholder slot.
     expect(input).toContain("placeholder:text-foreground-subtle");
-    // The control owns the *box*: a border color, a background or a ring here would draw a second
-    // one inside it. The height is the one metric the input does take, and it takes the control's
-    // own — the field's caret target spans the shell instead of a shorter line box inside it.
+    // The control owns the *box*: a border color, background or ring here would draw a second one
+    // inside it. Height is the one metric the input does take, and it takes the control's own, so the
+    // caret target spans the shell rather than a shorter line box inside it.
     expect(input).not.toContain("border-subtle");
     expect(input).not.toContain("bg-surface");
     expect(input).not.toContain("ring-");
@@ -131,9 +131,9 @@ describe("hope combobox recipe", () => {
   });
 
   it("pins the popup to the control's measured width, with no competing width anywhere", () => {
-    // The one width Combobox has: the kernel measures the anchor and publishes `--anchor-width`, and
-    // this spends it. Because it is the only one, no compound variant is needed to keep a second
-    // width class from racing it — the failure `popover.ts` uses compounds to avoid.
+    // The one width Combobox has: the kernel measures the anchor, publishes `--anchor-width`, and this
+    // spends it. Being the only one, no compound variant is needed to keep a second width class from
+    // racing it — the declaration-order failure `popover.ts` uses compounds to avoid.
     const positioner = comboboxRecipe({}).positioner();
     expect(positioner).toContain("w-(--anchor-width)");
     expect(positioner).toContain("z-50");
@@ -172,15 +172,16 @@ describe("hope combobox recipe", () => {
   });
 
   it("styles the empty message and the status line as card siblings of the list", () => {
-    // `role="listbox"` admits only options and groups, so both carry their own padding rather than
-    // inheriting the list's — the reason `content` and `list` are separate slots at all.
+    // `role="listbox"` admits only options and groups, so both sit beside the list and carry their own
+    // padding rather than inheriting it — the reason `content` and `list` are separate slots at all.
     const empty = comboboxRecipe({}).empty();
     expect(empty).toContain("text-center");
     expect(empty).toContain("text-foreground-muted");
     expect(empty).toMatch(/(?:^|\s)py-\d/);
 
     const status = comboboxRecipe({}).status();
-    // A visible live region, separated from the rows by a hairline; block-axis, so RTL-invariant.
+    // A visible live region, separated from the rows by a hairline. `border-t` is a block-axis edge, so
+    // it is direction-invariant — no logical spelling needed.
     expect(status).toContain("border-t");
     expect(status).toContain("border-subtle");
     expect(status).toContain("text-foreground-muted");
@@ -193,7 +194,7 @@ describe("hope combobox recipe", () => {
     expect(content).toContain("data-entering:opacity-0");
     expect(content).toContain("data-exiting:opacity-0");
     // Physical, and correct: `data-side` reports where the layer landed after `flip` — measured
-    // geometry, identical under `dir="rtl"`.
+    // geometry rather than reading direction, so it is identical under `dir="rtl"`.
     expect(content).toContain("data-side-bottom:data-entering:-translate-y-1");
     expect(content).toContain("data-side-bottom:origin-top");
   });
@@ -233,11 +234,11 @@ describe("hope combobox recipe", () => {
     for (const size of SIZES) {
       const parts = comboboxRecipe({ size });
       expect(parts.control(), `${size} control height`).toContain(heights[size]);
-      // The input fills the shell rather than sitting inside it on its own line box, so the caret
-      // and the text are centred against the same box the gutter buttons are.
+      // The input fills the shell rather than sitting inside it on its own line box, so caret and text
+      // are centred against the same box the gutter buttons are.
       expect(parts.input(), `${size} input height`).toContain(heights[size]);
-      // Logical, and tighter on the end: what sits there is a button with its own wash, not a bare
-      // glyph, so it needs less room than Select's chevron.
+      // Logical (`ps-`/`pe-`), and tighter on the end: what sits there is a button with its own wash,
+      // not a bare glyph, so it needs less room than Select's chevron.
       expect(parts.control(), `${size} control gutter`).toContain("ps-2.5 pe-1");
     }
   });

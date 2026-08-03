@@ -325,7 +325,8 @@ interface CalendarApi {
 
 function CalendarHarness(props: { onReady: (api: CalendarApi) => void }) {
   // 3 rows × 3 "days" per month; ArrowDown on the last row flips to the next month, ArrowUp on the
-  // first row to the previous — the Astryx `useGridFocus` month-flip pattern.
+  // first row to the previous. This is the month-flip shape Calendar needs — the reference it is
+  // modeled on is listed in `__internal__/reference-implementations.md`.
   const [month, setMonth] = createSignal(0);
   const counters = { before: 0, after: 0 };
   const days = createMemo<CellDesc[]>(() => {

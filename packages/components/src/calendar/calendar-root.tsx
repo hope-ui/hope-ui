@@ -17,20 +17,18 @@ import { Heading } from "./calendar-heading";
 import { NextButton } from "./calendar-next-button";
 import { PrevButton } from "./calendar-prev-button";
 
-// The `role="group"` container is a generic `<div>` — a calendar is an ARIA *group*, deliberately not
-// a `<fieldset>` (see `createCalendarGroup`), so there is no element-specific attribute surface.
+// A plain `<div role="group">`, deliberately not a `<fieldset>`, so there are no element-specific
+// attributes to inherit.
 type CalendarRootElementProps = JSX.HTMLAttributes<HTMLDivElement>;
 
 /**
- * `CalendarRootProps` = the primitive's `CreateCalendarOptions` (locale/selection/boundaries/focus +
- * the native-form fields) **plus** the themeable `size` axis (`CalendarThemeableProps`, owned by
- * `@hope-ui/theming`) **plus** the remaining native `<div>` attributes (so the group can be given an
- * `id`, named with `aria-label`/`aria-labelledby`, styled with `style`, hooked with `data-*`, …) and
- * the per-instance props below.
+ * `CalendarRootProps` = the `createCalendar` options (locale/selection/boundaries/focus, the
+ * native-form fields) **plus** the themeable `size` axis **plus** the remaining native `<div>`
+ * attributes (`id`, `aria-label`, `style`, `data-*`, …) and the per-instance props below.
  *
- * `CreateCalendarOptions` keys are `Omit`-ted from the native attributes so a native `dir`/`title` can
- * never clash with the primitive's own option of the same name. Extending `CalendarThemeableProps`
- * keeps the recipe variants and this surface in lockstep by construction.
+ * The `createCalendar` option keys are `Omit`-ted from the native attributes so a DOM `dir`/`title`
+ * can never clash with the option of the same name. Extending `CalendarThemeableProps` keeps the
+ * style recipe's variants and this surface in lockstep.
  */
 export interface CalendarRootProps
   extends CreateCalendarOptions,
@@ -45,10 +43,12 @@ export interface CalendarRootProps
   slotClasses?: SlotClasses<"calendar">;
   /**
    * Renders the group container as a different element/component while keeping Root's computed props
-   * (`role="group"`, the state `data-*`, `dir`). The internal ref — what the abandonment policy
-   * measures "outside" against and what the dev direction warning reads the applied layout from — is
-   * merged into the single function ref `renderElement` passes down, so a render target that ignores
-   * function refs silently disables both.
+   * (`role="group"`, the state `data-*`, `dir`).
+   *
+   * Your element receives a single function `ref` with the component's own ref merged in. Two
+   * features read that element — committing a half-finished range when focus leaves the calendar,
+   * and the dev-time reading-direction warning — so a target that ignores function refs disables
+   * both, silently.
    */
   render?: RenderProp<CalendarRootElementProps>;
   /** Merged over the recipe's `root` slot (applied last), so the consumer's utilities win. */
@@ -62,28 +62,24 @@ export interface CalendarRootProps
 }
 
 /**
- * The Calendar root. Calls `createCalendar` once for the shared state (view machine / roving cursor /
- * selection / date math + predicates, the shared navigation kernel, the heading id, and the form
- * accessors), resolves the recipe variants via `useDefaults` + `useSlots`, and puts the state + slot
- * class fns on context (composition — `ctx.state` + `ctx.slots`, not an extended state). Renders the
- * `role="group"` container over either the consumer's compound parts or — when Root is given no
- * children — the built-in default chrome, followed by (when `name` is set) one hidden native field per
- * submitted ISO value.
+ * The Calendar root. Calls `createCalendar` once for the state every part shares (the view stack,
+ * the keyboard cursor, selection, date math, the heading id, the form accessors), resolves the theme
+ * recipe, and publishes both on context. Renders the `role="group"` container over either the
+ * consumer's compound parts or — when given no children — the built-in default chrome, followed by
+ * one hidden native field per submitted value when `name` is set.
  *
- * Native `<div>` attributes that aren't a `createCalendar` option or a recipe input (`id`, `style`,
- * `data-*`, `aria-labelledby`, event handlers, `ref`, …) reach the container element. The primitive's
- * own attributes win over a consumer's, with two deliberate exceptions the part hook owns: an
- * `aria-label` overrides the built-in group label (as does the `label` option, of which it is the raw
- * spelling), and an `onFocusOut` is composed with — not replaced by — the abandonment policy's.
+ * Native `<div>` attributes that are neither a `createCalendar` option nor a recipe input reach the
+ * container element. The primitive's own attributes win over a consumer's, with two deliberate
+ * exceptions: an `aria-label` overrides the built-in group label, and an `onFocusOut` is composed
+ * with — not replaced by — the one that commits a half-finished range.
  *
- * Because it reads a recipe, a `Calendar.Root` **requires a `<ThemeProvider>`** ancestor (fed a
- * preset), like every other styled component.
+ * Reading a recipe means a `Calendar.Root` **requires a `<ThemeProvider>`** ancestor fed a preset,
+ * like every other styled component.
  */
 export function Root(props: CalendarRootProps): JSX.Element {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
-  // The nav-glyph factories default to hope's built-in chevrons; a preset's `defaultProps.calendar`
-  // swaps them app-wide (and a per-`Calendar.Root` `prevIcon`/`nextIcon` prop wins over that).
+  // `useDefaults` resolves each key with `??` across three layers: instance prop, then the preset's
+  // per-component `defaultProps`, then the built-ins below. So a preset can swap the nav chevrons
+  // app-wide while a per-instance `prevIcon`/`nextIcon` still wins over it.
   const merged = useDefaults({
     recipe: "calendar",
     props,
@@ -94,32 +90,31 @@ export function Root(props: CalendarRootProps): JSX.Element {
     },
   });
 
-  // `useSlots` returns one ready-to-call class fn per slot, each folding the override chain: recipe
-  // base → preset `slotClasses` → instance `slotClasses` → `class` (root slot only). `size` is the
-  // whole styling axis; passing the complete variant set every call is what `CompleteVariantsOf`
-  // requires (an omitted variant would silently fall back to the recipe's `defaultVariants`).
+  // One class function per named slot of the theme's `calendar` recipe, each folding the override
+  // chain: recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root slot only).
+  // Every variant must be passed on every call: an omitted one silently falls back to the recipe's
+  // own default rather than to this instance's.
   const slots = useSlots({
     recipe: "calendar",
     variantsProps: () => ({ size: merged.size }),
     slotClasses: () => merged.slotClasses,
   });
 
-  // `createCalendar` reads only its own option keys off `merged` (locale/selection/boundaries/focus/
-  // name/…) — the defaulted `size` and the per-instance class props ride along harmlessly. Pass
-  // `merged`, not raw `props`: `useDefaults` exposes its defaults as getters over `props`, so `merged`
-  // stays just as lazy and reactive (the controllable-state getters stay live) while being the single
-  // source of truth.
+  // Pass `merged`, never raw `props`: `useDefaults` returns a *new object of getters* rather than a
+  // copy, so `props.size` still reads `undefined` for a defaulted key while `merged.size` reads `md`.
+  // Getters also keep everything lazy and reactive. `createCalendar` picks off only the option keys
+  // it knows; `size` and the class props ride along harmlessly.
   const state = createCalendar(merged);
 
-  // The passthrough native attributes: everything not consumed as a `createCalendar` option, a recipe
-  // variant/override, or the explicitly-rendered `class`/`children`. `id`/`aria-label`/`style`/`data-*`
-  // survive here and are handed to the part hook, which merges them *under* its own `role`/`aria-*`/
-  // `data-*` and composes the consumer's `onFocusOut` with the abandonment policy. `dir` is omitted
-  // here and written explicitly below, so that making this list exhaustive over the option keys — a
-  // natural tidy-up — can't silently split the layout from the keyboard. Mirrors `Listbox.Root`.
+  // The native attributes to forward: everything not consumed as a `createCalendar` option, a recipe
+  // input, or the explicitly-rendered `class`/`children`. They go through the part hook below, which
+  // merges them *under* its own `role`/`aria-*`/`data-*`.
   //
-  // Hand-kept, and a key missing from it lands in the DOM as a junk attribute with nothing else
-  // failing — pinned by "does not leak createCalendar options onto the element as attributes".
+  // This list is hand-kept, and a key missing from it lands in the DOM as a junk attribute with
+  // nothing else failing — pinned by "does not leak createCalendar options onto the element as
+  // attributes". `dir` is dropped here and re-added explicitly below, so that "make this list
+  // exhaustive over the option keys" — the natural tidy-up — cannot silently split the layout from
+  // the keyboard. See the `dir` getter for why.
   const rest = omit(
     merged,
     "dir",
@@ -153,19 +148,18 @@ export function Root(props: CalendarRootProps): JSX.Element {
     "required",
   );
 
-  // The container part: the group's ARIA + state `data-*`, and the abandonment policy
-  // (`commitBehavior`) for a range the user walks away from. `rest` goes through the hook rather than
-  // being merged onto the element here, because the hook owns the precedence: its `role`/`data-*` win
-  // over a consumer's, its `aria-label` *defers* to one (`props["aria-label"] ?? state.groupLabel()`),
-  // and its `focusout` listener must run alongside — not instead of — the consumer's.
+  // The container part: the group's ARIA and state `data-*`, plus the `commitBehavior` policy for a
+  // range the user starts and walks away from. `rest` is routed *through* the hook rather than merged
+  // onto the element afterwards, because the hook owns the precedence — its `role`/`data-*` win over
+  // a consumer's, its `aria-label` defers to one, and its `focusout` listener must run alongside the
+  // consumer's rather than instead of it.
   //
-  // The cast is `ref` variance only: `rest` is typed against `HTMLDivElement` (what `Root` renders),
-  // the hook's props against `HTMLElement`. A consumer `ref` rides through untouched and is merged
-  // with `group.setRef` by `renderElement`, not by the hook. Same cast as `Listbox.Root`.
+  // The cast covers `ref` variance only: `rest` is typed against the `<div>` this renders, the hook's
+  // props against the wider `HTMLElement`. A consumer `ref` passes through untouched and is merged
+  // with the hook's by `renderElement`, not here.
   const group = createCalendarGroup(state, rest as unknown as JSX.HTMLAttributes<HTMLElement>);
-  // The parts read behavior off `state`, classes off `slots`, and — when given no `children` — their
-  // default glyph off `prevIcon`/`nextIcon`. Accessors (via `runIfFunction`), so each read builds a
-  // fresh glyph element from the resolved factory (instance ?? preset ?? built-in chevron).
+  // `prevIcon`/`nextIcon` are *accessors*, so each read builds a fresh glyph element — a single
+  // shared element would be moved between the two buttons instead of appearing in both.
   const context: CalendarContextValue = {
     state,
     slots,
@@ -173,15 +167,14 @@ export function Root(props: CalendarRootProps): JSX.Element {
     nextIcon: () => runIfFunction(merged.nextIcon),
   };
 
-  // The built-in default chrome, rendered when `Root` is given no children (the zero-children
-  // convenience). Declared here as a **nested** component — NOT module-scope — and rendered
-  // `<DefaultCalendar />` INSIDE the `role="group"` container below, which is under `<CalendarContext>`,
-  // so each part's `useCalendarContext()` resolves (mirrors Alert's nested-body-under-provider pattern).
-  // It assembles the very same public parts a compound consumer would (`Header` ▸ `PrevButton` /
-  // `Heading` / `NextButton`, then `Grid`) as **bare** parts: each nav button supplies its own default
-  // glyph (from `ctx.prevIcon`/`nextIcon`) and its own localized `aria-label`, and `Heading` its own
-  // period label — so there is no chrome content duplicated here, and a preset's `defaultProps` glyphs
-  // apply to the auto-chrome and the compound path alike.
+  // The built-in chrome, rendered when `Root` is given no children. A **nested** component, not a
+  // module-scope one, and rendered *inside* the container below — i.e. under the context provider —
+  // which is what lets each part's `useCalendarContext()` resolve at all.
+  //
+  // It assembles the same public parts a compound consumer would, and passes them nothing: each nav
+  // button supplies its own glyph and localized `aria-label` from context, and `Heading` its own
+  // period label. So there is no chrome duplicated here, and a preset's glyphs reach the automatic
+  // and the hand-written path alike.
   function DefaultCalendar(): JSX.Element {
     return (
       <>
@@ -195,22 +188,17 @@ export function Root(props: CalendarRootProps): JSX.Element {
     );
   }
 
-  // The `role="group"` container — its ARIA and state `data-*` come from `createCalendarGroup`, which
-  // also wires the abandonment policy and takes the element's ref (also what the dev direction warning
-  // measures). The recipe `root` slot is applied last, and the chrome renders inside.
-  //
-  // Through `renderElement`, not a literal `<div>`: it now spreads a getter-laden props object from a
-  // primitive hook, and such a spread on a literal host element allocates its subtree's `_hk`
-  // differently under the server (`ssr`) vs client (`dom`) Solid compile — the same measured hazard
-  // documented on `Calendar.Grid`'s `<table>`/`<thead>` and `CalendarCell`.
+  // The container goes through `renderElement` rather than being written as a literal `<div>`.
+  // Spreading a getter-backed props object from a primitive hook onto a *literal* host element makes
+  // Solid's server and client compilers allocate the subtree's hydration keys differently, so
+  // hydration silently fails to adopt those nodes. Routing through a component call allocates them
+  // identically on both sides. Same measured hazard as `Calendar.Grid` and `CalendarCell`.
   return (
     <CalendarContext value={context}>
-      {/* Generics on the element's own type (`HTMLDivElement`), not the group hook's `HTMLElement`, so
-      a consumer's `render` callback receives div-shaped props and `render={(p) => <div {...p} />}`
-      compiles without a cast — the same surface Button/Badge/Alert expose. Only `ref`'s parameter
-      type differs between the two, hence the props cast; `group.setRef` takes the wider `HTMLElement`
-      and stays assignable. Re-targeting a *different* tag casts at the call site, as
-      `renderAsAnchor` does in the Button tests. */}
+      {/* Typed over the element this actually renders, so a consumer's
+      `render={(p) => <div {...p} />}` compiles with no cast. Only the `ref` parameter type differs
+      from the primitive's wider `HTMLElement`, hence the props cast below. Re-targeting a *different*
+      tag is the case that casts, and it casts at the call site. */}
       {renderElement<CalendarRootElementProps, HTMLDivElement>({
         as: "div",
         render: merged.render,
@@ -220,36 +208,33 @@ export function Root(props: CalendarRootProps): JSX.Element {
             return slots.root(merged.class);
           },
           /* `dir` is the one `createCalendar` option that is also a real HTML attribute, and the two
-          halves of RTL travel down different channels: the grid's column order and the recipe's
-          logical utilities (`rounded-s-`, `rtl:[&_svg]:rotate-180`) mirror from the DOM, the arrow
-          keys from `state.direction()`. So the consumer's `dir` must reach the element, or
+          halves of right-to-left support arrive by different routes: the grid's column order and the
+          CSS mirror themselves from the DOM's direction, while the arrow keys are remapped from the
+          resolved direction in JS. So a consumer's `dir` must reach the element, or
           `<Calendar.Root dir="rtl">` navigates right-to-left across a grid still laid out
           left-to-right, with Sunday on the left.
 
-          `merged.dir`, never `state.direction()`: the latter falls back to the locale, and a
-          locale-derived `dir="ltr"` would override an inherited `dir="rtl"` from an ancestor. Base UI
-          and React Aria both draw the line here too — React Aria's `useCalendarGrid` reads
-          `useLocale().direction` for the arrow flip and puts no `dir` in `gridProps` at all. An app
-          declares direction where the browser can see it; the provider only tells the keymap.
-          `createTextDirectionWarning` says so out loud in dev when the two disagree. */
+          `merged.dir`, never the resolved direction: that one falls back to the locale, and a
+          locale-derived `dir="ltr"` would override a `dir="rtl"` inherited from an ancestor. An app
+          declares direction where the browser can see it; a locale provider only tells the keyboard
+          mapping. When the two disagree, the primitive warns in dev rather than papering over it. */
           get dir() {
             return merged.dir;
           },
-          /* Compound (consumer children) vs convenience (auto-chrome): a **single** read of
-          `merged.children`, in a getter so it stays evaluated under the provider, with a nullish
-          fallback to the built-in `<DefaultCalendar />`. One read, so no `children()` is needed — the
-          multi-read / `<Show>`-`when`-gate hydration hazard never arises — and `??` short-circuits, so
-          a compound consumer never constructs `DefaultCalendar`. */
+          /* Consumer parts, else the built-in chrome. A **single** read of `merged.children`, in a
+          getter so it is evaluated under the provider, with `??` short-circuiting so a consumer's
+          tree never constructs `DefaultCalendar`. One read needs no `children()` wrapper: it is the
+          *double* read — a `<Show>`'s `when` plus its body — that builds and discards a component and
+          shifts the hydration keys Solid derives from tree position. */
           get children(): JSX.Element {
             return merged.children ?? <DefaultCalendar />;
           },
         }) as unknown as CalendarRootElementProps,
         ref: group.setRef,
       })}
-      {/* Native form submission, opt-in via `name`: one hidden field per submitted ISO value, keyed by
-      the primitive's `formValues()` (single → one field; multiple → one per date; range → paired
-      `${name}Start`/`${name}End`). Siblings of the group, so an `<input>` never nests in the grid.
-      Empty (renders nothing) until the calendar opts into a form. Mirrors the Listbox shape. */}
+      {/* Native form submission, opt-in via `name`: one hidden field per submitted ISO date (single →
+      one field; multiple → one per date; range → paired `${name}Start`/`${name}End`). Siblings of the
+      group, so an `<input>` never nests inside the grid's table markup. */}
       <Show when={state.name()}>
         <For each={state.formValues()}>
           {(field) => (
@@ -261,5 +246,6 @@ export function Root(props: CalendarRootProps): JSX.Element {
   );
 }
 
-// Re-export the recipe vocabulary so consumers can import it from the component's subpath.
+// Re-exported so a consumer never has to reach into `@hope-ui/theming` for a type this component's
+// own props use.
 export type { CalendarSize };

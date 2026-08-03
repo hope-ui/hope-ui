@@ -10,14 +10,14 @@ export interface PopoverTriggerProps extends PopoverTriggerElementProps {
   render?: RenderProp<PopoverTriggerElementProps>;
 }
 
-// The trigger carries no recipe slot — a consumer usually renders their own `Button` via `render`, so
-// the popover chrome stays on the surface parts. `class` is therefore **forwarded untouched** (it
-// rides the primitive's prop passthrough, never a slot fn), which is why it is not omitted below.
+// The trigger carries no recipe slot — a consumer usually renders their own `Button` through
+// `render`, so the popover's chrome stays on the surface parts. `class` is therefore **forwarded
+// untouched**, which is why it is not omitted below.
 //
-// It wires the primitive's ARIA + the **toggle** handler, and — unlike `Dialog.Trigger` — registers
-// its element: the trigger is the default anchor the layer positions against, and the one element
-// dismissal must not treat as outside (without which clicking an open popover's trigger could never
-// close it — the capture-phase pointerdown would dismiss and the click would reopen).
+// Unlike `Dialog.Trigger`, this one registers its element, for two reasons: it is the default anchor
+// the layer positions against, and it is the one element outside-click dismissal must not count as
+// "outside". Without that exclusion an open popover could never be closed by its own trigger — the
+// capture-phase pointerdown would dismiss it and the click would immediately reopen it.
 export const Trigger: Component<PopoverTriggerProps> = (props) => {
   const ctx = usePopoverContext();
   const trigger = createPopoverTrigger(ctx.state, omit(props, "render"));

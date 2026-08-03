@@ -11,10 +11,9 @@ export interface ListboxGroupLabelProps extends JSX.HTMLAttributes<HTMLElement> 
 }
 
 /**
- * The label naming its `Listbox.Group`. `createListboxGroupLabel` takes the group's return (read off
- * `ListboxGroupContext`) and registers its `id` onto the group's `aria-labelledby` via
- * `createRegisteredId` (deferring the ancestor-signal write past Solid 2.0's ban). This layer adds
- * the recipe `groupLabel` slot + `data-slot`.
+ * The label naming its `Listbox.Group`. The primitive registers this element's `id` onto the group's
+ * `aria-labelledby`, deferring that write past render — Solid 2.0 throws if a child writes a signal
+ * its ancestor owns during the child's own render.
  */
 export function GroupLabel(props: ListboxGroupLabelProps): JSX.Element {
   const ctx = useListboxContext();

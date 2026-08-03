@@ -5,46 +5,50 @@ import { createFocusScope } from "./create-focus-scope";
 export interface CreateFocusTrapOptions {
   /** Whether the trap is currently active. */
   active: Accessor<boolean>;
-  /** The container element to trap focus within. */
+  /**
+   * The container element to trap focus within. Must be a real signal accessor, never a plain
+   * variable: it is typically created as a reactive consequence of the same signal `active` derives
+   * from, so a non-reactive read would see it as `undefined` forever.
+   */
   ref: Accessor<HTMLElement | null | undefined>;
   /** Explicit element to focus on activation, instead of the first focusable descendant. */
   initialFocus?: Accessor<HTMLElement | null | undefined>;
 }
 
 /**
- * Traps Tab/Shift+Tab focus cycling within a container while `active`, and refocuses the
- * container if focus is moved outside it programmatically. Gated entirely inside
- * `createEffect`, so it naturally never runs during SSR (no DOM access happens outside the
- * effect).
+ * Cages Tab/Shift+Tab within a container while `active`, and pulls focus back if something moves it
+ * outside programmatically. Everything happens inside `createEffect`, whose bodies never run on the
+ * server, so no DOM access can leak into server rendering.
  *
- * **Moving focus in on activation is `createAutoFocus`**, composed below rather than
- * reimplemented — a non-modal overlay (Popover, Tooltip) wants that half without the cage.
+ * Focus behavior is deliberately split across primitives, because a non-modal overlay wants some
+ * parts of it without the others:
  *
- * **Restoring focus on deactivation is not this primitive's job** — that's
- * `createFocusRestore`, which is a separate concern precisely because a non-modal overlay
- * (Popover, Tooltip, a non-modal Dialog) wants focus returned *without* being trapped.
- * Compose both, and create `createFocusRestore` first; see `create-focus-restore.md` for the two
- * ordering constraints that depend on it.
+ * - **Moving focus in on activation is `createAutoFocus`**, composed below rather than
+ *   reimplemented — a Popover or Tooltip wants that half without the cage.
+ * - **Restoring focus on deactivation is `createFocusRestore`**, separate for the mirror reason:
+ *   those same overlays want focus returned without ever being trapped. Compose both, and create
+ *   `createFocusRestore` *first* — `__internal__/primitives/internal/create-focus-restore.md` has
+ *   the two ordering constraints that depend on it.
  *
  * **A trap is not the outermost thing in the page.** It registers itself as a focus scope
- * (`createFocusScope`, composed below) and leaves alone any focus that landed in a layer opened
- * *above* it — a Popover portaled out of the Dialog it was opened in is not focus escaping, even
- * though it is outside this container by every DOM measure. See `create-focus-scope.md`.
+ * (`createFocusScope`, composed below) and leaves alone focus that landed in a layer opened *above*
+ * it — a Popover portaled out of the Dialog it was opened in is not focus escaping, even though it
+ * is outside this container by every DOM measure.
  */
 export function createFocusTrap(options: CreateFocusTrapOptions): void {
-  // Created first of the three, so the scope is on the stack before the listeners below can
-  // consult it and before `createAutoFocus` moves focus anywhere. Same `options`, so registration
-  // and the listeners activate on exactly the same edge.
+  // Created first of the three, so the scope is registered before the listeners below can consult
+  // it and before `createAutoFocus` moves focus anywhere. Same `options`, so the registration and
+  // the listeners activate on exactly the same edge.
   const scope = createFocusScope(options);
 
-  // Created BEFORE `createAutoFocus`, and that order is load-bearing. Sibling effects run
-  // their previous cleanup in *creation* order on a re-run, so listeners-first reproduces
-  // what the single welded effect used to do: remove the listeners, and only then let
-  // autofocus remove the `tabindex` it added. It also puts the `focusin` handler in place
-  // before autofocus fires, which is what makes an out-of-container `initialFocus` get
-  // pulled back inside — the observable half of the decision. See `create-focus-trap.md`.
+  // Created BEFORE `createAutoFocus`, and that order is load-bearing. Solid re-runs sibling effects
+  // — and their cleanups — in creation order, so listeners-first means the listeners are removed
+  // before autofocus removes the `tabindex` it added. It also puts the `focusin` handler in place
+  // before autofocus fires, which is what pulls an out-of-container `initialFocus` back inside.
   createEffect(
-    // Same compute as `createAutoFocus`'s, for the same reason — see the comment there.
+    // Solid 2.0 effects take two functions: the first declares what to track, the second reacts.
+    // `ref()` has to be tracked alongside `active()` — the container is conditionally rendered, so
+    // reading it only in the second function would see it as `undefined` forever.
     () => [options.active(), options.ref()] as const,
     ([active, container]) => {
       if (!active || !container) {

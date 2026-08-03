@@ -9,43 +9,39 @@ import { useDialogContext } from "./dialog-context";
 export interface DialogContentProps extends CreateDialogContentProps {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
   /**
-   * Auto-render a corner `Dialog.CloseTrigger` before the consumer's children (shadcn's
-   * `DialogContent` sugar). Default `true`. Set `false` and place your own `<Dialog.CloseTrigger/>`
-   * for full control over its position/label.
+   * Auto-render a corner `Dialog.CloseTrigger` before the children. Default `true`. Set it `false`
+   * and place your own `<Dialog.CloseTrigger/>` to control its position and label.
    */
   showCloseButton?: boolean;
 }
 
-// The dialog surface. `role` is lifted to `Dialog.Root` and threaded here via context — so it wins
-// over any consumer `role` on `Content` (which is why the getter is merged last). `class` is set to
-// the recipe's `content` slot merged with any consumer `class`.
+// The dialog surface. `role` is an accessibility concern, so it is owned by the shared state created
+// on `Dialog.Root` rather than by this part; `createDialogContent` reads it from there and its props
+// are merged last, which is what makes it beat a `role` written on `Content`.
 export const Content: Component<DialogContentProps> = (props) => {
   const ctx = useDialogContext();
-  // `withDefaults` (not `merge`): resolves `showCloseButton` with `??`, so a wrapper forwarding an
-  // unset `showCloseButton={undefined}` still gets the default. `showCloseButton` is a control prop,
-  // omitted from what the hook (and the surface) receives.
+  // `withDefaults` resolves each key with `??`; Solid's `merge` resolves by key *presence*, so a
+  // wrapper forwarding `showCloseButton={undefined}` would lose the default under `merge`.
   const merged = withDefaults(props, { showCloseButton: true });
 
-  // `role` is not threaded here — it lives on `ctx.state` (an a11y concern), and `createDialogContent`
-  // reads `state.role()` for the surface's `role` attribute. This layer is pure assembly.
   const content = createDialogContent(
     ctx.state,
     omit(merged, "render", "class", "showCloseButton"),
   );
 
-  // `content.props` already carries `data-presence` (the hook mirrors the shared overlay presence
-  // `Dialog.Root`/`createDialog` owns — that's what lets the card animate in). This layer only adds
-  // the recipe `class` + the auto CloseTrigger.
+  // `content.props` already carries `data-presence` — the entering/entered/exiting status the shared
+  // mount-and-animate state publishes, which the recipe's transition classes select on. This layer
+  // adds only the recipe class and the auto close button.
   const elementProps = merge(content.props, {
     get class(): string {
       return ctx.slots.content(merged.class);
     },
     "data-slot": "dialog-content",
     get children(): JSX.Element {
-      // The auto close button precedes the consumer's content. It is a static child gated by a
-      // boolean — no `children()` needed (and the whole subtree is client-only, behind the portal +
-      // the `mounted()` gate, so no hydration `_hk` is at stake). `Dialog.CloseTrigger` already folds
-      // the `closeTrigger` slot into its own `class`, so it needs no explicit class here.
+      // A static child behind a boolean gate, so it needs no `children()` resolution (that is only
+      // for a component arriving through a prop and read more than once), and the subtree is
+      // client-only — behind the portal and the `mounted()` gate — so no server/client node matching
+      // is at stake. `Dialog.CloseTrigger` folds the `closeTrigger` slot into its own `class`.
       return (
         <>
           <Show when={merged.showCloseButton}>
@@ -63,9 +59,9 @@ export const Content: Component<DialogContentProps> = (props) => {
         as: "div",
         render: merged.render,
         props: elementProps,
-        // `content.setRef` registers the element on the shared state, so the overlay presence can
-        // time its exit off the card's transition (and `Dialog.Positioner` rides along) and the
-        // focus/dismiss effects can read it. `renderElement` already merges any consumer `ref`.
+        // Publishing the element on the shared state is what lets the exit be timed off the card's
+        // own CSS transition, and what the focus/dismiss effects read. `renderElement` collapses
+        // this and any consumer `ref` into one, so passing it here does not shadow theirs.
         ref: content.setRef,
       })}
     </Show>

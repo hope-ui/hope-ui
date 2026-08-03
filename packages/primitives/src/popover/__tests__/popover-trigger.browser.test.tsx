@@ -8,9 +8,8 @@ import {
 } from "../popover-root";
 import { createPopoverTrigger } from "../popover-trigger";
 
-// A browser test, like the rest of the family: `createPopover` owns `createPresence` (effects + rAF)
-// and `createFloating` (`getComputedStyle`, `computePosition`), neither of which exists in the node
-// environment.
+// A browser test, like the rest of the family: `createPopover` drives `requestAnimationFrame`,
+// `getComputedStyle` and a real layout measurement, none of which exist in the node environment.
 
 interface HarnessProps {
   onClick?: (event: MouseEvent) => void;
@@ -64,7 +63,7 @@ describe("createPopoverTrigger", () => {
   });
 
   it("keeps aria-haspopup=dialog for role=alertdialog", () => {
-    // ARIA defines no `alertdialog` token for `aria-haspopup` — `dialog` is the only legal value
+    // ARIA defines no `alertdialog` token for `aria-haspopup`, so `dialog` is the only legal value
     // for both of `createPopover`'s roles.
     const { container, dispose } = mountHarness({ options: { role: "alertdialog" } });
     expect(triggerOf(container).getAttribute("aria-haspopup")).toBe("dialog");
@@ -115,8 +114,8 @@ describe("createPopoverTrigger", () => {
     const { container, state, dispose } = mountHarness();
     const trigger = triggerOf(container);
 
-    // Both halves of what the trigger element is for: `createFloating` positions against it until a
-    // `Popover.Anchor` overrides it, and `createDismissable` must not count it as "outside".
+    // Both halves of what the trigger element is for: the layer positions against it until a
+    // `Popover.Anchor` overrides it, and dismissal must not count it as "outside".
     expect(state().triggerElement()).toBe(trigger);
     expect(state().anchorElement()).toBe(trigger);
     expect(state().dismissExclusions()).toEqual([trigger]);
@@ -129,11 +128,10 @@ describe("createPopoverTrigger", () => {
 
     await userEvent.click(page.getByTestId("trigger"));
     await expectNoA11yViolations(container, {
-      // Undecidable by construction, not a markup problem: axe returns `aria-valid-attr-value` as
-      // *incomplete* for **any** element carrying both `aria-haspopup` and `aria-controls`, without
-      // ever resolving the IDREF (`ariaValidAttrValueEvaluate`'s `controlsWithinPopup` pre-check) —
-      // a popup may be added on demand, so it defers to a human. The closed assertion above runs
-      // strict, and "aria-controls names the popup only while open" pins the IDREF itself.
+      // Not a markup problem: axe cannot decide `aria-valid-attr-value` for ANY element that
+      // carries both `aria-haspopup` and `aria-controls` — it never resolves the IDREF, because a
+      // popup may be added on demand. The closed assertion above runs strict, and the
+      // "aria-controls names the popup only while open" test pins the IDREF itself.
       allowIncomplete: ["aria-valid-attr-value"],
     });
     dispose();

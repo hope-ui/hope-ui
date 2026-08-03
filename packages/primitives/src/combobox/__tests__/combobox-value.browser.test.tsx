@@ -34,7 +34,7 @@ describe("createComboboxValue", () => {
   it("marks the empty state with data-placeholder, and clears it once something is selected", async () => {
     const { container, dispose } = mountHarness();
     expect(valuePartOf(container)?.hasAttribute("data-placeholder")).toBe(true);
-    // Present-*empty*, so a recipe targets one `data-placeholder:` variant.
+    // Present-but-*empty*, so a style rule can target `[data-placeholder]` with no value to match.
     expect(valuePartOf(container)?.getAttribute("data-placeholder")).toBe("");
 
     await userEvent.click(page.getByTestId("trigger"));
@@ -49,8 +49,8 @@ describe("createComboboxValue", () => {
   });
 
   it("reads emptiness off the listbox's own value, so both selection modes agree", () => {
-    // "Nothing selected" is one condition on `list.value()` (an empty array) where the adapted shape
-    // spells it `null` in single mode and `[]` in multiple.
+    // "Nothing selected" is one condition on `list.value()` — an empty array — where the
+    // consumer-facing value spells it `null` in single mode and `[]` in multiple.
     const single = mountHarness({ options: { defaultValue: "Apple" } });
     expect(valuePartOf(single.container)?.hasAttribute("data-placeholder")).toBe(false);
     single.dispose();
@@ -81,7 +81,7 @@ describe("createComboboxValue", () => {
 
     const custom = mountHarness({ valueProps: { id: "fruit-value" } });
     expect(valuePartOf(custom.container)?.id).toBe("fruit-value");
-    // …and the consumer's id is what reaches the trigger, not the generated one.
+    // …and the consumer's id is what reaches the trigger, not the generated fallback.
     await vi.waitFor(() =>
       expect(triggerOf(custom.container).getAttribute("aria-labelledby")).toContain("fruit-value"),
     );
@@ -95,7 +95,7 @@ describe("createComboboxValue", () => {
     const id = state().valueId();
 
     dispose();
-    // A stale `valueId` would leave the next trigger pointing `aria-labelledby` at a removed node.
+    // A stale `valueId` would leave the trigger pointing `aria-labelledby` at a removed node.
     expect(id).toBeTruthy();
     expect(container.querySelector('[data-testid="value"]')).toBeNull();
   });

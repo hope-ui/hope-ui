@@ -1,16 +1,8 @@
-// The @hope-ui/theming contract kernel:
-// - the registry contract — the `RecipeRegistry` (+ `THEMING_CONTRACT_VERSION`) and the parallel,
-//   type-only `ThemeablePropsRegistry` (from the top-level `./registry` folder);
-// - the recipe contract — the `SlotRecipeFn`/`SlotClassFn` shape and each hope-authored component's
-//   recipe/themeable-props types (re-exported wholesale from `./recipes`, so this stays short as the
-//   component catalog grows);
-// - the preset machinery — `definePreset`/`isPreset`, the `Preset` type + the typed component-
-//   override vocabulary (from `./preset`). Token *values* are authored in CSS, not here;
-// - the styling seam (`tv`/`cn`/`cx`);
-// - the semantic color token vocabulary;
-// - `ThemeProvider`/`useRecipe` runtime.
+// The @hope-ui/theming contract kernel: the two registries, the recipe/slot shape and each
+// component's recipe types, the preset machinery, the styling seam, the semantic token vocabulary,
+// and the `ThemeProvider`/`useRecipe` runtime. Token *values* are authored in CSS, never here.
 //
-// The conformance kit is intentionally NOT re-exported here — it lives on the separate
+// The conformance kit is deliberately NOT re-exported: it lives on the separate
 // `@hope-ui/theming/conformance` subpath so it never enters a runtime consumer's bundle.
 
 export * from "./preset";

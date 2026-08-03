@@ -24,21 +24,19 @@ const _variants: ButtonRecipeVariants = {
 };
 void _variants;
 
-// `loaderPlacement` is layout only (no "hidden"/"none"): the component mounts the loader slot via
-// `<Show>`, so the recipe variant and the component prop share this three-member union.
+// `loaderPlacement` is layout only, with no "hidden"/"none" member: the component mounts the loader
+// slot via `<Show>`, so the recipe variant and the component prop share this three-member union.
 const _placement: ButtonLoaderPlacement = "start";
 void _placement;
 
-// `ButtonThemeableProps` is the curated surface a preset may default app-wide — a **superset** of the
-// recipe variants (it `extends ButtonRecipeVariants`), so every variants object is a valid themeable
-// object and the `defaultProps` rename loses nothing.
+// The themeable surface is a superset of the recipe variants, so every variants object is a valid
+// themeable object and nothing is lost passing one where the other is expected.
 const _variantsAreThemeable = (v: ButtonRecipeVariants): ButtonThemeableProps => v;
 void _variantsAreThemeable;
 
-// It adds component chrome content (`loader`/`loadingText`) in **factory** form — a bare `JSX.Element`
-// is not assignable, which is what forces a reuse-safe preset default (see `runIfFunction` /
-// `RenderProp`). It deliberately does NOT carry per-usage behavioral props (`nativeButton`/`type`):
-// those describe what a given button *is*, not a design-system-wide default.
+// Chrome content is in **factory** form — a bare `JSX.Element` is not assignable, which is what forces
+// a reuse-safe preset default. It deliberately carries no per-usage behavioral props
+// (`nativeButton`/`type`): those describe what a given button *is*, not an app-wide default.
 const _themeable: ButtonThemeableProps = {
   variant: "solid",
   colorScheme: "primary",
@@ -51,9 +49,8 @@ const _themeable: ButtonThemeableProps = {
 };
 void _themeable;
 
-// Negative pin: a per-usage behavioral prop is rejected by the themeable surface (excess-property
-// error). If someone re-adds `nativeButton`/`type` to `ButtonThemeableProps`, this stops erroring and
-// `pnpm typecheck` fails on the stale `@ts-expect-error`.
+// Negative pin: the themeable surface rejects a per-usage behavioral prop. If one is ever re-added,
+// this stops erroring and `pnpm typecheck` fails on the now-stale suppression below.
 const _behavioralExcluded: ButtonThemeableProps = {
   // @ts-expect-error `nativeButton` is not themeable — it is per-usage, not an app-wide policy.
   nativeButton: false,

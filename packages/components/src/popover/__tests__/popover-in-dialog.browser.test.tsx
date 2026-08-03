@@ -9,50 +9,40 @@ import { Dialog } from "../../dialog";
 import { Popover } from "../index";
 
 /**
- * **A Popover opened inside a modal Dialog — the regression net for the three layer registries.**
- * The executable form of `popover.stories.tsx`'s `InsideADialog`, which pinned the same nesting in
- * a doc comment; a doc comment fails nothing.
+ * **A Popover opened inside a modal Dialog.** A modal Dialog defends itself against everything
+ * outside its own content: it marks that content's siblings `inert` + `aria-hidden`, cages focus
+ * inside itself, and listens for Escape on the document. A `Popover.Portal` mounts its layer as a
+ * *sibling* of the dialog's — so by every DOM measure the popup is "outside", and all three defences
+ * fire on it.
  *
- * It was written red, one assertion per symptom, before any of the three ports existed. What it
- * caught was **four** independent mechanisms, each needing a different registry, and each test
- * below still names the one it guards:
+ * This file was written red, one assertion per symptom, and each test below still names the one it
+ * guards. The four symptoms, each fixed by a different document-wide layer registry:
  *
- * 1. **Escape / outside-pointerdown reached every open layer.** `create-dismissable.ts` attached to
- *    `document` per instance with no ordering guard, so both layers dismissed at once. Closed by
- *    the dismiss stack's topmost-only gate.
- * 2. **Focus went down with it** — two focus restores fired for triggers that were both
- *    unmounting. Measured against this harness the survivor was the *dialog's* trigger, not
- *    `<body>`: the popover restored first, onto a trigger the dialog's own unmount was about to
- *    take with it, and the dialog's restore landed last and won. Either way the popover trigger —
- *    the control the reader actually pressed — did not get focus back. Closed by the same gate:
- *    one Escape now closes one layer, so each restore has a live trigger to return to.
- * 3. **The Dialog's `MutationObserver` marked the Popover `inert` + `aria-hidden`.**
- *    `create-hide-outside.ts` hid every added `<body>` child not in that layer's *static* `spare`
- *    array, and the Popover's portal was one. The card still painted **on top**, undimmed and
- *    legible — it was `inert` making it transparent to hit testing that broke it, so
- *    `elementFromPoint` at its own centre returned whatever was underneath. It looked like a
- *    working popover and could not be touched. Closed by the hide-outside layer stack plus
- *    `createKeepVisible`, which `Popover.Positioner` calls.
- * 4. **The Dialog's focus trap yanked focus back out of the Popover.** `create-focus-trap.ts`
- *    refocused its container whenever focus landed outside it, portaled popup included, and the
- *    Popover read that as focus leaving and dismissed itself — the popup flashed and was gone in
- *    ~3ms. Closed by the focus-scope stack: the trap asks `containsSelfOrAbove`, not
- *    `container.contains`. **The harness carries default props on both roots**, which is what keeps
- *    this symptom reachable at all — the story used to set `closeOnFocusOutside={false}` to hide it.
+ * 1. **Escape and outside-pointerdown reached every open layer at once**, closing both. Fixed by
+ *    letting only the topmost layer consume a dismissal.
+ * 2. **Focus went down with it** — two focus restores fired for triggers that were both unmounting,
+ *    so the popover's trigger (the control the reader actually pressed) never got focus back. Fixed
+ *    by the same gate: one Escape now closes one layer, so each restore has a live trigger.
+ * 3. **The Dialog marked the Popover `inert` + `aria-hidden`.** `inert` makes an element transparent
+ *    to hit testing while changing nothing about how it paints, so the card still looked perfectly
+ *    normal on top of the dialog and no click reached a word of it. Fixed by letting an inner layer
+ *    register itself as spared.
+ * 4. **The Dialog's focus trap yanked focus back out of the Popover**, which read the yank as focus
+ *    leaving and dismissed itself — the popup flashed and was gone in ~3ms. Fixed by a focus-scope
+ *    stack: focus in a layer opened *above* a trap is not focus escaping it. **Both roots here carry
+ *    default props**, which is what keeps this symptom reachable at all.
  *
  * Symptom 3 *masked* symptom 4 while both were live: an element inside an `inert` subtree is not
- * focusable, so autofocus was a silent no-op and the trap never ran. That is why the tests below
- * assert on **focus** rather than on survival, and why the two ports could not ship separately.
+ * focusable, so autofocus was a silent no-op and the trap never ran. Hence the tests below assert on
+ * **focus** rather than on survival.
  *
- * Everything the assertions rest on was measured in this project, not assumed: the `browser`
- * project loads **no compiled Tailwind** and its viewport is **414×896**, so every recipe class is
- * an inert string and both layers need an inline box; a programmatic `.click()` fires no
- * pointerdown and no focus, so every interaction here goes through `userEvent`.
+ * Two measured facts the assertions rest on: this test project compiles no Tailwind and its viewport
+ * is 414×896, so every recipe class is inert and both layers need an inline box; and a programmatic
+ * `.click()` fires no pointerdown and no focus, so every interaction goes through `userEvent`.
  */
 
-// Both families read a recipe (`Dialog.CloseTrigger` renders a recipe-styled `CloseButton`), so
-// every tree here sits under a `<ThemeProvider>` fed the `hope` preset. Zero-DOM provider — its
-// token values live in CSS — so it changes nothing these assertions look at.
+// Both families read a theme recipe, so every tree here needs a provider. It renders no DOM of its
+// own (hope's token values live in CSS), so it changes nothing these assertions look at.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -73,8 +63,8 @@ const DIALOG_POSITIONER_STYLE: JSX.CSSProperties = {
 };
 
 /**
- * Positioned, because a modal popup must be — an unpositioned one paints *beneath* the
- * `ModalBackdrop` and its own content stops responding to the mouse (`modal-backdrop.md`).
+ * Positioned, because a modal popup must be: an unpositioned one paints *beneath* the modal backdrop,
+ * and its own content then stops responding to the mouse.
  */
 const DIALOG_CONTENT_STYLE: JSX.CSSProperties = { position: "relative", height: "100%" };
 
@@ -91,22 +81,21 @@ const POPOVER_TRIGGER_STYLE: JSX.CSSProperties = {
 };
 
 /**
- * Verbatim from `popover.browser.test.tsx` (they are module-local there, not exported). **The
- * browser project loads no compiled Tailwind**, so every recipe class is an inert string: an
- * unstyled positioner is a block `<div>` as wide as the viewport, which makes `flip`'s cross-axis
- * check fire and silently rewrites `data-align`. `TRANSITIONED_CONTENT_STYLE` spells the recipe's
- * own `duration-150` where `getComputedStyle` can read it — `createPresence` reads the computed
- * duration off this element and unmounts immediately when it is `0`.
+ * Verbatim from `popover.browser.test.tsx`, where they are module-local. No Tailwind is compiled
+ * here, so an unstyled positioner is a block `<div>` as wide as the viewport, which makes
+ * floating-ui's `flip` fire on the cross axis and rewrite `data-align`.
+ * `TRANSITIONED_CONTENT_STYLE` spells the recipe's own exit duration where `getComputedStyle` can
+ * read it — the animation state unmounts immediately when that duration is `0`.
  *
- * The exit duration is load-bearing *here* in a way it is not there: it is the window in which a
- * popover killed by symptom 4 is still in the DOM to be inspected, which is what keeps the
- * symptom-3 failures below reading `inert` rather than `null`.
+ * That duration is load-bearing *here* in a way it is not there: it is the window in which a popover
+ * killed by symptom 4 is still in the DOM to be inspected, which keeps the symptom-3 failures below
+ * reporting `inert` rather than `null`.
  */
 const POSITIONER_STYLE: JSX.CSSProperties = { width: "200px" };
 const TRANSITIONED_CONTENT_STYLE: JSX.CSSProperties = { transition: "opacity 150ms ease-out" };
 
 /**
- * A point on the `ModalBackdrop` clear of every other box in the tree — below the dialog (0–180),
+ * A point on the modal backdrop clear of every other box in the tree — below the dialog (0–180),
  * below the popover trigger (300–321) and below the card it anchors. Passed explicitly because the
  * backdrop is `position: fixed; inset: 0`, so its *centre* — where a bare click would land — is
  * wherever the card happens to be.
@@ -120,14 +109,13 @@ const SETTLE_MS = 300;
 const settle = () => new Promise((resolve) => setTimeout(resolve, SETTLE_MS));
 
 /**
- * The canonical nesting: `PopoverDemo`'s shape (`popover.browser.test.tsx`) inside `FullDialog`'s
- * (`dialog.browser.test.tsx`), with **default props on both roots**. No `closeOnFocusOutside`, no
- * `modal={false}`, no consumer `Dialog.Backdrop` — the kernel's `ModalBackdrop` is the outside
+ * The canonical nesting, with **default props on both roots**. No `closeOnFocusOutside`, no
+ * `modal={false}`, and no consumer `Dialog.Backdrop`: the built-in modal backdrop is the "outside"
  * surface these tests click, and a consumer backdrop would paint above it and intercept that.
  *
- * `Popover.Title` is not decoration: a `role="dialog"` surface with no accessible name is an axe
- * `aria-dialog-name` violation. The inner `<button>` is the popover's first focusable — what
- * autofocus targets, and what a pointerdown *inside* the layer lands on.
+ * `Popover.Title` is not decoration — a `role="dialog"` surface with no accessible name fails the
+ * axe check below. The inner `<button>` is the popover's first focusable: what autofocus targets, and
+ * what a pointerdown *inside* the layer lands on.
  */
 const PopoverInDialog: Component = () => (
   <Themed>
@@ -165,9 +153,9 @@ const partOf = (slot: string) => document.querySelector<HTMLElement>(`[data-slot
 const modalBackdrop = () => document.querySelector("[data-hope-ui-modal-backdrop]");
 
 /**
- * What a real mouse click at the centre of `element` would actually hit. Copied from
- * `dialog.browser.test.tsx` — a synthetic `element.click()` bypasses hit testing entirely and would
- * happily fire through an `inert` layer, so it cannot answer the question this file asks.
+ * What a real mouse click at the centre of `element` would actually hit. A synthetic `element.click()`
+ * bypasses hit testing entirely and fires happily through an `inert` layer, so it cannot answer the
+ * question this file asks.
  */
 function topmostElementOver(element: Element): Element | null {
   const rect = element.getBoundingClientRect();
@@ -179,15 +167,14 @@ const describeElement = (element: Element | null) =>
   element === null ? "null" : element.outerHTML.slice(0, 120);
 
 /**
- * `mount()` plus a safety net. Every test still calls `dispose()` itself — that call is the
- * `STRICT_READ_UNTRACKED` / `REACTIVE_WRITE_IN_OWNED_SCOPE` gate (`mount.md`), and it is how this
- * file *confirms* rather than assumes that the three layer registries are safe for a descendant to
- * register into.
+ * `mount()` plus a safety net. Every test still calls `dispose()` itself, because that call is what
+ * fails the test on a Solid reactivity violation — an untracked read, or a descendant writing an
+ * ancestor-owned signal — which is how this file confirms rather than assumes that the layer
+ * registries are safe for a descendant to register into.
  *
- * The net matters on the day one of these goes red again: a test failing before its own
- * `dispose()` would leave a modal dialog mounted, and `createHideOutside` would then mark the
- * *next* test's container `inert` + `aria-hidden` — turning one honest failure into eight
- * unreadable ones.
+ * The net matters on the day one of these goes red: a test failing before its own `dispose()` leaves
+ * a modal dialog mounted, which then marks the *next* test's container `inert` + `aria-hidden` —
+ * turning one honest failure into eight unreadable ones.
  */
 function mountLayers(ui: () => JSX.Element): { dispose: () => void } {
   const mounted = mount(ui);
@@ -215,10 +202,10 @@ interface OpenLayers {
 /**
  * Opens the dialog, then the popover inside it, and hands back every element the assertions need.
  *
- * The dialog trigger is grabbed **before** the dialog opens: `createHideOutside` puts the mount
- * container (and the trigger with it) inside an `aria-hidden` subtree, so a role locator correctly
- * stops matching it the moment the modal is up. The popover trigger is not affected — it lives
- * inside `Dialog.Content`, which is the layer's spared target.
+ * The dialog trigger is grabbed **before** the dialog opens: the modal puts the mount container (and
+ * the trigger with it) inside an `aria-hidden` subtree, so a role locator correctly stops matching it
+ * the moment the modal is up. The popover trigger is unaffected — it lives inside `Dialog.Content`,
+ * the one subtree the modal spares.
  */
 async function openBothLayers(): Promise<OpenLayers> {
   const dialogTrigger = page.getByRole("button", { name: "Open dialog" }).element() as HTMLElement;
@@ -235,9 +222,8 @@ async function openBothLayers(): Promise<OpenLayers> {
     .element() as HTMLElement;
   await userEvent.click(popoverTrigger);
 
-  // The component-layer stand-in for `floating.isPositioned()`: `floatingStyles()` is the
-  // `visibility: hidden` pre-positioned branch until the first measurement lands. Every geometry
-  // assertion (and axe) must wait for it — before it, they would inspect a layer parked at 0,0.
+  // Until the first measurement lands the layer is parked at 0,0 under `visibility: hidden`, so
+  // every geometry assertion (and axe) has to wait for it.
   const popoverPositioner = await vi.waitFor(() => {
     const element = partOf("popover-positioner");
     expect(element, "the popover never mounted its layer").not.toBeNull();
@@ -253,10 +239,9 @@ async function openBothLayers(): Promise<OpenLayers> {
 }
 
 /**
- * Axe returns `aria-valid-attr-value` as *incomplete* for **any** element carrying both
- * `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by
- * construction, not a markup problem. Same allowance, same reason, as
- * `popover.browser.test.tsx`'s.
+ * Axe reports `aria-valid-attr-value` as *incomplete* for **any** element carrying both
+ * `aria-haspopup` and `aria-controls`, bailing out before it resolves the id reference — undecidable
+ * by construction, not a markup problem. Same allowance, same reason, as `popover.browser.test.tsx`.
  */
 const AXE_OPTIONS = { allowIncomplete: ["aria-valid-attr-value"] };
 
@@ -267,8 +252,8 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     const { popoverPositioner } = await openBothLayers();
 
-    // The positioner is the direct `<body>` child the dialog's observer sees added, and sparing it
-    // spares its whole subtree — `isSpared` already tests `target.contains(node)`.
+    // The positioner is the direct `<body>` child the dialog's observer sees appear, and sparing an
+    // element spares its whole subtree.
     expect(popoverPositioner.hasAttribute("inert"), "the dialog marked the popover inert").toBe(
       false,
     );
@@ -284,10 +269,10 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     const { popoverContent } = await openBothLayers();
 
-    // The nastiest half of symptom 3, because the card looks perfectly fine: both layers are at
-    // `z-50` and the popover's portal is the later body child, so it paints **on top** of the
-    // dialog and its scrim, undimmed and legible. `inert` is what makes it transparent to hit
-    // testing — so this is the only assertion that can tell the two apart.
+    // The nastiest half of symptom 3, because the card looks perfectly fine: both layers share a
+    // `z-index` and the popover's portal is the later body child, so it paints **on top** of the
+    // dialog and its scrim, undimmed and legible. Only `inert`'s effect on hit testing distinguishes
+    // a working card from an untouchable one.
     const topmost = topmostElementOver(popoverContent);
     expect(
       popoverContent.contains(topmost),
@@ -301,8 +286,8 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     const { dialogContent, popoverContent } = await openBothLayers();
 
-    // A role locator is the accessibility tree's own view: `aria-hidden` removes an element from
-    // it, `inert` (measured, this Chromium) does not. Both surfaces carry `role="dialog"`.
+    // A role locator queries the accessibility tree: `aria-hidden` removes an element from it,
+    // `inert` (measured, this Chromium) does not. Both surfaces carry `role="dialog"`.
     const dialogs = page.getByRole("dialog").elements();
     expect(dialogs, `role=dialog matched ${dialogs.map(describeElement).join(", ")}`).toHaveLength(
       2,
@@ -319,17 +304,15 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     const { popoverContent } = await openBothLayers();
 
-    // The sequence symptom 4 named: autofocus moves focus into the portaled popup, the dialog's
-    // focus trap sees focus land outside *its* container and pulls it straight back to the dialog's
-    // own first focusable, and the popover's focus-out dismissal reads that as focus leaving. The
-    // card flashed and was gone — the thing a consumer hit first. `createFocusScope` is what stops
-    // it: the trap asks `containsSelfOrAbove`, and focus in a layer above it is not focus escaping.
+    // Symptom 4's sequence: autofocus moves focus into the portaled popup, the dialog's focus trap
+    // sees focus land outside *its* container and pulls it back to the dialog's first focusable, and
+    // the popover reads that as focus leaving and dismisses itself. The card flashes and is gone.
     //
-    // **Focus is the assertion that measures it, not survival.** While symptom 3 was live it
-    // *masked* symptom 4: an element inside an `inert` subtree is not focusable, so autofocus's
-    // `.focus()` was a silent no-op, no `focusin` fired, the trap never ran and the layer never
-    // dismissed itself. Asserting only "still open" would have passed with symptom 4 fully
-    // present — and would go quiet again the day a hide-outside regression re-hides the popup.
+    // **Focus is what measures this, not survival.** While symptom 3 was live it *masked* symptom 4:
+    // an element inside an `inert` subtree is not focusable, so autofocus was a silent no-op, no
+    // `focusin` fired, the trap never ran and nothing dismissed. Asserting only "still open" would
+    // have passed with symptom 4 fully present, and would go quiet again the day the popup gets
+    // re-hidden by a regression in the marking.
     await settle();
 
     const inner = page.getByTestId("popover-inner").element() as HTMLElement;
@@ -408,15 +391,14 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);
     await openBothLayers();
 
-    // **This test takes two registries to pass, and it is the reason they could not ship
-    // separately.** While the dialog's hide-outside marked the popover `inert`, a real pointer
-    // never reached the card at all: the hit test fell through to the `ModalBackdrop`, which is
-    // *outside* the dialog and dismisses it. The hide-outside port (no more `inert`) is what makes
-    // this interaction **reachable**; the dismissable port (a target inside a layer **above** this
-    // one is not "outside") is what makes it **pass**. Ship the first alone and a click inside the
-    // popover becomes a click that closes the dialog.
-    // The precondition is asserted rather than left to `userEvent`, which would otherwise fail this
-    // on a pointer-actionability timeout that names no cause.
+    // **This test needs two of the fixes at once, which is why they could not ship separately.**
+    // While the popover was marked `inert`, a real pointer never reached the card: the hit test fell
+    // through to the backdrop, which *is* outside the dialog and dismisses it. Sparing the popover
+    // from the marking makes this interaction **reachable**; treating a target inside a layer *above*
+    // the dialog as not-outside makes it **pass**.
+    //
+    // The precondition is asserted rather than left to `userEvent`, which would otherwise fail on a
+    // pointer-actionability timeout that names no cause.
     const inner = page.getByTestId("popover-inner").element() as HTMLElement;
     const topmost = topmostElementOver(inner);
     expect(
@@ -432,8 +414,6 @@ describe("Popover inside a modal Dialog — the layer above the modal", () => {
 
     dispose();
   });
-
-  // ---- the whole nesting, seen by axe ----
 
   it("has no accessibility violations with both layers open", async () => {
     const { dispose } = mountLayers(() => <PopoverInDialog />);

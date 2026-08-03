@@ -1,26 +1,18 @@
 /**
- * The filter seam — the one thing Combobox adds to the shared kernel, and deliberately the only
- * place in the tree that knows a query exists.
+ * The filter seam — the one thing Combobox adds to the shared behavior layer, and deliberately the
+ * only place in the tree that knows a query exists.
  *
- * `@hope-ui/primitives/combobox` owns no text value (see `combobox-root.md`), so it also owns no
- * filter: it is handed an `items` array and never asks where it came from. `Combobox.Root` derives
- * that array from the consumer's `items` and the input's text, and everything downstream — the
- * count `Combobox.Status` announces, the emptiness `Combobox.Empty` shows, the option set arrow keys
- * traverse — falls out of it for free.
+ * `@hope-ui/primitives/combobox` owns no text value, so it owns no filter either: it is handed an
+ * `items` array and never asks where it came from. `Combobox.Root` derives that array from the
+ * consumer's `items` and the input's text, and everything downstream — the count `Combobox.Status`
+ * announces, the emptiness `Combobox.Empty` shows, the option set arrow keys traverse — falls out of
+ * it for free.
  *
- * ## Matching is collator-based, never `toLowerCase()`
- *
- * `Intl.Collator` with `{ usage: "search", sensitivity: "base" }` folds **case and diacritics
- * together**, which is what makes a `cafe` query match `Café` and an `acai` query match `Açaí`.
- * `toLowerCase()` folds only case, so it silently fails for every accented language — including
- * French, which this project's own preview browser renders in. The same collator and the same two
- * options back `createListTypeahead`, so a Combobox's filter and a Select's typeahead agree on what
- * "matches" means.
- *
- * Modeled on react-aria's `useFilter` (`@react-aria/i18n`) — its idea and its option set, written
- * here rather than ported: the scan below is the obvious way to express "does this collator consider
- * any window of `text` equal to `query`", and it deliberately skips their extra
- * `Default_Ignorable_Code_Point` normalization pass, which exists for input this API never sees.
+ * **Matching is collator-based, never `toLowerCase()`.** `Intl.Collator` with
+ * `{ usage: "search", sensitivity: "base" }` folds **case and diacritics together**, which is what
+ * makes a `cafe` query match `Café` and an `acai` query match `Açaí`. `toLowerCase()` folds only case,
+ * so it fails silently for every accented language. Select's typeahead uses the same collator and the
+ * same two options, so both agree on what "matches" means.
  */
 
 /** Decides whether one item survives the current query. */
@@ -46,9 +38,9 @@ function startsWith(collator: Intl.Collator, text: string, query: string): boole
 }
 
 /**
- * Whether the collator considers any window of `text` equal to `query`. The scan is by code unit,
- * so a query splitting a surrogate pair or a combining sequence simply fails to match rather than
- * matching wrongly — the same trade react-aria makes.
+ * Whether the collator considers any window of `text` equal to `query`. The scan is by code unit, so
+ * a query that splits a surrogate pair or a combining sequence simply fails to match rather than
+ * matching wrongly.
  */
 function contains(collator: Intl.Collator, text: string, query: string): boolean {
   for (let offset = 0; offset + query.length <= text.length; offset += 1) {
@@ -60,9 +52,8 @@ function contains(collator: Intl.Collator, text: string, query: string): boolean
 }
 
 /**
- * Resolve a `filter` prop into a predicate. `false` never reaches here — `Combobox.Root` short
- * circuits on it, so the whole `items` array keeps its identity and the memo below it never
- * re-derives.
+ * Resolve a `filter` prop into a predicate. `false` never reaches here: `Combobox.Root` short-circuits
+ * on it so the `items` array keeps its identity and nothing downstream re-derives.
  */
 export function resolveFilter<V>(
   filter: Exclude<ComboboxFilter<V>, false>,

@@ -22,8 +22,8 @@ import { decadeStart, YEARS_PER_DECADE } from "./view";
 
 /**
  * True when `date` is strictly before `min` or after `max` — the **hard out-of-range** state: such days
- * are non-focusable, arrow-skipped, and not selectable (paired with the grid's `softDisabled=false`).
- * Distinct from "unavailable" (`isDateDisabled`), which stays focusable. Pure.
+ * are non-focusable, skipped by the arrow keys, and not selectable. Distinct from "unavailable"
+ * (`isDateDisabled`), which stays focusable. Pure.
  */
 export function isDateOutOfRange(
   date: CalendarDate,
@@ -36,9 +36,9 @@ export function isDateOutOfRange(
 }
 
 /**
- * Clamp `date` into `[min, max]` — React Aria's `constrainValue`, which it applies to the roving cursor
- * on every move, on the seed, and again at render. Without it the cursor lands on a hard out-of-range
- * cell that is non-focusable and arrow-skipped, stranding the roving tab stop. Pure.
+ * Clamp `date` into `[min, max]`. Applied to the roving cursor on every move, on the initial seed, and
+ * again at render — without it the cursor lands on a hard out-of-range cell that nothing can focus and
+ * the arrows skip, which strands the calendar's single tab stop there. Pure.
  */
 export function constrainDate(
   date: CalendarDate,
@@ -57,9 +57,10 @@ export function constrainDate(
  * unavailable one. `undefined` when no unavailable day turns up within a month of the anchor: that side
  * of the run is simply unbounded, and the caller's own `min`/`max` is what remains.
  *
- * React Aria's `nextUnavailableDate`, renamed for what it returns (RA names it for the day it stops
- * *at*, then hands back the one before). `createCalendar` calls it once per direction to derive the
- * bounds a contiguous range selection may not cross — see `calendar-root.md`. Pure.
+ * Named for what it returns, unlike React Aria's equivalent (`nextUnavailableDate`), which is named
+ * for the day it stops *at* and then hands back the one before. `createCalendar` calls it once per
+ * direction to derive the bounds a contiguous range selection may not cross — see
+ * `__internal__/primitives/calendar/calendar-root.md` § Contiguous ranges. Pure.
  */
 export function lastAvailableDateFrom(
   anchor: CalendarDate,
@@ -75,11 +76,11 @@ export function lastAvailableDateFrom(
   while (isWithinSearch(candidate) && !isDateUnavailable(candidate)) {
     candidate = candidate.add({ days: direction });
   }
-  // Two ways out: `candidate` is the first unavailable day, or it stepped one past the window. React
-  // Aria tests that out-of-window day as well, so a run filling the whole window is still reported
-  // bounded when the very next day is unavailable — kept verbatim. The `||` short-circuits, so
-  // `isDateUnavailable` (a consumer callback, with no purity contract) is never asked about the same
-  // day twice.
+  // Two ways out of that loop: `candidate` is the first unavailable day, or it stepped one past the
+  // window. The second term tests that out-of-window day too, so a run filling the whole window is
+  // still reported bounded when the very next day is unavailable. The `||` short-circuits, so
+  // `isDateUnavailable` — a consumer callback with no purity contract — is never asked twice about
+  // the same day.
   const stoppedOnUnavailableDay = isWithinSearch(candidate) || isDateUnavailable(candidate);
   return stoppedOnUnavailableDay ? candidate.add({ days: -direction }) : undefined;
 }

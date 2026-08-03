@@ -4,20 +4,16 @@ import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
 import { CloseButton } from "../close-button";
 
-// The single source of truth for CloseButton's SSR → hydration round-trip tree. Three consumers share
-// it, which enforces the "structurally identical tree" invariant by construction (hydration keys are a
-// path through the component tree — a shape mismatch between server and client fails hydration):
-//   - close-button.ssr.test.tsx      renders `Tree` with renderToStringAsync and inline-snapshots bytes
-//   - close-button.browser.test.tsx  passes `Tree` as the `ui` to hydrateFixture (client build)
-//   - the hydration-fixture bridge ssrLoadModule()s this file and calls `renderFixture()`
+// One tree, three consumers — which is what keeps the server and client trees identical by
+// construction, since Solid matches their nodes by position:
+//   - close-button.ssr.test.tsx      snapshots the server bytes
+//   - close-button.browser.test.tsx  hydrates it
+//   - the hydration-fixture bridge imports this file and calls `renderFixture()`
 //
-// The glyph is a **component** in both cases (the built-in `<CloseIcon/>`, and a consumer-supplied
-// `<CustomIcon/>`), so this exercises the component-in-slot hydration path by default — the same path
-// `button-icons.ssr-entry.tsx` guards for the decorator slots. CloseButton reads styling through
-// `useSlots`/`useRecipe`, so the tree sits under a `<ThemeProvider>` fed the `hope` preset; `hope`'s
-// token overrides are empty (values live in CSS), so the provider stays on the zero-DOM branch and
-// emits no `<style>`. The provider still shifts `_hk` keys, so it must be present identically. See
-// __internal__/theming.md.
+// The glyph is a component either way — built-in or consumer-supplied — so this covers the
+// component-in-slot hydration path by default, the same shape `button-icons.ssr-entry.tsx` guards
+// for the decorator slots. The `<ThemeProvider>` emits no DOM of its own but does occupy a position
+// in the tree, so it has to be present identically in both halves.
 
 /** A consumer-supplied glyph expressed as a **component** — the custom-`icon` round-trip subject. */
 function CustomIcon(): JSX.Element {
@@ -35,10 +31,7 @@ function CustomIcon(): JSX.Element {
   );
 }
 
-/**
- * CloseButton's hydration tree — a default close button (built-in `<CloseIcon/>`) and one with a
- * consumer-supplied component glyph, so both the default and custom paths round-trip.
- */
+/** Two buttons, so the built-in glyph and a consumer-supplied one both round-trip. */
 export function Tree(): JSX.Element {
   return (
     <ThemeProvider preset={hope}>
@@ -51,9 +44,8 @@ export function Tree(): JSX.Element {
 }
 
 /**
- * The server render the bridge invokes. `renderToStringAsync` only produces a string under the server
- * builds (the client build's stub returns `undefined`), so only the bridge — which mirrors the `ssr`
- * project's server-build resolution — calls this.
+ * Only the bridge and the `ssr` project call this: `renderToStringAsync` returns a string only under
+ * Solid's server builds — the client build's stub returns `undefined`.
  */
 export function renderFixture(): Promise<string> {
   return renderToStringAsync(() => <Tree />);

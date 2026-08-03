@@ -12,10 +12,10 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { Calendar, type CalendarHeaderProps, type CalendarRootProps } from "../index";
 // `Tree` is the single source of truth for the calendar round-trip render: `calendar.ssr.test.tsx`
-// inline-snapshots it and the hydration-fixture bridge renders it fresh into this project (no
-// committed `.html`). It doubles as the plain full-calendar the interaction tests below mount, so
-// there is no second hand-kept-identical copy to drift. The two `*LocaleTree`s are the same tree with
-// only the locale plumbing varied — see "Calendar locale hydration" at the bottom of this file.
+// snapshots it, and the fixture bridge renders it server-side for this project. It doubles as the
+// plain full calendar the interaction tests below mount, so there is no second copy to drift. The two
+// `*LocaleTree`s are the same tree with only the locale plumbing varied — see "Calendar locale
+// hydration" at the bottom of this file.
 import { Tree } from "./calendar.ssr-entry";
 import { Tree as DetectedLocaleTree } from "./calendar-detected-locale.ssr-entry";
 import { Tree as NoProviderTree } from "./calendar-no-provider.ssr-entry";
@@ -28,8 +28,8 @@ const heading = (root: ParentNode) => root.querySelector<HTMLElement>("button[id
 const chromeButton = (root: ParentNode, label: string) =>
   root.querySelector<HTMLElement>(`button[aria-label="${label}"]`) as HTMLElement;
 
-// Cross-tag `render` targets. `render` is typed over the part's *own* element props, so re-targeting
-// a different tag casts at the call site — the same shape as `renderAsAnchor` in the Button tests.
+// `render` is typed over the part's *own* element props, so re-targeting a different tag is the case
+// that needs a cast, and it casts here at the call site rather than widening the public prop type.
 const renderAsSection: NonNullable<CalendarRootProps["render"]> = (p) => (
   <section {...(p as unknown as JSX.HTMLAttributes<HTMLElement>)} />
 );
@@ -57,8 +57,8 @@ describe("Calendar", () => {
   });
 
   it("auto-renders the default chrome and grid when given no children", async () => {
-    // The Phase-4 convenience API: a bare `<Calendar.Root/>` with no compound parts. Root's internal
-    // `DefaultCalendar` supplies the whole anatomy (header + chevron nav + heading, then the grid).
+    // A bare `<Calendar.Root/>` with no compound parts: Root supplies the whole anatomy itself
+    // (header + chevron nav + heading, then the grid).
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={hope}>
         <I18nProvider locale="en-US">
@@ -67,24 +67,21 @@ describe("Calendar", () => {
       </ThemeProvider>
     ));
 
-    // Heading label, weekday head and day buttons all render with no explicit children.
     expect(heading(container).textContent).toBe("January 2020");
     expect(container.querySelector('th[scope="col"][aria-label="Sunday"]')).not.toBeNull();
     expect(dayButton(container, "Wednesday, January 15, 2020")).not.toBeNull();
 
-    // The built-in nav buttons carry the localized default aria-labels + an inline chevron glyph.
+    // The built-in nav buttons carry the localized default aria-labels and a chevron glyph.
     const prev = chromeButton(container, "Previous");
     const next = chromeButton(container, "Next");
     expect(prev.querySelector("svg")).not.toBeNull();
     expect(next.querySelector("svg")).not.toBeNull();
 
-    // Nav works: paging forward advances the month, back returns.
     next.click();
     await vi.waitFor(() => expect(heading(container).textContent).toBe("February 2020"));
     prev.click();
     await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
 
-    // The auto-composed default chrome is accessible out of the box.
     await expectNoA11yViolations(container);
     dispose();
   });
@@ -119,7 +116,6 @@ describe("Calendar", () => {
 
     dayButton(container, "Friday, January 10, 2020").click();
     await vi.waitFor(() => expect(value?.toString()).toBe("2020-01-10"));
-    // The selected cell reflects it in the accessibility tree.
     const selectedCell = container.querySelector('td[aria-selected="true"]') as HTMLElement;
     expect(selectedCell.querySelector("button")?.getAttribute("aria-label")).toContain(
       "January 10, 2020",
@@ -139,7 +135,6 @@ describe("Calendar", () => {
   it("drills up to the year view when the heading is clicked", async () => {
     const { container, dispose } = mount(() => <Tree />);
     heading(container).click();
-    // Year view: the heading shows the year and the grid shows month cells.
     await vi.waitFor(() => expect(heading(container).textContent).toBe("2020"));
     expect(dayButton(container, "June 2020")).not.toBeNull();
     dispose();
@@ -166,8 +161,8 @@ describe("Calendar", () => {
     ));
 
     dayButton(container, "Friday, January 10, 2020").click(); // anchor
-    // Wait for the anchor to commit (the client build defers the write) before the second click, so
-    // the completing activate reads the anchor rather than starting a fresh range.
+    // Solid 2.0 defers a signal write until the next flush, so the second click must wait for the
+    // anchor to land — otherwise it reads no anchor and starts a fresh range instead of completing.
     await vi.waitFor(() =>
       expect(container.querySelector('td[aria-selected="true"]')).not.toBeNull(),
     );
@@ -179,8 +174,8 @@ describe("Calendar", () => {
   });
 
   it("commits a range abandoned mid-selection once focus leaves the calendar", async () => {
-    // End-to-end proof that `Calendar.Root` wires `createCalendarGroup`: the policy itself is
-    // exercised in the primitive's own browser test, this is the assembly.
+    // Proof that Root actually wires the container part up. The policy itself is exercised in the
+    // primitive's own browser test; this covers the assembly.
     let value: unknown = null;
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={hope}>
@@ -260,7 +255,7 @@ describe("Calendar", () => {
       </ThemeProvider>
     ));
 
-    // Opt-in, but nothing selected yet → no hidden field.
+    // Opted in, but nothing selected yet, so there is nothing to submit.
     expect(container.querySelector('input[type="hidden"][name="date"]')).toBeNull();
 
     dayButton(container, "Friday, January 10, 2020").click();
@@ -273,7 +268,7 @@ describe("Calendar", () => {
 
   it("hides the weekday header row from assistive technology", async () => {
     // Each day button's accessible name already leads with its weekday, so an exposed column header
-    // makes a screen reader read it twice (React Aria's `headerProps`).
+    // would make a screen reader announce the weekday twice per cell.
     const { container, dispose } = mount(() => <Tree />);
     expect(container.querySelector("thead")?.getAttribute("aria-hidden")).toBe("true");
     expect(container.querySelector('th[scope="col"][aria-label="Sunday"]')).not.toBeNull();
@@ -375,9 +370,8 @@ describe("Calendar", () => {
   it("emits an explicit dir prop onto the group element, not only as primitive config", async () => {
     // `dir` is the one `createCalendar` option that is also a real HTML attribute. The primitive reads
     // it to pick the arrow-key mapping; if it stopped there, the grid would still lay out
-    // left-to-right — Sunday on the left — while the arrows moved right-to-left. Same contract as
-    // `Listbox.Root`: the prop is a per-instance instruction, so it reaches the element. A
-    // locale-derived direction never does — see `createTextDirectionWarning`.
+    // left-to-right — Sunday on the left — while the arrows moved right-to-left. The prop is a
+    // per-instance instruction, so it reaches the element; a locale-derived direction never does.
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={hope}>
         <I18nProvider locale="en-US">
@@ -400,9 +394,8 @@ describe("Calendar", () => {
   });
 
   it("mirrors from an ancestor's dir, which it does not itself write", async () => {
-    // The app declares direction where the browser can see it; hope-ui reads it from there. Same line
-    // Base UI and React Aria draw — React Aria's `useCalendarGrid` puts no `dir` in `gridProps` at
-    // all, and a locale-derived `dir` would override this ancestor.
+    // The app declares direction where the browser can see it; hope-ui reads it from there and never
+    // writes its own, because a locale-derived `dir="ltr"` would override this ancestor's `rtl`.
     const { container, dispose } = mount(() => (
       <div dir="rtl">
         <ThemeProvider preset={hope}>
@@ -432,10 +425,9 @@ describe("Calendar", () => {
   });
 
   it("warns in dev when the grid's keymap and layout disagree", async () => {
-    // A calendar grid is 2D, so Left/Right always matter — this always warns, unlike a vertical
-    // listbox. The split is real and both references accept it, so make it loud instead of silent:
-    // `<I18nProvider locale="ar-EG">` with no `dir` anywhere gives Arabic-Indic numerals and reversed
-    // arrows over a grid still laid out left-to-right.
+    // A calendar grid is two-dimensional, so Left/Right always matter and this always warns (unlike
+    // a vertical listbox, which never does). An Arabic locale with no `dir` anywhere gives
+    // Arabic-Indic numerals and reversed arrows over a grid still laid out left-to-right.
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const { container, dispose } = mount(() => (
@@ -500,14 +492,13 @@ describe("Calendar", () => {
 });
 
 describe("Calendar native attributes", () => {
-  // `Calendar.Root` forwards the native `<div>` attributes it doesn't consume itself onto the group
-  // element, through `createCalendarGroup` (which owns the precedence). Before it did, there was no
-  // way to give the container an `id`, a `style`, a `data-*` hook or a second event handler — a gap
-  // the docs already promised was closed, and one no other Calendar part had.
-  // The spread is typed as `CalendarRootProps`, which pins the passthrough at the type level too:
-  // before the fix these were not assignable to the prop surface at all. (`data-*` is exempt from
-  // that check in JSX position — TS lets any hyphenated attribute through — so the tests below assert
-  // it reaches the DOM rather than relying on the type.)
+  // Root forwards the native `<div>` attributes it doesn't consume onto the group element. It once
+  // did not, so there was no way to give the container an `id`, a `style`, a `data-*` hook or a
+  // second event handler — while the docs promised otherwise and every test stayed green.
+  //
+  // Typing this object as `CalendarRootProps` pins the passthrough at the type level too. `data-*`
+  // escapes that check in JSX position (TS lets any hyphenated attribute through), which is why the
+  // tests below assert on the DOM rather than trusting the type.
   const nativeProps: CalendarRootProps = {
     id: "birthday-calendar",
     style: { "max-width": "480px" },
@@ -540,10 +531,10 @@ describe("Calendar native attributes", () => {
   });
 
   it("does not leak createCalendar options onto the element as attributes", async () => {
-    // The cost of forwarding: the `omit` list in `Root` is what separates "a native attribute the
-    // consumer wants on the element" from "an option the primitive consumes", and it is hand-kept.
-    // A key missing from it lands in the DOM as a junk attribute — invisible, since nothing else
-    // fails. Options with a string value are the ones that would actually show up.
+    // The cost of forwarding: the list in `Root` separating "a native attribute the consumer wants on
+    // the element" from "an option the primitive consumes" is hand-kept, and a key missing from it
+    // lands in the DOM as a junk attribute with nothing else failing. String-valued options are the
+    // ones that would actually show up.
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={hope}>
         <I18nProvider locale="en-US">
@@ -612,8 +603,8 @@ describe("Calendar native attributes", () => {
     ));
     await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
 
-    // The part hook defers here (`props["aria-label"] ?? state.groupLabel()`) — the one attribute it
-    // deliberately does not win. Unreachable until `Root` forwarded anything at all.
+    // One of the two attributes the part hook deliberately does *not* win: it writes its built-in
+    // group label only as a fallback to the consumer's.
     const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
     expect(group.getAttribute("aria-label")).toBe("Departure date");
 
@@ -622,9 +613,9 @@ describe("Calendar native attributes", () => {
   });
 
   it("merges a consumer ref with the primitive's own, keeping the abandonment policy wired", async () => {
-    // `renderElement` collapses the consumer `ref` and `group.setRef` into one function ref. If the
-    // passthrough had shadowed the internal one, the range below would never commit — that is what
-    // proves both halves ran, not just that the consumer's fired.
+    // The consumer's `ref` and the component's own are collapsed into a single function ref. If the
+    // consumer's had shadowed the internal one, the range below would never commit — which is what
+    // proves both halves ran, rather than only the consumer's.
     let consumerRef: HTMLElement | undefined;
     let value: unknown = null;
     const { container, dispose } = mount(() => (
@@ -666,8 +657,8 @@ describe("Calendar native attributes", () => {
   });
 
   it("composes a consumer onFocusOut with the abandonment policy, rather than replacing it", async () => {
-    // The other attribute the part hook does not simply win: `composeEventHandlers` runs the
-    // consumer's first, then the policy's. Both must observe the same focus-out.
+    // The other attribute the part hook does not simply win: handlers are composed, consumer's
+    // first, so both must observe the same focus-out.
     let sawFocusOut = false;
     let value: unknown = null;
     const { container, dispose } = mount(() => (
@@ -709,9 +700,8 @@ describe("Calendar native attributes", () => {
   });
 
   it("re-targets Root, Header and Grid through a consumer render prop", async () => {
-    // `render` is the only polymorphism mechanism (there is no `as`), and these three were the parts
-    // that lacked it while every sibling had it. The computed props must survive the swap — the ARIA
-    // and the keymap live on them, so a render target that only got `class` would be decoration.
+    // The computed props must survive being re-targeted onto a consumer's element: the ARIA and the
+    // keyboard handling ride on them, so a target that received only `class` would be decoration.
     let groupRef: HTMLElement | undefined;
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={hope}>
@@ -741,8 +731,8 @@ describe("Calendar native attributes", () => {
     const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
     expect(group.tagName).toBe("SECTION");
     expect(group.getAttribute("role")).toBe("group");
-    // The internal ref survives the swap into a consumer element — without it the abandonment policy
-    // and the dev direction warning both go dormant, silently.
+    // The internal ref survives the swap — without it, both the range-commit-on-focus-loss policy
+    // and the dev direction warning go dormant with no error.
     expect(groupRef).toBe(group);
 
     expect((container.querySelector('[data-slot="calendar-header"]') as HTMLElement).tagName).toBe(
@@ -753,7 +743,7 @@ describe("Calendar native attributes", () => {
     expect(grid.getAttribute("role")).toBe("grid");
     expect(grid.getAttribute("aria-labelledby")).toBe(heading(container).id);
 
-    // Still a working calendar, not just the right tags: the roving cursor answers the keyboard.
+    // Still a working calendar, not merely the right tags: the cursor answers the keyboard.
     dayButton(container, "Wednesday, January 15, 2020").focus();
     await userEvent.keyboard("{ArrowRight}");
     await vi.waitFor(() =>
@@ -766,9 +756,9 @@ describe("Calendar native attributes", () => {
 });
 
 describe("Calendar navigation glyphs", () => {
-  // The prev/next glyph is built into the part itself: a bare `Calendar.PrevButton`/`NextButton` (even
-  // in a compound calendar, not just the auto-chrome) renders hope's chevron with no children, and it
-  // is overridable per instance via `children` or app-wide via the preset's `defaultProps`.
+  // The glyph is built into the part itself, not just into the automatic chrome: a bare
+  // `Calendar.PrevButton`/`NextButton` inside a hand-written calendar renders hope's chevron too.
+  // These three tests pin all three layers — built-in, preset-wide, per-instance.
   const bare = (): JSX.Element => (
     <ThemeProvider preset={hope}>
       <I18nProvider locale="en-US">
@@ -784,8 +774,6 @@ describe("Calendar navigation glyphs", () => {
 
   it("ships a built-in chevron in a bare compound PrevButton/NextButton", () => {
     const { container, dispose } = mount(() => bare());
-    // No children passed, yet each nav button carries an inline glyph — the built-in default flows
-    // from Root through context into the part.
     expect(chromeButton(container, "Previous").querySelector("svg")).not.toBeNull();
     expect(chromeButton(container, "Next").querySelector("svg")).not.toBeNull();
     dispose();
@@ -808,18 +796,16 @@ describe("Calendar navigation glyphs", () => {
     ));
 
     const prev = chromeButton(container, "Previous");
-    // Text child wins — no built-in chevron.
     expect(prev.textContent).toBe("PREV");
     expect(prev.querySelector("svg")).toBeNull();
-    // Custom element child wins over the built-in chevron.
     const next = chromeButton(container, "Next");
     expect(next.querySelector('svg[data-custom-icon="next"]')).not.toBeNull();
     dispose();
   });
 
   it("takes app-wide nav glyphs from a preset's defaultProps.calendar", () => {
-    // `hope` sets no calendar defaultProps, so extend it: a preset supplies the app-wide glyphs as
-    // reuse-safe factories, resolved by Root's `useDefaults` and flowed to the bare parts.
+    // `hope` sets no calendar `defaultProps`, so extend it. The glyphs are supplied as *factories*,
+    // not elements, so each button builds its own rather than sharing one movable node.
     const withNavIcons = definePreset(hope, {
       components: {
         calendar: {
@@ -844,7 +830,6 @@ describe("Calendar navigation glyphs", () => {
       </ThemeProvider>
     ));
 
-    // The preset's factory glyphs, not hope's built-in chevrons.
     expect(
       chromeButton(container, "Previous").querySelector('svg[data-custom-icon="prev"]'),
     ).not.toBeNull();
@@ -856,11 +841,12 @@ describe("Calendar navigation glyphs", () => {
 });
 
 describe("Calendar hydration", () => {
-  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` server-side
-  // and `calendar.ssr.test.tsx` inline-snapshots that same render, so they agree byte-for-byte.
-  // Hydrating with the shared `Tree` keeps the client structurally identical to the server (keys are
-  // a path through the tree). `hydrateFixture` proves hydration was silent and reused *every* server
-  // node (the whole grid), not just the `<table>`.
+  // `ssrFixture` is genuine server output, produced by rendering `Tree` through a real SSR pass;
+  // `calendar.ssr.test.tsx` snapshots that same render, so the two agree byte-for-byte. Reusing one
+  // `Tree` is what keeps the client structurally identical to the server, which matters because Solid
+  // pairs the two by a key derived from each node's path through the component tree. `hydrateFixture`
+  // fails unless hydration was silent and adopted *every* server node — the whole grid, not just the
+  // `<table>`.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     dispose();
@@ -886,10 +872,10 @@ describe("Calendar hydration", () => {
   });
 
   it("moves the single selection off the server-painted defaultValue on the first click", async () => {
-    // `Tree` ships `defaultValue` Jan 10, so the *server* HTML already carries `data-selected` +
-    // `aria-selected` on that day. Selecting another day in single mode must move the paint, not add a
-    // second one: a hydrated attribute the client never re-derives would leave Jan 10 lit alongside
-    // Jan 20 — visually two selected days for one selection.
+    // `Tree` ships a `defaultValue` of Jan 10, so the *server* HTML already paints that day selected.
+    // Choosing another day in single mode must move the paint, not add a second one: an attribute
+    // adopted from the server that the client never re-derives would leave Jan 10 lit beside Jan 20 —
+    // two selected days for one selection.
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
     expect(dayButton(container, "Friday, January 10, 2020").hasAttribute("data-selected")).toBe(
@@ -918,26 +904,30 @@ describe("Calendar hydration", () => {
 });
 
 describe("Calendar locale hydration", () => {
-  // The round-trip above pins `locale="en-US"` on both halves, so it never exercises the case a real
-  // deployment hits constantly: a prerendered page (no `navigator` → `en-US`) opened by a visitor whose
-  // browser is something else. A Monday-first locale shifts the whole month grid by a day — and January
-  // 2020 spans 35 cells under *either* first-day-of-week, so a client that rendered its own locale
-  // during hydration would reuse every node, warn about nothing, and leave the markup silently
-  // disagreeing with the model about what each cell is. It regressed exactly that way once: clicking
-  // "20" selected the 21st and `defaultValue`'s cell stayed painted beside it.
+  // The round-trip above pins `locale="en-US"` on both halves, so it never exercises what a real
+  // deployment hits constantly: a prerendered page (no `navigator`, so `en-US`) opened by a visitor
+  // whose browser is something else.
   //
-  // `readDetectedLocale`'s hydration gate is what prevents it. Both entries render the same calendar
-  // and differ only in locale plumbing — zero-config vs a provider with no `locale` prop — so the pair
-  // proves the gate covers both, rather than proving something about the calendar.
+  // That is a *silent* corruption, not a visible mismatch. A Monday-first locale shifts the whole
+  // month grid by a day, but January 2020 spans 35 cells under either first-day-of-week — so a client
+  // that rendered its own locale *during* hydration would adopt every server node, warn about
+  // nothing, and leave the markup disagreeing with the model about which date each cell is. It
+  // regressed exactly that way once: clicking "20" selected the 21st, and the default selection
+  // stayed painted beside it.
+  //
+  // The fix is a gate that keeps locale detection from changing anything until hydration has
+  // finished. Both entries render the same calendar and differ only in locale plumbing — no provider
+  // at all vs a provider with no `locale` prop — so the pair proves the gate covers both, rather than
+  // proving something about the calendar.
   const withBrowserLocale = async (locale: string, body: () => Promise<void>) => {
     const languageDescriptor = Object.getOwnPropertyDescriptor(
       Navigator.prototype,
       "language",
     ) as PropertyDescriptor;
     Object.defineProperty(navigator, "language", { value: locale, configurable: true });
-    // The detected locale is read once into a `Symbol.for` registry, so the stub only takes effect
-    // once that slot is cleared — and the slot must be cleared again afterwards, since it now holds a
-    // signal seeded from the stubbed value.
+    // The detected locale is read once and cached on a global registry, so this stub only takes
+    // effect once that slot is cleared — and it must be cleared again afterwards, since by then it
+    // holds a value seeded from the stub.
     const registryKey = Symbol.for("@hope-ui/i18n:locale-registry");
     const globalScope = globalThis as Record<symbol, unknown>;
     delete globalScope[registryKey];
@@ -954,9 +944,10 @@ describe("Calendar locale hydration", () => {
     ...container.querySelectorAll("button[data-selected]"),
   ];
 
-  // Hydration adopts the visitor's locale by *replacing* every locale-derived node, so the strict
-  // node-identity assertion can't apply; console silence and element count still do, and they are what
-  // separates this deliberate re-render from a silent client-render fallback.
+  // Adopting the visitor's locale *replaces* every locale-derived node, so the usual "hydration
+  // reused every server node" assertion cannot apply here. Console silence and the element counts
+  // still do, and they are what separates this deliberate re-render from hydration having failed and
+  // fallen back to a plain client render.
   const expectLocalizedRoundTrip = async (
     serverHtml: string,
     ui: () => JSX.Element,
@@ -965,8 +956,6 @@ describe("Calendar locale hydration", () => {
     try {
       // The gate opens on the first microtask after the hydration pass ends, so the localized
       // re-render lands a tick later — still before paint, but not synchronously with `hydrate()`.
-      // The server's `en-US` markup (Sunday-first, English) becomes Monday-first and French, with
-      // markup and model agreeing.
       await vi.waitFor(() =>
         expect(container.querySelector("thead")?.textContent).toBe("lun.mar.mer.jeu.ven.sam.dim."),
       );
@@ -975,8 +964,8 @@ describe("Calendar locale hydration", () => {
         "vendredi 10 janvier 2020, sélectionné",
       ]);
 
-      // And selecting moves the paint to exactly the day that was clicked — no ghost left behind,
-      // which is the regression this pair exists to catch.
+      // And selecting paints exactly the day that was clicked, with no ghost left behind — the
+      // regression this pair exists to catch.
       const clicked = dayButton(container, "lundi 20 janvier 2020");
       clicked.click();
       await vi.waitFor(() => expect(clicked.hasAttribute("data-selected")).toBe(true));

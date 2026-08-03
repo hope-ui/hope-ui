@@ -149,8 +149,8 @@ describe("definePreset — bootstrap from a raw registry", () => {
   });
 
   it("round-trips a chrome-content defaultProps (not just a variant)", () => {
-    // `defaultProps` widened from variants-only to the curated themeable surface, so a chrome-content
-    // prop (`loader`, a factory) — not a recipe variant — is now expressible and carried verbatim.
+    // `defaultProps` spans the whole themeable surface, not just recipe variants, so a chrome-content
+    // prop such as `loader` (a factory) is expressible here and must be carried verbatim.
     const brandLoader = () => null;
     const preset = definePreset(registry, {
       components: { button: { defaultProps: { loader: brandLoader } } },
@@ -166,7 +166,6 @@ describe("definePreset — bootstrap from a raw registry", () => {
     const derived = definePreset(base, {
       components: { button: { defaultProps: { loader: brandLoader } } },
     });
-    // The variant default from the base survives; the chrome-content one from the override is added.
     expect(derived.components.button?.defaultProps).toEqual({ size: "lg", loader: brandLoader });
   });
 });
@@ -192,9 +191,7 @@ describe("definePreset — extend a preset (deep-merge, config wins)", () => {
     const derived = definePreset(base, {
       components: { button: { defaultProps: { size: "xs" } } },
     });
-    // defaultProps deep-merges per key (size overridden, variant retained)…
     expect(derived.components.button?.defaultProps).toEqual({ variant: "solid", size: "xs" });
-    // …and the untouched slotClasses field survives.
     expect(derived.components.button?.slotClasses).toEqual({ root: "shadow" });
   });
 
@@ -232,8 +229,8 @@ describe("isPreset", () => {
   });
 
   it("recognizes a preset branded by a separate copy via the cross-realm Symbol.for registry", () => {
-    // Simulates a Preset produced by a *different* installed copy of @hope-ui/theming: same global
-    // symbol key, so `isPreset` must accept it (constraint #6).
+    // Stands in for a preset produced by a *different* installed copy of @hope-ui/theming. Both copies
+    // resolve the same symbol from the global registry, so `isPreset` has to accept it.
     const foreign = {
       [Symbol.for("hope-ui.preset")]: true,
       recipes: registry,

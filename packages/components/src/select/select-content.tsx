@@ -12,24 +12,23 @@ export interface SelectContentProps extends SelectContentElementProps {
 }
 
 // The popup card, and the behavior hub: `createComboboxContent` owns the whole effect stack —
-// dismissal, and (under `modal`, the default) `createHideOutside` + `createScrollLock` — all created
-// in its scope, so each tears down when the popup unmounts. This layer is pure assembly + the recipe
-// `class`.
+// close-on-outside-click/Escape, and (under `modal`, the default) marking the rest of the page
+// `inert` plus locking body scroll. All of it is created in this component's scope, so all of it
+// tears down when the popup unmounts. This layer is pure assembly plus the recipe `class`.
 //
-// **It is not the listbox.** `Content` and `List` stay distinct parts because `role="listbox"` may
-// only contain options and groups, so a future `Combobox.Empty`/`Combobox.Status` has to live in the
-// card beside the list rather than inside it. `Content` carries no `role` at all — the card is
-// chrome.
+// **It is not the listbox.** `Content` and `List` are separate parts because `role="listbox"` may
+// only contain options and groups, so anything else (Combobox's empty message and result count) has
+// to live in the card beside the list. `Content` carries no `role` at all — the card is chrome.
 //
-// It is also **the card, not the scroll container**: the cap comes from the kernel's measured
-// `--available-height` and `Select.List` scrolls inside it, which is what keeps the rounded corners
-// and the border still while the rows move.
+// It is also **the card, not the scroll container**: the height cap comes from the measured
+// `--available-height` and `Select.List` scrolls inside it, which keeps the rounded corners and the
+// border still while the rows move.
 export const Content: Component<SelectContentProps> = (props) => {
   const ctx = useSelectContext();
   const content = createComboboxContent(ctx.state, omit(props, "render", "class"));
 
-  // `content.props` already carries `data-presence` (mirroring the shared popup presence
-  // `createCombobox` owns — that's what lets the card animate in). The recipe keys its fade/scale on
+  // `content.props` carries `data-presence` — the enter/exit animation phase, which the element keeps
+  // through its exit so the card can animate out before unmounting. The recipe keys its fade/scale on
   // it, and the direction of the entry slide on the positioner's `data-side`.
   const elementProps = merge(content.props, {
     get class(): string {
@@ -44,10 +43,9 @@ export const Content: Component<SelectContentProps> = (props) => {
         as: "div",
         render: props.render,
         props: elementProps,
-        // `content.setRef` registers the element on the shared state: the presence times its exit
-        // transition off it, and the dismissal/modality effects read it. A render target that drops
-        // this function ref leaves Escape, outside-dismissal, hide-outside and the scroll lock all
-        // dead, silently.
+        // Publishes the element the exit transition is timed off and the dismissal/modality effects
+        // read. A render target that drops function refs leaves Escape, outside-click dismissal,
+        // `inert` and the scroll lock all dead, silently.
         ref: content.setRef,
       })}
     </Show>

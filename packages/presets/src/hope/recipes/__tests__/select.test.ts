@@ -63,9 +63,9 @@ describe("hope select recipe", () => {
   });
 
   it("pins the popup to the trigger's measured width, with no competing width anywhere", () => {
-    // The one width Select has: the kernel measures the anchor and publishes `--anchor-width`, and
-    // this spends it. Because it is the only one, no compound variant is needed to keep a second
-    // width class from racing it — the failure `popover.ts` uses compounds to avoid.
+    // The one width Select has: the kernel measures the anchor, publishes `--anchor-width`, and this
+    // spends it. Being the only one, no compound variant is needed to keep a second width class from
+    // racing it — the declaration-order failure `popover.ts` uses compounds to avoid.
     const positioner = selectRecipe({}).positioner();
     expect(positioner).toContain("w-(--anchor-width)");
     expect(positioner).toContain("z-50");
@@ -108,7 +108,7 @@ describe("hope select recipe", () => {
     expect(content).toContain("data-entering:opacity-0");
     expect(content).toContain("data-exiting:opacity-0");
     // Physical, and correct: `data-side` reports where the layer landed after `flip` — measured
-    // geometry, identical under `dir="rtl"`.
+    // geometry rather than reading direction, so it is identical under `dir="rtl"`.
     expect(content).toContain("data-side-bottom:data-entering:-translate-y-1");
     expect(content).toContain("data-side-bottom:origin-top");
   });
@@ -143,8 +143,8 @@ describe("hope select recipe", () => {
   });
 
   it("scales the chevron and the row glyphs with the size, in step", () => {
-    // A row's leading icon and the selected-row check share the row's glyph box, and the chevron
-    // rides the same scale — one size means one glyph size across both surfaces.
+    // One size means one glyph size across both surfaces: the chevron, a row's leading icon and the
+    // selected-row check all read as the same size at a given density.
     const expected: Record<SelectSize, string> = {
       sm: "[&_svg]:size-3.5",
       md: "[&_svg]:size-4",

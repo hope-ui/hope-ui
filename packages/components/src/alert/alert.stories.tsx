@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>;
 const VARIANTS: AlertVariant[] = ["default", "solid", "soft", "subtle", "outline"];
 const COLORS: AlertColorScheme[] = ["primary", "neutral", "success", "info", "warning", "danger"];
 
-// A plain demo glyph for the primary/neutral roles (which ship no built-in status icon).
+// A demo glyph for the primary/neutral roles, which deliberately ship no built-in status icon.
 const SparklesIcon = (): JSX.Element => (
   <svg
     viewBox="0 0 24 24"
@@ -162,8 +162,8 @@ export const WithActions: Story = {
 };
 
 /**
- * `closable` renders an `Alert.CloseTrigger`. Dismissing plays the exit transition (opacity + slide), then
- * unmounts and fires `onExitComplete`. "Show again" re-opens it (controlled `open`).
+ * `closable` renders an `Alert.CloseTrigger`. Dismissing plays the exit transition, then unmounts and
+ * fires `onExitComplete`. "Show again" re-opens it through the controlled `open` prop.
  */
 export const Dismissible: Story = {
   render: () => {

@@ -89,7 +89,7 @@ const dayButton = (container: HTMLElement, iso: string) =>
 async function mountCalendar(options?: CreateCalendarOptions) {
   let state!: CreateCalendarReturn;
   const rendered = mount(() => <CalendarHarness options={options} onReady={(s) => (state = s)} />);
-  // Wait for the cells to register into the collection (roving needs them mounted).
+  // Arrow navigation walks the collection, so nothing works until the cells have registered into it.
   await vi.waitFor(() => expect(state.collection.items().length).toBeGreaterThan(20));
   return { ...rendered, state };
 }
@@ -177,7 +177,7 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
     await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-selected")).toBe(""));
 
-    // Capture phase, so the assertion still sees the event when the handler stops it propagating.
+    // Capture phase, so the spy still sees the event even though the handler stops it propagating.
     const seen: KeyboardEvent[] = [];
     const spy = (event: KeyboardEvent) => seen.push(event);
     document.addEventListener("keydown", spy, true);
@@ -186,9 +186,9 @@ describe("createCalendarGrid — roving arrow navigation", () => {
 
     await vi.waitFor(() => expect(state.anchorDate()).toBeNull());
     expect(cellOf("2026-01-16").getAttribute("data-selected")).toBeNull();
-    // The band snaps back to the committed range — one field, two phases, so dropping the anchor is
-    // the whole cancel. Nothing was emitted: the consumer was never told about a value at all, because
-    // a range in progress never writes one.
+    // The band snaps back to the committed range: one field with two phases, so dropping the anchor is
+    // the whole cancel. Nothing is emitted either — a range in progress never writes `value`, so the
+    // consumer was never told about one.
     expect(state.highlightedRange()?.start.toString()).toBe("2026-01-02");
     expect(state.highlightedRange()?.end.toString()).toBe("2026-01-04");
     const value = state.selectionValue() as { start: CalendarDate; end: CalendarDate };
@@ -259,8 +259,8 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
     await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-16"));
 
-    // Jan 17 ends the anchor's available run, and a contiguous range cannot swallow it — so the
-    // extension stays put instead of hopping to Jan 18.
+    // Jan 17 ends the anchor's available run and a contiguous range cannot swallow it, so the
+    // extension stays put rather than hopping over to Jan 18.
     await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
     expect(state.focusedDate().toString()).toBe("2026-01-16");
     expect(state.highlightedRange()?.end.toString()).toBe("2026-01-16");

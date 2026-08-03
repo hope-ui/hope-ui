@@ -2,23 +2,19 @@
  * The i18n message contract — the user-facing strings hope-ui's components emit (screen-reader
  * labels, live-region announcements) that the consuming app does NOT author.
  *
- * The nested {@link I18nMessageMap} is the **single source of truth**: it groups keys by component and
- * gives each leaf its params type (`undefined` = takes no params). The dotted {@link I18nMessageKey}
- * union that `t()` accepts, {@link ParamsFor}, and the nested {@link I18nCatalog} are all **derived**
- * from it — so renaming a key, dropping a default, or drifting a param type is a compile error in one
- * place.
+ * The nested {@link I18nMessageMap} below is the **single source of truth**: it groups keys by
+ * component and gives each leaf its params type (`undefined` meaning "takes none"). The dotted
+ * {@link I18nMessageKey} union `t()` accepts, {@link ParamsFor} and {@link I18nCatalog} are all derived
+ * from it, so renaming a key or drifting a param type is a compile error in one place.
  *
- * Count-bearing keys (a singular/plural rule) are authored as functions of their params, so each locale
- * encodes its own rule; every other key is a plain string, optionally with `{{param}}` placeholders
- * (interpolated by {@link interpolate}).
+ * A count-bearing key is authored as a function of its params, letting each locale encode its own
+ * plural rule; every other key is a plain string, optionally with `{{param}}` placeholders.
  *
- * Dates/months/weekdays are already locale-formatted upstream by `@internationalized/date` + `Intl`
- * (keyed off the calendar's `locale`); the interpolated calendar keys receive those **already-formatted
- * strings** as params — i18n never formats a date itself.
+ * i18n never formats a date itself: dates, months and weekdays are formatted upstream by
+ * `@internationalized/date` + `Intl`, and the calendar keys receive those finished strings as params.
  *
- * Scoped to the components hope-ui ships today. Adding a component's strings = add a group/key to the
- * map + every locale catalog in `./locales/`. This file is the **contract only** — the built-in
- * catalogs live one per locale in `./locales/` (`en.ts`, `fr.ts`, …).
+ * This file is the contract only — the built-in catalogs live one per locale in `./locales/`. Adding a
+ * component's strings means adding a group here *and* an entry to every catalog there.
  */
 interface I18nMessageMap {
   common: {

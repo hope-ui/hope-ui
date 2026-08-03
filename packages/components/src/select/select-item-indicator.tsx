@@ -13,26 +13,21 @@ export interface SelectItemIndicatorProps extends SelectItemIndicatorElementProp
   /**
    * A custom selection glyph, overriding the default for this one indicator. When omitted, renders the
    * resolved default (instance `checkIcon` ?? preset `defaultProps.select.checkIcon` ?? hope's
-   * built-in check) from context. Read **exactly once**, gated on the item's `isSelected()` — see the
-   * `children()` note below.
+   * built-in check) from context.
    */
   children?: JSX.Element;
 }
 
 /**
- * The chosen-row check glyph. Purely presentational — it reads the item's `isSelected()` off
- * `SelectItemContext` (behavior stays on the primitive) and shows the glyph in the row's reserved
- * trailing gutter only while selected. `aria-hidden` because the selection is already conveyed by the
- * option's `aria-selected`.
+ * The chosen-row check glyph, shown in the row's reserved trailing gutter only while selected.
+ * `aria-hidden`, because the option's own `aria-selected` already conveys it.
  *
- * The glyph is **built in**: with no `children`, it renders `ctx.checkIcon()` — an accessor, so each
- * read builds a fresh element. A consumer's `children` overrides it per instance, keeping the default
- * themeable app-wide from a preset rather than hard-coded here.
+ * The glyph is **built in**: with no `children` it renders the one resolved on `Select.Root`, so a
+ * preset can swap the default app-wide instead of every consumer hard-coding an SVG.
  *
- * The custom glyph is read **exactly once**, inside a `<Show>` gated on `isSelected()` — not on the
- * glyph prop itself. Per the codified `children()` decision procedure, a component-valued child read
- * once — inside a `<Show>` or not — needs no `children()`: only the `when`-gate + body *double* read
- * misaligns `_hk`, and there is no such double read here.
+ * The `<Show>` gates on `isSelected()`, never on the glyph prop itself — reading a JSX-valued prop
+ * twice builds the component twice and gives the two copies different hydration positions, so it must
+ * stay a single read.
  */
 export const ItemIndicator: Component<SelectItemIndicatorProps> = (props) => {
   const ctx = useSelectContext();
@@ -42,8 +37,8 @@ export const ItemIndicator: Component<SelectItemIndicatorProps> = (props) => {
 
   const elementProps = merge(rest, {
     "data-slot": "select-item-indicator",
-    // Component-owned, deliberately not forwardable: un-hiding the glyph would double-announce a
-    // selection the option's own `aria-selected` already conveys.
+    // Deliberately not forwardable: un-hiding the glyph would double-announce a selection the
+    // option's own `aria-selected` already conveys.
     "aria-hidden": "true" as const,
     get class(): string {
       return ctx.slots.itemIndicator(props.class);

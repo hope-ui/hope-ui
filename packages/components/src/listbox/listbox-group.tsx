@@ -15,11 +15,10 @@ export interface ListboxGroupProps extends JSX.HTMLAttributes<HTMLElement> {
 }
 
 /**
- * A `role="group"` section that names itself from its `Listbox.GroupLabel`. `createListboxGroup` owns
- * the `role` + `aria-labelledby` + the label-id registration seam (published on `ListboxGroupContext`
- * for the label child); this layer adds the recipe `group` slot + `data-slot`. Rendered from
- * `Listbox.Root`'s per-entry callback once `groupToItems` is set — a virtual listbox is flat and has
- * no groups.
+ * A `role="group"` section that names itself from its `Listbox.GroupLabel`. The primitive owns the
+ * `role`, the `aria-labelledby` and the label-id registration; this layer adds the recipe class.
+ * Rendered from `Listbox.Root`'s per-entry callback once `groupToItems` is set — a virtual listbox is
+ * flat and has no groups.
  */
 export function Group(props: ListboxGroupProps): JSX.Element {
   const ctx = useListboxContext();

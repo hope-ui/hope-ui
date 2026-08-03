@@ -11,8 +11,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// ---------- demo icons (plain SVG; the recipe sizes them per button size) ----------
-
+// Demo icons. They carry no width/height on purpose — the recipe sizes the bare `<svg>` per button
+// size, so a hard-coded one would not scale.
 const strokeIcon = (d: string): JSX.Element => (
   <svg
     viewBox="0 0 24 24"
@@ -90,10 +90,9 @@ export const Inverted: Story = {
 /** variant × color — the validated matrix (mirrors the look-&-feel mockup). */
 export const VariantColorMatrix: Story = {
   parameters: { layout: "padded" },
-  // Each `<For>` callback returns a single element (a flex row, or one cell) — never a fragment
-  // wrapping another `<For>`, which produces a variable node count per row and breaks Solid's
-  // `<For>` DOM tracking (`nextSibling` of null). Flex rows keep the columns aligned. The `inverted`
-  // row sits on a dark strip so its light fills stay visible.
+  // Each `<For>` callback must return exactly one element — a row, or one cell — never a fragment
+  // wrapping another `<For>`. A fragment yields a variable number of nodes per row, which breaks how
+  // `<For>` tracks its DOM and throws on a null `nextSibling`.
   render: () => (
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-3">
@@ -174,7 +173,6 @@ export const Decorators: Story = {
 export const IconOnly: Story = {
   render: () => (
     <div class="flex flex-col gap-4">
-      {/* Every size is a genuine square. */}
       <div class="flex flex-wrap items-center gap-3">
         <Button iconOnly size="xs" aria-label="Add">
           <PlusIcon />
@@ -192,7 +190,6 @@ export const IconOnly: Story = {
           <PlusIcon />
         </Button>
       </div>
-      {/* Works across the chrome variants. */}
       <div class="flex flex-wrap items-center gap-3">
         <Button iconOnly variant="solid" aria-label="Add">
           <PlusIcon />
@@ -212,10 +209,10 @@ export const IconOnly: Story = {
 };
 
 /**
- * Per-instance `slotClasses` targets individual slots with **literal** Tailwind classes (so the
- * consumer's build can scan them). They fold in after the recipe base and any preset-level
- * `slotClasses`, before `class` — a later utility wins a Tailwind conflict (here `rounded-full`
- * overrides the recipe's `rounded-md`).
+ * Per-instance `slotClasses` targets individual slots with **literal** Tailwind classes, so the
+ * consumer's build can scan them. They apply after the recipe base and any preset-level
+ * `slotClasses`, and before `class` — the later utility wins a conflict, which is how `rounded-full`
+ * here beats the recipe's `rounded-md`.
  */
 export const SlotClasses: Story = {
   render: () => (
@@ -356,10 +353,10 @@ export const AsAnchor: Story = {
 };
 
 /**
- * Canary for the `solid-refresh` prop-forwarding bug documented in CLAUDE.md: HMR wrapping
- * used to silently drop `children` for components imported from another module — which is
- * exactly what every story does. If this story renders an empty button, `refresh` got
- * re-enabled somewhere; check `solid-babel-options.ts`.
+ * A canary, not a feature demo — do not delete it. `solid-refresh` (the hot-reload wrapper) has a
+ * bug where it silently drops `children` for a component imported from another module, which is
+ * exactly what every story here does. If this button renders empty, hot reload was re-enabled
+ * somewhere; check `solid-babel-options.ts` at the repo root.
  */
 export const ChildrenReachTheDom: Story = {
   name: "Children reach the DOM (solid-refresh canary)",

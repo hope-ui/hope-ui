@@ -1,57 +1,48 @@
 /*
  * @hope-ui/presets/hope — Badge slot recipe.
  *
- * The `tailwind-variants` slot recipe the `@hope-ui/components` `Badge` reads through
- * `useRecipe("badge")`. Badge is a **static, non-interactive** inline label (a styled `<span>`), so
- * this recipe carries no interaction states — no `hover:`, no `data-pressed`, no `focus-visible:` —
- * only the visual axes (variant × colorScheme × size × shape × fullWidth).
+ * A *slot recipe*: `tv` (tailwind-variants) maps variant props to one class string per named part
+ * ("slot"), and `@hope-ui/components`' Badge reads it through `useRecipe("badge")`. Badge is a
+ * **static, non-interactive** inline label, so this recipe carries no interaction states — no
+ * `hover:`, no `data-pressed`, no `focus-visible:` — only variant × colorScheme × size × shape ×
+ * fullWidth.
  *
  * ── Why every class is a literal string ─────────────────────────────────────────────────────────
- * The consumer's Tailwind build discovers which utilities to generate by scanning this file
- * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
- * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
- * `COLOR_CLASSES` / `DOT_CLASSES` and assembled into `compoundVariants`. The literals are what makes
- * `bg-primary`, `bg-on-primary`, `text-primary-emphasis`, `border-danger-subtle-line`, etc. actually
- * exist in the emitted CSS.
+ * The consumer's Tailwind build only emits utilities it can find by scanning this file (`@source
+ * "./recipes"`), and a scanner sees *literal* candidates only. So the per-color utilities cannot be
+ * built with `bg-${role}` template strings — they are written out in `COLOR_CLASSES`/`DOT_CLASSES` and
+ * assembled into `compoundVariants`, entries that apply only when several variants match at once.
+ * Those literals are what makes `bg-primary`, `text-primary-emphasis`, `border-danger-subtle-line` and
+ * the rest actually exist in the emitted CSS.
  *
- * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
- * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`). Every
- * fill is a *finished* token; the recipe computes no color: no `color-mix`, no alpha modifier
- * (`bg-x/50`), no magic opacity, so a preset that redefines a shade changes the painted result
- * predictably (the recipe-purity rule — enforced by `pnpm check:recipe-purity`).
+ * ── Recipe purity ───────────────────────────────────────────────────────────────────────────────
+ * `bg-primary` resolves `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`).
+ * Every fill is a *finished* token — never one this recipe computes: no `color-mix`, no alpha modifier
+ * (`bg-x/50`), no magic opacity — so a preset redefining a shade changes the painted result
+ * predictably. Derived colors are authored as tokens in the preset's `theme.css` instead. Enforced by
+ * `pnpm check:recipe-purity`.
  *
- * ── The six variants ────────────────────────────────────────────────────────────────────────────
- *  - solid    : `bg-{role}` + `text-on-{role}` + a fill-matched `border-{role}`.
- *  - inverted : the swap of solid on its own dedicated tokens — `bg-{role}-inverted` +
- *               `text-on-{role}-inverted` + `border-{role}-inverted`. The hope defaults reproduce the
- *               on-color/role swap (so it stays legible, and warning defaults to a dark chip) but as
- *               independent, tunable knobs rather than borrowing solid's `on-{role}`/`{role}`.
- *  - soft     : `bg-{role}-soft` + `text-{role}-emphasis` + a fill-matched `border-{role}-soft`.
- *  - subtle   : soft plus the darker soft role border `border-{role}-subtle-line`.
- *  - outline  : transparent fill + `text-{role}-emphasis` + `border-{role}-subtle-line`.
- *  - dot      : neutral chrome (`bg-transparent text-foreground border-neutral-subtle-line`) with a
- *               role-colored `dot` slot (`bg-{role}`).
- * The filled variants (solid/inverted/soft) carry a border matching their own fill, so the reserved
- * 1px edge is a clean continuation of the fill rather than a transparent gap to the page background.
- * The soft/subtle/outline label is `{role}-emphasis` — the role's legible *content* color — so
- * neutral & warning read correctly in both themes.
+ * ── What distinguishes the six variants ─────────────────────────────────────────────────────────
+ * `inverted` is the swap of `solid` on its own dedicated `{role}-inverted` tokens rather than
+ * borrowing solid's `on-{role}`/`{role}`, so the pair stays independently tunable. `subtle` is `soft`
+ * plus the darker `-subtle-line` border; `dot` is neutral chrome with the role color on the `dot` slot
+ * alone. The filled variants (solid/inverted/soft) carry a border matching their own fill, so the
+ * reserved 1px edge continues the fill instead of showing a transparent gap to the page background.
+ * The soft/subtle/outline label is `{role}-emphasis` — the role's legible *content* color — so neutral
+ * and warning read correctly in both themes rather than looking disabled.
  */
 
 import type { BadgeColorScheme } from "@hope-ui/theming";
-// The Badge recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this theme
-// implements it. `hopeRecipes` (in `./index`) checks the finished recipe against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
 
 /** The colored variants that vary per role (dot is handled separately — its chrome is role-neutral). */
 type ColoredBadgeVariant = "solid" | "inverted" | "soft" | "subtle" | "outline";
 
 /*
- * Per-color, per-variant fills on the `root` slot — literal so Tailwind's `@source` scan emits them.
- * Every (role × variant) is its own finished token; nothing is computed and nothing is borrowed from
- * a sibling variant. Every variant carries an explicit border color (filled variants match their own
- * fill; subtle/outline/dot use the darker `-subtle-line` edge), so the `root` base's reserved 1px
- * border is a real, fill-matched line rather than a transparent gap — and its constant width keeps
- * bordered and unbordered variants aligned to the pixel.
+ * Every (role × variant) is its own finished token; nothing is computed and nothing is borrowed from a
+ * sibling variant. Every variant carries an explicit border color, so the `root` base's reserved 1px
+ * border is a fill-matched line rather than a transparent gap — and its constant width keeps bordered
+ * and unbordered variants aligned to the pixel.
  */
 const COLOR_CLASSES: Record<BadgeColorScheme, Record<ColoredBadgeVariant, string>> = {
   primary: {
@@ -98,7 +89,7 @@ const COLOR_CLASSES: Record<BadgeColorScheme, Record<ColoredBadgeVariant, string
   },
 };
 
-/** The role-colored fill for the `dot` slot, per colorScheme — literal so the scan emits them. */
+/** The role-colored fill for the `dot` slot, per colorScheme. */
 const DOT_CLASSES: Record<BadgeColorScheme, string> = {
   primary: "bg-primary",
   neutral: "bg-neutral",
@@ -134,9 +125,9 @@ const dotCompoundVariants = (Object.keys(DOT_CLASSES) as BadgeColorScheme[]).map
 export const badgeRecipe = tv({
   slots: {
     // The bare `border` reserves a 1px border WIDTH so bordered↔borderless variants never shift by a
-    // pixel; the border COLOR is supplied by every variant (see `COLOR_CLASSES` and the `dot` variant),
-    // so the reserved edge is a real, fill-matched line rather than a transparent gap to the page
-    // background — no `bg-clip-padding` needed. `align-middle` sits it on the text baseline.
+    // pixel; every variant supplies the COLOR (see `COLOR_CLASSES`), so the reserved edge is a
+    // fill-matched line rather than a transparent gap to the page background — no `bg-clip-padding`
+    // needed. `align-middle` sits the chip on the surrounding text's baseline.
     root: [
       "inline-flex items-center justify-center whitespace-nowrap align-middle",
       "font-medium leading-none select-none",
@@ -145,17 +136,18 @@ export const badgeRecipe = tv({
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
     endDecorator: "inline-flex shrink-0 items-center justify-center",
-    // The role dot (rendered by the component only for the `dot` variant). Its color comes from the
-    // dot compound variants; its size from the `size` variant. Base is chrome only.
+    // Rendered by the component only for the `dot` variant; its color comes from the dot compound
+    // variants and its size from `size`, so the base is chrome only.
     dot: "inline-block shrink-0 rounded-full",
   },
   variants: {
-    // `size` before `shape` so `shape` wins the radius/padding tailwind-merge conflict — `circle`'s
-    // `px-0` must beat the size padding, and `shape` owns the radius entirely (size sets none).
-    // Optical padding (matching Button): when a decorator is present on a side, tighten that side's
-    // padding one 2px step below the text-edge `px`, so an icon doesn't look over-spaced against the
-    // chip edge. `has-data-[slot=badge-{start,end}-decorator]:` only fires when the part is mounted;
-    // a plain (decorator-less) badge keeps the symmetric `px`.
+    // Declared before `shape` so `shape` wins the radius/padding tailwind-merge conflict: `circle`'s
+    // `px-0` must beat the size padding, and `shape` owns the radius entirely.
+    //
+    // Optical padding (matching Button): when a decorator is mounted on a side, that side tightens one
+    // step below the symmetric text-edge `px`, so an icon does not look over-spaced against the chip
+    // edge. The `has-data-[slot=…]:` gate keys off the `data-slot` attribute each part renders with, so
+    // a decorator-less badge keeps the symmetric padding.
     size: {
       xs: {
         root: [
@@ -194,8 +186,8 @@ export const badgeRecipe = tv({
         dot: "size-2",
       },
     },
-    // `shape` owns the radius; declared after `size` so it wins the merge. `circle` also squares the
-    // aspect and drops the horizontal padding (for a single glyph/count).
+    // Owns the radius; declared after `size` so it wins the merge. `circle` also squares the aspect and
+    // drops the horizontal padding, for a single glyph or count.
     shape: {
       sharp: { root: "rounded-none" },
       rounded: { root: "rounded-md" },
@@ -207,22 +199,22 @@ export const badgeRecipe = tv({
       false: { root: "" },
     },
     variant: {
-      // The colored fills live per-role in `COLOR_CLASSES` (via `compoundVariants`); these carry only
-      // the variant-wide, color-independent chrome. (Slot recipes need `{ root }` objects, not bare
-      // strings — a bare string applies to no slot.)
+      // The colored fills live per-role in `COLOR_CLASSES` via `compoundVariants`; these carry only the
+      // variant-wide, color-independent chrome. (A slot recipe needs `{ root }` objects here, not bare
+      // strings — a bare string applies to no slot at all.)
       solid: { root: "" },
       inverted: { root: "" },
       soft: { root: "" },
       subtle: { root: "" },
       outline: { root: "bg-transparent" },
-      // dot: neutral chrome; the role color is on the `dot` slot (per-role compound variants).
+      // Neutral chrome; the role color rides the `dot` slot via per-role compound variants.
       dot: {
         root: "bg-surface-raised text-foreground border-neutral-subtle-line",
       },
     },
-    // `colorScheme` carries no base classes of its own — every fill is variant×colorScheme-specific
-    // and lives in `compoundVariants`. It's declared here (with empty slots) so it's a real, typed
-    // variant the compound entries can match on, rather than an untyped prop.
+    // No base classes of its own — every fill is variant×colorScheme-specific and lives in
+    // `compoundVariants`. Declared here with empty slots so those entries can match on it as a real,
+    // typed variant rather than an untyped prop.
     colorScheme: {
       primary: {},
       neutral: {},

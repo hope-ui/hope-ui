@@ -8,8 +8,8 @@ import type { CreateComboboxReturn } from "./combobox-root";
 export interface CreateComboboxClearProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Empty the field. Called on click, **before** focus is returned to the input. What "empty" means
-   * — the text, the selection, or both — is the component's call, for the reason
-   * `createComboboxInput`'s `onCommit` gives: the kernel owns no text value.
+   * — the text, the selection, or both — is the component's call, since this family owns no text
+   * value (same reason `createComboboxInput` takes an `onCommit`).
    */
   onClear?: () => void;
   /**
@@ -30,16 +30,14 @@ export interface CreateComboboxClearReturn {
 /**
  * The clear button inside a Combobox's control: empties the field and hands focus back to the input.
  *
- * It shares the chevron's two structural rules and none of its ARIA — see `combobox-toggle.ts` for
- * the long form. `tabindex="-1"`, because the input is the widget's single tab stop; and
- * `preventDefault()` on `pointerdown`, because a click that moved DOM focus here would blur the
- * input and fire its blur-commit — which would re-fill the field the user just asked to empty.
+ * It shares the chevron's two structural rules (`combobox-toggle.ts` has the long form) and none of
+ * its ARIA. `tabindex="-1"`, because the input is the widget's single tab stop; and a cancelled
+ * `pointerdown`, because a click that moved DOM focus here would blur the input and fire its
+ * blur-commit — re-filling the field the user just asked to empty.
  *
- * It carries **no** popup ARIA. Clearing is not opening: `aria-expanded`/`aria-controls` here would
- * assert this button owns the listbox, and the input already does.
- *
- * The localized `aria-label` (`combobox.clearLabel`) is not optional — a bare ✕ is an axe
- * `button-name` violation.
+ * No popup ARIA at all: clearing is not opening, and `aria-expanded`/`aria-controls` here would
+ * claim this button owns the listbox when the input already does. The localized `aria-label` is not
+ * optional — a bare ✕ has no accessible name (axe `button-name`).
  *
  * **It is not a `CloseButton`.** That component is a themed, surface-adaptive dismissal affordance
  * with its own recipe; this is a slot inside another control's box, and the two want different
@@ -53,8 +51,8 @@ export function createComboboxClear<V = unknown, M extends SelectionMode = "sing
 
   const clear = () => {
     props.onClear?.();
-    // After, not before: the input's blur already fired when the pointer went down elsewhere on a
-    // non-preventDefault path, and re-focusing first would let a blur-commit race the clear.
+    // After the clear, not before: re-focusing first would let the input's blur-commit race it and
+    // put back the text that was just removed.
     state.triggerElement()?.focus();
   };
 

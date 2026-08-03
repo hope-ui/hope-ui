@@ -3,33 +3,33 @@ import { createDialogCloseTrigger } from "@hope-ui/primitives/dialog";
 import { type Component, merge, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";
 
-// `Dialog.CloseTrigger` is a `CloseButton` with the dialog's close wiring — so it inherits
-// `size`/`icon`/`render`/`class`/`slotClasses`/native attrs for free, and shows the themed X by
-// default. Because it renders a recipe-styled `CloseButton`, `Dialog.CloseTrigger` **requires a
-// `<ThemeProvider>`** ancestor, like every other styled component (see the doc website).
+// A `CloseButton` with the dialog's close wiring bolted on, so it inherits
+// `size`/`icon`/`render`/`class`/`slotClasses` and the native attributes for free. Rendering a styled
+// `CloseButton` is also why this part requires a `<ThemeProvider>` ancestor.
 export interface DialogCloseTriggerProps extends CloseButtonProps {}
 
 export const CloseTrigger: Component<DialogCloseTriggerProps> = (props) => {
   const ctx = useDialogContext();
-  // The primitive owns only the close `onClick` (composed in front of the consumer's, so their
-  // `preventDefault()` cancels the close). The label + visual + `type` default come from `CloseButton`.
+  // The hook contributes only the close `onClick`, composed in *front* of the consumer's so their
+  // `preventDefault()` cancels the close. Label, glyph and `type` all come from `CloseButton`.
   const close = createDialogCloseTrigger(ctx.state, omit(props, "render", "class"));
 
   const elementProps = merge(close.props, {
     get class(): string {
-      // Placement from the dialog recipe's `closeTrigger` slot, merged with any consumer `class`
-      // (which wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's chrome.
+      // The consumer's class goes *into* the slot function, never concatenated after it: only then
+      // does tailwind-merge see both strings and let the consumer's utility win a conflict.
       return ctx.slots.closeTrigger(props.class);
     },
-    // Re-scope CloseButton's root marker to this part (overrides its `close-button` default).
+    // Overrides the `close-button` marker `CloseButton` sets on itself.
     "data-slot": "dialog-close-trigger",
   });
 
-  // `close.props` is typed as the primitive's `JSX.ButtonHTMLAttributes` (the hook can't reference the
-  // component's `CloseButtonProps` without a layering cycle), which widens `disabled` to Solid's
-  // `boolean | ""`. It still carries the consumer's `size`/`icon`/etc. at runtime, so cast back to the
-  // component surface for the spread. `render` is passed to `CloseButton` directly (not through the
-  // spread) — it is read synchronously to build the element, so a reactive spread-read would trip
-  // `STRICT_READ_UNTRACKED`.
+  // The hook types its props as plain `JSX.ButtonHTMLAttributes` — it cannot name `CloseButtonProps`
+  // without the primitive depending on the component — which widens `disabled` to `boolean | ""`.
+  // The consumer's `size`/`icon`/etc. are all still there at runtime, so cast back for the spread.
+  //
+  // `render` is handed over separately rather than through the spread: `CloseButton` reads it
+  // synchronously to build the element, and Solid flags a reactive read outside a tracking scope
+  // (`STRICT_READ_UNTRACKED`) when it comes from a spread.
   return <CloseButton {...(elementProps as CloseButtonProps)} render={props.render} />;
 };

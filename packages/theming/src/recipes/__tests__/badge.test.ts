@@ -23,11 +23,9 @@ const _variants: BadgeRecipeVariants = {
 };
 void _variants;
 
-// `BadgeThemeableProps` is the curated surface a preset may default app-wide. Badge has no
-// non-variant themeable props, so it is an exact (empty) extension of `BadgeRecipeVariants` — the
-// two are mutually assignable. This pins the "contract uniformity with Button" decision: the
-// mechanism (a `…ThemeableProps` per component + a registry entry) is identical even where the
-// curated surface equals the recipe variants.
+// Badge has no non-variant themeable props, so the two types are mutually assignable. Pinning that
+// records the "contract uniformity" decision: every component exports a `…ThemeableProps` and carries
+// a registry entry, even where the curated surface happens to equal the recipe variants.
 const _variantsAreThemeable = (v: BadgeRecipeVariants): BadgeThemeableProps => v;
 void _variantsAreThemeable;
 const _themeableAreVariants = (v: BadgeThemeableProps): BadgeRecipeVariants => v;

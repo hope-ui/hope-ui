@@ -7,25 +7,24 @@ import { Combobox } from "../index";
 
 // The single source of truth for Combobox's SSR → hydration round-trip tree, shared by
 // `combobox.ssr.test.tsx` (renders it, inline-snapshots the bytes), `combobox.browser.test.tsx`
-// (passes it to `hydrateFixture` and drives it), and the hydration-fixture bridge (renders it
-// server-side to feed the browser test). Reusing one tree is what enforces "structurally identical
-// server and client" — hydration keys are a path through the component tree, so a component inserted
-// before `Combobox.Input`, even one that renders nothing, would shift the input's key.
+// (hydrates it and drives it), and the bridge that renders it server-side to feed that browser test.
+//
+// **Sharing one tree is the point.** Solid matches server and client nodes by position, walking the
+// component tree to assign each one a hydration key, so inserting *any* component before
+// `Combobox.Input` — even one that renders nothing — shifts the input's key and breaks hydration. Two
+// hand-written copies of this tree would drift into exactly that. The `<ThemeProvider>` counts as such
+// a component and must therefore appear identically on both sides, even though it renders no DOM.
 //
 // **The closed server render is the control and nothing else.** `Combobox.Portal` renders nothing
 // server-side and the popup renders nothing while closed, so no option row reaches the server. Unlike
 // Select there is no hidden `<select>` either: `name`/`form`/`required` are `Omit`-ted from
-// `ComboboxRootProps`, because a Combobox's kernel holds the *filtered* option set and a native field
-// built from it would drop options as the user typed.
+// `ComboboxRootProps`, because a Combobox holds the *filtered* option set and a native field built
+// from it would drop options as the user typed.
 //
-// The tree exercises the **grouped** mode end-to-end, and `defaultValue` pre-selects a row so the
-// server-rendered `<input value>` carries that row's label — which is the one thing here that could
-// disagree across hydration, since `createTextInput`'s value is a snapshot computed from props on
-// both sides. `Combobox.Clear` is rendered too, and its `<Show>` is deliberately *true* on the server
-// (something is selected) so the round-trip covers a mounted gutter button rather than an absent one.
-//
-// The whole tree sits under a `<ThemeProvider>` fed the `hope` preset (a zero-DOM provider — its
-// token values live in CSS), which must be present identically everywhere because it shifts `_hk`.
+// The tree exercises the **grouped** mode end to end, and `defaultValue` pre-selects a row so the
+// server-rendered `<input value>` carries that row's label — the one value here that could disagree
+// across hydration, since it is computed from props on both sides. `Combobox.Clear` renders too, and
+// its `<Show>` is deliberately *true* on the server so the round-trip covers a mounted gutter button.
 //
 // The input's `aria-label` is not decoration: a nameless `role="combobox"` is an axe
 // `aria-input-field-name` violation, and the popup's `role="listbox"` inherits its name from it.
@@ -72,9 +71,9 @@ function FruitItem(props: { fruit: Fruit }): JSX.Element {
 }
 
 /**
- * `defaultOpen` is optional so the ssr test can also exercise the open server render (the `Portal`'s
- * `isServer` guard must not crash `renderToStringAsync`, and no portaled row may reach the output).
- * The hydration path uses the default — closed.
+ * `defaultOpen` is optional so the ssr test can also exercise the *open* server render: the `Portal`'s
+ * `isServer` guard must not crash `renderToStringAsync`, and no portaled row may reach the output. The
+ * hydration path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
   return (

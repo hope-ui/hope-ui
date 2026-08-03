@@ -5,21 +5,18 @@ import { renderToStringAsync } from "@solidjs/web";
 import { type Accessor, For, Show } from "solid-js";
 import { Listbox } from "../index";
 
-// The single source of truth for Listbox's SSR → hydration round-trip tree, shared by
-// `listbox.ssr.test.tsx` (renders it, inline-snapshots the bytes), `listbox.browser.test.tsx`
-// (passes it to `hydrateFixture`), and the hydration-fixture bridge (renders it server-side to feed
-// the browser test). Reusing one tree is what enforces "structurally identical server and client" —
-// hydration keys are a path through the component tree, so a component inserted before the first
-// item, even one that renders nothing, would shift every following key.
+// The single source of truth for Listbox's server-render → hydration round-trip, shared by
+// `listbox.ssr.test.tsx` (snapshots the bytes), `listbox.browser.test.tsx` (hydrates it), and the
+// fixture bridge that renders it server-side for that browser test.
 //
-// It exercises the **grouped data mode** end-to-end: `items` holds the group entries, `groupToItems`
-// flattens them into navigation order, and the per-entry `children` callback renders a `Group` (with
-// its `GroupLabel` and a nested `<For>` of the group's own items) plus a `Separator` between groups.
-// `name` is set so the hidden form field(s) are part of the round-trip, and a `defaultValue`
-// pre-selects one row, so the tree includes both a rendered `ItemIndicator` (the check glyph) and a
-// hidden `<input>`. The whole tree sits under a `<ThemeProvider>` fed the `hope` preset (a zero-DOM
-// provider — its token values live in CSS), which must be present identically everywhere because it
-// shifts `_hk` keys.
+// Reusing one definition is what enforces "structurally identical server and client": Solid pairs
+// server and client nodes by a key derived from each node's *path through the component tree*, so a
+// component inserted before the first item — even one that renders nothing — shifts every following
+// key. The `<ThemeProvider>` counts: it renders no DOM (hope's token values live in CSS) but it is a
+// node on that path, so it must be present identically on both sides.
+//
+// The tree covers the **grouped data mode** end to end, and `name` + `defaultValue` pull the hidden
+// form control and a rendered selection glyph into the round-trip too.
 
 interface Fruit {
   id: number;

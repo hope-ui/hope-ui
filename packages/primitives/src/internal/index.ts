@@ -1,6 +1,5 @@
-// The `internal/` barrel: the library's `createX` behavior primitives, exported as the single
-// subpath `@hope-ui/primitives/internal`. Subfolders have no barrel of their own — only the
-// top-level `src/` folders do.
+// Barrel for the `@hope-ui/primitives/internal` subpath. Only top-level `src/` folders get a barrel
+// and a subpath export, so nothing below this one has its own.
 
 export {
   type CreateAutoFocusOptions,

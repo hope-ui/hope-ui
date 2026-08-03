@@ -1,6 +1,6 @@
-// The `createCalendar` hook family: a root state hook + one hook per part (grid / cell / heading /
-// prev / next), plus the pure date-math + selection utilities. Exported as the single subpath
-// `@hope-ui/primitives/calendar`. Modeled on the `dialog/` family.
+// The `createCalendar` hook family: a root state hook + one hook per part (group / grid / cell /
+// heading / prev / next), plus the pure date-math + selection utilities. Exported as the single
+// subpath `@hope-ui/primitives/calendar`. Same shape as the `dialog/` family.
 
 export {
   type CalendarDayState,

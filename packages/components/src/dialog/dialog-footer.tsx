@@ -7,8 +7,8 @@ export interface DialogFooterProps extends JSX.HTMLAttributes<HTMLDivElement> {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 
-// The action row: a sunken bar pulled into the card's padding with a top hairline (the recipe's
-// `footer` slot). Reverses to a column on narrow viewports and right-aligns on wider ones.
+// The action row. The recipe stacks it as a column on narrow viewports and aligns it to the end on
+// wider ones, so buttons dropped in here need no responsive classes of their own.
 export const Footer: Component<DialogFooterProps> = (props) => {
   const ctx = useDialogContext();
   const rest = omit(props, "render");

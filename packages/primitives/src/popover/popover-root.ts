@@ -15,59 +15,40 @@ import {
 import { withDefaults } from "../utils";
 
 /**
- * The shared state kernel of a popover — the one call at the root of the tree. It owns open state,
- * the popup/title/description ids, every element ref the family shares, the positioning layer and
- * the overlay presence, and it renders **no JSX and no host element**. The per-part hooks
- * (`createPopoverTrigger`, `createPopoverAnchor`, `createPopoverPositioner`, `createPopoverContent`,
- * `createPopoverArrow`, `createPopoverTitle`, `createPopoverDescription`,
- * `createPopoverCloseTrigger`) each take this state plus their own props and own the rest — their
- * effects, their id-and-element registration, and their consumer-prop precedence. `Popover.Root`
- * calls this once and shares the return on context; a headless consumer holds it and threads it into
- * whichever part hooks it needs. Mirrors the `createDialog` split.
+ * Shared state for a popover — the one call at the root of the tree. It owns open state, the
+ * popup/title/description ids, every element ref the family shares, the positioning layer and the
+ * presence (the mount/enter/exit lifecycle), and renders no JSX and no host element. The sibling
+ * `createPopover*` hooks take this state plus their own props and own the rest. `Popover.Root` calls
+ * this once and shares the return on context; a headless consumer holds it directly.
  *
- * **Non-modal.** Nothing here traps focus, locks scroll, hides the page or blocks the pointer — a
- * popover composes `createFloating` + `createDismissable` + `createPresence` + `createFocusRestore`
- * directly, never Dialog's modal machinery. A `modal` mode is later work.
+ * **Non-modal.** Nothing here traps focus, locks scroll, hides the page or blocks the pointer.
+ * A `modal` mode is later work.
  *
- * ## Why positioning and presence live on the root
+ * **Presence is created here for correctness, not tidiness.** `Popover.Content` mounts only once
+ * open, so a presence created inside `createPopoverContent` would see `present` already `true` on
+ * its first run and latch straight to `"entered"`, skipping the enter animation. Created here, its
+ * first run observes `open === false`. Content and Positioner share this one object.
  *
- * **Presence must be eager for correctness.** `Popover.Content` is mounted lazily — only once open —
- * so a presence created inside `createPopoverContent` would see `present` already `true` on its
- * first run and latch straight to `"entered"`, skipping the enter animation. Created here, its first
- * run observes `open === false`. Both the Content and the Positioner consume this one presence.
+ * **The positioning layer is created here for sharing.** A late positioner ref would be fine
+ * wherever it lived, but `side()` is read by both the Positioner and the Arrow, and the arrow
+ * element has to reach the positioning config — a positioner-owned call would need a second context
+ * or a descendant writing an ancestor-owned signal, which Solid 2.0 rejects with
+ * `[REACTIVE_WRITE_IN_OWNED_SCOPE]`. That is also why `side`/`align`/`sideOffset`/… are options of
+ * the **root** rather than of the Positioner part. They are forwarded as **getters**, so changing
+ * one re-measures instead of needing a remount.
  *
- * **`createFloating` is root-owned for sharing**, not for that reason: it tracks its elements in the
- * compute of its own effect, so a late positioner ref is fine wherever it is created. But `side()` is
- * read by the Positioner *and* the Arrow, and `arrowElement` must reach its config memo — a
- * positioner-owned call would need a second context or a descendant→ancestor write
- * (`[REACTIVE_WRITE_IN_OWNED_SCOPE]`).
- *
- * ## Positioning options live here
- *
- * `side`/`align`/`sideOffset`/`alignOffset`/`flip`/… are options of the **root**, not of the
- * Positioner part, which follows from the call site above and matches Dialog's precedent
- * (`closeOnEscape`/`role` on the root). A deliberate divergence from Base UI, which spells them on
- * its Positioner — recorded in `popover-root.md`.
- *
- * They are forwarded to `createFloating` as **getters**, never read once: that is the documented
- * idiom, and the only shape in which changing `side` re-measures instead of needing a remount.
- * No offset defaults are applied here — the *visual* defaults belong to the component layer, so a
- * preset can theme them.
- *
- * ## No locale
- *
- * Popover takes no `dir` option and calls no `useLocale()`. `createFloating` resolves a logical side
- * against `getComputedStyle(floating).direction` — the same call `platform.isRTL` makes, on the same
- * element — so there is one direction channel and nothing to disagree. Writing a locale-derived
- * `dir` would stamp `dir="ltr"` on an en-US browser and override the `dir="rtl"` the layer was
- * rendered into. See `popover-root.md`.
+ * **No locale.** There is no `dir` option and no `useLocale()` call: the positioning layer resolves
+ * a logical side from `getComputedStyle` on the floating element itself, so there is one direction
+ * channel and nothing to disagree. A locale-derived `dir` would stamp `dir="ltr"` on an en-US
+ * browser and override the `dir="rtl"` the layer was actually rendered into.
  *
  * Call it **once**, inside a reactive owner scope (a component body, or a `createRoot`).
+ * Full rationale: `__internal__/primitives/popover/popover-root.md`.
  */
 
 /**
- * The popup's ARIA role. `alertdialog` is the APG destructive-confirmation pattern; it stays legal
- * on a non-modal layer, which never sets `aria-modal`.
+ * The popup's ARIA role. `alertdialog` is the pattern for a destructive confirmation, and stays
+ * legal on a non-modal layer — which never sets `aria-modal`.
  */
 export type PopoverRole = "dialog" | "alertdialog";
 
@@ -91,9 +72,9 @@ export interface CreatePopoverOptions {
   closeOnInteractOutside?: boolean;
   /**
    * Whether focus landing outside the content closes the popover. Default `true` — **Popover's**
-   * default, not the kernel's: `createDismissable`'s `dismissOnFocusOutside` defaults `false`,
-   * because a modal layer traps focus and the listener would be dead weight there. A non-modal
-   * layer is the case it exists for, so Tab-ing away closes it, as Radix and Base UI both do.
+   * default, not `createDismissable`'s, which is `false` because a modal layer traps focus and the
+   * listener would be dead weight there. A non-modal layer is the case it exists for, so Tab-ing
+   * away closes it.
    */
   closeOnFocusOutside?: boolean;
   /**
@@ -103,10 +84,9 @@ export interface CreatePopoverOptions {
    */
   bubbles?: DismissBubbles;
   /**
-   * ARIA role for the popup — `"dialog"` (default) or `"alertdialog"`. An accessibility concern, so
-   * it lives on the state hook (not the styling layer): `createPopoverContent` reads it for the
-   * surface's `role` attribute. The trigger's `aria-haspopup` stays `"dialog"` either way — ARIA
-   * defines no `alertdialog` token for it.
+   * ARIA role for the popup — `"dialog"` (default) or `"alertdialog"`. It lives here rather than in
+   * the styling layer because it is an accessibility concern. The trigger's `aria-haspopup` stays
+   * `"dialog"` either way: ARIA defines no `alertdialog` token for it.
    */
   role?: PopoverRole;
 
@@ -192,7 +172,7 @@ export interface CreatePopoverReturn {
   contentElement: Accessor<HTMLElement | undefined>;
   /** Register the content element. Wired to `createPopoverContent`'s `setRef`. */
   setContentElement: (element: HTMLElement | undefined) => void;
-  /** The arrow element. Its arrival is what enables floating-ui's `arrow` middleware. */
+  /** The arrow element. Its arrival is what makes the arrow get measured at all. */
   arrowElement: Accessor<HTMLElement | undefined>;
   /** Register the arrow element. Wired to `createPopoverArrow`'s `setRef`. */
   setArrowElement: (element: HTMLElement | undefined) => void;
@@ -200,8 +180,9 @@ export interface CreatePopoverReturn {
   /** What must not count as "outside" for dismissal — the trigger, once registered. Fed straight to
    * `createDismissable`'s `exclude` by `createPopoverContent`. */
   dismissExclusions: Accessor<Element[]>;
-  /** The **shared** overlay presence for `Content` + `Positioner`. Gate their render on `mounted()`
-   * and drive `data-presence` off `status()`. Created eagerly here so the enter animation fires. */
+  /** The **shared** presence (mount/enter/exit lifecycle) for `Content` + `Positioner`. Gate their
+   * render on `mounted()` and drive `data-presence` off `status()`. Created here, while closed, so
+   * the enter animation actually fires. */
   contentPresence: PresenceState;
   /** The positioning layer. `floatingStyles()` goes on the positioner; `side()`/`align()` drive
    * `data-side`/`data-align` on the positioner, the content and the arrow. */
@@ -209,13 +190,13 @@ export interface CreatePopoverReturn {
 }
 
 export function createPopover(options: CreatePopoverOptions = {}): CreatePopoverReturn {
-  // `withDefaults`, not `merge({ closeOnEscape: true }, options)`: `merge` resolves by key
-  // *presence*, so a wrapper forwarding an unset `closeOnEscape`/`defaultOpen` (the key present with
-  // value `undefined`) would silently beat the default. See `withDefaults`' doc.
+  // `withDefaults`, never `merge({ closeOnEscape: true }, options)`: Solid 2.0's `merge` resolves a
+  // key by *presence*, so a wrapper forwarding an unset `closeOnEscape` (key present, value
+  // `undefined`) would beat the default. `withDefaults` resolves with `??`.
   //
-  // The positioning options are deliberately absent: `createFloating` applies its own `??` defaults,
-  // and the *visual* ones (a non-zero `sideOffset`, `collisionPadding`, `arrowPadding`) belong to the
-  // component layer, where a preset can theme them.
+  // The positioning options are deliberately absent: `createFloating` applies its own, and the
+  // *visual* ones (a non-zero `sideOffset`, `collisionPadding`, `arrowPadding`) belong to the
+  // component layer where a preset can theme them.
   const merged = withDefaults(options, {
     defaultOpen: false,
     closeOnEscape: true,
@@ -237,9 +218,10 @@ export function createPopover(options: CreatePopoverOptions = {}): CreatePopover
   const bubbles = () => merged.bubbles;
   const role = () => merged.role;
 
-  // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
-  // so a consumer-pinned id can't be registered server-side. This is the only `createUniqueId`
-  // the root consumes, and it fixes the trigger's SSR hydration key — see the fixtures README.
+  // The server-visible fallback: `createRegisteredId` runs in an effect, so a consumer-pinned id is
+  // never registered during SSR. This is the only `createUniqueId` the root consumes, and Solid's
+  // hydration keys are positional — inserting another one here would shift the trigger's key and
+  // break hydration.
   const generatedPopupId = createUniqueId();
   const [customPopupId, setCustomPopupId] = createSignal<string | undefined>();
   const popupId = () => customPopupId() ?? generatedPopupId;
@@ -253,45 +235,42 @@ export function createPopover(options: CreatePopoverOptions = {}): CreatePopover
   const [arrowElement, setArrowElement] = createSignal<HTMLElement>();
 
   // A derived accessor over both signals, so an anchor mounting after the trigger — or unmounting
-  // while the layer is open — re-runs `createFloating`'s attach effect and re-points `autoUpdate`.
+  // while the layer is open — re-runs the positioning attach effect and re-points its observers.
   const anchorElement = () => customAnchorElement() ?? triggerElement();
 
-  // A memo, so the array's identity only changes when the trigger does. `createDismissable` reads it
-  // live inside its handlers, but a part is free to track it.
+  // A memo, so the array's identity only changes when the trigger does — `createDismissable` reads
+  // it live inside its handlers, but a part is free to track it instead.
   const dismissExclusions = createMemo<Element[]>(() => {
     const trigger = triggerElement();
     return trigger === undefined ? [] : [trigger];
   });
 
-  // The ONE shared overlay presence, and the positioning layer. Both created after
-  // `createUniqueId` above so the trigger's SSR hydration key is unaffected by the id
-  // `createPresence` reserves. Eager (created while `open` is `false`) so opening drives
-  // `entering → entered` — see this hook's doc.
+  // Created after the `createUniqueId` above, deliberately: `createPresence` reserves an id of its
+  // own, and Solid's hydration keys are positional, so reordering these two shifts the trigger's key
+  // and breaks hydration. Created while `open` is still `false` so opening drives
+  // `entering → entered` rather than latching to `entered`.
   const contentPresence = createPresence({ present: open, ref: contentElement });
 
   const floating = createFloating({
-    // `mounted()`, NOT `open`. `createFloating`'s config effect does `!active →
-    // setIsPositioned(false)`, and `floatingStyles()` then reverts to `{ left: 0, top: 0, visibility:
-    // "hidden" }`. Keyed on `open` that fires the instant the popover closes — while the presence is
-    // still holding the content mounted for its exit transition — so the layer would vanish instead
-    // of animating out. Keyed on `mounted()` it stays positioned, and `autoUpdate` stays attached, so
-    // a closing layer can't drift either.
+    // `mounted()`, NOT `open`. When inactive, `createFloating` reverts `floatingStyles()` to
+    // `{ left: 0, top: 0, visibility: "hidden" }` — which keyed on `open` fires the instant the
+    // popover closes, while the presence is still holding the content mounted for its exit
+    // transition, so the layer would vanish instead of animating out. Keyed on `mounted()` it stays
+    // positioned and its scroll/resize observers stay attached, so a closing layer can't drift.
     active: () => contentPresence.mounted(),
     anchor: anchorElement,
     floating: positionerElement,
-    // Always supplied: what enables the `arrow` middleware is the *element* arriving, which is
-    // tracked in `createFloating`'s config memo. So a popover with no arrow, and one whose arrow ref
-    // arrives late, both work with no branch here.
+    // Always supplied. What enables arrow measurement is the *element* arriving, and that is tracked
+    // reactively — so a popover with no arrow and one whose arrow ref arrives late both work without
+    // a branch here.
     arrowElement,
-    // Unconditional, and a literal rather than an option: `createPopoverPositioner` publishes the
-    // measurements as `--anchor-width`/`--available-height`/… on every popover, so a consumer's
-    // `w-(--anchor-width)` always resolves. Behind a flag those variables would be absent by
-    // default, and a `width: var(--anchor-width)` that nobody enabled is an invalid declaration the
-    // browser drops in silence — the failure mode Ark, Base UI and React Aria all avoid by exposing
-    // theirs unconditionally too. The middleware itself only reads rects; it writes nothing.
+    // Unconditional rather than an option: `createPopoverPositioner` publishes the measurements as
+    // `--anchor-width`/`--available-height`/… on every popover, so a consumer's `w-(--anchor-width)`
+    // always resolves. Behind a flag they would be absent by default, and the browser silently drops
+    // a declaration whose `var()` does not resolve. Measurement only — nothing is written back.
     trackSize: true,
-    // Getters throughout — the documented `createFloating` idiom, and the only shape in which
-    // changing an option re-measures instead of needing a remount.
+    // Getters throughout: the only shape in which changing an option re-measures rather than
+    // needing a remount.
     get side() {
       return merged.side;
     },

@@ -11,20 +11,19 @@ export interface CreateComboboxValueReturn {
 }
 
 /**
- * The value part: the element inside the trigger that displays the current selection, and the
- * reason the trigger can announce that selection **before** the field's label.
+ * The value part: the element inside the trigger that displays the current selection, and the reason
+ * the trigger can announce that selection **before** the field's label.
  *
- * It registers its id upward, and `createComboboxTrigger` prepends it to the trigger's
- * `aria-labelledby` — react-aria's `useSelect` ordering. Left to content-based naming, a screen
- * reader would read the label first and the value last, which is backwards for a field whose whole
- * purpose is the value.
+ * It registers its id upward and `createComboboxTrigger` prepends it to the trigger's
+ * `aria-labelledby`. Left to content-based naming a screen reader reads the label first and the
+ * value last, which is backwards for a field whose whole purpose is the value.
  *
- * The registration is client-only (`createRegisteredId` runs in `onSettled`), so a server render
- * emits no `aria-labelledby` on the trigger and falls back to its own contents — which contain this
- * element anyway. Nothing to disagree about across hydration.
+ * The registration is client-only, so a server render emits no `aria-labelledby` on the trigger and
+ * falls back to its own contents — which contain this element anyway. Nothing for the server and
+ * client renders to disagree about, so hydration is safe.
  *
- * `data-placeholder` is present-empty when nothing is selected, so a recipe styles one
- * `data-placeholder:` variant instead of the empty state needing a slot of its own.
+ * `data-placeholder` is present-but-empty when nothing is selected, so a style rule can target
+ * `[data-placeholder]` instead of the empty state needing an element of its own.
  */
 export function createComboboxValue<V = unknown, M extends SelectionMode = "single">(
   state: CreateComboboxReturn<V, M>,
@@ -35,8 +34,9 @@ export function createComboboxValue<V = unknown, M extends SelectionMode = "sing
 
   createRegisteredId({ id, register: state.setValueId });
 
-  // Read off the listbox's own `V[]`, not the adapted scalar: "nothing selected" is one condition in
-  // both modes there, where the adapted shape spells it `null` in one and `[]` in the other.
+  // Read off the listbox's own `V[]`, not the consumer-facing value: "nothing selected" is one
+  // condition in both modes here, where the adapted shape spells it `null` in single and `[]` in
+  // multiple.
   const isPlaceholder = () => state.list.value().length === 0;
 
   const elementProps = merge(props, {

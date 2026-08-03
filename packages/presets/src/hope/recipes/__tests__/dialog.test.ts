@@ -56,7 +56,7 @@ describe("hope dialog recipe", () => {
     expect(positioner).toContain("inset-0");
     expect(positioner).toContain("flex");
 
-    // The card is a flow child now (relative, not fixed) but keeps its chrome + transitions.
+    // The card is a plain flow child — `relative`, never `fixed` — since the positioner owns the frame.
     const content = dialogRecipe({}).content();
     expect(content).toContain("relative");
     expect(content).toContain("flex");
@@ -66,8 +66,8 @@ describe("hope dialog recipe", () => {
     expect(content).toContain("border-subtle");
     expect(content).toContain("rounded-xl");
     expect(content).toContain("shadow-lg");
-    // Symmetric enter/exit zoom+fade, keyed on data-presence. Transitions `scale` (Tailwind v4's
-    // standalone property), not `transform`, or the zoom would snap.
+    // Symmetric enter/exit zoom+fade, keyed on `data-presence`. Tailwind v4 compiles `scale-*` to the
+    // standalone `scale` CSS property, so a `transition-transform` here would make the zoom snap.
     expect(content).toContain("transition-[opacity,scale]");
     expect(content).toContain("data-entering:opacity-0");
     expect(content).toContain("data-entering:scale-95");
@@ -90,7 +90,8 @@ describe("hope dialog recipe", () => {
   });
 
   it("centers by default via auto margins and anchors near the top for placement=top", () => {
-    // Centering is auto margins on the card within the `items-start justify-center` frame.
+    // Centering is auto margins on the card within the `items-start` frame — they collapse when the
+    // card outgrows the viewport, so a tall card stays top-reachable.
     const center = dialogRecipe({ placement: "center" });
     expect(center.content()).toContain("my-auto");
     expect(center.positioner()).toContain("items-start");
@@ -116,7 +117,7 @@ describe("hope dialog recipe", () => {
     expect(cover.content()).toContain("max-w-none");
     expect(cover.content()).toContain("rounded-xl");
     expect(cover.content()).not.toContain("rounded-none");
-    // `my-0` (size, declared last) cancels `placement:center`'s `my-auto` — same `my` group.
+    // `size` is declared last, so its `my-0` cancels `placement:center`'s `my-auto` (same merge group).
     expect(cover.content()).toContain("my-0");
     expect(cover.content()).not.toContain("my-auto");
   });
@@ -141,7 +142,7 @@ describe("hope dialog recipe", () => {
     expect(parts.positioner()).toContain("overflow-hidden");
     expect(parts.content()).toContain("max-h-full");
     expect(parts.body()).toContain("overflow-y-auto");
-    // The body scrolls but hides its scrollbar (the base `no-scrollbar` @utility).
+    // The body scrolls but hides its scrollbar, so it cannot break the card's padding symmetry.
     expect(parts.body()).toContain("no-scrollbar");
   });
 

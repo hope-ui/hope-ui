@@ -7,13 +7,13 @@ export interface DialogPositionerProps extends JSX.HTMLAttributes<HTMLDivElement
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 
-// The fixed, full-viewport scroll container that centers/positions the Content card. Required wrapper:
-// Portal > Backdrop + Positioner > Content. Because it is `fixed inset-0`, it unmounts when closed (an
-// empty full-viewport wrapper would block the page). It shares the Content's presence
-// (`ctx.state.contentPresence`, owned by `createDialog` and timed off the Content element), NOT its
-// own — the Positioner has no transition of its own, so a self-timed presence would report exit-done
-// immediately and cut the Content's exit animation short. Sharing it also keeps the frame mounted
-// exactly as long as the card, and is what lets that card animate in (see `dialog-context.ts`).
+// The fixed, full-viewport frame that positions the Content card. Required nesting:
+// Portal > Backdrop + Positioner > Content.
+//
+// It mounts and unmounts on the *Content's* enter/exit state, not one of its own. Two reasons: it is
+// `fixed inset-0`, so leaving it mounted while closed would swallow every click on the page; and it
+// has no CSS transition of its own, so a self-timed exit would report "done" on the first frame and
+// cut the card's exit animation short.
 export const Positioner: Component<DialogPositionerProps> = (props) => {
   const ctx = useDialogContext();
 

@@ -192,11 +192,11 @@ const SIDES = ["top", "right", "bottom", "left"] as const;
  *
  * The arrow's **border** keys on `data-side` too: it carries the card's hairline around its two
  * *outward* edges, so the border no longer stops dead where the arrow covers it. **This story is the
- * only place a swapped pair is catchable** — the browser test project compiles no Tailwind, so every
- * automated check passes on a chevron pointing the wrong way. What to look for: all four arrows point
- * *away* from their card, and the hairline runs continuously through both elbows of each. A wrong
- * adjacent pair points back *into* the card; an opposite pair paints two parallel bars instead of a
- * point. Under `dir="rtl"` (the `RTL` story) the pair must be **identical**, never mirrored.
+ * only place a swapped pair is catchable** — the automated tests compile no Tailwind, so every check
+ * passes on an arrow pointing the wrong way. What to look for: all four point *away* from their card,
+ * and the hairline runs continuously through both elbows. A wrong adjacent pair points back *into*
+ * the card; an opposite pair paints two parallel bars instead of a point. Under `dir="rtl"` (the
+ * `RTL` story) the pair must be **identical**, never mirrored.
  */
 export const Sides: Story = {
   // Fullscreen + generous gaps: at the default centered layout the four demos sit shoulder to
@@ -353,11 +353,11 @@ export const CustomAnchor: Story = {
 };
 
 /**
- * A form inside, and the one story that exercises `initialFocus`. Left to itself `createAutoFocus`
- * takes the **first focusable descendant**, which here is the corner `Popover.CloseTrigger` — a
- * reader who opened "Rename project" wants the caret in the field, not on the ✕. `initialFocus` is
- * the escape hatch: a per-read accessor, resolved after the content mounts, so it can point at an
- * element inside the popup. Closing still returns focus to the trigger (`createFocusRestore`).
+ * A form inside, and the one story that exercises `initialFocus`. Left alone, opening the popover
+ * focuses its **first focusable descendant** — here the corner `Popover.CloseTrigger`, when a reader
+ * who opened "Rename project" wants the caret in the field. `initialFocus` takes an accessor,
+ * resolved after the content mounts, so it can point at an element inside the popup. Closing still
+ * returns focus to the trigger.
  */
 export const WithAForm: Story = {
   render: () => {
@@ -410,27 +410,24 @@ export const StaysOpenOnFocusOut: Story = {
  * Default props on both roots, which is the whole point. A `Popover.Portal` mounts its layer as a
  * *sibling* of the dialog's, so by every DOM measure the popup sits outside the modal's content —
  * and a modal Dialog marks everything outside that content `inert` + `aria-hidden`, cages focus
- * inside it, and listens for Escape on the document. Three `document`-keyed registries are what make
- * the popup a layer *above* the modal rather than a casualty of it:
+ * inside it, and listens for Escape on the document. Three things make the popup a layer *above* the
+ * modal rather than a casualty of it:
  *
- * - **The card stays reachable.** `Popover.Positioner` registers with the innermost open
- *   hide-outside layer (`createKeepVisible`), so the dialog's `MutationObserver` spares it and its
- *   whole subtree. Not merely legible — *hit-testable*. `inert` is transparent to hit testing while
- *   changing nothing about how the card paints, so without this the popover looks perfectly normal
- *   and no click reaches a word of it.
- * - **Focus lands inside it and stays.** `Popover.Content` registers a focus scope above the
- *   dialog's, and the dialog's trap consults the scope stack instead of its own `contains` — focus
- *   in a layer opened above it is not focus escaping. Without that, the trap yanks focus back and
- *   the popover's `closeOnFocusOutside` reads the yank as focus leaving: the card flashes and is
- *   gone in ~3ms.
- * - **Escape walks down one layer at a time.** Only the topmost dismissable layer consumes an
- *   Escape or an outside pointerdown, so the first Escape closes the popover, the second closes the
- *   dialog, and a click on the backdrop closes the dialog alone. `bubbles` opts back in per event
- *   channel for a consumer who wants one keystroke to take the whole chain.
+ * - **The card stays reachable.** The popover registers itself with the innermost open modal, which
+ *   then spares it and its whole subtree. Not merely legible — *hit-testable*: `inert` is
+ *   transparent to hit testing while changing nothing about how an element paints, so without this
+ *   the popover looks perfectly normal and no click reaches a word of it.
+ * - **Focus lands inside it and stays.** The popover opens a focus scope above the dialog's, and the
+ *   dialog's trap consults that stack rather than its own `contains` — focus in a layer opened above
+ *   it is not focus escaping. Without it, the trap yanks focus back, `closeOnFocusOutside` reads the
+ *   yank as focus leaving, and the card is gone in ~3ms.
+ * - **Escape walks down one layer at a time.** Only the topmost layer consumes an Escape or an
+ *   outside pointerdown: the first Escape closes the popover, the second the dialog, and a backdrop
+ *   click closes the dialog alone. `bubbles` opts back in per event channel for a consumer who wants
+ *   one keystroke to take the whole chain.
  *
- * Focus follows that chain back down: the popover hands it to the button that opened the popover,
- * the dialog to the button that opened the dialog. Executable form:
- * `__tests__/popover-in-dialog.browser.test.tsx`.
+ * Focus follows that chain back down: each layer hands it to the button that opened it. Executable
+ * form: `__tests__/popover-in-dialog.browser.test.tsx`.
  */
 export const InsideADialog: Story = {
   render: () => (

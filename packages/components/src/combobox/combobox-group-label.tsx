@@ -14,10 +14,10 @@ export interface ComboboxGroupLabelProps extends ComboboxGroupLabelElementProps 
 }
 
 /**
- * The label naming its `Combobox.Group`. `createListboxGroupLabel` — reused unchanged, props only —
- * takes the group's return (read off `ComboboxGroupContext`) and registers its `id` onto the group's
- * `aria-labelledby` via `createRegisteredId`, which defers the ancestor-signal write past Solid 2.0's
- * ban. This layer adds the recipe `groupLabel` slot + `data-slot`.
+ * The label naming its `Combobox.Group`: it registers its own `id` onto the group's `aria-labelledby`.
+ * That registration is deferred rather than written during render, because Solid 2.0 throws when a
+ * descendant writes a signal owned by an ancestor from its synchronous render body — and it is
+ * *unregistered* on teardown the same way, which is what lets a filter swap one group for another.
  */
 export const GroupLabel: Component<ComboboxGroupLabelProps> = (props) => {
   const ctx = useComboboxContext();

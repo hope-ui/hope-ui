@@ -12,8 +12,8 @@ import {
 import { SEMANTIC_COLOR_TOKENS, SEMANTIC_OPACITY_TOKENS } from "../semantic-tokens";
 import type { SlotRecipeFn } from "../slot-recipe";
 
-// A synthetic multi-slot recipe stands in for what a theme author would pass — the kit is generic,
-// so it needs no knowledge of any real component. `cases`/`slots` are what the author supplies.
+// A synthetic multi-slot recipe stands in for what a theme author would pass; the kit is generic and
+// knows nothing about any real component.
 type DemoVariants = { variant?: "a" | "b" };
 const expectation = {
   cases: [{}, { variant: "a" }, { variant: "b" }] as DemoVariants[],
@@ -49,9 +49,9 @@ describe("conformance kit", () => {
   });
 
   it("allows an intentionally-unstyled slot to produce no class via `unstyledSlots`", () => {
-    // `hint` is declared but carries no default classes (like Alert's description). tailwind-variants
-    // resolves an empty `""` slot base to `undefined`, so the slot function returns nothing — that is
-    // exactly what an unstyled slot is, and it must not be reported.
+    // `hint` is declared but carries no classes of its own, like Alert's description. An empty slot
+    // base resolves to `undefined`, so its function returns nothing — the shape of an unstyled slot,
+    // which must not be reported.
     const recipe: SlotRecipeFn<DemoVariants, "root" | "hint"> = () => ({
       root: () => "demo",
       hint: () => undefined as unknown as string,
@@ -156,16 +156,16 @@ describe("logical-property (RTL) conformance", () => {
   });
 
   it("allows a physical utility that an rtl:/ltr: variant deliberately flips", () => {
-    // The one shape where physical is correct — an explicit manual flip, or a rule no logical
+    // The one shape where a physical class is correct: an explicit manual flip, or a rule no logical
     // property can express (hope's calendar mirrors its chevrons with `rtl:[&_svg]:rotate-180`).
     const recipe = recipeEmitting("ltr:pr-8 rtl:pl-8 rtl:[&_svg]:rotate-180");
     expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
   });
 
   it("allows a physical utility scoped by a measured `data-side-*`", () => {
-    // `data-side` reports where a floating layer LANDED after `flip`. Which two edges of a
-    // 45°-rotated arrow face outward is a fact of that measured geometry, not of reading direction,
-    // so the pair is IDENTICAL under `dir="rtl"` — hope's popover arrow is the worked example.
+    // `data-side` reports where a floating layer *landed* after flipping. Which two edges of a
+    // 45°-rotated arrow face outward follows from that measured geometry, not from reading direction,
+    // so the pair is identical under `dir="rtl"` — hope's popover arrow is the worked example.
     const recipe = recipeEmitting(
       "data-side-bottom:border-t data-side-bottom:border-l data-side-left:border-r",
     );
@@ -174,9 +174,9 @@ describe("logical-property (RTL) conformance", () => {
   });
 
   it("exempts on the variant chain, never on the base utility", () => {
-    // The exemption is the SCOPE. The same `border-l` bare, or under an unrelated variant, is the
-    // ordinary defect this rule exists for — a `data-side-*` class elsewhere in the recipe must not
-    // launder it.
+    // What earns the exemption is the scope, not the utility: the same `border-l` bare, or under an
+    // unrelated variant, is the ordinary defect this rule exists for. A `data-side-*` class elsewhere
+    // in the recipe must not launder it.
     for (const classes of [
       "flex border-l",
       "hover:border-l",
@@ -189,9 +189,8 @@ describe("logical-property (RTL) conformance", () => {
   });
 
   it("does not exempt the arbitrary `data-[side=…]` form", () => {
-    // Only `_base/_variants.css`'s four registered variant names are exempt — the vocabulary
-    // `createFloating` actually emits. The arbitrary form is out of scope by design: it can select
-    // values the registered set never produces, so it gets no free pass.
+    // Only the four registered variant names are exempt — the vocabulary `createFloating` actually
+    // emits. The arbitrary form can select values that set never produces, so it gets no free pass.
     const result = checkLogicalPropertyConformance(
       recipeEmitting("data-[side=bottom]:border-l"),
       rootOnly,
@@ -201,10 +200,10 @@ describe("logical-property (RTL) conformance", () => {
   });
 
   it("keys the `data-side-*` exemption on the attribute, not on a utility allowlist", () => {
-    // The deliberate boundary, pinned rather than narrowed. `pl-4` under a side scope passes too:
-    // the doctrine is "a measured-geometry scope carries physical values", not "these particular
-    // utilities are safe". A recipe that genuinely wants "the side nearest where the text starts"
-    // under a side scope layers `ltr:`/`rtl:` on top, which is the other exemption.
+    // A deliberate boundary, pinned rather than narrowed: `pl-4` under a side scope passes too,
+    // because the rule is "a measured-geometry scope carries physical values", not "these particular
+    // utilities are safe". A recipe that really wants "the side nearest where the text starts" under
+    // a side scope layers `ltr:`/`rtl:` on top, which is the other exemption.
     expect(
       checkLogicalPropertyConformance(recipeEmitting("data-side-bottom:pl-4"), rootOnly).ok,
     ).toBe(true);
@@ -220,8 +219,8 @@ describe("logical-property (RTL) conformance", () => {
   });
 
   it("catches a violation only a compound variant introduces", () => {
-    // The reason this runtime half exists alongside the source scan: a class assembled at call time
-    // never appears as a literal the static scan could read.
+    // Why this runtime half exists alongside the static source scan: a class assembled at call time
+    // never appears as a literal the scan could read.
     const recipe: SlotRecipeFn<DemoVariants, "root"> = (props) => ({
       root: () => (props?.variant === "b" ? "flex text-right" : "flex text-end"),
     });

@@ -9,10 +9,9 @@ export interface PopoverHeaderProps extends PopoverHeaderElementProps {
   render?: RenderProp<PopoverHeaderElementProps>;
 }
 
-// An optional layout container for the title/description (mirrors `dialog-header.tsx`). No behavior
-// and no ARIA: the labelling stays on `Popover.Title`/`Popover.Description`, which register their own
-// ids with the content hook wherever they sit — so wrapping them here changes nothing but the rhythm.
-// There is no primitive part hook for the same reason.
+// An optional layout container for the title/description. No behavior and no ARIA — and so no
+// primitive hook: `Popover.Title`/`Popover.Description` register their own ids with the content
+// wherever they sit, so wrapping them here changes nothing but the spacing.
 export const Header: Component<PopoverHeaderProps> = (props) => {
   const ctx = usePopoverContext();
   const rest = omit(props, "render");

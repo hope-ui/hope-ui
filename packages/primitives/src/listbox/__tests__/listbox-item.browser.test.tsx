@@ -30,14 +30,14 @@ function rowAt(container: HTMLElement, index: number): HTMLElement {
 }
 
 /**
- * A one-option listbox that hands `createListboxItem` whatever extra props a test passes — for the
- * two things a props change breaks silently: an attribute the hand-kept `omit` list stops forwarding,
- * and an `item` the data never contained.
+ * A one-option listbox that hands `createListboxItem` whatever extra props a test passes. It targets
+ * the two things a props change breaks silently: an attribute the hand-kept `omit` list stops
+ * forwarding, and an `item` the data never contained.
  */
 function ProbeListbox(props: {
   item?: Fruit;
-  // `data-*` is spelled out: Solid's `HTMLAttributes` allows arbitrary ones only through JSX, not in
-  // a plain object literal.
+  // `data-testid` is spelled out because Solid's `HTMLAttributes` accepts arbitrary `data-*` only
+  // through JSX, not in a plain object literal.
   extra?: Omit<JSX.HTMLAttributes<HTMLElement>, "ref"> & { "data-testid"?: string };
 }): JSX.Element {
   const state = createListbox<Fruit>({ items: FRUITS, ...fruitOptions() });
@@ -48,8 +48,8 @@ function ProbeListbox(props: {
     <div
       ref={(element) => state.setListboxElement(element)}
       {...state.rootProps}
-      // Repeated from `rootProps` (same value) so biome can see the role behind the spread — the
-      // shape `GroupedListbox`/`VirtualListbox` already use.
+      // Repeated from `rootProps` with the same value so biome's a11y lint can see the role behind
+      // the spread. Same shape as `GroupedListbox` / `VirtualListbox`.
       role="listbox"
       aria-label="fruits"
     >
@@ -98,8 +98,8 @@ describe("createListboxItem — attributes", () => {
 
   it("forwards the native attributes it does not own onto the option element", async () => {
     // The `omit` list is hand-kept, so a renamed control prop can quietly start swallowing a
-    // consumer's attributes with a green typecheck and a green suite. Assert them **on the element**,
-    // never on the props object — that is the only place the drift shows.
+    // consumer's attributes with a green typecheck and a green suite. Assert them **on the element**
+    // rather than on the props object — the element is the only place that drift shows.
     const { container, dispose } = mount(() => (
       <ProbeListbox
         extra={{
@@ -119,8 +119,8 @@ describe("createListboxItem — attributes", () => {
     expect(option.getAttribute("title")).toBe("Pick me");
     expect(option.classList.contains("probe-class")).toBe(true);
     expect(option.style.color).toBe("rgb(1, 2, 3)");
-    // …while the hook keeps the ones it owns. `id` is deliberately not forwardable: it is the
-    // `aria-activedescendant` IDREF, generated per row by the source.
+    // …while the hook keeps the ones it owns. `id` is deliberately not forwardable: it is what
+    // `aria-activedescendant` points at, generated per row by the item source.
     expect(option.getAttribute("role")).toBe("option");
     expect(option.id).toBeTruthy();
     dispose();
@@ -132,7 +132,7 @@ describe("createListboxItem — attributes", () => {
     await vi.waitFor(() => expect(options(container)).toHaveLength(1));
 
     // Arrow keys and typeahead traverse `items`, not the DOM, so a row outside it is unreachable —
-    // and nothing else says so: it renders, it just never activates.
+    // and nothing else says so: it renders fine, it just never activates.
     await vi.waitFor(() =>
       expect(warn).toHaveBeenCalledWith(expect.stringContaining("[hope-ui] createListboxItem")),
     );
@@ -147,8 +147,8 @@ describe("createListboxItem — registration", () => {
   it("re-registers a row under its new index when the data reorders", async () => {
     // The registration effect tracks the index *and* the ref, which is what makes a moved row publish
     // itself under its new slot and clear the old one. Reading the index in the effect body instead
-    // would be an untracked read of a memo — `[STRICT_READ_UNTRACKED]`, which `mount()` fails on, so
-    // this test also pins that the effect keeps its two-argument shape.
+    // would be an untracked read of a memo (`[STRICT_READ_UNTRACKED]`, which `mount()` fails on), so
+    // this also pins that the effect keeps its two-argument `(compute, effect)` shape.
     const [values, setValues] = createSignal<Fruit[]>(FRUITS);
     let state!: CreateListboxReturn<Fruit>;
     const { container, dispose } = mount(() => (
@@ -231,8 +231,8 @@ describe("createListboxItem — pointer / click", () => {
     await userEvent.keyboard("{ArrowDown}");
     await vi.waitFor(() => expect(activeValues(container)).toEqual(["Banana"]));
 
-    // A pointermove fired WITHOUT motion (same coords) — e.g. the list scrolled under a still
-    // cursor — must NOT yank the active item back to Apple.
+    // A pointermove fired WITHOUT motion (same coords) — what the browser emits when the list scrolls
+    // under a stationary cursor — must NOT yank the active item back to Apple.
     pointerMoveAt(nth(options(container), 0), 10, 10);
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(activeValues(container)).toEqual(["Banana"]);
@@ -270,8 +270,8 @@ describe("createListboxItem — hover moves the highlight but never the scroll",
         count={50}
         rowHeight={30}
         viewport={100}
-        // Activedescendant so DOM focus never moves: a real `.focus()` scrolls on its own, which
-        // would hide whichever path is under test.
+        // Activedescendant so DOM focus never moves: a real `.focus()` scrolls the element into view
+        // by itself, which would mask whichever scroll behavior is under test.
         options={{ focusMode: "activedescendant" }}
         onReady={(s) => (state = s)}
       />
@@ -288,8 +288,8 @@ describe("createListboxItem — hover moves the highlight but never the scroll",
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(list.scrollTop).toBe(0);
 
-    // Clicking the same row does scroll — only the pointer-move path opts out. `.click()` rather
-    // than `userEvent.click`, which scrolls the target into view before pressing.
+    // Clicking the same row does scroll — only the pointer-move path opts out. A bare `.click()`,
+    // because `userEvent.click` scrolls the target into view before pressing it.
     clipped.click();
     await vi.waitFor(() => expect(list.scrollTop).toBe(120 - 100));
     await expectNoA11yViolations(container);
@@ -316,7 +316,7 @@ describe("createListboxItem — highlight follows focus", () => {
     // Blur moves DOM focus to <body>, outside the list — the highlight must not linger.
     nth(options(container), 0).blur();
     await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
-    // Only the paint gate closed; the active index is retained (react-aria keeps focusedKey on blur).
+    // Only the paint gate closed; the position is retained, so returning lands on the same row.
     expect(state.focus.activeIndex()).toBe(0);
 
     // Returning focus repaints the same row.

@@ -5,14 +5,12 @@ import { page, userEvent } from "vitest/browser";
 import { createDialogCloseTrigger } from "../dialog-close-trigger";
 import { createDialog } from "../dialog-root";
 
-// `createDialogCloseTrigger` is now **minimal**: it injects only the close `onClick` (composed in front
-// of the consumer's, so their `preventDefault()` cancels the close). The accessible name (`common.close`)
-// and the `type="button"` default moved down into the `CloseButton` component that
-// `@hope-ui/components`' `Dialog.CloseTrigger` renders — so those are covered by CloseButton's own tests,
-// and these tests cover exactly what the hook still owns: closing, and honoring a consumer's cancel.
+// The hook owns only the close `onClick`, so that is all this covers: closing, and honoring a
+// consumer's `preventDefault()` cancel. The accessible name and the `type="button"` default belong
+// to the `CloseButton` component and are covered by its own tests.
 
-// A minimal open dialog: a close button (with a visible label so it has an accessible name), and a
-// marker gated on `open()` so the test can observe that clicking Close actually closed the dialog.
+// A minimal open dialog: a close button (labelled, so it has an accessible name) and a marker gated
+// on `open()`, so the test can observe that clicking Close actually closed the dialog.
 function Harness(props: { onClick?: (event: MouseEvent) => void }) {
   const state = createDialog({ defaultOpen: true });
   const close = createDialogCloseTrigger(state, { onClick: props.onClick });
@@ -57,8 +55,7 @@ describe("createDialogCloseTrigger", () => {
   });
 
   it("owns only the close onClick — forwards the consumer's other props unchanged", async () => {
-    // The hook sets no `aria-label`/`type` of its own (that is the CloseButton component's job now), so
-    // a consumer's values pass straight through.
+    // The hook sets no `aria-label`/`type` of its own, so a consumer's pass straight through.
     const { container, dispose } = mount(() => <PassthroughHarness />);
     const close = container.querySelector('[data-testid="close"]') as HTMLButtonElement;
     expect(close.getAttribute("aria-label")).toBe("Custom label");

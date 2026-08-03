@@ -11,8 +11,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// ---------- demo icons (plain SVG; the recipe sizes them per badge size) ----------
-
+// Demo icons. They carry no width/height on purpose — the recipe sizes the bare `<svg>` per badge
+// size, so a hard-coded one would not scale.
 const strokeIcon = (d: string): JSX.Element => (
   <svg
     viewBox="0 0 24 24"
@@ -49,9 +49,9 @@ export const Variants: Story = {
 };
 
 /**
- * `inverted` is the literal swap of `solid` (the on-color as fill, the role as text). It is designed
- * to sit on a **solid, colored surface**, so it is shown here on a dark panel. `warning` honestly
- * inverts to a dark chip — the documented consequence of a symmetric swap, not a special case.
+ * `inverted` swaps `solid`: the on-color becomes the fill, the role color becomes the text. It is
+ * meant for a solid, colored surface, hence the dark panel here. `warning` inverting to a dark chip
+ * is the honest consequence of a symmetric swap, not a bug to special-case away.
  */
 export const Inverted: Story = {
   parameters: { layout: "padded" },
@@ -71,9 +71,9 @@ export const Inverted: Story = {
 /** variant × color — the validated matrix. */
 export const VariantColorMatrix: Story = {
   parameters: { layout: "padded" },
-  // Each `<For>` callback returns a single element (a flex row, or one cell) — never a fragment
-  // wrapping another `<For>`, which produces a variable node count per row and breaks Solid's `<For>`
-  // DOM tracking. The `inverted` row sits on a dark strip so its light fills stay visible.
+  // Each `<For>` callback must return exactly one element — a row, or one cell — never a fragment
+  // wrapping another `<For>`. A fragment yields a variable number of nodes per row, which breaks how
+  // `<For>` tracks its DOM.
   render: () => (
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-3">

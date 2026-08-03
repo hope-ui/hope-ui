@@ -7,10 +7,10 @@ import type { CreateDialogReturn } from "../dialog-root";
 import { createDialog } from "../dialog-root";
 import { createDialogTitle } from "../dialog-title";
 
-// The shared overlay presence lives in `createDialog` (the root state), so `content.mounted()` and
-// `content.props["data-presence"]` come straight from it — the content hook is exercised exactly as
-// `Dialog.Content` uses it. `createDialog` is created inside `mount()` so its `createPresence`
-// effect has a DOM + owner (why this file is a browser, not a node-unit, test).
+// `content.mounted()` and `content.props["data-presence"]` come straight off the shared presence
+// the root hook owns, so the content hook is exercised exactly as `Dialog.Content` uses it.
+// `createDialog` is called inside `mount()` so that presence effect has a DOM and an owner — which
+// is also why this is a browser test rather than a node one.
 
 function TitleInContent(props: { state: CreateDialogReturn }) {
   const title = createDialogTitle(props.state, {});

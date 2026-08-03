@@ -13,24 +13,22 @@ export interface ComboboxItemIndicatorProps extends ComboboxItemIndicatorElement
   /**
    * A custom selection glyph, overriding the default for this one indicator. When omitted, renders the
    * resolved default (instance `checkIcon` ?? preset `defaultProps.combobox.checkIcon` ?? hope's
-   * built-in check) from context. Read **exactly once**, gated on the item's `isSelected()`.
+   * built-in check) from context.
    */
   children?: JSX.Element;
 }
 
 /**
- * The chosen-row check glyph. Purely presentational — it reads the item's `isSelected()` off
- * `ComboboxItemContext` (behavior stays on the primitive) and shows the glyph in the row's reserved
- * trailing gutter only while selected. `aria-hidden` because the selection is already conveyed by the
- * option's `aria-selected`.
+ * The chosen-row check glyph, shown in the row's reserved trailing gutter only while selected.
+ * `aria-hidden`, because the option's own `aria-selected` already conveys it.
  *
  * On a **multiple** Combobox this is the only thing reporting what is picked — the input holds the
  * query rather than a joined list of labels — so a multi-select tree that omits it shows the user
  * nothing.
  *
- * The custom glyph is read **exactly once**, inside a `<Show>` gated on `isSelected()` — not on the
- * glyph prop itself. Per the codified `children()` decision procedure, a component-valued child read
- * once — inside a `<Show>` or not — needs no `children()`.
+ * The `<Show>` gates on `isSelected()`, never on the glyph prop itself — reading a JSX-valued prop
+ * twice builds the component twice and gives the two copies different hydration positions, so it must
+ * stay a single read.
  */
 export const ItemIndicator: Component<ComboboxItemIndicatorProps> = (props) => {
   const ctx = useComboboxContext();
@@ -40,8 +38,8 @@ export const ItemIndicator: Component<ComboboxItemIndicatorProps> = (props) => {
 
   const elementProps = merge(rest, {
     "data-slot": "combobox-item-indicator",
-    // Component-owned, deliberately not forwardable: un-hiding the glyph would double-announce a
-    // selection the option's own `aria-selected` already conveys.
+    // Deliberately not forwardable: un-hiding the glyph would double-announce a selection the
+    // option's own `aria-selected` already conveys.
     "aria-hidden": "true" as const,
     get class(): string {
       return ctx.slots.itemIndicator(props.class);

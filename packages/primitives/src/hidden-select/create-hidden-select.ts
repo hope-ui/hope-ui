@@ -29,8 +29,7 @@ export interface CreateHiddenSelectOptions<T> {
   /**
    * The hidden control that stands in for the widget — the `<select>`, or the **first** `<input>`
    * of the fallback path. Must be a real signal accessor: the control is rendered as a reactive
-   * consequence of `name` (and of the option count crossing the `<select>` cutoff), so an
-   * untracked read would catch it still `undefined`, forever.
+   * consequence of `name`, so a plain untracked read catches it still `undefined`, forever.
    */
   element: Accessor<HiddenFormControl | null | undefined>;
   /**
@@ -63,28 +62,24 @@ function firstInvalidControl(form: HTMLFormElement): Element | null {
 }
 
 /**
- * The two native-form behaviors a hidden field owes its widget, neither of which comes for free
- * once the real control is clipped out of sight:
+ * The two native-form behaviors a hidden field owes its widget, neither of which survives the real
+ * control being clipped out of sight:
  *
- * 1. **Reset.** `form.reset()` reverts the hidden control's own DOM state, and nothing tells the
- *    widget its selection just changed. A `reset` listener on the owning form calls `onReset` with
- *    `defaultValue()` so the two stay in step.
+ * 1. **Reset.** `form.reset()` reverts the hidden control's own DOM state and tells nobody, so a
+ *    `reset` listener on the owning form calls `onReset` with `defaultValue()` to keep the widget
+ *    in step.
  * 2. **Invalid.** A blocked submit fires `invalid` on the offending control, and the browser then
  *    tries to anchor a validation bubble to it — a 1px clipped `<select>`, or a `display: none`
  *    `<input>` it refuses to point at at all ("An invalid form control is not focusable"). So the
- *    listener cancels the report and moves focus somewhere a user can see. **Cancelling `invalid`
+ *    listener cancels the report and moves focus somewhere visible instead. **Cancelling `invalid`
  *    suppresses the report, never the constraint** — submission stays blocked either way.
  *
- * Focus is taken **only when this is the form's first invalid control**: a form with an empty
- * required text field above this one must land on that field, not here.
+ * Focus is taken **only when this is the form's first invalid control**, so a form with an empty
+ * required text field above this one still lands on that field.
  *
- * Deliberately out of scope: `setCustomValidity` and realtime validation errors. Surfacing an
- * error message is a `Field`'s job, not a hidden field's.
- *
- * ## SSR
- *
- * Everything is inside `createEffect`, which never runs server-side — no listener is attached and
- * no DOM is touched during a server render.
+ * Out of scope: `setCustomValidity` and realtime validation errors — surfacing a message is a
+ * `Field`'s job. Everything here runs inside `createEffect`, so a server render attaches no
+ * listener and touches no DOM.
  */
 export function createHiddenSelect<T>(options: CreateHiddenSelectOptions<T>): void {
   createEffect(
@@ -93,18 +88,18 @@ export function createHiddenSelect<T>(options: CreateHiddenSelectOptions<T>): vo
       if (element == null) {
         return;
       }
-      // Sampled with the element: a control that is moved to a different form is remounted, which
-      // re-runs this effect with a fresh `element`. React Aria samples it the same way.
+      // Safe to sample rather than track: a control moved to a different form is remounted, which
+      // re-runs this effect with a fresh `element` anyway.
       const form = element.form;
 
       const onReset = (event: Event) => {
         if (event.defaultPrevented) {
           return;
         }
-        // A deliberate current-value sample, not a dependency — tracking it here would tear down
-        // and reattach the listeners on every selection change. Spelled `untrack` because
-        // `form.reset()` can be called from inside an effect, where the read would otherwise trip
-        // `[STRICT_READ_UNTRACKED]` (the same argument `createDismissable` makes for `exclude`).
+        // A deliberate sample, not a dependency: tracking it would tear down and reattach both
+        // listeners on every selection change. Spelled `untrack` (Solid's "read without
+        // subscribing") because `form.reset()` can be called from inside an effect, where a bare
+        // read trips the dev build's `[STRICT_READ_UNTRACKED]` warning.
         options.onReset?.(untrack(() => options.defaultValue()));
       };
 

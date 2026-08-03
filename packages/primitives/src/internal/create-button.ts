@@ -18,27 +18,26 @@ export interface CreateButtonOptions<T extends HTMLElement = HTMLElement> {
   /** Whether the button is disabled. Default `false`. */
   disabled?: Accessor<boolean>;
   /**
-   * Whether the rendered element is a native `<button>`. Default `true`. Set `false` when a
-   * `render` prop swaps in a non-`<button>` (an `<a>`, a `<div role="button">`): the native
-   * `disabled` attribute, browser keyboard activation, and default focusability don't exist on
-   * those elements, so this switches on `role`/`tabIndex`/`aria-disabled` and keyboard synthesis.
+   * Whether the rendered element is a native `<button>`. Default `true`. Set `false` when a `render`
+   * prop swaps in an `<a>` or a `<div role="button">`: those get none of the browser's `disabled`
+   * attribute, keyboard activation, or default focusability, so this switches on the
+   * `role`/`tabIndex`/`aria-disabled` and keyboard-synthesis substitutes.
    */
   nativeButton?: Accessor<boolean>;
   /** The `type` attribute for a native button. Default `"button"` (never accidentally submits). */
   type?: Accessor<ButtonType | undefined>;
   /**
-   * Keep the button focusable while disabled (so a tooltip can describe *why* it's disabled),
-   * conveying the disabled state via `aria-disabled` instead of the native `disabled` attribute
-   * / tab-order removal. Interaction is still blocked. Default `false`.
+   * Keep the button focusable while disabled — so a tooltip can explain *why* — by conveying the
+   * state with `aria-disabled` instead of the native attribute, which would drop it from the tab
+   * order. Interaction is still blocked. Default `false`.
    */
   focusableWhenDisabled?: Accessor<boolean>;
   /** Skip focusing the element on press start. Forwarded to `createPress`. */
   preventFocusOnPress?: Accessor<boolean>;
   /**
-   * Consumer event handlers, composed in the correct order: a disabled-guard runs first (so a
-   * disabled non-native element blocks the consumer's handler and any native default), then the
-   * consumer's handler (whose `preventDefault()` can veto activation), then the press engine.
-   * Passed as accessors so they're read reactively inside the returned prop getters.
+   * Consumer event handlers. Composed as disabled-guard, then this handler (whose
+   * `preventDefault()` can veto activation), then the press engine. Accessors rather than plain
+   * handlers so the returned prop getters re-read them reactively.
    */
   onClick?: Accessor<JSX.EventHandlerUnion<T, MouseEvent> | undefined>;
   onKeyDown?: Accessor<JSX.EventHandlerUnion<T, KeyboardEvent> | undefined>;
@@ -59,9 +58,9 @@ export interface ButtonBehaviorProps<T extends HTMLElement = HTMLElement> {
   readonly tabIndex: number | undefined;
   readonly disabled: boolean | undefined;
   readonly "aria-disabled": "true" | undefined;
-  /** Present-empty (`""`) styling hook when disabled, absent otherwise — for the `data-disabled:` variant. */
+  /** Empty string when disabled, absent otherwise — the hook for a `data-disabled:` style variant. */
   readonly "data-disabled": "" | undefined;
-  /** Present-empty (`""`) styling hook while a press is active, absent otherwise — for the `data-pressed:` variant. */
+  /** Empty string while pressed, absent otherwise — the hook for a `data-pressed:` style variant. */
   readonly "data-pressed": "" | undefined;
   readonly onClick: JSX.EventHandler<T, MouseEvent>;
   readonly onKeyDown: JSX.EventHandler<T, KeyboardEvent>;
@@ -79,28 +78,17 @@ export interface CreateButtonReturn<T extends HTMLElement = HTMLElement> {
 }
 
 /**
- * Element-aware button behavior. Computes every static a11y prop from the `nativeButton`
- * boolean at **render time** (SSR-safe: server and client agree without consulting a ref), and
- * composes `createPress` for the interaction. A `ref` is used only at event time — to refine
- * keyboard synthesis to the element's real kind and to warn (dev only) when `nativeButton`
- * disagrees with the element actually rendered.
+ * Button behavior that adapts to whichever element is actually rendered. Every static a11y prop is
+ * computed from the `nativeButton` flag at render time rather than read off the ref, so the server
+ * and the client produce the same markup; the ref is consulted only at event time, to match keyboard
+ * synthesis to the real element and to warn in dev when flag and element disagree.
  *
- * Static props by element kind:
- * - **native** (`nativeButton` true): `type` + native `disabled` (no `aria-disabled` — the
- *   native attribute already conveys it; the redundant double-up is deliberately dropped).
- * - **non-native**: `role="button"`, `tabIndex` (`0`, or omitted when disabled and not
- *   `focusableWhenDisabled`), and `aria-disabled` when disabled. No `type` (meaningless off a
- *   `<button>`/`<input>`). A `render`-ed disabled `<a>` should also have its `href` dropped by
- *   the consumer so navigation is impossible — keyboard/click are blocked here regardless.
- * - **focusableWhenDisabled**: stays focusable, disabled state via `aria-disabled` (never the
- *   native attribute, which would drop it from the tab order).
- * - **every disabled case**: a present-empty `data-disabled` attribute — the single styling hook a
- *   recipe targets (`data-disabled:`), so it never has to pair `disabled:` with `aria-disabled:`.
- *
- * Keyboard synthesis lives in `createPress` (element-aware via the `ref` + `nativeButton`
- * hint): native buttons get browser activation; a generic `role="button"` (and an anchor on
- * Space) has a `click` synthesized so the consumer's `onClick` fires; Space scroll is prevented
- * only for non-native elements.
+ * A native `<button>` gets `type` plus the native `disabled` attribute. Anything else gets
+ * `role="button"`, `tabIndex`, `aria-disabled`, and the keyboard activation `createPress`
+ * synthesizes — none of which the browser supplies off a `<button>`. Both get `data-disabled`, so a
+ * theme styles one selector rather than pairing `disabled:` with `aria-disabled:`. A disabled `<a>`
+ * needs its `href` dropped by the consumer too: clicks and keys are blocked here, but only a missing
+ * `href` makes navigation impossible.
  */
 export function createButton<T extends HTMLElement = HTMLElement>(
   options: CreateButtonOptions<T> = {},
@@ -123,10 +111,9 @@ export function createButton<T extends HTMLElement = HTMLElement>(
     onPressChange: options.onPressChange,
   });
 
-  // Disabled-guard: cancels the composed chain (and any native default) before the consumer's
-  // handler or the press engine runs. A native disabled `<button>` never fires these anyway,
-  // so this is what makes a non-native `aria-disabled` element (or a focusable-when-disabled
-  // one) genuinely inert.
+  // Cancels the composed chain, and any native default, before the consumer's handler or the press
+  // engine runs. A native disabled `<button>` never fires these at all, so this is what makes an
+  // `aria-disabled` element — including a focusable-when-disabled one — genuinely inert.
   const guard = (event: Event) => {
     if (!isDisabled()) {
       return;
@@ -135,11 +122,12 @@ export function createButton<T extends HTMLElement = HTMLElement>(
     event.stopPropagation();
   };
 
-  // Dev-only element/`nativeButton` mismatch warning (Base UI's check). Client-only: effects
-  // never run during SSR, and the ref is populated only after mount.
+  // Dev-only mismatch warning. Never runs on the server: effects don't, and the ref only fills in
+  // after mount.
   createEffect(
-    // Track both in the deps function — reading `isNative()` inside the effect callback would
-    // be an untracked read (`STRICT_READ_UNTRACKED`); deps is the tracking scope.
+    // Both signals belong in this first argument. In Solid 2.0's `createEffect(compute, effect)`
+    // only the first function tracks, so reading `isNative()` in the second would both miss updates
+    // and warn `STRICT_READ_UNTRACKED`.
     () => [element(), isNative()] as const,
     ([el, native]) => {
       if (el == null) {
@@ -190,21 +178,17 @@ export function createButton<T extends HTMLElement = HTMLElement>(
       if (isNative() && !isFocusableWhenDisabled()) {
         return undefined;
       }
-      // The string "true", not the boolean: Solid renders `aria-disabled={true}` as the empty
-      // `aria-disabled=""`, which is not a valid ARIA token value.
+      // The string, not the boolean: Solid renders `aria-disabled={true}` as `aria-disabled=""`,
+      // which is not a valid ARIA value.
       return "true";
     },
-    // A present-empty `data-disabled` styling hook, emitted for BOTH native and non-native
-    // elements (and focusable-when-disabled). It exists so a theme's recipe styles ONE
-    // `data-disabled:` variant instead of pairing `disabled:` (native) with `aria-disabled:`
-    // (non-native). Byte-stable: `isDisabled()` is prop-derived, identical on server and client.
+    // Derived from props alone, so the server and the first client render agree and hydration
+    // matches.
     get "data-disabled"() {
       return isDisabled() ? "" : undefined;
     },
-    // Present-empty `data-pressed` styling hook while a press is active — the styling counterpart to
-    // the `isPressed` accessor, kept here (not hand-wired in the consumer) for the same reason as
-    // `data-disabled`. Byte-stable: `false` on the server and initial client, so it only ever
-    // appears client-side once a press begins.
+    // Always `false` on the server and at first client render, so it can only appear after a press
+    // begins — no hydration mismatch.
     get "data-pressed"() {
       return press.isPressed() ? "" : undefined;
     },

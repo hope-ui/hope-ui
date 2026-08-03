@@ -20,9 +20,8 @@ const _variants: DialogRecipeVariants = {
 };
 void _variants;
 
-// `DialogThemeableProps` is the curated surface a preset may default app-wide. Dialog carries no
-// non-variant chrome content, so it is exactly the recipe variants — a strict superset by
-// construction, so a bare variants object is still assignable to it (and vice versa).
+// Dialog carries no non-variant chrome content, so the themeable surface is exactly the recipe
+// variants and the two are mutually assignable.
 const _variantsAreThemeable = (v: DialogRecipeVariants): DialogThemeableProps => v;
 void _variantsAreThemeable;
 const _themeableAreVariants = (v: DialogThemeableProps): DialogRecipeVariants => v;

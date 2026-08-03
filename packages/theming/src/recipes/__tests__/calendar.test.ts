@@ -16,11 +16,10 @@ const _variants: CalendarRecipeVariants = {
 };
 void _variants;
 
-// `CalendarThemeableProps` is a **superset** of the recipe variants (like CloseButton/Button): every
-// variants object is a valid themeable-props object, and it carries the two navigation glyphs
-// (`prevIcon`/`nextIcon`) on top in **factory** form — a bare element is *not* assignable, which is
-// what forces a reuse-safe preset default. Calendar is a multi-part component, so its themeable
-// surface stays on the root (no per-part themeable props); the parts read the resolved glyph off context.
+// A superset of the recipe variants, carrying the two navigation glyphs on top in **factory** form —
+// a bare element is *not* assignable, which is what forces a reuse-safe preset default. Calendar is a
+// multi-part component, so this surface stays on the root and the parts read the resolved glyph off
+// context.
 const _variantsAreThemeable = (v: CalendarRecipeVariants): CalendarThemeableProps => v;
 void _variantsAreThemeable;
 const _themeable: CalendarThemeableProps = {
@@ -30,9 +29,9 @@ const _themeable: CalendarThemeableProps = {
 };
 void _themeable;
 
-// Negative pin: each nav glyph must be a factory, not a bare element (a shared preset node would move
-// if reused). If `prevIcon`/`nextIcon` ever widen to accept a bare `JSX.Element`, this stops erroring
-// and `pnpm typecheck` fails on the stale `@ts-expect-error`.
+// Negative pin: each nav glyph must be a factory, never a bare element — one preset node shared across
+// instances would *move* if reused. If either widens to accept a `JSX.Element`, this stops erroring and
+// `pnpm typecheck` fails on the now-stale suppressions below.
 const _navIconsAreFactoryOnly: CalendarThemeableProps = {
   // @ts-expect-error a preset-wide `prevIcon` default must be a `() => JSX.Element` factory, never a node.
   prevIcon: null,

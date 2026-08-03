@@ -14,9 +14,9 @@ export interface PopoverAnchorProps extends PopoverAnchorElementProps {
 // section — while the trigger keeps owning the toggle and the ARIA. Opt-in: with no `Popover.Anchor`
 // mounted, the trigger is the anchor.
 //
-// A bare wrapper: no recipe slot (so `class` is forwarded untouched), no ARIA, no `data-*` — a
-// positioning reference is not a control, which is also why it is deliberately not dismiss-excluded.
-// Usually worn by an element that already exists, via `render`.
+// A bare wrapper: no recipe slot (so `class` is forwarded untouched), no ARIA, no `data-*`. A
+// positioning reference is not a control, which is also why it is deliberately *not* excluded from
+// outside-click dismissal. Usually worn by an existing element through `render`.
 export const Anchor: Component<PopoverAnchorProps> = (props) => {
   const ctx = usePopoverContext();
   const anchor = createPopoverAnchor(ctx.state, omit(props, "render"));
@@ -25,8 +25,8 @@ export const Anchor: Component<PopoverAnchorProps> = (props) => {
     as: "div",
     render: props.render,
     props: anchor.props,
-    // Registering the element is what outranks the trigger; the hook's `unregister` on unmount is
-    // what hands positioning back to it.
+    // Registering the element is what outranks the trigger; unregistering on unmount is what hands
+    // positioning back to it.
     ref: anchor.setRef,
   });
 };

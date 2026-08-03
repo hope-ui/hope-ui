@@ -16,14 +16,13 @@ const _variants: ComboboxRecipeVariants = {
 };
 void _variants;
 
-// `ComboboxThemeableProps` is the curated surface a preset may default app-wide: the variants
-// **plus** the three chrome glyphs, each a factory. A strict superset by construction, so a bare
-// variants object is still assignable to it — but not the reverse, matching Select.
+// The curated surface a preset may default app-wide: the variants **plus** the three chrome glyphs.
+// A superset, so a bare variants object is assignable to it but not the reverse — matching Select.
 const _variantsAreThemeable = (v: ComboboxRecipeVariants): ComboboxThemeableProps => v;
 void _variantsAreThemeable;
 
 // All three glyphs are factories, never bare elements: a preset value is one object shared by every
-// instance, so a built node would move between them.
+// instance, so an already-built DOM node would *move* between them.
 const _glyphs: ComboboxThemeableProps = {
   size: "sm",
   chevronIcon: () => null,
@@ -61,26 +60,26 @@ describe("combobox recipe contract", () => {
 
   it("splits Select's single trigger into the control shell and the chevron button", () => {
     // On Select one `trigger` slot is both the bordered box and the focusable button. Here the
-    // focusable element is the `<input>` inside the box, so the shell (`control`, which takes the
-    // `focus-within:` ring) and the chevron's hit area (`trigger`, excluded from the tab order) are
-    // separate slots, and the input is a third.
+    // focusable element is the `<input>` inside the box, so the shell (`control`, taking the
+    // `focus-within:` ring) and the chevron's hit area (`trigger`, out of the tab order) are separate
+    // slots, with the input a third.
     expect(SLOTS).toContain("control");
     expect(SLOTS).toContain("input");
     expect(SLOTS).toContain("trigger");
   });
 
   it("gives the no-results message and the live status their own slots", () => {
-    // A `role="listbox"` may only contain options and groups, so both live in the card beside the
-    // list — the slots Select's contract predicted and left to this one. Each renders an element
-    // that does not otherwise exist, which is why neither is a `data-*` state on an existing slot.
+    // A `role="listbox"` may only contain options and groups, so both live in the card beside the list.
+    // Each renders an element that does not otherwise exist, which is why neither is a `data-*` state
+    // on an existing slot.
     expect(SLOTS).toContain("empty");
     expect(SLOTS).toContain("status");
   });
 
   it("has no slot for the root, the portal, or the placeholder — all deliberate omissions", () => {
-    // `Combobox.Root` and `Combobox.Portal` render no element at all, and the empty input is the
-    // native `placeholder:` pseudo-element rather than an element of its own (where Select needs a
-    // `value` slot carrying `data-placeholder`).
+    // `Combobox.Root` and `Combobox.Portal` render no element at all, and the empty input is the native
+    // `placeholder:` pseudo-element rather than an element of its own — where Select needs a real
+    // `value` slot carrying `data-placeholder`.
     expect(SLOTS).not.toContain("root" as ComboboxSlot);
     expect(SLOTS).not.toContain("portal" as ComboboxSlot);
     expect(SLOTS).not.toContain("placeholder" as ComboboxSlot);
