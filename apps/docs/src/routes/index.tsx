@@ -2,10 +2,10 @@ import { Button } from "@hope-ui/components/button";
 import type { JSX } from "@solidjs/web";
 import { createFileRoute, Link } from "@tanstack/solid-router";
 import { type Component, type ComponentProps, createSignal, For, onSettled, Show } from "solid-js";
+import { ComponentShowcase } from "~/components/ComponentShowcase";
 import {
   AccessibilityIcon,
   ArrowRightIcon,
-  BoxIcon,
   BrandLogoIcon,
   CheckIcon,
   CopyIcon,
@@ -390,107 +390,6 @@ function BentoFeatures() {
             </article>
           )}
         </For>
-      </div>
-    </section>
-  );
-}
-
-// A live gallery of the real Button component across variants, roles, and states.
-function ComponentShowcase() {
-  return (
-    <section class="relative overflow-x-clip border-y border-subtle bg-surface-sunken/60 py-20 sm:py-28">
-      <div
-        aria-hidden="true"
-        // `left-1/2` + `-translate-x-1/2` is the horizontal-centering idiom — direction-invariant,
-        // rtl-ok: no logical spelling exists for it.
-        class="hope-glow pointer-events-none absolute left-1/2 top-0 -z-10 size-144 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
-      />
-      <div class="mx-auto max-w-7xl px-6">
-        <div class="hope-reveal mx-auto max-w-2xl text-center">
-          <span class="inline-flex items-center gap-2 rounded-full border border-subtle bg-surface-raised px-3 py-1 text-xs font-medium text-foreground-muted">
-            <BoxIcon class="size-3.5 text-primary" />
-            Real components, right here
-          </span>
-          <h2 class="mt-5 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Polished, out of the box
-          </h2>
-          <p class="mt-4 text-lg leading-relaxed text-foreground-muted">
-            Every one of these is a live hope-ui component — hover it, tab to it, toggle the theme.
-            What you see is exactly what ships.
-          </p>
-        </div>
-
-        <div class="hope-reveal mt-12 overflow-hidden rounded-2xl border border-subtle bg-surface-raised shadow-sm">
-          {/* Variants row. */}
-          <div class="doc-preview flex flex-wrap items-center justify-center gap-3 border-b border-subtle p-8">
-            <Button variant="solid" colorScheme="primary">
-              Solid
-            </Button>
-            <Button variant="soft" colorScheme="primary">
-              Soft
-            </Button>
-            <Button variant="outline" colorScheme="primary">
-              Outline
-            </Button>
-            <Button variant="ghost" colorScheme="primary">
-              Ghost
-            </Button>
-            <Button variant="link" colorScheme="primary">
-              Link
-            </Button>
-          </div>
-
-          {/* Color schemes row. */}
-          <div class="doc-preview flex flex-wrap items-center justify-center gap-3 border-b border-subtle p-8">
-            <Button variant="solid" colorScheme="primary">
-              Primary
-            </Button>
-            <Button variant="solid" colorScheme="success">
-              Success
-            </Button>
-            <Button variant="solid" colorScheme="info">
-              Info
-            </Button>
-            <Button variant="solid" colorScheme="warning">
-              Warning
-            </Button>
-            <Button variant="solid" colorScheme="danger">
-              Danger
-            </Button>
-            <Button variant="soft" colorScheme="neutral">
-              Neutral
-            </Button>
-          </div>
-
-          {/* Sizes + states row. */}
-          <div class="doc-preview flex flex-wrap items-center justify-center gap-3 p-8">
-            <Button size="xs" variant="soft" colorScheme="primary">
-              Extra small
-            </Button>
-            <Button size="sm" variant="soft" colorScheme="primary">
-              Small
-            </Button>
-            <Button size="lg" variant="solid" colorScheme="primary">
-              Large
-            </Button>
-            <Button size="lg" variant="solid" colorScheme="primary" loading>
-              Loading
-            </Button>
-            <Button size="lg" variant="outline" colorScheme="neutral" disabled>
-              Disabled
-            </Button>
-          </div>
-        </div>
-
-        <div class="hope-reveal mt-8 flex justify-center">
-          <Link
-            to="/components"
-            class="group inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary-hovered"
-          >
-            Explore all components
-            <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
       </div>
     </section>
   );
