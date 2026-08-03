@@ -198,8 +198,9 @@ Also required:
   `assertLogicalPropertyConformance` (`@hope-ui/theming/conformance`) — the latter is what reaches a
   third-party preset and a `compoundVariant`-assembled class. See `__internal__/theming.md`.
 - Stories pin known-but-unfixed behavior where a human can see it. **Don't "fix" a story by deleting
-  it** — fix the component and rename the story. Current example: Dialog's `Modal with an
-  unpositioned Popup (content is unclickable — by design)`.
+  it** — fix the component and rename the story. **Nothing currently does**: Dialog's `Modal with an
+  unpositioned Content` was dropped in a stories rewrite, and what it pinned — an unpositioned modal
+  popup paints under the backdrop and stops taking clicks (`modal-backdrop.md`) — now has no story.
 - Hydration goes through a shared render entry
   `src/<component>/__tests__/<component>.ssr-entry.tsx` exporting the `Tree` both halves use — **no
   committed fixture file**. Sharing one `Tree` keeps the `ssr` and `browser` halves structurally
