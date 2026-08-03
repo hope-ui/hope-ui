@@ -102,6 +102,18 @@ look; this covers what you owe when you actually copy.
   `licenses/`, plus both added to its `package.json#files`.
 - Never relicense: the MIT grant in `LICENSE.md` covers hope-ui's own code only.
 
+## Replies lead with the answer, in plain language
+
+**The reader is an intermediate JS/TS/SolidJS dev who doesn't know this repo's internals, Base UI, or
+React Aria.**
+
+- **Answer first.** No preamble, no restating the question, no recap of what was just read.
+- **Show, don't narrate.** A short code block, diff, or schema beats a paragraph; past ~5 lines of
+  prose, what's missing is the example.
+- **Gloss each repo term on first use in a session** — `_hk`, presence, `inert`, slot recipe,
+  compound variant, part hook — in one clause, inline. A bare term the reader must go look up
+  breaks this.
+
 ## Code style
 
 Names carry the meaning; comments are the exception.
@@ -110,7 +122,11 @@ Names carry the meaning; comments are the exception.
   loop indices or math.
 - **Comments explain _why_, not _what_.** A comment restating the next line is noise — delete it.
   Keep them for rationale, non-obvious constraints, spec/issue links, and **the hazards this repo
-  tracks (SSR/hydration, Solid 2.0)**.
+  tracks (SSR/hydration, Solid 2.0)**. Self-explanatory code gets none; JSDoc on public API stays.
+- **A comment reads for the same reader as a reply** (above) — the hazard ones stay, they just have
+  to land with no repo knowledge: `// keyed on _hk, so an inserted sibling shifts the trigger's key`
+  → `// Solid matches server and client nodes by position (its "_hk" key), so inserting any sibling
+  before this one breaks hydration.` Applies to comments you write or touch, never a repo-wide sweep.
 - **A function needing a paragraph of comment is the problem.** Extract helpers, split
   responsibilities, rename. Refactor instead of annotating.
 
