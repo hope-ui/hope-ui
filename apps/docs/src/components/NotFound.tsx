@@ -19,7 +19,7 @@ export function NotFound({ children }: { children?: JSX.Element }) {
           to="/"
           class="bg-primary text-on-primary px-2 py-1 rounded uppercase font-black text-sm"
         >
-          Start Over
+          Start over
         </Link>
       </p>
     </div>

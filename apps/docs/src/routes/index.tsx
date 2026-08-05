@@ -211,7 +211,7 @@ function Hero() {
         <div class="text-center lg:text-start">
           <span class="hope-fade-up inline-flex items-center gap-2 rounded-full border border-primary-line bg-primary-soft/60 px-3 py-1 text-xs font-medium text-primary-emphasis backdrop-blur-sm">
             <SparklesIcon class="size-3.5" />
-            Now in {SITE.version.replace(/-/g, " ")}
+            Now in {SITE.version}
           </span>
 
           <h1 class="hope-fade-up mt-6 text-balance text-5xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl [animation-delay:80ms]">
@@ -307,7 +307,7 @@ const FEATURES: {
   {
     icon: ZapIcon,
     title: "Built for SolidJS 2.0",
-    desc: "Fine-grained reactivity with clean server rendering and hydration, characterized against the 2.0 beta so upgrades never surprise you.",
+    desc: "Fine-grained reactivity with clean server rendering and hydration. The Solid internals hope-ui relies on are pinned by characterization tests against the 2.0 beta.",
   },
   {
     icon: LayersIcon,
@@ -331,10 +331,11 @@ function BentoFeatures() {
     <section class="mx-auto max-w-7xl px-6 py-20 sm:py-28">
       <div class="hope-reveal mx-auto max-w-2xl text-center">
         <h2 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Everything you need, nothing you don't
+          One system, tokens to components
         </h2>
         <p class="mt-4 text-lg leading-relaxed text-foreground-muted">
-          A carefully composed system — from the design tokens up to the polished components.
+          Every component paints from the same semantic tokens, so restyling the app is one preset
+          swap.
         </p>
       </div>
 
@@ -548,7 +549,7 @@ function FinalCta() {
           </span>
         </h2>
         <p class="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-foreground-muted">
-          Install the components, drop in a preset, and ship an interface you're proud of —
+          Install the components, drop in a preset, and ship an interface you’re proud of —
           themeable and accessible from the very first line.
         </p>
         <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

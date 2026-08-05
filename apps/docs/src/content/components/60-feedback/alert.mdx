@@ -28,11 +28,11 @@ import { Alert } from "@hope-ui/components/alert";
 ```
 
 `Alert` is a **compound** component — a namespace object whose parts you compose. For the common case
-you don't touch them (see [Usage](#usage) below); the full part tree is in the [Anatomy](#anatomy).
+you don’t touch them (see [Usage](#usage) below); the full part tree is in the [Anatomy](#anatomy).
 
 ## Usage
 
-For the common case, you don't touch the parts at all. Pass `title`, `description`, and a
+For the common case, you don’t touch the parts at all. Pass `title`, `description`, and a
 `colorScheme` to `Alert.Root` and it **auto-composes** the anatomy for you — icon, content, title,
 and description — picking the matching status glyph automatically.
 
@@ -150,13 +150,13 @@ markup and the same accessibility wiring.
       part: "Alert.Title",
       element: "div",
       description:
-        "The heading. Self-registers its id as the alert's aria-labelledby.",
+        "The heading. Self-registers its id as the alert’s aria-labelledby.",
     },
     {
       part: "Alert.Description",
       element: "p",
       description:
-        "The body prose. Self-registers its id as the alert's aria-describedby.",
+        "The body prose. Self-registers its id as the alert’s aria-describedby.",
     },
     {
       part: "Alert.Actions",
@@ -184,11 +184,15 @@ The color and glyph are reinforcing second channels; the meaning lives in the te
 </Preview>
 
 ```tsx
-<Alert.Root variant="soft" colorScheme="info" title="Heads up" description="…" />
-<Alert.Root variant="soft" colorScheme="success" title="Payment received" description="…" />
-<Alert.Root variant="soft" colorScheme="warning" title="Storage almost full" description="…" />
-<Alert.Root variant="soft" colorScheme="danger" title="Deployment failed" description="…" />
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  title="Heads up"
+  description="A new workspace theme is available."
+/>
 ```
+
+Swap `colorScheme` for `success`, `warning`, or `danger` and the glyph follows.
 
 <Alert.Root
   variant="soft"
@@ -246,12 +250,16 @@ The `variant` prop sets the visual treatment. `default` is a role-neutral raised
 </Preview>
 
 ```tsx
-<Alert.Root variant="default" colorScheme="info" title="default" description="…" />
-<Alert.Root variant="solid" colorScheme="info" title="solid" description="…" />
-<Alert.Root variant="soft" colorScheme="info" title="soft" description="…" />
-<Alert.Root variant="subtle" colorScheme="info" title="subtle" description="…" />
-<Alert.Root variant="outline" colorScheme="info" title="outline" description="…" />
+<Alert.Root
+  variant="default"
+  colorScheme="info"
+  title="default"
+  description="A short description line."
+/>
 ```
+
+The other four variants are the same call with `variant` set to `solid`, `soft`, `subtle`,
+or `outline`.
 
 ## Sizes
 
@@ -282,14 +290,14 @@ glyph together.
 </Preview>
 
 ```tsx
-<Alert.Root size="sm" colorScheme="success" title="Small" description="…" />
-<Alert.Root size="md" colorScheme="success" title="Medium" description="…" />
-<Alert.Root size="lg" colorScheme="success" title="Large" description="…" />
+<Alert.Root size="sm" colorScheme="success" title="Small" />
+<Alert.Root size="md" colorScheme="success" title="Medium" />
+<Alert.Root size="lg" colorScheme="success" title="Large" />
 ```
 
 ## Icons
 
-The `icon` prop overrides the role's default glyph per instance. It accepts any JSX — an inline
+The `icon` prop overrides the role’s default glyph per instance. It accepts any JSX — an inline
 `<svg>` or an icon from your set. The glyph inherits `currentColor`, so a stroked SVG needs no color
 of its own.
 
@@ -322,7 +330,7 @@ Pass `icon={false}` to drop the glyph entirely — a text-only notice.
       colorScheme="neutral"
       icon={false}
       title="No icon"
-      description="Just the message, no leading glyph."
+      description="The message, with no leading glyph."
     />
   </div>
 </Preview>
@@ -333,7 +341,7 @@ Pass `icon={false}` to drop the glyph entirely — a text-only notice.
   colorScheme="neutral"
   icon={false}
   title="No icon"
-  description="…"
+  description="The message, with no leading glyph."
 />
 ```
 
@@ -371,13 +379,15 @@ the convenience props give way to the compound anatomy.
 
 ### On a soft or subtle alert
 
-The buttons above work because a `default` alert is neutral raised chrome — an untinted surface, so a
-`ghost` button's wash reads normally against it. A `soft` or `subtle` alert is **tinted**, and
-`ghost`'s hover wash is a fixed shade in the same tier as that tint: a `ghost success` button inside
-a `soft success` alert paints the alert's own background, so hovering it does nothing visible.
+The buttons above work because a `default` alert is neutral raised chrome. On an untinted surface a
+`ghost` button’s hover wash reads normally against it.
+
+A `soft` or `subtle` alert is **tinted**, and `ghost`’s hover wash is a fixed shade in the same tier
+as that tint. So a `ghost success` button inside a `soft success` alert washes to the alert’s own
+background, and hovering it produces no visible change.
 
 Use the Button [`adaptive`](/components/button#on-a-tinted-surface) variant for the secondary action
-instead. It inherits the alert's text color and mixes its hover/press wash from that, so it takes no
+instead. It inherits the alert’s text color and mixes its hover/press wash from that, so it takes no
 `colorScheme` — the surface supplies it.
 
 <Preview>
@@ -422,7 +432,9 @@ the lighter-weight choice for a secondary action.
   </Alert.Icon>
   <Alert.Content>
     <Alert.Title>A new version is available</Alert.Title>
-    <Alert.Description>Reload to get the latest features and fixes.</Alert.Description>
+    <Alert.Description>
+      Reload to get the latest features and fixes.
+    </Alert.Description>
     <Alert.Actions>
       <Button variant="inverted" colorScheme="info" size="sm">
         Reload
@@ -463,7 +475,12 @@ Left uncontrolled, an alert manages its own open state: it starts open (`default
 `closable` dismisses it on click.
 
 ```tsx title="Uncontrolled — dismisses itself"
-<Alert.Root closable colorScheme="success" title="Saved" description="…" />
+<Alert.Root
+  closable
+  colorScheme="success"
+  title="Saved"
+  description="Your changes are stored."
+/>
 ```
 
 <Alert.Root
@@ -482,7 +499,7 @@ Left uncontrolled, an alert manages its own open state: it starts open (`default
   }
 />
 
-## Live region & role
+## Live region and role
 
 An alert is a **live region**: assistive tech announces its content when it appears. The `role` prop
 picks the politeness.
@@ -506,14 +523,19 @@ picks the politeness.
     },
     {
       role: '"none"',
-      aria: "—",
+      aria: "None",
       when: "No role — a purely visual notice that is not announced. For decorative or redundant messaging.",
     },
   ]}
 />
 
 ```tsx
-<Alert.Root role="status" colorScheme="success" title="Saved" description="…" />
+<Alert.Root
+  role="status"
+  colorScheme="success"
+  title="Saved"
+  description="Your changes are stored."
+/>
 ```
 
 <Alert.Root
@@ -546,18 +568,18 @@ prop**; `render` is the single polymorphism API.
   variant="soft"
   colorScheme="info"
   title="Rendered as a section"
-  description="…"
+  description="Root is a section, keeping every Alert prop and its styling."
   render={(props) => <section {...props} />}
 />
 ```
 
 ## Theming
 
-Alert's look comes from the active preset's recipe. You can override it at three levels, applied in
+Alert’s look comes from the active preset’s recipe. You can override it at three levels, applied in
 order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance `slotClasses`
 → `class`**.
 
-### Parts
+### Part slots
 
 Every part carries a `data-slot` attribute you can target, and each is addressable by name through
 `slotClasses`.
@@ -634,7 +656,7 @@ name. Use literal class strings so your Tailwind build can see them.
 />
 ```
 
-### App-wide defaults & overrides
+### App-wide defaults and overrides
 
 Set defaults and global part classes for **every** Alert through the theme with `definePreset`, then
 pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at **instance ?? preset ??
@@ -758,7 +780,7 @@ below) in addition to the props below.
       type: "JSX.Element | false",
       default: "role default",
       description:
-        "Convenience: the leading glyph. false hides it; omit it to fall back to the preset {role}Icon default, then hope's built-in status glyph.",
+        "Convenience: the leading glyph. false hides it; omit it to fall back to the preset {role}Icon default, then hope’s built-in status glyph.",
     },
     {
       prop: "closable",
@@ -799,7 +821,7 @@ below) in addition to the props below.
       type: "(props) => JSX.Element",
       default: "",
       description:
-        "Render Alert.Root as another element or component. Receives Root's computed props. The only polymorphism mechanism — there is no as prop.",
+        "Render Alert.Root as another element or component. Receives Root’s computed props. The only polymorphism mechanism — there is no as prop.",
     },
     {
       prop: "class",
@@ -825,7 +847,7 @@ below) in addition to the props below.
   ]}
 />
 
-### Parts
+### Part props
 
 `Alert.Icon`, `Alert.Content`, `Alert.Title`, `Alert.Description`, and `Alert.Actions` each accept
 their native element attributes plus a `render` prop. `Alert.CloseTrigger` accepts every
@@ -843,7 +865,7 @@ accessible name and description automatically.
   _inserted_ into a region that already exists.
 - **Choose politeness deliberately.** `role="alert"` interrupts the user — reserve it for errors and
   time-sensitive messages. Use `role="status"` for confirmations and passive updates, and
-  `role="none"` for a purely visual notice that shouldn't be announced.
+  `role="none"` for a purely visual notice that shouldn’t be announced.
 - **Never rely on color alone.** Each `colorScheme` is a distinct token, but color is a second
   channel, not the message (WCAG 1.4.1). The status glyph is decorative (`aria-hidden`), so the
   meaning must live in the title and description text.

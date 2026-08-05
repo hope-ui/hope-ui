@@ -23,7 +23,7 @@ export function PopoverScrollContainerDemo() {
               <Popover.Arrow />
               <Popover.Title>Not clipped</Popover.Title>
               <Popover.Description>
-                The card lives at the end of <code>body</code>, so the scroll box can't cut it off.
+                The card lives at the end of <code>body</code>, so the scroll box can’t cut it off.
               </Popover.Description>
             </Popover.Content>
           </Popover.Positioner>

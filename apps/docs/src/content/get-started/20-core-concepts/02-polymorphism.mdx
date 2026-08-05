@@ -15,15 +15,17 @@ export const description =
 
 ## The `render` prop
 
-Every hope-ui component has a single polymorphism API: the **`render`** prop. It's a function that
-receives the component's fully-computed props and spreads them onto the element you return.
+Every hope-ui component has a single polymorphism API: the **`render`** prop. It’s a function that
+receives the component’s fully-computed props and spreads them onto the element you return.
 
 ```tsx
-<Badge render={(props) => <a href="/tags/new" {...props} />}>Linkable</Badge>
+<Badge render={(props) => <a href="/components/badge" {...props} />}>
+  Linkable
+</Badge>
 ```
 
 `render` is a **function, never an element** — and there is deliberately **no `as` prop**. An element
-form could only ever _drop_ the component's computed props, so it would silently render something
+form could only ever _drop_ the component’s computed props, so it would silently render something
 unstyled and inert. A function forces you to spread them, so the styling and behavior always reach
 your element.
 
@@ -33,7 +35,7 @@ your element.
   class="not-prose"
   description={
     <div>
-      There's no <code>as</code> prop on purpose: its polymorphic typing
+      There’s no <code>as</code> prop on purpose: its polymorphic typing
       degrades IDE IntelliSense on every component. <code>render</code> keeps
       completions and error messages honest without a
       <code> Polymorphic&lt;T&gt;</code> generic — at the cost of one explicit
@@ -46,7 +48,7 @@ your element.
 
 The most common use is turning a component into a link while keeping its look. Because **Badge** is a
 static label with no behavior of its own, an anchor is all you need — the anchor brings its own link
-semantics, and Badge just contributes its computed `class` and merges refs.
+semantics, and Badge contributes its computed `class` and merges refs.
 
 <Preview>
   <Badge
@@ -62,7 +64,7 @@ semantics, and Badge just contributes its computed `class` and merges refs.
 <Badge
   variant="soft"
   colorScheme="primary"
-  render={(props) => <a href="/tags/new" {...props} />}
+  render={(props) => <a href="/components/badge" {...props} />}
 >
   Linkable tag
 </Badge>
@@ -70,7 +72,7 @@ semantics, and Badge just contributes its computed `class` and merges refs.
 
 ## Preserve behavior with an interactive component
 
-An interactive component is different. A native `<button>` carries behavior an `<a>` doesn't —
+An interactive component is different. A native `<button>` carries behavior an `<a>` doesn’t —
 `role`, tab order, and Space/Enter activation. When you render **Button** as anything other than a
 button, set **`nativeButton={false}`** so Button re-supplies that behavior itself: `role="button"`,
 tab-order management, and synthesized keyboard activation.
@@ -104,7 +106,7 @@ tab-order management, and synthesized keyboard activation.
   description={
     <div>
       Forget to set <code>nativeButton</code> to <code>false</code> on a
-      non-button and you get an element that looks right but isn't
+      non-button and you get an element that looks right but isn’t
       keyboard-operable. Button logs a warning in development when it detects
       the mismatch; the check compiles out of production builds.
     </div>
@@ -113,9 +115,9 @@ tab-order management, and synthesized keyboard activation.
 
 ## Render as a component
 
-`render` also targets a **component**, not just host elements — for example your router's `Link`.
-hope-ui merges its own internal ref with the rendered element's into a single function ref, which a
-router `Link` honors, so you get hope-ui's styling and press behavior together with real
+`render` also targets a **component**, not only host elements — for example your router’s `Link`.
+hope-ui merges its own internal ref with the rendered element’s into a single function ref, which a
+router `Link` honors, so you get hope-ui’s styling and press behavior together with real
 client-side navigation.
 
 <Preview>
@@ -148,8 +150,8 @@ import { Button } from "@hope-ui/components/button";
 
 ## Ref merging
 
-You never wire up refs yourself. `render` collapses the component's internal ref and any `ref` you
-pass into **one function ref** (it delegates to `@solidjs/web`'s `applyRef`, which flattens arrays
+You never wire up refs yourself. `render` collapses the component’s internal ref and any `ref` you
+pass into **one function ref** (it delegates to `@solidjs/web`’s `applyRef`, which flattens arrays
 and skips falsy values). There is no `mergeRefs` helper to reach for — merging is automatic, and it
 works with any render target.
 
@@ -167,8 +169,8 @@ let anchor: HTMLAnchorElement | undefined;
 
 ## Typing
 
-Each component types its `render` against its **own** element's attributes — Button's `render`
-receives button attributes, Badge's receives span attributes. Rendering as a _different_ element
+Each component types its `render` against its **own** element’s attributes — Button’s `render`
+receives button attributes, Badge’s receives span attributes. Rendering as a _different_ element
 (button → anchor) type-checks once you assert the props at the spread:
 
 ```tsx
@@ -185,11 +187,10 @@ receives button attributes, Badge's receives span attributes. Rendering as a _di
 </Button>
 ```
 
-This is a deliberate trade-off: hope-ui avoids a `Polymorphic<T>` generic — and the IntelliSense
-cost that comes with it — so a cross-element `render` needs one explicit cast. The runtime behavior
-is unaffected.
+The cast is the price of avoiding a `Polymorphic<T>` generic, which would degrade completions on
+every component to spare you this one assertion. The runtime behavior is unaffected.
 
-## At a glance
+## Props
 
 <PropsTable
   rows={[
@@ -203,7 +204,7 @@ is unaffected.
       prop: "nativeButton",
       type: "boolean",
       description:
-        "On interactive components like Button: set false when rendering a non-button so the component supplies role, tabIndex, and keyboard activation. Static components like Badge don't need it.",
+        "On interactive components like Button: set false when rendering a non-button so the component supplies role, tabIndex, and keyboard activation. Static components like Badge don’t need it.",
     },
   ]}
 />

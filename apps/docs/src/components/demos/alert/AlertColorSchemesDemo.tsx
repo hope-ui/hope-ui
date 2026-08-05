@@ -12,7 +12,7 @@ const ROWS: { colorScheme: AlertColorScheme; title: string; description: string 
   {
     colorScheme: "warning",
     title: "Storage almost full",
-    description: "You've used 92% of your plan's quota.",
+    description: "You’ve used 92% of your plan’s quota.",
   },
   {
     colorScheme: "danger",

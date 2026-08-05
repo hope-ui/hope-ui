@@ -225,7 +225,7 @@ export function ThemePreview(props: { config: ThemeConfig }) {
                 colorScheme="danger"
                 variant="soft"
                 title="Something went wrong"
-                description="We couldn't complete the request."
+                description="We couldn’t complete the request."
               />
             </div>
           </Group>

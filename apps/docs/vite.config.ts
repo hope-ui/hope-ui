@@ -7,6 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
+import remarkSmartypants from "remark-smartypants";
 import { defineConfig } from "vite";
 import viteSolid from "vite-plugin-solid";
 // Reuse the canonical `@hope-ui/* -> packages/*/src` alias array (dev only). Sharing the
@@ -105,6 +106,13 @@ export default defineConfig(({ command }) => ({
         // affect markdown-derived HTML, never author-written JSX (<ButtonDemo/>).
         elementAttributeNameCase: "html",
         stylePropertyNameCase: "css",
+        // Typographic quotes and ellipses from the straight characters authors
+        // type. `dashes: false` is deliberate: this prose uses em dashes as
+        // punctuation on purpose, and dash conversion would also rewrite the
+        // `--hope-*` token names that appear in prose outside backticks.
+        // Runs in the remark phase, so it only ever sees markdown text nodes —
+        // never fenced code, inline code, or author-written JSX attributes.
+        remarkPlugins: [[remarkSmartypants, { dashes: false }]],
         // Build-time pipeline (pure SSG — highlighting is baked into the compiled
         // .mdx module, no client-side highlighter). rehype-pretty-code highlights
         // fenced code (order-independent); the slug -> extract -> export chain is

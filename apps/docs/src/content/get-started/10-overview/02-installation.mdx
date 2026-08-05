@@ -4,7 +4,7 @@ import { Button } from "@hope-ui/components/button";
 export const summary = "Add hope-ui to your app.";
 
 export const description =
-  "Add hope-ui to a SolidJS app and render your first themeable component in minutes.";
+  "Add hope-ui to a SolidJS app: three packages, two CSS imports, and one provider.";
 
 # Installation
 
@@ -25,7 +25,7 @@ hope-ui targets **SolidJS 2.0** and **Tailwind CSS v4**. Before you start, you n
   class="not-prose"
   description={
     <span>
-      hope-ui is in <strong>early preview</strong> and isn't on npm yet — it
+      hope-ui is in <strong>early preview</strong> and isn’t on npm yet — it
       publishes as <code>1.0</code> once SolidJS 2.0 stable lands. The commands
       below describe the intended install for that release.
     </span>
@@ -38,16 +38,18 @@ Add the three packages you consume directly:
 
 ```bash
 pnpm add @hope-ui/components @hope-ui/theming @hope-ui/presets
-# or: npm install @hope-ui/components @hope-ui/theming @hope-ui/presets
-# or: yarn add @hope-ui/components @hope-ui/theming @hope-ui/presets
 ```
 
-They rely on peers you likely already have in a Solid 2.0 app: `solid-js` and `@solidjs/web` (the
-runtime), and `tailwindcss` `^4`.
+```bash
+npm install @hope-ui/components @hope-ui/theming @hope-ui/presets
+```
+
+Their peer dependencies are the ones a Solid 2.0 app already has: `solid-js` and `@solidjs/web` (the
+runtime), plus `tailwindcss` `^4`.
 
 ## Add the preset styles
 
-In your Tailwind entry CSS, import Tailwind, then the `hope` preset's structure, then its theme:
+In your Tailwind entry CSS, import Tailwind, then the `hope` preset’s structure, then its theme:
 
 ```css title="app.css"
 @import "tailwindcss";
@@ -55,11 +57,13 @@ In your Tailwind entry CSS, import Tailwind, then the `hope` preset's structure,
 @import "@hope-ui/presets/hope/theme.css";
 ```
 
-The preset comes in two parts. `tailwind.css` is the **structure** — it maps the `--hope-*` design
+The preset comes in two parts. `tailwind.css` is the **structure**: it maps the `--hope-*` design
 tokens to clean utilities (`bg-primary`, `text-on-primary`, `border-subtle`, …). `theme.css` supplies
-the **token values** (hope's default look). They're separate imports on purpose: `theme.css` is
-opt-out, so you can swap hope's defaults for your own — the [Theme Creator](/theme-creator) generates
-a drop-in `theme.css` you import in its place. `hope` is a **zero-DOM preset**: it ships CSS, not markup.
+the **token values**, hope’s default look.
+
+They are separate imports on purpose. `theme.css` is opt-out, so you can swap hope’s defaults for
+your own — the [Theme Creator](/theme-creator) generates a drop-in `theme.css` you import in its
+place. Either way `hope` is a **zero-DOM preset**: it ships CSS, never markup.
 
 ## Wrap your app
 
@@ -106,12 +110,12 @@ elements with [Polymorphism](/get-started/polymorphism).
 
 ## Framework notes
 
-hope-ui ships **JSX-preserved source** under the `"solid"` export condition — your app's
+hope-ui ships **JSX-preserved source** under the `"solid"` export condition — your app’s
 `vite-plugin-solid` compiles it per environment (client and server). Every SolidJS app already has
 that plugin, so the condition resolves automatically; an app without it gets no match and fails
 loudly, by design.
 
-For a server-rendered setup, tell Vite to run hope-ui's source through the Solid compiler instead of
+For a server-rendered setup, tell Vite to run hope-ui’s source through the Solid compiler instead of
 importing the raw `.jsx` in Node:
 
 ```ts title="vite.config.ts"
@@ -131,7 +135,7 @@ export default defineConfig({
   class="not-prose"
   description={
     <div>
-      SolidStart hasn't migrated to SolidJS 2.0 yet, so a full SolidStart app is
+      SolidStart hasn’t migrated to SolidJS 2.0 yet, so a full SolidStart app is
       blocked on that upstream work — not on hope-ui. Until it lands, a plain{" "}
       <strong>Vite + Solid 2.0 SPA</strong> (or TanStack Start, which this
       documentation site itself is built on) is the supported path.

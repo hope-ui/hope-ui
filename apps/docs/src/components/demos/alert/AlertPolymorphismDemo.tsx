@@ -17,7 +17,7 @@ export function AlertPolymorphismDemo() {
         variant="soft"
         colorScheme="info"
         title="Rendered as a section"
-        description="Root is a <section> here, keeping all of Alert's props and styling."
+        description="Root is a <section> here, keeping all of Alert’s props and styling."
         render={(props) => <section {...(props as unknown as JSX.HTMLAttributes<HTMLElement>)} />}
       />
     </div>

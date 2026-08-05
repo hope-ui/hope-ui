@@ -1,9 +1,59 @@
-export const description = "First public preview.";
+export const summary = "First public preview.";
+
+export const description =
+  "The first public preview of hope-ui: ten components, the theming contract, the hope preset, and the i18n layer.";
 
 # 0.1.0
 
-First public preview.
+{description}
+
+This release is a documentation preview. The packages are not on npm yet — they publish as `1.0`
+once SolidJS 2.0 stable lands. See [About](/get-started/about) for what that means for you.
 
 ## Added
 
-[TODO]
+### Components
+
+`@hope-ui/components`, one subpath export per component:
+
+- **[Button](/components/button)**: eight variants, six color schemes, five sizes, decorator slots,
+  a loading state, and an icon-only shape.
+- **[CloseButton](/components/close-button)**: a surface-adaptive dismiss button that self-labels for
+  screen readers.
+- **[Badge](/components/badge)**: six variants, four shapes, and a status dot.
+- **[Alert](/components/alert)**: a live-region status message, composable or auto-composed from
+  `title`/`description`, with an animated dismissal.
+- **[Dialog](/components/dialog)**: a modal overlay with focus trap, scroll lock, and the
+  `alertdialog` pattern.
+- **[Popover](/components/popover)**: a non-modal anchored card that flips and shifts to stay in
+  view, nests, and opens from inside a Dialog.
+- **[Listbox](/components/listbox)**: single, multiple, or no selection, with roving or
+  active-descendant focus, type-ahead, grouping, and optional virtualization.
+- **[Select](/components/select)**: the ARIA 1.2 combobox pattern over a `role="listbox"` popup,
+  backed by a real `<select>` for autofill and form reset.
+- **[Combobox](/components/combobox)**: Select with an editable focus owner and a collator-backed
+  filter, plus async search and custom values.
+- **[Calendar](/components/calendar)**: single, range, or multiple date selection with
+  month/year/decade drill-down, bounds, unavailable dates, and non-Gregorian calendar systems.
+
+### Theming
+
+- **`@hope-ui/theming`**: `ThemeProvider`, `definePreset`, `useRecipe`, and the semantic-token
+  vocabulary components read from. See [Theming](/get-started/theming).
+- **`@hope-ui/presets/hope`**: the default visual identity, shipped as CSS in two opt-in parts
+  (`tailwind.css` for the utilities, `theme.css` for the token values).
+- **[Theme Creator](/theme-creator)**: pick a color family per role plus a radius, preview it across
+  real components, and copy a complete `theme.css`.
+
+### Internationalization
+
+- **`@hope-ui/i18n`**: `I18nProvider` and `useLocale`, with built-in catalogs for twelve locales and
+  reading direction derived from the locale. Components are localized with no setup. See
+  [Internationalization](/get-started/i18n).
+
+### Cross-cutting
+
+- **Polymorphism** through a single `render` prop on every part that renders an element. There is no
+  `as` prop. See [Polymorphism](/get-started/polymorphism).
+- **Server-side rendering**: every component renders on the server and hydrates without mismatch.
+- **Accessibility**: every component is checked against axe-core in a real browser in CI.

@@ -13,7 +13,7 @@ export const summary = "Icon button for dismissing a surface.";
 export const description =
   "An always-icon-only button for dismissing overlays, banners, and chips. It ships a built-in X, self-labels for screen readers, and adapts to whatever surface it sits on — no color or variant to choose.";
 
-# Close Button
+# CloseButton
 
 {description}
 
@@ -25,7 +25,7 @@ import { CloseButton } from "@hope-ui/components/close-button";
 
 ## Usage
 
-`CloseButton` needs nothing to render: it draws hope's built-in **X** glyph and gives itself a
+`CloseButton` needs nothing to render: it draws hope’s built-in **X** glyph and gives itself a
 localized accessible name (`"Close"`). Wire up `onClick` to dismiss whatever it belongs to.
 
 <Preview>
@@ -55,11 +55,11 @@ a compact, square corner affordance at every size.
 
 ## Adapts to the surface
 
-This is the whole point: CloseButton asserts **no color of its own**. Unlike [Button](/components/button),
+CloseButton asserts **no color of its own**. Unlike [Button](/components/button),
 it has no `variant` or `colorScheme`. The glyph inherits `currentColor`, and its hover/press wash and
 focus ring are derived from that — so a single component reads correctly on any surface (light,
 soft-tinted, solid-colored, dark) with zero configuration. Hover or focus each row to see the wash
-and ring pick up that surface's text color.
+and ring pick up that surface’s text color.
 
 <Preview>
   <CloseButtonSurfacesDemo />
@@ -111,7 +111,7 @@ ordinary handler — CloseButton is a real button underneath.
 ## Custom icon
 
 `icon` overrides the built-in X — per instance, or app-wide via a preset (see
-[App-wide defaults](#app-wide-defaults-amp-overrides)). The glyph inherits `currentColor`, so a
+[App-wide defaults](#app-wide-defaults-and-overrides)). The glyph inherits `currentColor`, so a
 stroked SVG needs no color of its own. When the icon changes the **meaning** of the affordance
 (here, "remove" rather than "close"), pass a matching `aria-label` — the default name is `"Close"`.
 
@@ -142,7 +142,7 @@ stroked SVG needs no color of its own. When the icon changes the **meaning** of 
 ## Polymorphism
 
 Render CloseButton as a different element or component with the `render` prop — a function that
-receives CloseButton's fully-computed props and spreads them onto your element. There is **no `as`
+receives CloseButton’s fully-computed props and spreads them onto your element. There is **no `as`
 prop**; `render` is the single polymorphism API.
 
 <Preview>
@@ -176,7 +176,7 @@ prop**; `render` is the single polymorphism API.
 
 ## Theming
 
-CloseButton's look comes from the active preset's recipe. You can override it at three levels,
+CloseButton’s look comes from the active preset’s recipe. You can override it at three levels,
 applied in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance
 `slotClasses` → `class`**.
 
@@ -223,7 +223,7 @@ name. Use literal class strings so your Tailwind build can see them.
 <CloseButton size="lg" class="rounded-full ring-1 ring-subtle" />
 ```
 
-### App-wide defaults & overrides
+### App-wide defaults and overrides
 
 Set defaults and global part classes for **every** CloseButton through the theme with
 `definePreset`, then pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at
@@ -297,7 +297,7 @@ Defaultable through `defaultProps`: `size` and the `icon` factory. Per-usage pro
     {
       prop: "icon",
       type: "JSX.Element | (() => JSX.Element)",
-      default: "hope's X",
+      default: "hope’s X",
       description:
         "The glyph. A bare element per instance, or a factory as an app-wide preset default. Inherits currentColor.",
     },
@@ -320,7 +320,7 @@ Defaultable through `defaultProps`: `size` and the `icon` factory. Per-usage pro
       type: "(props) => JSX.Element",
       default: "",
       description:
-        "Render CloseButton as another element or component. Receives CloseButton's computed props. The only polymorphism mechanism — there is no as prop.",
+        "Render CloseButton as another element or component. Receives CloseButton’s computed props. The only polymorphism mechanism — there is no as prop.",
     },
     {
       prop: "aria-label",
@@ -371,9 +371,9 @@ means something more specific than "close".
   ]}
 />
 
-- **Self-labeling** — the localized `"Close"` name means it is never an unlabeled icon button.
+- **Self-labeling**: the localized `"Close"` name means it is never an unlabeled icon button.
   Override `aria-label` when the glyph changes the meaning (e.g. a trash icon for "remove").
-- **Focus is keyboard-only** — a pointer press does not leave a lingering focus ring; the `:focus-visible`
+- **Focus is keyboard-only**: a pointer press leaves no lingering focus ring. The `:focus-visible`
   ring appears for keyboard focus, matching every other hope control.
 - **Disabled** uses the native `disabled` attribute on a `<button>` (no redundant `aria-disabled`),
   and `aria-disabled` on a non-native element rendered via `render` + `nativeButton={false}`.

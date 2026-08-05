@@ -461,9 +461,9 @@ function DeployAlertCard() {
               Visit preview
             </Button>
             {/*
-              `adaptive`, not `ghost`: the alert is a tinted surface, and ghost's wash is a fixed
-              shade in the same tier as `bg-success-soft` — it would paint the alert's own background
-              and show no hover at all. `adaptive` inherits the alert's text color and mixes its wash
+              `adaptive`, not `ghost`: the alert is a tinted surface, and ghost’s wash is a fixed
+              shade in the same tier as `bg-success-soft` — it would paint the alert’s own background
+              and show no hover at all. `adaptive` inherits the alert’s text color and mixes its wash
               from that, so it ignores `colorScheme` by design.
             */}
             <Button size="sm" variant="adaptive">

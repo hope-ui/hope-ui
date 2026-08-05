@@ -137,7 +137,7 @@ export function SiteHeader() {
             <SearchIcon class="size-4 shrink-0" />
             <span>Search…</span>
             <kbd class="ms-auto rounded border border-subtle bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-foreground-subtle">
-              ⌘K
+              ⌘&nbsp;K
             </kbd>
           </button>
           <RepositoryLink />

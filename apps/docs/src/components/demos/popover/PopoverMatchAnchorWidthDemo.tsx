@@ -36,11 +36,11 @@ export function PopoverMatchAnchorWidthDemo() {
       <WidePopover
         matchAnchorWidth
         label="matchAnchorWidth"
-        body="This card is exactly as wide as the button that opened it, past the md size's own max width."
+        body="This card is exactly as wide as the button that opened it, past the md size’s own max width."
       />
       <WidePopover
         label="The default"
-        body="This card shrink-wraps its content and stops at the md size's max width."
+        body="This card shrink-wraps its content and stops at the md size’s max width."
       />
     </div>
   );

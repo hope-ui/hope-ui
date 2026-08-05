@@ -39,9 +39,9 @@ import { Button } from "@hope-ui/components/button";
 
 The `variant` prop sets the visual style. `solid`, `soft`, `outline`, `ghost`, and `link` are the
 colored variants — they take their color from `colorScheme`. Two variants are color-independent and
-ignore it: `default` is neutral chrome, and `adaptive` takes its color from the surface it sits on —
-shown [below](#on-a-tinted-surface). `inverted` is a filled variant for solid surfaces — shown
-[below](#on-solid-surfaces).
+ignore it: `default` is neutral chrome, and `adaptive` takes its color from the surface it sits on
+(see [On a tinted surface](#on-a-tinted-surface)). `inverted` is a filled variant for solid surfaces
+(see [On solid surfaces](#on-solid-surfaces)).
 
 <Preview>
   <Button variant="default">Default</Button>
@@ -102,14 +102,15 @@ the honest, symmetric result. On the plain page background its light fill is nea
 ### On a tinted surface
 
 Every colored variant picks a **fixed shade** per role, which means it cannot know what it was
-dropped onto. `ghost` is the case that bites: its hover wash sits in the same tier as the role's
-`soft` fill, so a `ghost` button inside a `soft` Alert washes to that Alert's own background and
-hovering appears to do nothing at all.
+dropped onto. `ghost` is where that fails: its hover wash sits in the same tier as the role’s `soft`
+fill, so a `ghost` button inside a `soft` Alert washes to that Alert’s own background, and hovering
+produces no visible change.
 
 `adaptive` inverts the dependency. It sets no color of its own, so its label inherits `currentColor`
 from the surface, and its hover/press wash is mixed from that same inherited color — always a tint
-*of* the text, over whatever is behind it. That is the same mechanism [CloseButton](/components/close-button#adapts-to-the-surface)
-uses, and it is why `adaptive` ignores `colorScheme`.
+of the text, over whatever is behind it. That is the same mechanism
+[CloseButton](/components/close-button#adapts-to-the-surface) uses, and it is why `adaptive` ignores
+`colorScheme`.
 
 <Preview>
   <ButtonAdaptiveDemo />
@@ -123,7 +124,7 @@ uses, and it is why `adaptive` ignores `colorScheme`.
 </div>
 ```
 
-`adaptive` does not replace `ghost` — reach for it when you don't control the background. On a plain
+`adaptive` does not replace `ghost` — reach for it when you don’t control the background. On a plain
 page surface there is no role color to inherit, so an `adaptive` button reads neutral and `ghost` is
 the one carrying the role.
 
@@ -136,7 +137,7 @@ Pair a colored variant with a `colorScheme` — one of the six semantic roles. T
   <ButtonMatrixDemo />
 </Preview>
 
-```tsx title="The list below is non-exhaustive"
+```tsx title="A few of the combinations"
 <Button variant="solid" colorScheme="primary">Primary</Button>
 <Button variant="soft" colorScheme="success">Success</Button>
 <Button variant="outline" colorScheme="info">Info</Button>
@@ -193,11 +194,11 @@ radius, and any decorator icon to match.
 </Button>
 ```
 
-## Icons & decorators
+## Icons and decorators
 
 Put content before or after the label with `startDecorator` and `endDecorator`. Both accept any
 JSX — an inline `<svg>`, or an icon from your icon set. The recipe sizes decorator SVGs to the
-button's size for you.
+button’s size for you.
 
 <Preview>
   <ButtonIconsDemo />
@@ -216,13 +217,13 @@ button's size for you.
 ## Icon-only
 
 Set `iconOnly` and pass a single icon as the children to get a **square** button: the recipe locks
-the width to the size's height, drops the horizontal padding, and sizes the icon for you (the same
+the width to the size’s height, drops the horizontal padding, and sizes the icon for you (the same
 per-size scale the decorators use). Without `iconOnly`, an icon in the children is laid out like a
 text label — a wide rectangle.
 
-An icon-only button has no visible text, so it needs an accessible name: always pass an `aria-label`
-(or `aria-labelledby`). In development, an icon-only button with neither logs a warning; the check
-is client-only and compiles out of production builds.
+An icon-only button has no visible text, so it needs an `aria-label` (or `aria-labelledby`) — see
+[Accessibility](#accessibility). In development, an icon-only button with neither logs a warning;
+the check compiles out of production builds.
 
 <Preview>
   <ButtonIconOnlyDemo />
@@ -245,7 +246,7 @@ Combining it with `fullWidth` or `variant="link"` is unsupported — those fight
 
 `loading` shows a loader, sets `aria-busy`, and blocks activation — while keeping the button in
 the tab order (it does not use the native `disabled` attribute). By default the loader overlays
-and hides the label (`loaderPlacement="center"`), preserving the button's width. Pass
+and hides the label (`loaderPlacement="center"`), preserving the button’s width. Pass
 `loadingText` to swap the label for a message instead — this keeps the text visible with an inline
 loader. Use `loaderPlacement` (`start` / `end`) to place an inline loader yourself.
 
@@ -310,7 +311,7 @@ gets `aria-disabled` with blocked handlers.
 ## Polymorphism
 
 Render Button as a different element or component with the `render` prop — a function that
-receives Button's fully-computed props and spreads them onto your element. This is how you make a
+receives Button’s fully-computed props and spreads them onto your element. This is how you make a
 link that looks and behaves like a button. There is **no `as` prop**; `render` is the single
 polymorphism API.
 
@@ -336,9 +337,9 @@ polymorphism API.
 </Button>
 ```
 
-It also works with a **component** target — for example your router's `Link`. Button merges its
-internal ref with the rendered element's into a single function ref, which a router `Link` honours,
-so you get hope-ui's styling and press behavior with real client-side navigation.
+It also works with a **component** target — for example your router’s `Link`. Button merges its
+internal ref with the rendered element’s into a single function ref, which a router `Link` honors,
+so you get hope-ui’s styling and press behavior with real client-side navigation.
 
 <Preview>
   <Button
@@ -388,7 +389,7 @@ import { Button } from "@hope-ui/components/button";
 
 ## Theming
 
-Button's look comes from the active preset's recipe. You can override it at three levels, applied
+Button’s look comes from the active preset’s recipe. You can override it at three levels, applied
 in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance
 `slotClasses` → `class`**.
 
@@ -469,7 +470,7 @@ by name. Use literal class strings so your Tailwind build can see them.
 </Button>
 ```
 
-### App-wide defaults & overrides
+### App-wide defaults and overrides
 
 Set defaults and global part classes for **every** Button through the theme with `definePreset`,
 then pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at **instance ??
@@ -540,7 +541,7 @@ are intentionally **not** defaultable app-wide.
       type: "ButtonVariant",
       default: '"default"',
       description:
-        "Visual style: default, solid, inverted, soft, outline, ghost, adaptive, link. default (neutral chrome) and adaptive (inherits the surface's color) both ignore colorScheme; inverted is the swap of solid for solid surfaces.",
+        "Visual style: default, solid, inverted, soft, outline, ghost, adaptive, link. default (neutral chrome) and adaptive (inherits the surface’s color) both ignore colorScheme; inverted is the swap of solid for solid surfaces.",
     },
     {
       prop: "colorScheme",
@@ -559,7 +560,7 @@ are intentionally **not** defaultable app-wide.
       prop: "fullWidth",
       type: "boolean",
       default: "false",
-      description: "Stretches the button to fill its container's width.",
+      description: "Stretches the button to fill its container’s width.",
     },
     {
       prop: "loading",
@@ -580,7 +581,7 @@ are intentionally **not** defaultable app-wide.
       type: "JSX.Element | (() => JSX.Element)",
       default: "",
       description:
-        "Custom loader content. Defaults to hope's spinner. A factory is reuse-safe as an app-wide default.",
+        "Custom loader content. Defaults to hope’s built-in loader. A factory is reuse-safe as an app-wide default.",
     },
     {
       prop: "loaderPlacement",
@@ -593,13 +594,13 @@ are intentionally **not** defaultable app-wide.
       prop: "startDecorator",
       type: "JSX.Element",
       default: "",
-      description: "Leading content before the label — typically an icon.",
+      description: "Leading content before the label, normally an icon.",
     },
     {
       prop: "endDecorator",
       type: "JSX.Element",
       default: "",
-      description: "Trailing content after the label — typically an icon.",
+      description: "Trailing content after the label, normally an icon.",
     },
     {
       prop: "iconOnly",
@@ -627,7 +628,7 @@ are intentionally **not** defaultable app-wide.
       type: "(props) => JSX.Element",
       default: "",
       description:
-        "Render Button as another element or component. Receives Button's computed props. The only polymorphism mechanism — there is no as prop.",
+        "Render Button as another element or component. Receives Button’s computed props. The only polymorphism mechanism — there is no as prop.",
     },
     {
       prop: "class",

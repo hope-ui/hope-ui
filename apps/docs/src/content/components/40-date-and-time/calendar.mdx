@@ -31,15 +31,15 @@ import { Calendar } from "@hope-ui/components/calendar";
 ```
 
 `Calendar` is a **compound** component — a namespace object whose parts you compose yourself, with a
-zero-config convenience mode when you don't. See the [Anatomy](#anatomy) for every part, and
-[Convenience & compound](#convenience--compound) for the two ways to render it.
+zero-config convenience mode when you don’t. See the [Anatomy](#anatomy) for every part, and
+[Convenience and compound](#convenience-and-compound) for the two ways to render it.
 
 ## Usage
 
 `Calendar.Root` owns the state (the selection, the roving focus cursor, month/year/decade view,
 date math, ARIA, and — opt-in — a native form value) and renders the `role="group"` container. Inside
 it, `Calendar.Header` holds the navigation (`Calendar.PrevButton`, the `Calendar.Heading` caption, and
-`Calendar.NextButton`), and `Calendar.Grid` draws the weekday head and the month's day cells. Choose a
+`Calendar.NextButton`), and `Calendar.Grid` draws the weekday head and the month’s day cells. Choose a
 day with a click, `Enter`, or `Space`.
 
 <Preview>
@@ -49,7 +49,8 @@ day with a click, `Enter`, or `Space`.
 ```tsx
 const [value, setValue] = createSignal<CalendarValue>(null);
 
-// `defaultFocusedValue` seeds the visible month; a stable date keeps SSR deterministic (see below).
+// `defaultFocusedValue` seeds the visible month. A stable date keeps SSR
+// deterministic (see below).
 <Calendar.Root
   defaultFocusedValue={new CalendarDate(2020, 9, 7)}
   value={value()}
@@ -130,7 +131,7 @@ and every day cell internally, so you never assemble rows or cells yourself.
       part: "Calendar.PrevButton",
       element: "button",
       description:
-        "Steps to the previous period (month / year / decade, following the view). Renders the preset's chevron by default; disables at a min bound.",
+        "Steps to the previous period (month / year / decade, following the view). Renders the preset’s chevron by default; disables at a min bound.",
     },
     {
       part: "Calendar.Heading",
@@ -142,7 +143,7 @@ and every day cell internally, so you never assemble rows or cells yourself.
       part: "Calendar.NextButton",
       element: "button",
       description:
-        "Steps to the next period. Renders the preset's chevron by default; disables at a max bound.",
+        "Steps to the next period. Renders the preset’s chevron by default; disables at a max bound.",
     },
     {
       part: "Calendar.Grid",
@@ -153,12 +154,12 @@ and every day cell internally, so you never assemble rows or cells yourself.
   ]}
 />
 
-## Convenience & compound
+## Convenience and compound
 
 `Calendar.Root` renders two ways. Give it the parts above for **full compound control** — a custom
 heading, extra chrome, a differently-composed layout. Or give it **no children at all** and it
-auto-renders the built-in default chrome (the navigation header with the preset's chevrons, then the
-grid). Same recipe, same behavior; the bare form is just less to type.
+auto-renders the built-in default chrome (the navigation header with the preset’s chevrons, then the
+grid). Same recipe, same behavior; the bare form is less to type.
 
 <Preview>
   <CalendarConvenienceDemo />
@@ -176,10 +177,10 @@ the composed parts.
 
 `selectionMode` sets how many dates can be chosen:
 
-- **`single`** (default) — one date; choosing another replaces it. (shown in [Usage](#usage))
-- **`range`** — a start and an end; the days between paint as a band. `onValueChange` fires only when
+- **`single`** (default): one date; choosing another replaces it. (shown in [Usage](#usage))
+- **`range`**: a start and an end; the days between paint as a band. `onValueChange` fires only when
   the range **completes**, and the value is a `{ start, end }` object.
-- **`multiple`** — an independent set; each click or `Space` toggles a day. The value is a
+- **`multiple`**: an independent set; each click or `Space` toggles a day. The value is a
   `CalendarDate[]`.
 
 <Preview>
@@ -218,15 +219,15 @@ selection always paints with the `primary` / `selected` tokens.
 
 `min` and `max` bound the selectable and reachable range (inclusive). Days outside the window are
 disabled and never focusable, and the `Calendar.PrevButton` / `Calendar.NextButton` disable at the
-edges so navigation can't leave the window.
+edges so navigation can’t leave the window.
 
 <Preview>
   <CalendarBoundedDemo />
 </Preview>
 
 ```tsx
-<Calendar.Root 
-  min={new CalendarDate(2020, 9, 1)} 
+<Calendar.Root
+  min={new CalendarDate(2020, 9, 1)}
   max={new CalendarDate(2020, 9, 15)}
 />
 ```
@@ -235,7 +236,7 @@ edges so navigation can't leave the window.
 
 `isDateDisabled` marks individual dates **unavailable** — here every weekend. Unavailable days differ
 from out-of-range ones: they stay focusable and are announced to screen readers, but render struck
-through and can never be selected (React Aria's "unavailable" semantics).
+through and can never be selected (React Aria’s "unavailable" semantics).
 
 <Preview>
   <CalendarUnavailableDemo />
@@ -269,7 +270,7 @@ to opt out and let a range span them — the unavailable days still drop out of 
 ## Native form submission
 
 Set `name` and the calendar renders a hidden `<input>` (a sibling of the group) valued as the selected
-date's ISO `YYYY-MM-DD` string, so a plain `<form>` submit carries the value with no extra wiring. Add
+date’s ISO `YYYY-MM-DD` string, so a plain `<form>` submit carries the value with no extra wiring. Add
 `form` to associate the input with a form by id, and `required` for native validation.
 
 The shape follows the selection mode: **single** submits one field; **multiple** submits one field per
@@ -287,17 +288,17 @@ only once the range is complete.
 </form>
 ```
 
-## Localization & i18n
+## Localization and i18n
 
 Calendar localizes through [`@hope-ui/i18n`](/get-started/i18n): wrap a subtree in an `I18nProvider`
 and pass a `locale`, and the heading, weekday names, day numbers, keyboard direction, and screen-reader
-announcements all follow — no per-component flags. Everything below changes **only** the provider's
+announcements all follow — no per-component flags. Everything below changes **only** the provider’s
 `locale` (plus, for RTL, a `dir` on the layout).
 
-### Reading direction (LTR & RTL)
+### Reading direction (LTR and RTL)
 
 An RTL locale mirrors the whole calendar: the chrome flips (Prev on the right, Next on the left),
-arrow-key navigation reverses, and the day numbers render in the locale's numbering system — Arabic-Indic
+arrow-key navigation reverses, and the day numbers render in the locale’s numbering system — Arabic-Indic
 digits here, for free.
 
 <Preview>
@@ -334,18 +335,24 @@ explicitly with `firstDayOfWeek` — the weekday header and the day columns shif
 Pass a `CalendarDate` in another calendar system — build it with `toCalendar` from
 `@internationalized/date` — and pair it with a matching `-u-ca-` locale. The heading, weekday names,
 era, and day numbers then all render in that system: because the day numbers are formatted from the
-date's **own** calendar (not the locale's default), the grid and heading always agree.
+date’s **own** calendar (not the locale’s default), the grid and heading always agree.
 
 <Preview>
   <CalendarNonGregorianDemo />
 </Preview>
 
 ```tsx
-import { CalendarDate, IslamicUmalquraCalendar, toCalendar } from "@internationalized/date";
+import {
+  CalendarDate,
+  IslamicUmalquraCalendar,
+  toCalendar,
+} from "@internationalized/date";
 
-// Reproject a Gregorian date into the target system, then pair it with a matching `-u-ca-` locale so
-// the heading, era, weekday names, and day numbers all render in that system.
-const date = toCalendar(new CalendarDate(2020, 9, 7), new IslamicUmalquraCalendar());
+// Reproject a Gregorian date into the target system, then pair it with a
+// matching `-u-ca-` locale so the heading, era, weekday names, and day
+// numbers all render in that system.
+const gregorian = new CalendarDate(2020, 9, 7);
+const date = toCalendar(gregorian, new IslamicUmalquraCalendar());
 
 <I18nProvider locale="ar-SA-u-ca-islamic-umalqura">
   <Calendar.Root defaultFocusedValue={date} />
@@ -396,16 +403,16 @@ directions respect the reading direction (they reverse under RTL).
 
 ## Theming
 
-Calendar's look comes from the active preset's recipe. It is a **neutral date surface** — no color
+Calendar’s look comes from the active preset’s recipe. It is a **neutral date surface** — no color
 axis; the only accents are the selection (the `primary` tokens) and the range / hover band (the
 `selected` tokens), all token-driven. Override styling at three levels, applied in order (later wins a
 Tailwind conflict): **recipe base → preset `slotClasses` → instance `slotClasses` / part `class`**.
 
-### Parts
+### Part slots
 
 Every part carries a `data-slot` attribute you can target, and each is addressable by name through
 `slotClasses`. The day-cell state (today, outside-month, selected, range endpoints/middle, tentative
-highlight, disabled) is painted on `cellTrigger` through the preset's registered `data-*` variants, so
+highlight, disabled) is painted on `cellTrigger` through the preset’s registered `data-*` variants, so
 pointer and keyboard share one visual state.
 
 <DataTable
@@ -440,7 +447,7 @@ Tailwind build can see them.
 />
 ```
 
-### App-wide defaults & overrides
+### App-wide defaults and overrides
 
 Set the default `size`, the navigation glyphs (`prevIcon` / `nextIcon`), and global part classes for
 **every** Calendar through the theme with `definePreset`, then pass the derived preset to
@@ -551,7 +558,7 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       prop: "firstDayOfWeek",
       type: '"sun" | "mon" | … | "sat"',
       default: "locale-derived",
-      description: "Week-start override. Defaults to the locale's convention.",
+      description: "Week-start override. Defaults to the locale’s convention.",
     },
     {
       prop: "locale",
@@ -564,13 +571,13 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       type: '"ltr" | "rtl"',
       default: "useLocale()",
       description:
-        "Mirrors this calendar on its own, overriding the page's direction. Unset, it follows the page.",
+        "Mirrors this calendar on its own, overriding the page’s direction. Unset, it follows the page.",
     },
     {
       prop: "timeZone",
       type: "string",
       default: "system zone",
-      description: 'IANA time zone for "today" and formatting.',
+      description: "IANA time zone for “today” and formatting.",
     },
     {
       prop: "disabled",
@@ -594,13 +601,13 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       prop: "prevIcon",
       type: "() => JSX.Element",
       default: "chevron",
-      description: "Factory for the PrevButton's default glyph. Overridable app-wide via the preset.",
+      description: "Factory for the PrevButton’s default glyph. Overridable app-wide via the preset.",
     },
     {
       prop: "nextIcon",
       type: "() => JSX.Element",
       default: "chevron",
-      description: "Factory for the NextButton's default glyph. Overridable app-wide via the preset.",
+      description: "Factory for the NextButton’s default glyph. Overridable app-wide via the preset.",
     },
     {
       prop: "name",
@@ -624,7 +631,7 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       prop: "label",
       type: "string",
       default: "localized",
-      description: "The group's accessible name. Defaults to the localized calendar.label message.",
+      description: "The group’s accessible name. Defaults to the localized calendar.label message.",
     },
     {
       prop: "slotClasses",
@@ -636,7 +643,7 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       prop: "render",
       type: "(props) => JSX.Element",
       default: "",
-      description: "Render the group container as another element or component. Receives Root's computed props; honour the ref it passes.",
+      description: "Render the group container as another element or component. Receives Root’s computed props; honor the ref it passes.",
     },
     {
       prop: "class",
@@ -648,12 +655,12 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       prop: "children",
       type: "JSX.Element",
       default: "auto chrome",
-      description: "The compound parts. Omit for the built-in default chrome (see Convenience & compound).",
+      description: "The compound parts. Omit for the built-in default chrome (see Convenience and compound).",
     },
   ]}
 />
 
-### Parts
+### Part props
 
 `Calendar.PrevButton`, `Calendar.NextButton`, and `Calendar.Heading` each accept their native
 `<button>` attributes, a `render` prop, a `class`, and `children` (which overrides the built-in
@@ -661,7 +668,7 @@ glyph / period label). `Calendar.Header` and `Calendar.Grid` accept their native
 plus a `render` prop and a `class`. Every part that renders a host element takes `render` — the
 single polymorphism API, as elsewhere in hope-ui.
 
-`Calendar.Grid`'s children are `<thead>`/`<tbody>`/`<tr>`, so `render`-ing it as something that isn't
+`Calendar.Grid`’s children are `<thead>`/`<tbody>`/`<tr>`, so `render`-ing it as something that isn’t
 table-shaped produces invalid HTML. The computed props (`role="grid"`, the `aria-labelledby`, the
 keymap) come with you either way.
 
@@ -671,7 +678,7 @@ Calendar implements the WAI-ARIA [grid](https://www.w3.org/WAI/ARIA/apg/patterns
 pattern.
 
 - **Roles and state are wired for you.** The container is `role="group"` with an accessible name, the
-  grid is `role="grid"` labelled by the heading, each day is a `role="gridcell"` button, and selected /
+  grid is `role="grid"` labeled by the heading, each day is a `role="gridcell"` button, and selected /
   today / disabled / unavailable state is exposed through `aria-*` and `data-*`.
 - **One roving tab stop.** The grid is a single tab stop; arrows move focus between days, and pointer
   and keyboard share one focused day, so the cursor and the keyboard never paint two highlights.

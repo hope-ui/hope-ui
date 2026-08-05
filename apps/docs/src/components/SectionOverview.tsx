@@ -52,7 +52,7 @@ export function SectionOverview(props: {
           {/* Decorative hero gradient — the one deliberate exception to the semantic-token
               rule. This is a hand-tuned multi-stop gradient (primary tint fading into the
               neutral surface) whose exact per-mode stops are kept as literal palette
-              utilities + `dark:` variants; the semantic surface tokens can't reproduce the
+              utilities + `dark:` variants; the semantic surface tokens can’t reproduce the
               specific light/dark stop ramp. Everything else in the docs uses semantic tokens. */}
           <div class="overflow-hidden rounded-2xl border border-mauve-200 bg-linear-to-br from-primary/10 via-mauve-50 to-mauve-50 px-8 py-12 dark:border-mauve-800 dark:from-primary/20 dark:via-mauve-900 dark:to-mauve-950">
             <h1 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
