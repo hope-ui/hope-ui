@@ -19,7 +19,7 @@ coverage is not enough; hope-ui's differentiator is that it *guarantees* this en
 Two mechanical requirements for any adoption:
 
 - **Version:** the `next`-branch packages peer-depend on `solid-js ^2.0.0-beta.17`; the workspace
-  catalog is aligned to `2.0.0-beta.17` so they resolve to a single `solid-js` instance
+  catalog is aligned to `2.0.0-beta.19` so they resolve to a single `solid-js` instance
   (`pnpm why solid-js` must report one version). Adopted packages are published prereleases — pin
   the exact version.
 - **SSR test resolution:** add the package to the `ssr` project's `server.deps.inline` in

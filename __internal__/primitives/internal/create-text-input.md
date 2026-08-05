@@ -36,7 +36,8 @@ unchanged: controlled-ness is decided per read by `value() === undefined`, so `"
 good controlled value, and `onChange` fires on every *requested* change — typing, each composition
 update, `compositionend`, and a programmatic `setValue`.
 
-`setRef` follows [`createButton`](create-button.md): the primitive emits the props for the element,
+`setRef` follows `createButton` (`packages/primitives/src/internal/create-button.ts` — `internal/` is
+doc-exempt, so read the source): the primitive emits the props for the element,
 so it owns the element signal and hands back one ref to wire.
 
 ## The DOM value is owned here, not by a JSX binding

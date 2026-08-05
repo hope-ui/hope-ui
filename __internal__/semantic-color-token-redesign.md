@@ -7,9 +7,10 @@
 >
 > **The authoritative, current model is [`theming.md`](./theming.md)** — the token list, the utility
 > each token reads as, the cross-system mapping, and the resolved decisions table. Do not use the
-> counts that used to appear here: the shipped set is **110 color + 2 opacity**, not the 111 this
-> spec proposed (the `disabled` fill token was dropped during implementation — a disabled control
-> dims via the opacity axis instead).
+> counts that used to appear here: the shipped set is **143 color + 2 opacity**, not the 111 this
+> spec proposed. The `disabled` fill token was dropped during implementation (a disabled control dims
+> via the opacity axis instead), and the set has since grown past the proposal — the `inverted` fill
+> ladder, the `-subtle-line` border tier, and the `surface-adaptive-*` wash all landed after it.
 >
 > **Filename note:** the CSS files this spec named were later reorganized — hope's `tokens.css`
 > became `theme.css`, split out of `tailwind.css` as a separate opt-out import, and the
@@ -80,6 +81,6 @@ sketch is quoted in older notes:
 - **`.dark` drift.** `checkSemanticTokenConformance` only checks `:root`, so the `.dark` block must
   carry every token too — easy to miss, and nothing fails if it doesn't. Extending the check to
   assert the `.dark` block as well is still worth doing, given the doubled surface.
-- **Value authoring is the bulk of the effort**, not the mechanics: ~110 color tokens × 2 modes is
-  ~220 declarations. A bad shade pick shows up nowhere but the eye — `pnpm storybook`, Button's 6
+- **Value authoring is the bulk of the effort**, not the mechanics: 143 color tokens × 2 modes is
+  ~286 declarations. A bad shade pick shows up nowhere but the eye — `pnpm storybook`, Button's 6
   roles × 5 variants × rest/hover/press in light and `.dark`, is the check.

@@ -6,8 +6,9 @@ into `FormData`.
 
 The **second DOM-rendering member of `@hope-ui/primitives`**, after
 [`ModalBackdrop`](../modal-backdrop/modal-backdrop.md), and shared for the same reason: `Listbox`
-and a future `Select` need it identically, and the obvious hand-rolled version — an
-`<input type="hidden">` per value — silently drops `required`, `disabled`, autofill and form reset.
+and `Select` need it identically — `select-root.tsx` renders it beside its children — and the obvious
+hand-rolled version, an `<input type="hidden">` per value, silently drops `required`, `disabled`,
+autofill and form reset.
 That was `Listbox.Root`'s hidden-field block before this primitive existed, and it is exactly why
 `createListbox`'s `required` option was dead plumbing for its whole life.
 
@@ -32,10 +33,10 @@ const state = createListbox<Fruit>({ items, name: "fruit", required: true, /* �
 <HiddenSelect state={state} triggerRef={listElement} />;
 ```
 
-It reads eight things off `state` and takes no other configuration: `indexed.items()` +
-`itemToValue` (the `<option>`s), `formValues()` (what is selected), `selectionMode()` (`multiple`),
-`name()` / `form()` / `required()` / `disabled()` (the field), and `selection.setValue` (the
-write-back). Nothing about the field is a separate prop, so a component that renders it cannot
+It reads nine things off `state` and takes no other configuration: `indexed.items()` +
+`itemToValue` (the `<option>`s), `formValues()` (what is selected), `value()` (sampled once as the
+form-reset baseline), `selectionMode()` (`multiple`), `name()` / `form()` / `required()` /
+`disabled()` (the field), and `selection.setValue` (the write-back). Nothing about the field is a separate prop, so a component that renders it cannot
 configure it inconsistently with the widget it belongs to.
 
 ## Rendering rules, each with a browser behind it

@@ -77,7 +77,7 @@ Not `data-status`. That name says neither *whose* status nor *which* status, and
 obvious name unavailable for a component that genuinely has a domain status of its own.
 
 The attribute is **component-owned** — a consumer cannot override it, because its value is
-derived entirely from state they don't control. See `Dialog.md`'s prop-precedence table.
+derived entirely from state they don't control. See `../dialog/dialog-content.md`'s prop-precedence rule.
 
 ## Exit behavior — end events, cancels, and the backstop
 

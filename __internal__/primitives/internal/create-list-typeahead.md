@@ -33,8 +33,9 @@ function createListTypeahead<V = unknown>(options: {
   [`createKeyboardHandler`](../utils/keymap.md)'s `onText` channel. Compose it alongside
   navigation/selection handlers with `composeEventHandlers`.
 - `onMatch` — called with the matched index instead of the default `focus.focusIndex`. A plain
-  listbox never sets this, so its behavior is unchanged; it exists for a future Select/Combobox
-  kernel to intercept and **select** the match rather than highlight it while the popup is closed —
+  listbox never sets this, so its behavior is unchanged; `createCombobox` is the interceptor it was
+  built for, passing `onTypeaheadMatch` to **select** the match rather than highlight it while the
+  popup is closed —
   native `<select>` behavior, react-aria's `onTypeSelect → setSelectedKey`, Base UI's `onMatch`.
 - `collator` — when present, matching uses
   `collator.compare(textValue.slice(0, query.length), query) === 0` instead of

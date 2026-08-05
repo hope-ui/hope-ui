@@ -331,7 +331,16 @@ pnpm workspace, Turborepo pipeline.
     `@internationalized/date`; same shape as `dialog/`. Reads locale + `t` from `@hope-ui/i18n`.
   - `listbox/` — `createListbox` hook family (root/item/group/group-label/separator) over the
     collection + navigation kernel.
-  - `modal-backdrop/` — `ModalBackdrop`, the kernel's only DOM-rendering component.
+  - `combobox/` — `createCombobox` hook family (root/input/trigger/toggle/clear/list/content/
+    positioner/value/status): the shared half of Select and Combobox, named after the ARIA pattern.
+    **Input-agnostic by construction — it never owns a text value**, which is what lets Select
+    compose it without inheriting Combobox's filtering. `__internal__/primitives/combobox/`.
+  - `popover/` — `createPopover` hook family (root/trigger/anchor/positioner/content/arrow/title/
+    description/close-trigger): the non-modal floating layer, composing
+    `createFloating`/`createDismissable`/`createPresence` directly rather than through Dialog.
+  - `modal-backdrop/` — `ModalBackdrop`, the unconditional pointer blocker.
+  - `hidden-select/` — `HiddenSelect` + `createHiddenSelect`: the clipped native `<select>` that
+    buys Listbox and Select real form submission — autofill, a working `required`, and form reset.
   - `render/` — `renderElement`: the render-prop/`as`-polymorphism primitive every component part
     routes through, and the owner of ref merging. Modeled on Base UI's `useRender` idea, not its
     code. `__internal__/primitives/render/render.md`.
@@ -339,11 +348,12 @@ pnpm workspace, Turborepo pipeline.
     `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`.
   - `internal/` — the `createX` behavior primitives: `createComponentContext`,
     `createControllableState`, `createPresence`, `createAutoFocus`, `createFocusTrap`,
-    `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
-    `createFloating`, `createPress`, `createButton`, `createRegisteredId`,
-    `createRegisteredElement`, plus the collection/navigation family (`createCollection`,
-    `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListTypeahead`,
-    `createListSelection`, `createListExpansion`, `createGridNavigation`).
+    `createFocusScope`, `createFocusRestore`, `createHideOutside`, `createDismissable`,
+    `createScrollLock`, `createFloating`, `createPress`, `createButton`, `createTextInput`,
+    `createRegisteredId`, `createRegisteredElement`, plus the collection/navigation family
+    (`createCollection`, `createDataCollection`, `createVirtualCollection`, `createListFocus`,
+    `createListNavigation`, `createListTypeahead`, `createListSelection`, `createListExpansion`,
+    `createGridNavigation`).
     Docs under `__internal__/primitives/internal/`; read the ref/`createEffect` timing gotcha in
     `__internal__/solid-2.0-notes.md` before writing another one.
 

@@ -41,21 +41,21 @@ isn't built — it carries no ✅.
 
 **Kernel & styling already in place** (per-component status lives in the §1 tables below — this is
 infrastructure, deliberately *not* a growing component tracker):
-- Kernel primitives: `createCollection`, `createVirtualCollection`, `createListFocus`,
-  `createListNavigation`, `createListTypeahead`, `createListSelection`, `createListExpansion`,
-  `createGridNavigation`, `createComponentContext`, `createControllableState`, `createDismissable`,
-  `createAutoFocus`, `createFocusTrap`, `createFocusScope`, `createFocusRestore`,
-  `createHideOutside`, `createScrollLock`,
-  `createPresence`, `createFloating`, `createPress`, `createButton`, `createRegisteredId`,
-  `createRegisteredElement`; utils `renderElement`, `withDefaults`, `composeEventHandlers`,
-  `createKeyboardHandler`, `compareByIdOrReference`. Plus `ModalBackdrop`, the kernel's only
-  DOM-rendering component.
+- Kernel primitives: `createCollection`, `createDataCollection`, `createVirtualCollection`,
+  `createListFocus`, `createListNavigation`, `createListTypeahead`, `createListSelection`,
+  `createListExpansion`, `createGridNavigation`, `createComponentContext`, `createControllableState`,
+  `createDismissable`, `createAutoFocus`, `createFocusTrap`, `createFocusScope`, `createFocusRestore`,
+  `createHideOutside`, `createScrollLock`, `createPresence`, `createFloating`, `createPress`,
+  `createButton`, `createTextInput`, `createRegisteredId`, `createRegisteredElement`; utils
+  `renderElement`, `withDefaults`, `composeEventHandlers`, `createKeyboardHandler`,
+  `compareByIdOrReference`. Plus the kernel's two DOM-rendering components — `ModalBackdrop` and
+  `HiddenSelect` (the clipped native `<select>` that buys Select/Listbox autofill and form reset).
 - **Adopted, not in-repo:** `createAnnounce` (`@solid-primitives/a11y`) — the polite/assertive live-region
   announcer, in use by `createCalendar`. Call it directly rather than wrapping it; it is why #2 is retired.
 - Styling / theming: **Tailwind v4 + `tailwind-variants`** via `@hope-ui/theming` (`tv`/`cn`/`cx` +
   `useRecipe` + the semantic-token contract); the default visual identity is **`@hope-ui/presets/hope`**.
-  Dark mode via a `.dark` class. The recipe pattern is proven end-to-end — Button, Badge, Alert,
-  CloseButton, and Dialog all consume it.
+  Dark mode via a `.dark` class. The recipe pattern is proven end-to-end — all ten registry entries
+  (Alert, Badge, Button, Calendar, CloseButton, Combobox, Dialog, Listbox, Popover, Select) consume it.
 
 ---
 
@@ -148,7 +148,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
-| Calendar ⚠️ | Date & Time | 4/5 | `createDateState`* + `createGridNavigation` | behavior complete (month grid, min/max, ranges, i18n, React Aria one-band selection + keyboard auto-advance); **recipe styling pending** — the only unstyled component |
+| Calendar ✅ | Date & Time | 4/5 | `createCalendar` (#16) + `createGridNavigation` | styled API landed (compound parts + `calendar` recipe, all nine slots); behavior complete (month grid, min/max, ranges, i18n, React Aria one-band selection + keyboard auto-advance) — the RA gaps below are deferred on purpose |
 | DatePicker | Date & Time | 4/5 | Calendar + `createFloating`* + `createTextInput`* | |
 | TimePicker | Date & Time | 3/5 | `createTextInput`* + segments | |
 
@@ -192,7 +192,7 @@ stable reference and the ordering claim holds within the original survey.
 | 13 | `createFileUploadState` | file selection, drag-drop, accept/size validation | FileUpload | T3 |
 | 14 | ~~`createOverlayStack`~~ | **Retired in place — never build this.** Nesting is shipped as **three separate registries**: #18 (dismissal order), #19 (`aria-hidden`/`inert`), #20 (focus containment). Merging them would be a bug, not a simplification: a Dialog with `dismissOnEscape: false` still participates in hide-outside *and* focus-scope ordering but must never win Escape. react-aria keeps its three apart for the same reason and centralizes nothing — [`reference-implementations.md`](reference-implementations.md) §1. The number is kept so cross-references stay valid | — see #18/#19/#20 | — |
 | 15 | `createTreeCollection` | hierarchical collection: levels, expand-aware flat nav | TreeView *(builds on `createCollection` + nav + expansion)* | T3 |
-| 16 | `createDateState` | calendar model: month grid, min/max, ranges, disabled dates, i18n | Calendar, DatePicker *(pairs with `createGridNavigation`)* | T4 |
+| 16 | ~~`createDateState`~~ | **Retired in place — built, under another name.** The calendar model shipped as the `primitives/src/calendar/` hook family: `createCalendar` plus `calendar/utils/` (month/year/decade views, boundary clamping, single/range/multiple selection, navigation) over `@internationalized/date`. Splitting it into a root state hook + one hook per part is what lets each part own its own effects — the same shape `dialog/` uses — and one `createDateState` blob would have undone that. **DatePicker composes `createCalendar`; nothing is left to build here.** The number is kept so cross-references stay valid | Calendar ✅, DatePicker *(pairs with `createGridNavigation`)* | T4 |
 | 17 | `createAutoFocus` ✅ | Move focus into a container on activation **without** trapping it — including the `tabindex="-1"` fallback for a container with no focusable descendant, and its cleanup. Extracted from `createFocusTrap`, whose own doc comment had named the gap and named Popover as the caller, and which now composes it rather than welding the two together | Popover (a non-modal layer must not trap), and `createFocusTrap` itself | T1 |
 | 18 | `createDismissable` — **nested layer ordering** ✅ ✳︎ | An activation-order stack on `document`, so only the **topmost** open layer consumes Escape or an outside pointerdown, plus a layers-above clause that stops a press inside an upper layer counting as "outside" for the one below. Ported from react-aria `useOverlay`'s `visibleOverlays`, with Base UI `useDismiss`'s `bubbles` for the opt-back-in vocabulary (defaults deviate: neither channel bubbles). Two deliberate divergences from upstream — document-level Escape, and a single-phase pointer guard — are recorded in [`reference-implementations.md`](reference-implementations.md) §1. Now an attributed Apache-2.0 derivative | nested Popover-in-Dialog (pinned by `popover-in-dialog.browser.test.tsx` and Popover's `InsideADialog` story), Menu, Select, ContextMenu | T2 |
 | 19 | `createHideOutside` — **nested `aria-hidden`/`inert`** ✅ ✳︎ | `observerStack` (only the innermost layer observes, out-of-order closes included) + a dynamic `keepVisible`/`createKeepVisible` + `TOP_LAYER_ATTRIBUTE`, the declarative always-visible marker. The two cover opposite orderings: registration reaches a layer opening *after* the modal, the marker reaches a modal opening *after* the layer — which no registration can. `Popover.Positioner` calls `createKeepVisible`; the marker ships wired to nothing, as the third-party/toast escape hatch. Now an attributed Apache-2.0 derivative | same as #18 | T2 |
@@ -251,14 +251,21 @@ Not components and not primitives — repo-wide seams that get more expensive pe
 Every styled Root that forwards native attributes onto its element has to separate "an option the
 primitive consumes" from "an attribute the consumer wants on the DOM node". Today that separation is
 a literal key list passed to `omit(merged, …)`, hand-copied from the primitive's `CreateXOptions`
-interface — `Calendar.Root` (29 keys) and `Listbox.Root` (27) carry one each, and every future
-compound root that **renders an element** (Select, Combobox, Menu, Tabs, Accordion, …) will need its
-own. `Popover.Root` is the counter-example and the cheapest fix available: it renders no element at
-all, exactly as `Dialog.Root` doesn't, so it has nothing to subtract from and keeps no list. Stated
-in `popover-root.md` so the absence isn't read as an oversight and "fixed".
+interface — `Calendar.Root` (29 keys) and `Listbox.Root` (28) carry one each, and every future
+compound root that **renders an element** (Menu, Tabs, Accordion, …) will need its own.
+`Popover.Root` is the counter-example and the cheapest fix available: it renders no element at all,
+exactly as `Dialog.Root` doesn't, so it has nothing to subtract from and keeps no list. Stated in
+`popover-root.md` so the absence isn't read as an oversight and "fixed".
 
-*(Those two counts are as measured. They are also the section's own point in miniature — they were
-written as 28 and 26, and each drifted by one the next time an option was added.)*
+**Select and Combobox were on that "will need one" list and then didn't** — both roots render only
+their provider, their children and `HiddenSelect`, so neither carries a key list. That is the
+`Popover.Root` route taken twice more, and it is the reason this section has not gotten worse since
+it was written. It also narrows the problem: the cost lands on roots that render an element, which
+is now a smaller set than the catalog first suggested.
+
+*(Those counts are as measured. They are also the section's own point in miniature — they were
+written as 28 and 26, then as 29 and 27, and `Listbox.Root` has since drifted to 28. Every number
+here has been wrong at least once.)*
 
 **It drifts in both directions, silently.**
 - A key **missing** from the list leaks into the DOM as a junk attribute (`commitbehavior="reset"`).
@@ -491,12 +498,15 @@ Not prescriptive, but the natural sequence given what's now landed:
    than build (verdict in [`solid-primitives-eval.md`](solid-primitives-eval.md)), gated on the
    `Field` hydration round-trip. Same package as the already-adopted `createAnnounce`, so no new
    dependency.
-4. **`scrollIndexIntoView` on `createCollection`** — small, and Select cannot ship without it.
-   `createListFocus` calls it only when a row's `element()` is `null` (a virtualized row outside the
-   window), and `createCollection` never implements it at all — so a **mounted** list scrolls nothing.
-   Roving mode has been hiding this: a native `.focus()` scrolls on its own. Activedescendant mode —
-   which is what Select and Combobox use — moves no DOM focus, so an offscreen highlighted option
-   stays offscreen, with every test green.
+4. ~~**`scrollIndexIntoView` on `createCollection`**~~ — **done**, and it landed on
+   `createDataCollection` rather than `createCollection`: an `untrack`ed, `"nearest"`-aligned scroll
+   of the row's element inside the source's `scrollElement()`. `createListFocus` now calls it on
+   **every** move in activedescendant mode, not only for a row whose `element()` hasn't resolved —
+   which is what Select and Combobox needed, since neither moves DOM focus and a mounted-but-clipped
+   option would otherwise sit offscreen while `aria-activedescendant` names it, with every test
+   green. Roving still asks the source only for a row that isn't mounted yet: there the native
+   `.focus()` scrolls it in, and a second, coarser source scroll on top of that clips the row
+   (measured at 6px).
 5. ~~**The combobox kernel (#21)**, then **Select**, then **Combobox**~~ — **done.** All three
    shipped, and neither component grew a keymap of its own: `Select.Trigger` and `Combobox.Input` are
    the same ARIA pattern on a `<button>` and an `<input>`. `createTextInput` (#9) landed with the

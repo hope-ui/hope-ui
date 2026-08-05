@@ -98,7 +98,8 @@ Two fixes make it work, both commented in `vitest.config.ts`:
 Assert on the string a server would send. `dialog.ssr.test.tsx` is the model: `renderToStringAsync`
 resolves, portaled content is absent, no dangling `aria-controls` IDREF is emitted.
 
-Every `@hope-ui/components` source file **must** have a `Foo.ssr.test.tsx` containing a real
+Every `@hope-ui/components` component **folder** — not every source file; a compound split across
+`<name>-<part>.tsx` files is one component — **must** have a `Foo.ssr.test.tsx` containing a real
 `renderToStringAsync()` call — not in a comment, not in a string, not merely imported, not inside an
 `it.skip`. `check:coverage-parity` checks all four.
 

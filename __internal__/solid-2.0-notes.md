@@ -92,12 +92,14 @@ the installed package, not read from docs.
   consumer-supplied `aria-labelledby`, leaving the dialog with no accessible name. Write
   `props["aria-labelledby"] ?? context.titleId()`. Only props derived from state the
   consumer doesn't control (`aria-modal`, `data-presence`) stay component-owned. See
-  `dialog.md`'s "Prop precedence" table for the house rule.
+  `dialog-root.md` for the house rule, and `dialog-content.md`'s rejected alternatives for why
+  `merge` can't express it (it gives the *last* source precedence and treats a getter returning
+  `undefined` as a value).
 - **A signal write is not visible to a plain read until the next flush — in the *client*
   build only.** `setV(2); v()` returns the *old* value under `solid-js`'s client/dev build
   (deterministic microtask batching) and the *new* value under its server build. Tests that
   write a signal and read it back need `flush(() => setV(2))` (see
-  `scroll-lock.browser.test.tsx`, `defaults.test.ts`). This bites hardest when a snippet is
+  `create-scroll-lock.browser.test.tsx`, `defaults.test.ts`). This bites hardest when a snippet is
   prototyped with plain `node` (which resolves the server build) and then moved into a
   Vitest project (which resolves the client build) — the behavior silently inverts.
 - **`createSignal(fn)` creates a *memo*, not a signal holding a function.** 2.0 overloads it:
@@ -109,7 +111,7 @@ the installed package, not read from docs.
   generic `createSignal<T>` wrapper.
 - **Sibling effects run in creation order. On *re-run* their cleanups do too — but on
   *owner disposal* cleanups are LIFO.** Verified against the installed beta and pinned in
-  `solid-contract.test.tsx`. The re-run path is the one that matters (`active` flips false;
+  `solid-contract.test.ts`. The re-run path is the one that matters (`active` flips false;
   Solid walks the siblings in creation order, running each one's previous cleanup before its
   own new body). Two consequences, both live in `createFocusRestore` (see
   `create-focus-restore.md`): a primitive that must snapshot state before a sibling mutates it has

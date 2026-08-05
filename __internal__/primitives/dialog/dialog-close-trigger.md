@@ -10,9 +10,9 @@ function createDialogCloseTrigger(
 ): { props: JSX.ButtonHTMLAttributes<HTMLButtonElement> };
 ```
 
-Returns merged button `props`: an `onClick` that closes the dialog, composed **in front of** the
+Returns merged button `props`: an `onClick` that closes the dialog, composed **behind** the
 consumer's own `onClick` (via `composeEventHandlers`) so `event.preventDefault()` cancels the close —
-the mirror of `createDialogTrigger`. Every other prop passes through unchanged.
+exactly as `createDialogTrigger` composes its open. Every other prop passes through unchanged.
 
 ## Minimal by design — no label, no `type` default
 

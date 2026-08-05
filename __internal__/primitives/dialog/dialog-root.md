@@ -49,11 +49,16 @@ function createDialog(options?: {
   modal?: boolean;             // default true
   closeOnEscape?: boolean;            // Escape dismisses, default true
   closeOnInteractOutside?: boolean;   // outside pointerdown dismisses, default true
+  role?: DialogRole;                  // "dialog" (default) | "alertdialog"
+  bubbles?: DismissBubbles;           // opt a dismiss channel back into bubbling to the layer below;
+                                      // absent means neither channel does
 }): {
   open: Accessor<boolean>;
   setOpen: (open: boolean) => void;
   modal: Accessor<boolean>;
   isModal: Accessor<boolean>;                 // open() && modal()
+  role: Accessor<DialogRole>;
+  bubbles: Accessor<DismissBubbles | undefined>;  // forwarded to createDismissable by createDialogContent
   closeOnEscape: Accessor<boolean>;           // read by createDialogContent's createDismissable
   closeOnInteractOutside: Accessor<boolean>;  // read by createDialogContent's createDismissable
   popupId: Accessor<string>;                  // registered id, else SSR-stable generated fallback
@@ -79,9 +84,9 @@ function createDialog(options?: {
   live on the root (a consumer sets them once) but are consumed by `createDialogContent`, which
   forwards them to its `createDismissable` as `dismissOnEscape` / `dismissOnOutsidePointerDown`. The
   returned `closeOnEscape` / `closeOnInteractOutside` accessors exist for that forwarding. See
-  `../content/dialog-content.md`.
+  `dialog-content.md`.
 - `initialFocus` (element to focus on open) is **not** here — it's a prop of `createDialogContent`,
-  the part that owns the focus trap and the only consumer. See `../content/dialog-content.md`.
+  the part that owns the focus trap and the only consumer. See `dialog-content.md`.
 - ids — `popupId` falls back to a generated (SSR-stable) `createUniqueId`; a part publishes a
   consumer id via `setPopupId`/`setTitleId`/`setDescriptionId` (the id-registering part hooks wrap
   `createRegisteredId`, which never runs during SSR — hence the generated fallback).

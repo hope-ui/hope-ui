@@ -3,7 +3,7 @@
 A memoized `Intl.Collator` for the current locale (`useLocale()`), reactive to locale changes.
 Backs `createListTypeahead`'s accent/case-insensitive matching (`listbox-root.ts` passes
 `createCollator({ usage: "search", sensitivity: "base" })`), and is the seam Combobox's filter
-(later work) reuses for the same reason.
+reuses for the same reason — `combobox-root.tsx` builds one with those same options.
 
 ## API
 

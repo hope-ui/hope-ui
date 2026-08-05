@@ -2,8 +2,8 @@
 
 Where to look when building or debugging a kernel primitive. This captures the sources evaluated
 while porting the signal-based navigation kernel and `createFloating` — and the sources chosen for
-the overlay work still to build (`createHoverIntent`, nested-overlay ordering) — so future work
-doesn't re-derive the map. **Negative results are recorded too**: §1's nested-overlay entry exists
+the overlay work still to build (`createHoverIntent`; nested-overlay ordering has since shipped as
+the three registries in §1) — so future work doesn't re-derive the map. **Negative results are recorded too**: §1's nested-overlay entry exists
 mostly to stop the next reader re-surveying three references that turn out not to implement it at
 all.
 
@@ -317,20 +317,21 @@ than replacing it, exactly as floating-ui-react's own `useDismiss` uses both.
 
 ## 2. Per-component pointers
 
-For each planned component, the references to open, ranked. (These components are follow-up work; the
-kernel above is what they compose.)
+For each component, the references to open, ranked. The kernel above is what they compose. Rows
+marked ✅ have shipped — their source map is kept because it is what the next change to them should
+be read against, not because work is pending.
 
 | Component | References, ranked |
 |---|---|
-| **Listbox** | Angular Aria `listbox` (canonical) · react-aria `useListBox` · Base UI `listbox` |
-| **Popover** | Base UI `popover` (anatomy + API surface) · react-aria `usePopover`/`useOverlay` · over `createFloating` + `createDismissable` — **not** over Dialog's modal machinery |
+| **Listbox** ✅ | Angular Aria `listbox` (canonical) · react-aria `useListBox` · Base UI `listbox` |
+| **Popover** ✅ | Base UI `popover` (anatomy + API surface) · react-aria `usePopover`/`useOverlay` · over `createFloating` + `createDismissable` — **not** over Dialog's modal machinery |
+| **Select / Combobox** ✅ | Angular Aria `combobox` (pluggable-widget popup) · react-aria `useComboBox`/`useSelect` · Base UI. Both compose the shared `primitives/src/combobox/` kernel |
+| **Calendar Grid** ✅ | **Astryx `useGridFocus`** (month-flip) over `createGridNavigation` |
 | **Menu** | Angular Aria `menu` (+ `expansion`/`popup`) · Base UI `menu` · Astryx `useMenuHover` |
-| **Select / Combobox** | Angular Aria `combobox` (pluggable-widget popup) · react-aria `useComboBox`/`useSelect` · Base UI |
 | **Tabs** | Angular Aria `tabs` (roving + follow-focus selection) |
 | **Toolbar** | Angular Aria `toolbar` |
 | **Accordion** | Angular Aria `accordion` (+ `createListExpansion`) |
 | **Tree** | Angular Aria `tree` (navigation + expansion, `aria-level`/`aria-expanded`) |
-| **Calendar Grid** | **Astryx `useGridFocus`** (month-flip) over `createGridNavigation` |
 | **Data / composite Grid** | Angular Aria `private/grid` over `createGridNavigation` (span-aware) |
 
 ---

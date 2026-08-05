@@ -26,7 +26,7 @@ Peer dependencies: `solid-js` and `@solidjs/web` (`2.0.0-beta.x`). Bundled: `tai
 | Import | Contents |
 | ------ | -------- |
 | `@hope-ui/theming` | The contract kernel: `ThemeProvider`/`useRecipe`/`useDefaults`/`useSlots`/`useTheme`; `definePreset`/`isPreset` and the `Preset` type; the `RecipeRegistry` + `ThemeablePropsRegistry` types and `THEMING_CONTRACT_VERSION`; `SlotRecipeFn`/`SlotClassFn` and each component's recipe/themeable-props types; `SEMANTIC_COLOR_TOKENS` + `SemanticColorContract`; and the `tv`/`cn`/`cx` styling helpers. |
-| `@hope-ui/theming/conformance` | A generic runtime conformance kit — `checkSlotRecipeConformance`/`assertSlotRecipeConformance` (recipe axis) and `checkSemanticTokenConformance`/`assertSemanticTokenConformance` (token axis). Kept off the main subpath so it never enters a runtime consumer's bundle. |
+| `@hope-ui/theming/conformance` | A generic runtime conformance kit, four axes: `checkSlotRecipeConformance`/`assertSlotRecipeConformance` (recipe), `checkSemanticTokenConformance`/`assertSemanticTokenConformance` (token), `checkLogicalPropertyConformance`/`assertLogicalPropertyConformance` (RTL — the one that reaches a third-party preset and a `compoundVariant`-assembled class), and `checkOpacityTokenConformance`/`assertOpacityTokenConformance`. Kept off the main subpath so it never enters a runtime consumer's bundle. |
 
 ## How it works
 
@@ -50,18 +50,24 @@ Peer dependencies: `solid-js` and `@solidjs/web` (`2.0.0-beta.x`). Bundled: `tai
 
 ## Usage
 
-Reading a recipe inside a component (`button` is the recipe registered today):
+Reading a recipe inside a component (ten recipes are registered today — `alert`, `badge`, `button`,
+`calendar`, `closeButton`, `combobox`, `dialog`, `listbox`, `popover`, `select`):
 
 ```tsx
 import { useRecipe } from "@hope-ui/theming";
-import { renderElement } from "@hope-ui/primitives/utils";
+import { renderElement } from "@hope-ui/primitives/render";
+import { merge, omit } from "solid-js";
 
 function Button(props) {
   const recipe = useRecipe("button");
-  return renderElement("button", props, {
-    get class() {
-      return recipe(props).root({ class: props.class });
-    },
+  return renderElement({
+    as: "button",
+    render: props.render,
+    props: merge(omit(props, "render", "class"), {
+      get class() {
+        return recipe(props).root({ class: props.class });
+      },
+    }),
   });
 }
 ```
@@ -73,7 +79,7 @@ Declaring a **new** component's contract (in this package, then implemented by e
 export interface AccordionRecipeVariants { size?: "sm" | "md"; }
 export type AccordionSlot = "root" | "item" | "trigger";
 
-// registry/recipe-registry.ts
+// recipe-registry.ts
 interface RecipeRegistry {
   accordion: SlotRecipeFn<AccordionRecipeVariants, AccordionSlot>;
 }

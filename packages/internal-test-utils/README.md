@@ -5,8 +5,8 @@ published (`"private": true`), has no build step (consumers resolve its `src/` d
 only so every workspace package's tests share one `mount` + a11y + hydration harness. Not part of
 the public API.
 
-Consumed by the tests of `@hope-ui/primitives`, `@hope-ui/theming`, and `@hope-ui/components` as a
-`workspace:*` dev dependency.
+Consumed by the tests of `@hope-ui/primitives`, `@hope-ui/theming`, `@hope-ui/components` and
+`@hope-ui/i18n` as a `workspace:*` dev dependency.
 
 ## Exports
 
@@ -35,7 +35,7 @@ enforced by `pnpm check:coverage-parity`.
 ## Docs
 
 Per-helper docs: [`__internal__/internal-test-utils/`](../../__internal__/internal-test-utils/)
-(`mount`, `axe`). The testing stack, the three Vitest projects, and the hydration bridge are
+(`mount`, `axe`, `hydrate-fixture`). The testing stack, the three Vitest projects, and the hydration bridge are
 explained in [`__internal__/testing.md`](../../__internal__/testing.md); the enforced rules are in
 [`__internal__/definition-of-done.md`](../../__internal__/definition-of-done.md).
 

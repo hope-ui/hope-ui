@@ -34,9 +34,9 @@ A `Popover` opened inside a modal `Dialog` is portaled to `<body>`, so
 focus escaping the dialog, and the measured consequence was a three-step collapse:
 
 ```
-create-auto-focus.ts:76   initial.focus()                       → the popover's inner button
-create-focus-trap.ts:74   (focusable[0] ?? container).focus()   → the DIALOG's close trigger
-create-dismissable.ts:97  handleFocusIn → onDismiss             → the popover closes itself
+create-auto-focus.ts    initial.focus()                       → the popover's inner button
+create-focus-trap.ts    (focusable[0] ?? container).focus()   → the DIALOG's close trigger
+create-dismissable.ts   handleFocusIn → onDismiss             → the popover closes itself
 ```
 
 A popover open for about three milliseconds, with no error anywhere — the breakage

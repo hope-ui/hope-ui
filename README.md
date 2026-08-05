@@ -30,11 +30,12 @@ This is a pnpm + Turborepo workspace. Every package lives under [`packages/`](pa
 | [`@hope-ui/primitives`](packages/primitives/README.md) | The headless behavior kernel — **internal / advanced escape hatch**, not a stability-promised API. Everything else composes it. |
 | [`@hope-ui/theming`](packages/theming/README.md) | The theming contract and dependency-inversion seam: `ThemeProvider`/`useRecipe`, the `RecipeRegistry`, the semantic-token vocabulary, and the `tv`/`cn`/`cx` styling seam. |
 | [`@hope-ui/presets`](packages/presets/README.md) | The default visual identity, `@hope-ui/presets/hope` — design tokens (a Tailwind CSS entry) plus a runtime recipe map. |
+| [`@hope-ui/i18n`](__internal__/i18n/) | Dependency-free locale layer: locale + reading-direction context and the built-in message catalogs. Imports no other `@hope-ui/*`, so it sits at the bottom of the graph; end users import `I18nProvider` from it. |
 | [`@hope-ui/internal-test-utils`](packages/internal-test-utils/README.md) | Private shared test harness (`mount` + `expectNoA11yViolations` + `hydrateFixture`). Not published. |
 
-Runtime dependency direction: `@hope-ui/primitives` ← `@hope-ui/theming` ← `@hope-ui/components`.
-Presets depend *up* on `@hope-ui/theming` for the contract they implement. Components read recipes
-through theming; presets implement them; neither knows about the other.
+Runtime dependency direction: `@hope-ui/i18n` ← `@hope-ui/primitives` ← `@hope-ui/theming` ←
+`@hope-ui/components`. Presets depend *up* on `@hope-ui/theming` for the contract they implement.
+Components read recipes through theming; presets implement them; neither knows about the other.
 
 ## Getting started
 
@@ -115,11 +116,13 @@ packages/
   primitives/            @hope-ui/primitives  — headless behavior kernel
   theming/               @hope-ui/theming     — theming contract + conformance kit
   presets/               @hope-ui/presets     — presets (hope = default)
+  i18n/                  @hope-ui/i18n        — locale + reading-direction context, message catalogs
   internal-test-utils/   @hope-ui/internal-test-utils — private test harness
 apps/
   docs/                  @hope-ui/docs — the end-user documentation website
 __internal__/            internal contributor docs — architecture, theming, testing, roadmap
   primitives/<path>/     per-source-file API docs for the primitives kernel (mirrors src path)
+  i18n/<path>/           per-source-file API docs for @hope-ui/i18n, incl. one per locale catalog
   internal-test-utils/   per-helper docs for the private test harness
 scripts/                 check-coverage-parity.mjs and other repo tooling
 .storybook/              Storybook config (shares one Solid compiler config with the tests)
@@ -146,7 +149,7 @@ kernel was designed against their public APIs and reasoning, and in a few places
 directly:
 
 - **[Adobe React Spectrum](https://github.com/adobe/react-spectrum)** (React Aria / React Stately) —
-  the ARIA patterns, interaction edge cases, and the press model. Four files are derived from it.
+  the ARIA patterns, interaction edge cases, and the press model. Nine files are derived from it.
 - **[Base UI](https://github.com/mui/base-ui)** — the compound-component anatomy and the
   anchor-positioning option vocabulary (`side`/`align`/`sideOffset`).
 - **[Angular Components](https://github.com/angular/components)** (Angular CDK / Angular Aria) — the

@@ -31,9 +31,9 @@ Everything else is **derived** from it, so a key is declared exactly once:
 | `I18nCatalog` | nested mirror of the map | `{ common: { close: … }, calendar: { … } }` — the shape each locale catalog in `./locales/` is typed against. |
 | `interpolate(template, params?)` | — | Replace `{{name}}` placeholders, coercing each param to a string. |
 
-The catalogs `MESSAGES_EN` / `MESSAGES_FR` are exported from `locales/en.ts` and
-`locales/fr.ts` (see [`locales/en.md`](./locales/en.md), [`locales/fr.md`](./locales/fr.md)); each is typed as
-`I18nCatalog`, so it must carry every key or it fails to compile.
+One `MESSAGES_<CODE>` per locale file in `./locales/` — twelve today (`ar`, `da`, `de`, `el`, `en`,
+`es`, `fi`, `fr`, `it`, `pl`, `pt`, `sv`), each with its own doc under [`locales/`](./locales/). Each
+is typed as `I18nCatalog`, so it must carry every key or it fails to compile.
 
 ## Design
 
@@ -65,9 +65,10 @@ Resolution (overlay → catalog → key) lives in `translate.ts`; see `translate
 
 ## Tests
 
-`messages.test.ts` (unit) covers the shared `interpolate`. Each catalog is tested beside its file:
-`locales/en.test.ts` (frozen English values + the English plural rules) and `locales/fr.test.ts`
-(en/fr **key parity** + French values + the `count <= 1` plural rules).
+`messages.test.ts` (unit) covers the shared `interpolate`. Each of the twelve catalogs has a test
+beside its file — `locales/en.test.ts` pins the frozen English values and the English plural rules,
+and each other locale's covers its own values and plural rules. Cross-catalog **key parity** is
+asserted once, for every registered catalog at once, in `catalogs.test.ts`.
 
 ## Rejected alternatives
 

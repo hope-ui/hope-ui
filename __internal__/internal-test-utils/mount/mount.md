@@ -6,7 +6,12 @@ browser-mode (Vitest + Playwright) tests, so tests can query real DOM/focus/layo
 ## API
 
 ```ts
-function mount(ui: () => unknown): { container: HTMLElement; dispose: () => void };
+interface MountedComponent {
+  container: HTMLElement;
+  dispose: () => void;
+}
+
+function mount(ui: () => JSX.Element): MountedComponent;
 ```
 
 Call `dispose()` at the end of each test to unmount and remove the container — every

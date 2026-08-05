@@ -37,8 +37,9 @@ The set:
 
    **Exception:** files under `packages/primitives/src/internal/` — the advanced/unstable behavior
    kernel — require a test but **not** a `.md`, and `check:coverage-parity` no longer asks for one.
-   The composed families (`dialog`, `calendar`, `listbox`, `modal-backdrop`) and the `utils/` helpers
-   still carry one, since those are the surface an advanced consumer actually composes.
+   The composed families (`dialog`, `calendar`, `listbox`, `combobox`, `popover`, `hidden-select`,
+   `modal-backdrop`), `render/` and the `utils/` helpers still carry one, since those are the surface
+   an advanced consumer actually composes.
 
    Every such doc also carries a **`## Rejected alternatives`** section — the shapes that were
    genuinely on the table and what happened when they lost. See *Rejected alternatives* below.
@@ -84,10 +85,13 @@ Everything non-source still has a home: tests, `__fixtures__/` and `__screenshot
 ## The rules layered on top of the file set
 
 Stories are also where known-but-unfixed behavior gets pinned somewhere a human can see
-it. Don't "fix" a story by deleting it; fix the component and rename the story. Dialog's
-`Modal with an unpositioned Popup (content is unclickable — by design)` is the current
-example: it reproduces a real, documented consequence of the pointer-blocking
-`ModalBackdrop` rather than a defect, and exists so the failure mode is visible somewhere.
+it. Don't "fix" a story by deleting it; fix the component and rename the story.
+
+**Nothing currently does this, and that is a gap rather than a milestone.** Dialog's
+`Modal with an unpositioned Content` was the example, and it was dropped in a stories rewrite. What
+it pinned is still true — an unpositioned modal popup paints under the backdrop and stops taking
+clicks (`__internal__/primitives/modal-backdrop/modal-backdrop.md` § *The popup must be positioned*)
+— so the failure mode is now documented in prose and visible nowhere.
 
 Every browser test that calls `mount()` **must** also call `expectNoA11yViolations`
 (both from `@hope-ui/internal-test-utils`) at least once, so a baseline axe-core check

@@ -119,7 +119,8 @@ Returned surface: `items`, `activeIndex`, `activeItem`, `disabled`, `skipDisable
 - **`isFocused` is a paint gate, not a focus mover.** It records whether the widget holds focus so the
   highlight can be shown only while it does — react-aria's `manager.isFocused`, zag's `focused`. It
   never moves DOM focus. The *consumer* owns focus tracking and calls `setFocused(true/false)`
-  (`createListbox` does this from the container's focus-in/out; a Select drives it from its input).
+  (`createListbox` does this from the container's focus-in/out; a Select drives it from its trigger
+  `<button>`, a Combobox from its input).
   The highlight itself (`data-active`) is `isActive(item) && isFocused()`, computed one layer up — this
   primitive keeps `isActive` meaning "is the active item", so nothing that layers on focus is disturbed.
 - **`isFocusable`** is `!item.disabled() || !skipDisabled()` — with `skipDisabled` off (menus),

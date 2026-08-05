@@ -29,7 +29,7 @@ the cross-component coupling this project exists to avoid).
 ## Two ordering constraints
 
 Both verified empirically against the installed `solid-js@2.0.0-beta`, not assumed — and
-both pinned by `../solid-contract.test.tsx`, so SolidJS 2.0 stable changing either goes red
+both pinned by `../__tests__/solid-contract.test.ts`, so SolidJS 2.0 stable changing either goes red
 there first.
 
 **1. Call `createFocusRestore` before `createFocusTrap`.**
@@ -131,7 +131,7 @@ primitive's cleanup fires while `createFocusTrap`'s `focusin` listener is still 
 `.focus()` dispatches `focusin` synchronously and the still-live trap yanks focus straight back into
 its container. And `createHideOutside` still has `inert` on the trigger's ancestor, where `.focus()`
 silently does nothing at all. Both were measured against the installed `solid-js@2.0.0-beta` and are
-pinned in `../solid-contract.test.tsx`.
+pinned in `../__tests__/solid-contract.test.ts`.
 
 ### `@solid-primitives/focus`'s `createFocusTrap`
 

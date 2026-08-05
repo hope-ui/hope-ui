@@ -94,7 +94,8 @@ Components (`--trigger-width`) all publish theirs unconditionally for the same r
 extra middleware reading rects per measurement pass.
 
 **Unprefixed on purpose.** These name the *anchor*, not the popover: `--anchor-width` is kernel
-vocabulary a future Select or Menu positioner publishes identically. Contrast `--popover-arrow-size`,
+vocabulary every positioner publishes identically — `createComboboxPositioner`, which Select and
+Combobox both call, already does, and a future Menu will. Contrast `--popover-arrow-size`,
 which is component-local and therefore component-named. Neither is `--hope-*` — that namespace belongs
 to `@hope-ui/theming`'s *semantic tokens*, and `check:recipe-purity` rejects a recipe naming it in a
 bracketed value.

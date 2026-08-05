@@ -5,8 +5,8 @@ catalog defers to for a key it omits. Typed as `I18nCatalog` (nested `group.name
 carry every key in the contract or it fails to compile.
 
 - **Shape + key list:** `../messages.md` (the `I18nMessageMap` contract).
-- **Resolution / how it's selected:** `../../translate/translate.md` (chosen when the active locale is
-  not `fr…`, and as the final fallback).
+- **Resolution / how it's selected:** `../translate.md` (chosen when the active locale's primary
+  subtag matches no registered catalog, and as the final per-key fallback).
 - **String values are frozen** for the keys that feed the committed calendar SSR fixture (pinned to
   `en-US`) — see `en.test.ts`. Changing e.g. `calendar.previousLabel` means regenerating that fixture.
 

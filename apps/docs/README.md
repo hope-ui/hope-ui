@@ -57,7 +57,7 @@ sidebar, and (if it has `##`/`###` headings) in the "On this page" ToC. The page
 
 ### Group the sidebar by category
 
-Put pages in a `NN-<category>/` **subfolder**: `content/components/20-overlays/dialog.mdx` renders
+Put pages in a `NN-<category>/` **subfolder**: `content/components/70-overlays/dialog.mdx` renders
 under an **Overlays** header (label humanized from the folder — `data-display` → "Data display"),
 groups ordered by the `NN-` prefix. URLs stay flat (`/components/dialog`) — the folder is
 sidebar-only. Sections without subfolders (e.g. `get-started`) render a flat, header-less list.
@@ -77,14 +77,15 @@ pinned on top. (See `resolveGroup` in `src/lib/content.ts`.)
 - Heading ids (`rehype-slug`) and the `tableOfContents` export (`@stefanprobst/rehype-extract-toc`)
   are added by the MDX pipeline in `vite.config.ts` — the ToC is generated, not hand-written.
 - Import live demo components from `~/components/…` and render them inline (see
-  `content/components/10-forms/button.mdx`).
+  `content/components/10-buttons/button.mdx`).
 
 ### Add a whole section
 
 1. Create `src/content/<section>/`.
 2. Add three route files mirroring an existing section — copy `components.tsx`, `components.index.tsx`,
    and `components.$slug.tsx`, swapping the `kind` / section string and the overview title.
-3. Add a link in the top nav (`src/routes/__root.tsx`).
+3. Add an entry to `PRIMARY_NAV` in `src/lib/nav.ts` — the desktop top bar and the mobile drawer
+   both read that one list — plus its content-folder key in `DOC_SECTIONS` beside it.
 
 Shared UI lives in `src/components/`: `DocsSection` (grouped sidebar + `<Outlet/>`), `SectionOverview`
 (index page), `MdxDoc` (article + ToC), `TableOfContents`, `CodeBlock`, and `PathLink` (a thin retype

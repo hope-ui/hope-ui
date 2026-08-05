@@ -112,7 +112,7 @@ never shows. Same reasoning as Base UI's `useAnchorPositioning`.
 `createPopoverPositioner` publishes all four numbers as custom properties on every popover, so a
 `w-(--anchor-width)` in a recipe always resolves — see
 [`popover-positioner.md`](../popover/popover-positioner.md) for the full argument, which applies
-verbatim to a future Select or Menu.
+verbatim to the shipped Select/Combobox positioner and to a future Menu.
 
 ### Base UI vocabulary → floating-ui middleware
 

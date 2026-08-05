@@ -19,7 +19,10 @@ Render `<button {...props}>…</button>` (the icon/label is the component's).
   composed behind the consumer's `onClick`.
 - `disabled` (combined with the consumer's) + `data-disabled` reflect `isNextDisabled()` — the whole
   next period lying after `max`.
-- `aria-label` defaults to `messages.nextLabel` ("Next"), overridable via the consumer's `aria-label`.
+- `aria-label` defaults to `state.t("calendar.nextLabel")` ("Next"), overridable via the consumer's
+  `aria-label`. It resolves through the `@hope-ui/i18n` catalog, not a `messages` prop — the
+  `CalendarMessages` dictionary was dropped during implementation (see `calendar-root.md`'s rejected
+  alternatives).
 
 <!-- no-rejected-alternatives: a thin onClick + disabled mirror of `next()` / `isNextDisabled()`; every
 paging and boundary decision it reflects (including why the button disables while a contiguous range

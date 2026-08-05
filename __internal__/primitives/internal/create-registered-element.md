@@ -3,9 +3,11 @@
 Publishes a descendant's DOM element into an ancestor's context, so the ancestor can act on an
 element it doesn't own.
 
-`Dialog` uses it to collect three elements — the popup, the consumer's optional
-`Dialog.Backdrop`, and the `ModalBackdrop` — into the `targets` list that `createHideOutside`
-must spare. Any modal Popover or Select needs the same collection.
+`Dialog` uses it to collect two elements — the `ModalBackdrop` and the consumer's optional
+`Dialog.Backdrop` — into the `sparedElements` list that `createHideOutside` must spare. The popup
+itself is not in that list: it is set directly (`state.setContentElement`) and handed to
+`createHideOutside` as its `target`, which is the thing being spared *around*. Any modal Popover or
+Select needs the same collection.
 
 ## API
 
@@ -54,8 +56,8 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
   // pointer handlers while the dialog is modal.
   createRegisteredElement({
     ref: backdropEl,
-    register: context.addModalTarget,
-    unregister: context.removeModalTarget,
+    register: context.addSparedElement,
+    unregister: context.removeSparedElement,
   });
 
   return <Show when={presence.mounted()}>{/* … ref={setBackdropEl} … */}</Show>;
@@ -64,7 +66,7 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
 
 ## Rejected alternatives
 
-### A direct `context.addModalTarget(element)` from the render body
+### A direct `context.addSparedElement(element)` from the render body
 
 **Why not:** SolidJS 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` when a descendant writes a signal
 owned by an ancestor's reactive scope from its own synchronous render body — the same wall

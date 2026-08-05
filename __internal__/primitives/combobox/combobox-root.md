@@ -15,16 +15,24 @@ option. Select and Combobox both get it from here, which is the point — it is 
 two keyboard/ARIA implementations that drift.
 
 Per-part hooks take this return plus their own props:
-[`createComboboxTrigger`](combobox-trigger.md), [`createComboboxValue`](combobox-value.md),
-[`createComboboxPositioner`](combobox-positioner.md),
-[`createComboboxContent`](combobox-content.md), [`createComboboxList`](combobox-list.md). There is no
-`createComboboxItem`: an option is `createListboxItem(state.list, { ref, item })`, unchanged.
+[`createComboboxInput`](combobox-input.md) and [`createComboboxTrigger`](combobox-trigger.md) — the
+two focus owners, an `<input>` for Combobox and a `<button>` for Select —
+[`createComboboxToggle`](combobox-toggle.md), [`createComboboxClear`](combobox-clear.md),
+[`createComboboxValue`](combobox-value.md), [`createComboboxPositioner`](combobox-positioner.md),
+[`createComboboxContent`](combobox-content.md), [`createComboboxList`](combobox-list.md),
+[`createComboboxStatus`](combobox-status.md). There is no `createComboboxItem`: an option is
+`createListboxItem(state.list, { ref, item })`, unchanged.
 
 ## The absence of filtering is the design
 
-There is no `inputValue`, no filtered-vs-original collection, no `commit`/`revert`, no
-`allowsCustomValue`, and **no filtering of any kind**. Someone opening this folder expecting them will
-not find them.
+The **root state hook** has no `inputValue`, no filtered-vs-original collection, no
+`allowsCustomValue`, and **no filtering of any kind**. Someone opening this folder expecting the
+kernel to own a text value will not find one — that is the constraint that lets Select compose it.
+
+The one nuance: `createComboboxInput` does take `onCommit`/`onRevert` **callbacks**. That is not the
+kernel owning a value — it owns the *keymap* (which keys mean commit and revert) and delegates the
+policy to whoever holds the text. See [`combobox-input.md`](combobox-input.md) § *Commit and revert
+are policy*.
 
 That is deliberate, and it is the whole reason the kernel is small enough for Select to compose. Base
 UI built the same kernel one layer *up*, around an input value (`AriaCombobox.tsx`, 1782 lines) — and

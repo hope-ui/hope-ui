@@ -102,11 +102,12 @@ second renderer to justify the split.
      `createGridNavigation` — each injects one `createListFocus` (grid over a 2D cell collection),
      exactly as Angular injects one `ListFocus`.
 
-   Alongside these: `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`,
-   `createFloating` (wraps `@floating-ui/dom`), `createScrollLock`, `createPresence`,
-   `createControllableState`, `createRegisteredId`, `createRegisteredElement`, `composeEventHandlers`,
-   `withDefaults`, `renderElement`, `createKeyboardHandler` (the declarative, modifier-aware keymap
-   builder in `utils/`), and `ModalBackdrop` (the one component in the kernel: the pointer-blocking
+   Alongside these: `createFocusTrap`, `createFocusScope`, `createAutoFocus`, `createFocusRestore`,
+   `createHideOutside`, `createDismissable`, `createFloating` (wraps `@floating-ui/dom`),
+   `createScrollLock`, `createPresence`, `createControllableState`, `createPress`, `createButton`,
+   `createTextInput`, `createRegisteredId`, `createRegisteredElement`, `createTextDirectionWarning`,
+   `scrollIntoView`, `composeEventHandlers`, `withDefaults`, `renderElement`, `createKeyboardHandler`
+   (the declarative, modifier-aware keymap builder in `utils/`), and `ModalBackdrop` (the pointer-blocking
    third of modality, alongside `createHideOutside` for assistive technology + focus order, and
    `createFocusTrap` for Tab cycling). Side-effectful wiring uses 2.0's split
    `createEffect(depsFn, computeFn)` form and `onSettled`.
@@ -122,11 +123,13 @@ second renderer to justify the split.
      `createHideOutside` key their ref counts off `document.body`/the element under a `Symbol.for`,
      which resolves through the cross-realm global symbol registry.
    - The `internal/` behavior primitives need a test but no consumer-facing `.md` contract. The
-     composed families (`dialog`, `calendar`, `listbox`, `modal-backdrop`) and the `utils/` helpers
-     still carry one, since those are the surface an advanced consumer composes.
+     composed families (`dialog`, `calendar`, `listbox`, `combobox`, `popover`, `hidden-select`,
+     `modal-backdrop`), `render/` and the `utils/` helpers still carry one, since those are the
+     surface an advanced consumer composes.
 
    **Rule:** Popover composes `createFloating` + `createDismissable` + `createPresence` +
-   `createFocusRestore`. Dialog composes `createFocusTrap` + `createFocusRestore` +
+   `createFocusRestore` + `createAutoFocus` + `createFocusScope` + `createKeepVisible` — the last
+   three are what make it work as a layer *above* an open modal rather than a sibling of one. Dialog composes `createFocusTrap` + `createFocusRestore` +
    `createHideOutside` + `ModalBackdrop` + `createDismissable` + `createScrollLock` +
    `createPresence`. Popover composes the kernel directly rather than routing through Dialog's modal
    machinery. Focus *restore* is deliberately a separate primitive from the focus *trap*: Popover and
@@ -181,7 +184,7 @@ Concrete rules every primitive/component must follow:
   generated with `createUniqueId`** — deterministic and SSR-stable. Never `Math.random()`, a
   module-level counter, or anything that can differ server vs client.
 - **An ARIA IDREF must never point at an element that isn't in the DOM.** `Dialog.Trigger` emits
-  `aria-controls` **only while open**, because `Popup` is unmounted while closed. Verified against
+  `aria-controls` **only while open**, because `Content` is unmounted while closed. Verified against
   axe-core 4.12: a dangling `aria-controls` reports `aria-valid-attr-value` (as `incomplete`) whether
   `aria-expanded` is `"true"` or `"false"`, and reports nothing once removed. Base UI's
   `DialogTrigger` emits it unconditionally; that is not a reason to follow. Every future component
@@ -192,7 +195,7 @@ Concrete rules every primitive/component must follow:
 - **Portals do NOT degrade gracefully server-side in this `@solidjs/web` beta.** The server build
   (`dist/server.js`) implements `Portal` as `function Portal() { throw new Error("Portal is not
   supported on the server"); }` — calling it during SSR crashes the whole render rather than
-  no-opping. Every component that portals content (Dialog's Backdrop/Popup) gates its `<Portal>` with
+  no-opping. Every component that portals content (Dialog's Backdrop/Content) gates its `<Portal>` with
   `isServer` as a plain `if (isServer) return null;` at the top of a small wrapper component — **not**
   a reactive `<Show when={!isServer}>`, since `isServer` is a fixed per-environment constant and a
   plain `if` avoids relying on `Show`'s hydration-key bookkeeping for something that never changes
@@ -224,8 +227,9 @@ this project is designed to avoid.
 ## Publishing strategy
 
 - **Package granularity:** a small fixed set — `@hope-ui/primitives` (internal behavior kernel),
-  `@hope-ui/components` (every public component), and the theming pair `@hope-ui/theming` /
-  `@hope-ui/presets`. Every public component is a subpath export of one package
+  `@hope-ui/components` (every public component), the theming pair `@hope-ui/theming` /
+  `@hope-ui/presets`, and `@hope-ui/i18n` (the dependency-free locale layer at the bottom of the
+  graph, which end users import `I18nProvider` from directly). Every public component is a subpath export of one package
   (`@hope-ui/components/button`, `@hope-ui/components/dialog`, …), so there is no package name to look
   up before importing, while keeping per-component tree-shaking: each subpath is its own build entry
   (see each `package.json`'s `hope.entries`), so importing `@hope-ui/components/button` never pulls in

@@ -13,8 +13,8 @@ machinery. Exported as one subpath, `@hope-ui/primitives/popover`.
 The part hooks (`createPopoverTrigger`, `createPopoverAnchor`, `createPopoverPositioner`,
 `createPopoverContent`, `createPopoverArrow`, `createPopoverTitle`, `createPopoverDescription`,
 `createPopoverCloseTrigger`) each take this state plus their own props and own the rest — their
-effects, their id-and-element registration, their consumer-prop precedence. They land in Phases 5–6;
-this file documents the root only.
+effects, their id-and-element registration, their consumer-prop precedence. All eight have shipped,
+each with its own doc in this folder; this file documents the root only.
 
 **Non-modal, deliberately.** Nothing here traps focus, locks page scroll, hides the page from
 assistive technology or blocks the pointer. That is the whole point of the component: it is the
@@ -33,6 +33,8 @@ function createPopover(options?: {
   closeOnInteractOutside?: boolean;   // default true
   closeOnFocusOutside?: boolean;      // default true  ← Popover's default, not the kernel's
   role?: PopoverRole;                 // "dialog" (default) | "alertdialog"
+  bubbles?: DismissBubbles;           // opt a dismiss channel back into bubbling to the layer below;
+                                      // absent means neither channel does
 
   // Positioning — forwarded to createFloating as getters. No defaults applied here.
   side?: SideOrLogical;  align?: FloatingAlign;
@@ -47,6 +49,7 @@ function createPopover(options?: {
   closeOnEscape: Accessor<boolean>;
   closeOnInteractOutside: Accessor<boolean>;
   closeOnFocusOutside: Accessor<boolean>;
+  bubbles: Accessor<DismissBubbles | undefined>;  // forwarded to createDismissable by createPopoverContent
 
   popupId: Accessor<string>;                    // registered id, else SSR-stable generated fallback
   setPopupId: (id: string | undefined) => void;

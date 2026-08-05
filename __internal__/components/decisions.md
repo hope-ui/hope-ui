@@ -90,6 +90,30 @@ bare-element `loadingText` was constructed up to 3× and the extras discarded. R
 `button-slot-resolution.browser.test.tsx`, which counts real constructions — without it a
 reintroduced raw multi-read is silent.
 
+### Retuning `{role}-ghost-hovered`/`-pressed` instead of adding the `adaptive` variant
+**Why not:** In hope's theme those tokens are the role's `-soft` shade (success = green-100 light /
+green-950 dark), which is right for a ghost button on a neutral surface — and is *exactly* the
+background of a `soft` Alert, so a `ghost success` button inside one washes to the alert's own fill
+and hover appears to do nothing. Deepening the ghost ladder to survive that nesting would over-paint
+the far more common untinted case, and no fixed shade can be correct on a surface the token author
+has never seen. `adaptive` inverts the dependency: it asserts no color, so the surface supplies it.
+The two are siblings, not replacements — `ghost` carries a role color on a neutral surface,
+`adaptive` takes the surface's own on a tinted one.
+
+### A `colorScheme: "inherit"` member rather than a new variant
+**Why not:** It would make one axis mean two things — six members naming a role, one naming a
+mechanism — and every `Record<ButtonColorScheme, …>` in every preset would owe an entry that cannot
+have one. `adaptive` is a variant for the same reason `default` is: both are color-*independent*,
+and the variant axis is where a recipe already expresses that.
+
+### An `adaptive` variant that still honours `colorScheme`
+**Why not:** `colorScheme` defaults to `primary`, so a plain `<Button variant="adaptive">` would
+render violet text and lose the inherit-from-surface property that is the entire point. It would also
+be a strictly worse `ghost` rather than its complement. Focus is deliberately *not* special-cased
+either: `focus-halo` is violet in the light theme, so an `adaptive` button focused on a `bg-success`
+surface gets a violet ring — CloseButton's existing, settled behavior (see *A bespoke `close-focus`
+token* below), not a new question.
+
 ## CloseButton
 
 ### A `variant` / `colorScheme` axis
@@ -103,6 +127,8 @@ only axis.
 after a single component, and `close-overlay-*` collided with the existing `surface-overlay`. They
 became `surface-adaptive-hovered`/`-pressed` (values unchanged) — a token vocabulary is swap-safe
 only if a third-party preset can implement it without knowing which component spends each token.
+Button's `adaptive` variant is that rename paying off: a second component spends the pair with no
+import from, and no knowledge of, CloseButton.
 
 ### A bespoke `close-focus` token
 **Why not:** A close affordance has no reason to focus differently from every other control. Dropped
@@ -112,11 +138,11 @@ in favour of the shared `focus-halo` ring, the same one Button uses.
 
 ### A bespoke close button inside Dialog
 **Why not:** It would have been a second implementation of an icon-only, self-labelling, surface-
-adaptive button. `Dialog.Close` **is** a `CloseButton` (it extends `CloseButtonProps`), and
+adaptive button. `Dialog.CloseTrigger` **is** a `CloseButton` (it extends `CloseButtonProps`), and
 `createDialogCloseTrigger` was slimmed to own only the close `onClick` — `type` and the label come
 from `CloseButton` + `createButton`.
 
-The accepted cost is that `Dialog.Close` now requires a `ThemeProvider`, and the repo rule that a
+The accepted cost is that `Dialog.CloseTrigger` now requires a `ThemeProvider`, and the repo rule that a
 component may import a sibling component's subpath dates from this change. Its two constraints — no
 circular component imports, and never couple a component's behavior to a heavier sibling — are what
 keep that from becoming a licence to compose anything with anything.

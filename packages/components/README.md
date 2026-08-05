@@ -29,9 +29,16 @@ keeps it tree-shakable).
 
 | Import | Component |
 | ------ | --------- |
+| `@hope-ui/components/alert` | `Alert` compound + convenience form; `Alert.Close` |
+| `@hope-ui/components/badge` | `Badge` (+ `BadgeProps` and its variant vocabulary) |
 | `@hope-ui/components/button` | `Button` (+ `ButtonProps` and its variant vocabulary) |
-| `@hope-ui/components/dialog` | `Dialog` compound (`Dialog.Root`, `Dialog.Trigger`, `Dialog.Portal`, `Dialog.Backdrop`, `Dialog.Content`, `Dialog.Title`, `Dialog.Description`, `Dialog.CloseTrigger`) |
 | `@hope-ui/components/calendar` | `Calendar` compound |
+| `@hope-ui/components/close-button` | `CloseButton` — surface-adaptive, reused by `Dialog.CloseTrigger` and `Alert.Close` |
+| `@hope-ui/components/combobox` | `Combobox` compound — input focus owner, filtered list |
+| `@hope-ui/components/dialog` | `Dialog` compound (`Root`, `Trigger`, `Portal`, `Backdrop`, `Positioner`, `Content`, `Header`, `Body`, `Footer`, `Title`, `Description`, `CloseTrigger`) |
+| `@hope-ui/components/listbox` | `Listbox` compound — data and virtual modes |
+| `@hope-ui/components/popover` | `Popover` compound — non-modal floating layer |
+| `@hope-ui/components/select` | `Select` compound — button focus owner, native form submission |
 
 ## Usage
 
@@ -59,7 +66,7 @@ import { Button } from "@hope-ui/components/button";
 
 Compound components (Dialog) follow the parts model — every part except `Root` accepts a `render`
 prop for polymorphism, and open state is uncontrolled by default (`defaultOpen`) or controlled with
-`open`/`onOpenChange`:
+`open`/`onOpenChange`. The required nesting is `Portal > Backdrop + Positioner > Content`:
 
 ```tsx
 import { Dialog } from "@hope-ui/components/dialog";
@@ -68,17 +75,27 @@ import { Dialog } from "@hope-ui/components/dialog";
   <Dialog.Trigger>Open</Dialog.Trigger>
   <Dialog.Portal>
     <Dialog.Backdrop />
-    <Dialog.Content class="fixed inset-0 m-auto h-fit w-fit">
-      <Dialog.Title>Confirm</Dialog.Title>
-      <Dialog.Description>This can't be undone.</Dialog.Description>
-      <Dialog.CloseTrigger />
-    </Dialog.Content>
+    <Dialog.Positioner>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>Delete project</Dialog.Title>
+          <Dialog.Description>This can't be undone.</Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Body>
+          <p>Removed for every member of the workspace.</p>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Dialog.CloseTrigger>Cancel</Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Positioner>
   </Dialog.Portal>
 </Dialog.Root>;
 ```
 
-A modal `Dialog.Content` must be positioned (`fixed`/`absolute`/`relative`), or it paints beneath the
-pointer-blocking backdrop — see the Dialog page in the doc website (`apps/docs/`).
+`Dialog.Positioner` is the `fixed inset-0` frame that places the card, so you don't hand-position
+`Content` — an unpositioned modal card paints beneath the pointer-blocking backdrop and stops taking
+clicks. See the Dialog page in the doc website (`apps/docs/`).
 
 ## Polymorphism: `render`, not `as`
 

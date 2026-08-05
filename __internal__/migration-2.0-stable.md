@@ -12,7 +12,7 @@ This file is the living checklist for that pass. Anything discovered along the w
 
 ## 1. Release-blocking: peer ranges publish as an exact pin
 
-Both published packages declare:
+All four runtime packages — `components`, `primitives`, `theming` and `i18n` — declare:
 
 ```jsonc
 "peerDependencies": { "solid-js": "catalog:", "@solidjs/web": "catalog:" }
@@ -27,8 +27,11 @@ This is correct today (nothing is published, and the beta genuinely must be pinn
 becomes a landmine at exactly the moment nobody is looking at `pnpm-workspace.yaml`.
 
 - [ ] Add a named catalog for peer ranges, e.g. `catalogs.solidPeer` → `^2.0.0`, and point
-      both packages' `peerDependencies` at `catalog:solidPeer`. Keep the exact pin for
+      all four packages' `peerDependencies` at `catalog:solidPeer`. Keep the exact pin for
       `devDependencies`.
+- [ ] Do the same for `@hope-ui/primitives`' two **optional** peers, `@floating-ui/dom` and
+      `@tanstack/virtual-core` — both are `catalog:` today and hit the identical exact-pin-on-publish
+      landmine, with the extra sting that an optional peer's pin is easier to miss in review.
 - [ ] Add `publint` and `@arethetypeswrong/core` to the release job so the published
       manifest is checked mechanically rather than by eye.
 - [ ] Verify on a `pnpm pack` tarball, not on the source tree.
@@ -43,10 +46,10 @@ here. **They are now pinned by characterization tests**, so stable breaking any 
 up as a red test naming the code that depended on it, rather than as a mysterious component
 bug days into the migration:
 
-- `packages/primitives/src/solid-contract.test.ts` — unit project, `solid-js` client build.
-- `packages/primitives/src/solid-contract.ssr.test.tsx` — `ssr` project, where both packages
+- `packages/primitives/src/__tests__/solid-contract.test.ts` — unit project, `solid-js` client build.
+- `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` — `ssr` project, where both packages
   resolve to their **server** builds.
-- `packages/primitives/src/solid-contract.browser.test.tsx` — browser project, client build.
+- `packages/primitives/src/__tests__/solid-contract.browser.test.tsx` — browser project, client build.
 
 What they pin:
 

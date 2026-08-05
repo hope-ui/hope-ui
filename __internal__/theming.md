@@ -260,9 +260,10 @@ so a preset is a different set of values behind the same tokens. Raw scales come
 
 The runtime source of truth is `SEMANTIC_COLOR_TOKENS`
 ([`semantic-tokens.ts`](../packages/theming/src/semantic-tokens.ts)); its `SemanticColorContract` type
-is the canonical description. The **authoritative, current token list** — each token with the utility
-it reads as — is the semantic-tokens reference in the doc website; this section is the design
-rationale and cross-system provenance behind it, and the origin story is
+is the canonical description, and that file is the **authoritative, current token list** — the
+conformance kit checks presets against `SEMANTIC_COLOR_TOKENS` itself, so nothing else can be
+authoritative without drifting. This section is the design rationale and cross-system provenance
+behind it (the grouped summary below carries the utility each token reads as), and the origin story is
 [`semantic-color-token-redesign.md`](semantic-color-token-redesign.md).
 
 **Name by identity, not context (the 5 rules).** A token carries `role + variant + state` and nothing
@@ -299,12 +300,15 @@ maps down to each without losing MD3/Fluent nuance.
   `foreground-subtle`, plus `foreground-disabled`. Icons fold into these via `currentColor`; there is
   no separate `icon` family.
 - **Roles** (`primary` · `neutral` · `success` · `info` · `warning` · `danger`) each carry a fully
-  decomposed set: the solid fill `{role}` (also the full-strength border `border-{role}`) with a
-  `-hovered`/`-pressed` ladder; the tonal fill `{role}-soft` with its own ladder; per-variant wash
-  ladders `{role}-outline-hovered/-pressed` and `{role}-ghost-hovered/-pressed`; the outline-variant
-  border `{role}-line` (chromatic only — `neutral` uses `border-strong`); the role content color
-  `{role}-emphasis` (soft/outline/ghost/link label, inline role text → `text-{role}-emphasis`) with a
-  link ladder `{role}-link-hovered/-pressed`; and `on-{role}` (content on the solid fill).
+  decomposed set of **20**: the solid fill `{role}` (also the full-strength border `border-{role}`)
+  with a `-hovered`/`-pressed` ladder; the tonal fill `{role}-soft` with its own ladder; per-variant
+  wash ladders `{role}-outline-hovered/-pressed` and `{role}-ghost-hovered/-pressed`; the inverted
+  fill `{role}-inverted` with its own ladder (the `inverted` variant shipped on Button and Badge);
+  **two** border tiers — `{role}-line` (strong, the outline variant) and `{role}-subtle-line` (soft)
+  — both defined for all six roles, `neutral` included; the role content color `{role}-emphasis`
+  (soft/outline/ghost/link label, inline role text → `text-{role}-emphasis`) with a link ladder
+  `{role}-link-hovered/-pressed`; and `on-{role}` plus `on-{role}-inverted` (content on the solid and
+  inverted fills).
 - **On-state text** (`on-*`, `text-*`): `on-inverse` (on `surface-inverse`, e.g. a tooltip),
   `on-active` (on the transient collection highlight), `on-selected` (on the persistent selection).
 - **Neutral borders**: `subtle` · `strong` (`border-subtle`, `border-strong`) — emphasis levels only;
@@ -336,11 +340,12 @@ both — `data-disabled:opacity-disabled` and `aria-busy:opacity-loading`). hope
 `opacity-disabled` at 0.4 and `opacity-loading` at 1 (the loader arc conveys the loading state, so the
 content isn't dimmed); both are preset knobs a theme can retune.
 
-### Token reference (110 color + 2 opacity)
+### Token reference (143 color + 2 opacity)
 
-The full, authoritative list with every utility is the semantic-tokens reference in the doc website;
-this is the grouped summary. **Per role** (`primary` · `neutral` · `success` · `info` · `warning` ·
-`danger` — 15 each, `neutral` = 14 with no `-line`):
+The authoritative list is `packages/theming/src/semantic-tokens.ts` — `SEMANTIC_COLOR_TOKENS` is the
+vocabulary the conformance kit checks against. This is the grouped summary. **Per role**
+(`primary` · `neutral` · `success` · `info` · `warning` · `danger` — 20 each, uniformly; there is no
+role with a hole in the set):
 
 | token | reads as | purpose |
 |---|---|---|
@@ -348,11 +353,13 @@ this is the grouped summary. **Per role** (`primary` · `neutral` · `success` �
 | `{role}-soft` · `{role}-soft-hovered` · `{role}-soft-pressed` | `bg-*` | tonal fill ladder |
 | `{role}-outline-hovered` · `{role}-outline-pressed` | `bg-*` | outline-variant wash (rest transparent) |
 | `{role}-ghost-hovered` · `{role}-ghost-pressed` | `bg-*` | ghost-variant wash (rest transparent) |
-| `{role}-line` | `border-{role}-line` | outline-variant border (rest) — chromatic only |
+| `{role}-inverted` · `{role}-inverted-hovered` · `{role}-inverted-pressed` | `bg-*` | inverted-variant fill ladder |
+| `{role}-line` | `border-{role}-line` | outline-variant border (rest) — strong tier |
+| `{role}-subtle-line` | `border-{role}-subtle-line` | soft tier border |
 | `{role}-emphasis` · `{role}-link-hovered` · `{role}-link-pressed` | `text-*` | role content color + link ladder |
-| `on-{role}` | `text-on-{role}` | content on the solid fill |
+| `on-{role}` · `on-{role}-inverted` | `text-on-{role}` · `text-on-{role}-inverted` | content on the solid fill / on the inverted fill |
 
-**Non-role (21):**
+**Non-role (23):**
 
 | token | reads as | purpose |
 |---|---|---|
@@ -362,6 +369,7 @@ this is the grouped summary. **Per role** (`primary` · `neutral` · `success` �
 | `subtle` · `strong` | `border-*` | default → strong border tint |
 | `active` · `selected` | `bg-*` | transient highlight · persistent selection |
 | `focus` · `focus-halo` · `scrim` | `ring-*`/`border-*` · `ring-*` · `bg-*` | focus indicator · translucent halo · modal dimming |
+| `surface-adaptive-hovered` · `surface-adaptive-pressed` | `bg-*` | hover/press tint for a control with no rest background of its own (CloseButton, Button's `adaptive` variant); a preset derives these from `currentColor`, so the control takes its color from whatever surface it sits on instead of picking a role |
 
 **Opacity axis (separate contract):** `opacity-disabled` (0.4) · `opacity-loading` (1) →
 `opacity-disabled`, `opacity-loading` (via `_base/_opacity.css`).

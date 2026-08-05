@@ -1,8 +1,10 @@
 # `MESSAGES_FR` — French catalog
 
 The built-in **French** message catalog, available with zero configuration. Selected by the resolver
-when the active locale starts with `fr` (e.g. `fr`, `fr-FR`, `fr-CA`); any key it somehow omitted would
-fall back to `MESSAGES_EN`.
+when the active locale's primary subtag is `fr` (`fr`, `fr-FR`, `fr-CA`, …); any key it somehow
+omitted would fall back to `MESSAGES_EN`. Matching is on the **primary subtag, not a prefix** — see
+the rejected alternative in `../catalogs.md`, where `frr` (North Frisian) is the case that rules
+prefix matching out.
 
 - **Shape + key list:** `../messages.md` (the `I18nMessageMap` contract).
 - **Parity:** must mirror every key in `en.ts` — enforced by the `I18nCatalog` type at compile time and
