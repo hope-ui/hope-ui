@@ -199,12 +199,12 @@
   /*
    * Surface-adaptive interaction wash (part of the surface family). Unlike every token above, these
    * mix against `currentColor` — the inherited text color — not a fixed shade, so a control with no
-   * rest background of its own (an icon-only button such as CloseButton) tints correctly on any
+   * rest background of its own (CloseButton, or Button's `adaptive` variant) tints correctly on any
    * surface (solid / soft / light / dark) without a colorScheme. `currentColor` resolves at the use
    * site, so there is deliberately **no `.dark` counterpart** — it already flips per surface. The
    * `color-mix` lives here (the preset owns raw color math); recipes reference only the finished
    * `bg-surface-adaptive-*` utilities. Focus is not special-cased — a surface-adaptive control uses
-   * the shared `focus-halo` ring, same as Button.
+   * the shared `focus-halo` ring, same as every other Button variant.
    */
   --hope-surface-adaptive-hovered: color-mix(in oklab, currentColor 10%, transparent);
   --hope-surface-adaptive-pressed: color-mix(in oklab, currentColor 15%, transparent);

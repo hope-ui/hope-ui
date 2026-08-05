@@ -75,6 +75,27 @@ describe("Button — native", () => {
     dispose();
   });
 
+  it("gives the adaptive variant no role color, so it inherits the surface's currentColor", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button variant="adaptive" colorScheme="danger">
+          On a tinted surface
+        </Button>
+      </Themed>
+    ));
+
+    const cls = container.querySelector("button")?.className ?? "";
+    expect(cls).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
+    expect(cls).toContain("data-pressed:bg-surface-adaptive-pressed");
+    // `colorScheme` is inert here: no role color reaches the element, so the label keeps whatever
+    // `currentColor` it inherits. That the wash then resolves to a different real color per surface
+    // is a property of CSS `color-mix`, pinned once in `close-button.browser.test.tsx` — not
+    // Button's to re-assert.
+    expect(cls).not.toContain("text-danger-emphasis");
+    expect(cls).not.toMatch(/(?:^|\s)bg-danger/);
+    dispose();
+  });
+
   it("emits data-disabled as the styling hook when disabled (absent when enabled)", async () => {
     const { container, dispose } = mount(() => (
       <Themed>

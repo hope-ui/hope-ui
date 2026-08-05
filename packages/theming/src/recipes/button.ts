@@ -10,9 +10,16 @@ import type { JSX } from "@solidjs/web";
 import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
- * Visual style. `default` is neutral chrome (shadcn's outline) and ignores `colorScheme`. `inverted`
- * is the on-color/role swap of `solid` — a light fill with role-colored text — on its own dedicated
- * `{role}-inverted` tokens, meant to sit on a solid/colored/dark surface (a toolbar, a banner).
+ * Visual style. Two members are color-independent and ignore `colorScheme`: `default` is neutral
+ * chrome (shadcn's outline), and `adaptive` asserts no color at all — it inherits `currentColor` from
+ * its surface for the label and derives its hover/press wash from that, so it stays legible and
+ * interactive on any container (the same mechanism CloseButton uses).
+ *
+ * The other five pick a fixed shade per role, which means they cannot know what they were dropped
+ * onto: `inverted` is the on-color swap of `solid` — a light fill with role-colored text — on its own
+ * dedicated `{role}-inverted` tokens, meant to sit on a solid/colored/dark surface (a toolbar, a
+ * banner); and `ghost`'s wash is a fixed tint that can coincide with a soft container's own fill, so
+ * `adaptive` is the low-emphasis button for a surface you do not control.
  */
 export type ButtonVariant =
   | "default"
@@ -21,9 +28,10 @@ export type ButtonVariant =
   | "soft"
   | "outline"
   | "ghost"
+  | "adaptive"
   | "link";
 
-/** Semantic role color scheme. Ignored by the `default` variant. */
+/** Semantic role color scheme. Ignored by the `default` and `adaptive` variants. */
 export type ButtonColorScheme = "primary" | "neutral" | "success" | "info" | "warning" | "danger";
 
 /** Density/scale — heights 28 / 32 / 36 / 40 / 44px for xs→xl. */
@@ -38,9 +46,12 @@ export type ButtonLoaderPlacement = "start" | "center" | "end";
 
 /** The Button recipe's variant props — also the visual axes a preset may default app-wide. */
 export interface ButtonRecipeVariants {
-  /** Visual style. `default` is the neutral chrome button (shadcn's outline) and ignores `colorScheme`. */
+  /**
+   * Visual style. `default` (neutral chrome) and `adaptive` (inherits its surface's color) are both
+   * color-independent and ignore `colorScheme`.
+   */
   variant?: ButtonVariant;
-  /** Semantic role color scheme. Ignored by the `default` variant. */
+  /** Semantic role color scheme. Ignored by the `default` and `adaptive` variants. */
   colorScheme?: ButtonColorScheme;
   /** Density/scale. Heights 28/32/36/40/44px for xs→xl. */
   size?: ButtonSize;
@@ -50,7 +61,7 @@ export interface ButtonRecipeVariants {
    * Renders a **square, icon-only** button: the icon (passed as `children`) is sized per `size` and
    * centered, horizontal padding is dropped, and the width is locked to the `size`'s height. Requires
    * an `aria-label` (or `aria-labelledby`) for an accessible name — the component dev-warns if missing.
-   * Intended for the chrome variants (`default`/`solid`/`inverted`/`soft`/`outline`/`ghost`);
+   * Intended for the chrome variants (`default`/`solid`/`inverted`/`soft`/`outline`/`ghost`/`adaptive`);
    * combining it with `fullWidth` or `link` is unsupported (they fight the square metrics).
    */
   iconOnly?: boolean;

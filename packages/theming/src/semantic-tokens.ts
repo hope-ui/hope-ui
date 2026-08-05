@@ -191,9 +191,9 @@ export const SEMANTIC_COLOR_TOKENS = [
   "focus-halo",
   "scrim",
 
-  // The hover/press tint a control with no rest background of its own — an icon-only button such as
-  // CloseButton — lays over whatever surface it sits on. A preset derives these from `currentColor`,
-  // so such a control takes its color from its surroundings instead of picking a role.
+  // The hover/press tint a control with no rest background of its own — CloseButton, or Button's
+  // `adaptive` variant — lays over whatever surface it sits on. A preset derives these from
+  // `currentColor`, so such a control takes its color from its surroundings instead of picking a role.
   "surface-adaptive-hovered",
   "surface-adaptive-pressed",
 ] as const;

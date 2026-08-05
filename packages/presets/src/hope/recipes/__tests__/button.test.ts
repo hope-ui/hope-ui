@@ -18,6 +18,7 @@ const VARIANTS: ButtonVariant[] = [
   "soft",
   "outline",
   "ghost",
+  "adaptive",
   "link",
 ];
 const COLOR_SCHEMES: ButtonColorScheme[] = [
@@ -125,6 +126,11 @@ describe("hope button recipe", () => {
     expect(buttonRecipe({ variant: "link", colorScheme: "primary" }).root()).toContain(
       "border-transparent",
     );
+    // `adaptive` opts out for the same reason, and more sharply: it sets no color at all, so a bare
+    // `border` would paint the inherited `currentColor` as a fully opaque outline.
+    expect(buttonRecipe({ variant: "adaptive", colorScheme: "primary" }).root()).toContain(
+      "border-transparent",
+    );
     // A filled variant never falls back to a transparent border (the gap the borders close).
     expect(buttonRecipe({ variant: "solid", colorScheme: "primary" }).root()).not.toContain(
       "border-transparent",
@@ -136,7 +142,15 @@ describe("hope button recipe", () => {
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {
-    for (const variant of ["solid", "inverted", "soft", "outline", "ghost", "link"] as const) {
+    for (const variant of [
+      "solid",
+      "inverted",
+      "soft",
+      "outline",
+      "ghost",
+      "adaptive",
+      "link",
+    ] as const) {
       for (const colorScheme of COLOR_SCHEMES) {
         const root = buttonRecipe({ variant, colorScheme }).root();
         expect(root).not.toContain("color-mix");
@@ -162,6 +176,29 @@ describe("hope button recipe", () => {
     // `default` guards its hover against the pressed state too — consistent with the colored variants.
     expect(asPrimary).toContain("hover:not-data-pressed:bg-surface-raised-hovered");
     expect(asPrimary).toContain("data-pressed:bg-surface-raised-pressed");
+  });
+
+  it("keeps the adaptive variant color-independent, inheriting currentColor for label and wash", () => {
+    const asPrimary = buttonRecipe({ variant: "adaptive", colorScheme: "primary" }).root();
+    const asDanger = buttonRecipe({ variant: "adaptive", colorScheme: "danger" }).root();
+    // Byte-identical across roles: `adaptive` matches no colorScheme compound at all.
+    expect(asPrimary).toBe(asDanger);
+    // The mechanism: no text COLOR, so the label inherits `currentColor` from its surface, exactly
+    // as CloseButton's glyph does. The match is exact rather than a `not.toMatch(/text-/)` because
+    // the root legitimately carries the size's FONT SIZE (`text-sm` at the default `md`).
+    expect(asPrimary.split(/\s+/).filter((candidate) => candidate.startsWith("text-"))).toEqual([
+      "text-sm",
+    ]);
+    // Rest is fully transparent — no fill, and no `currentColor` edge from the base's bare `border`.
+    expect(asPrimary).toContain("bg-transparent");
+    expect(asPrimary).toContain("border-transparent");
+    // Both interaction states come from the currentColor-derived tokens, and the hover wash is
+    // guarded against the pressed state like every other variant.
+    expect(asPrimary).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
+    expect(asPrimary).toContain("data-pressed:bg-surface-adaptive-pressed");
+    // Unlike ghost, it never reaches for a role wash — a fixed shade cannot know its surface, which
+    // is the whole reason this variant exists.
+    expect(asPrimary).not.toContain("ghost-hovered");
   });
 
   it("dims the disabled state via opacity only — no color swap, single data-disabled axis", () => {

@@ -2,6 +2,7 @@ import { Alert } from "@hope-ui/components/alert";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { AlertActionsDemo } from "~/components/demos/alert/AlertActionsDemo";
+import { AlertSoftActionsDemo } from "~/components/demos/alert/AlertSoftActionsDemo";
 import { AlertColorSchemesDemo } from "~/components/demos/alert/AlertColorSchemesDemo";
 import { AlertDismissibleDemo } from "~/components/demos/alert/AlertDismissibleDemo";
 import { AlertPolymorphismDemo } from "~/components/demos/alert/AlertPolymorphismDemo";
@@ -368,11 +369,47 @@ the convenience props give way to the compound anatomy.
 </Alert.Root>
 ```
 
+### On a soft or subtle alert
+
+The buttons above work because a `default` alert is neutral raised chrome — an untinted surface, so a
+`ghost` button's wash reads normally against it. A `soft` or `subtle` alert is **tinted**, and
+`ghost`'s hover wash is a fixed shade in the same tier as that tint: a `ghost success` button inside
+a `soft success` alert paints the alert's own background, so hovering it does nothing visible.
+
+Use the Button [`adaptive`](/components/button#on-a-tinted-surface) variant for the secondary action
+instead. It inherits the alert's text color and mixes its hover/press wash from that, so it takes no
+`colorScheme` — the surface supplies it.
+
+<Preview>
+  <AlertSoftActionsDemo />
+</Preview>
+
+```tsx
+<Alert.Root variant="soft" colorScheme="success">
+  <Alert.Icon>
+    <CircleCheckIcon />
+  </Alert.Icon>
+  <Alert.Content>
+    <Alert.Title>Deployment finished</Alert.Title>
+    <Alert.Description>acme-web #128 is live on preview.</Alert.Description>
+    <Alert.Actions>
+      <Button variant="solid" colorScheme="success" size="sm">
+        Visit preview
+      </Button>
+      <Button variant="adaptive" size="sm">
+        View logs
+      </Button>
+    </Alert.Actions>
+  </Alert.Content>
+</Alert.Root>
+```
+
 ### On a solid alert
 
 A `solid` alert is a filled, role-colored banner, so a `solid` action button would blend into it.
 Reach for the Button [`inverted`](/components/button#on-solid-surfaces) variant instead — a
-contrasting fill built to stay legible on a solid, colored surface.
+contrasting fill built to stay legible on a solid, colored surface. `adaptive` works here too, and is
+the lighter-weight choice for a secondary action.
 
 <Preview>
   <AlertSolidActionsDemo />

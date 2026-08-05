@@ -3,6 +3,7 @@ import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { Link } from "@tanstack/solid-router";
+import { ButtonAdaptiveDemo } from "~/components/demos/button/ButtonAdaptiveDemo";
 import { ButtonIconOnlyDemo } from "~/components/demos/button/ButtonIconOnlyDemo";
 import { ButtonIconsDemo } from "~/components/demos/button/ButtonIconsDemo";
 import { ButtonMatrixDemo } from "~/components/demos/button/ButtonMatrixDemo";
@@ -36,9 +37,11 @@ import { Button } from "@hope-ui/components/button";
 
 ## Variants
 
-The `variant` prop sets the visual style. `default` is neutral, color-independent chrome (it
-ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the colored variants.
-`inverted` is a filled variant for solid surfaces — shown [below](#on-solid-surfaces).
+The `variant` prop sets the visual style. `solid`, `soft`, `outline`, `ghost`, and `link` are the
+colored variants — they take their color from `colorScheme`. Two variants are color-independent and
+ignore it: `default` is neutral chrome, and `adaptive` takes its color from the surface it sits on —
+shown [below](#on-a-tinted-surface). `inverted` is a filled variant for solid surfaces — shown
+[below](#on-solid-surfaces).
 
 <Preview>
   <Button variant="default">Default</Button>
@@ -46,6 +49,7 @@ ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the 
   <Button variant="soft">Soft</Button>
   <Button variant="outline">Outline</Button>
   <Button variant="ghost">Ghost</Button>
+  <Button variant="adaptive">Adaptive</Button>
   <Button variant="link">Link</Button>
 </Preview>
 
@@ -55,6 +59,7 @@ ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the 
 <Button variant="soft">Soft</Button>
 <Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
+<Button variant="adaptive">Adaptive</Button>
 <Button variant="link">Link</Button>
 ```
 
@@ -94,10 +99,38 @@ the honest, symmetric result. On the plain page background its light fill is nea
 </div>
 ```
 
+### On a tinted surface
+
+Every colored variant picks a **fixed shade** per role, which means it cannot know what it was
+dropped onto. `ghost` is the case that bites: its hover wash sits in the same tier as the role's
+`soft` fill, so a `ghost` button inside a `soft` Alert washes to that Alert's own background and
+hovering appears to do nothing at all.
+
+`adaptive` inverts the dependency. It sets no color of its own, so its label inherits `currentColor`
+from the surface, and its hover/press wash is mixed from that same inherited color — always a tint
+*of* the text, over whatever is behind it. That is the same mechanism [CloseButton](/components/close-button#adapts-to-the-surface)
+uses, and it is why `adaptive` ignores `colorScheme`.
+
+<Preview>
+  <ButtonAdaptiveDemo />
+</Preview>
+
+```tsx
+<div class="bg-success-soft text-success-emphasis p-4">
+  <Button variant="adaptive" size="sm">
+    View logs
+  </Button>
+</div>
+```
+
+`adaptive` does not replace `ghost` — reach for it when you don't control the background. On a plain
+page surface there is no role color to inherit, so an `adaptive` button reads neutral and `ghost` is
+the one carrying the role.
+
 ## Color schemes
 
-Pair a colored variant with a `colorScheme` — one of the six semantic roles. The `default`
-variant is color-independent and ignores it.
+Pair a colored variant with a `colorScheme` — one of the six semantic roles. The `default` and
+`adaptive` variants are color-independent and ignore it.
 
 <Preview>
   <ButtonMatrixDemo />
@@ -507,14 +540,14 @@ are intentionally **not** defaultable app-wide.
       type: "ButtonVariant",
       default: '"default"',
       description:
-        "Visual style: default, solid, inverted, soft, outline, ghost, link. default is neutral chrome and ignores colorScheme; inverted is the swap of solid for solid surfaces.",
+        "Visual style: default, solid, inverted, soft, outline, ghost, adaptive, link. default (neutral chrome) and adaptive (inherits the surface's color) both ignore colorScheme; inverted is the swap of solid for solid surfaces.",
     },
     {
       prop: "colorScheme",
       type: "ButtonColorScheme",
       default: '"primary"',
       description:
-        "Semantic role color: primary, neutral, success, info, warning, danger. Applied by the colored variants; ignored by default.",
+        "Semantic role color: primary, neutral, success, info, warning, danger. Applied by the colored variants; ignored by default and adaptive.",
     },
     {
       prop: "size",

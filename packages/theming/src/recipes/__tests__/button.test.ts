@@ -66,6 +66,7 @@ describe("button recipe contract", () => {
       "soft",
       "outline",
       "ghost",
+      "adaptive",
       "link",
     ];
     const colorSchemes: ButtonColorScheme[] = [
@@ -79,7 +80,7 @@ describe("button recipe contract", () => {
     const sizes: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
     const slots: ButtonSlot[] = ["root", "label", "startDecorator", "endDecorator", "loader"];
 
-    expect(variants).toHaveLength(7);
+    expect(variants).toHaveLength(8);
     expect(colorSchemes).toHaveLength(6);
     expect(sizes).toHaveLength(5);
     expect(slots).toHaveLength(5);

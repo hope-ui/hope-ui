@@ -37,9 +37,12 @@ const VARIANTS: ButtonVariant[] = [
   "soft",
   "outline",
   "ghost",
+  "adaptive",
   "link",
 ];
-const COLORED_VARIANTS: Exclude<ButtonVariant, "default">[] = [
+// `default` and `adaptive` are both color-independent — they ignore `colorScheme`, so neither has a
+// row in the per-role matrix.
+const COLORED_VARIANTS: Exclude<ButtonVariant, "default" | "adaptive">[] = [
   "solid",
   "inverted",
   "soft",
@@ -54,8 +57,10 @@ export const Default: Story = {
 };
 
 /**
- * The variants at their default `primary` color (`default` is color-independent chrome). `inverted`
- * gets its own solid-surface story — on the light page background its light fill is near-invisible.
+ * The variants at their default `primary` color (`default` is color-independent chrome, and so is
+ * `adaptive` — here it inherits the page's plain `foreground`). `inverted` and `adaptive` each get
+ * their own surface story: on the light page background `inverted`'s light fill is near-invisible,
+ * and `adaptive` has no surface worth adapting to.
  */
 export const Variants: Story = {
   render: () => (
@@ -85,6 +90,49 @@ export const Inverted: Story = {
       </For>
     </div>
   ),
+};
+
+/**
+ * `adaptive` asserts no color of its own: it sets no text color, so its label inherits `currentColor`
+ * from the surface, and its hover/press wash is mixed from that same inherited color.
+ *
+ * Hover and press each row and compare the two buttons. `ghost` picks a fixed shade per role, and
+ * `{role}-ghost-hovered` is the same shade as `{role}-soft` — so on the soft row the ghost button's
+ * wash **is** that row's own background and it appears to do nothing at all. `adaptive` has real
+ * feedback on all four. It is not a replacement for `ghost`: on the plain light row there is no role
+ * color to inherit, so `adaptive` reads neutral and `ghost` is the one carrying the role.
+ */
+export const Adaptive: Story = {
+  parameters: { layout: "padded" },
+  render: () => {
+    const Row = (props: { class: string; label: string }): JSX.Element => (
+      <div class={`flex items-center justify-between gap-6 rounded-lg p-4 ${props.class}`}>
+        <span class="text-sm font-medium">{props.label}</span>
+        <div class="flex items-center gap-2">
+          <Button variant="ghost" colorScheme="success" size="sm">
+            ghost
+          </Button>
+          <Button variant="adaptive" size="sm">
+            adaptive
+          </Button>
+        </div>
+      </div>
+    );
+
+    return (
+      <div class="flex flex-col gap-3">
+        {/*
+          Labelled by the semantic surface, not by how it looks: `bg-surface` is white in the light
+          theme and near-black in the dark one, so "on a light surface" would be a lie in half the
+          cases. `adaptive` is correct in both because it never names a color either.
+        */}
+        <Row class="border border-subtle bg-surface text-foreground" label="On the page surface" />
+        <Row class="bg-success-soft text-success-emphasis" label="On a soft surface" />
+        <Row class="bg-success text-on-success" label="On a solid surface" />
+        <Row class="bg-surface-inverse text-on-inverse" label="On the inverse surface" />
+      </div>
+    );
+  },
 };
 
 /** variant × color — the validated matrix (mirrors the look-&-feel mockup). */

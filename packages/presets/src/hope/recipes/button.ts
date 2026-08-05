@@ -16,8 +16,9 @@
  * `bg-primary` resolves `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`).
  * Every interaction state is a *finished* token too, so this recipe computes no color — no
  * `color-mix`, no alpha modifier (`bg-x/50`), no magic opacity — and a preset redefining a shade
- * changes the painted result predictably. Derived colors (the focus halo) are authored as tokens in
- * `theme.css` instead. Enforced by `pnpm check:recipe-purity`. Interaction *triggers* stay Tailwind's
+ * changes the painted result predictably. Derived colors (the focus halo, `adaptive`'s
+ * `currentColor`-derived wash) are authored as tokens in `theme.css` instead. Enforced by
+ * `pnpm check:recipe-purity`. Interaction *triggers* stay Tailwind's
  * own `hover:`/`focus-visible:` plus hope's `data-pressed`/`data-disabled`/`aria-busy` variants.
  */
 
@@ -36,10 +37,13 @@ import { tv } from "@hope-ui/theming";
  * the page background — and the base's `border-color` transition animates it in step. `ghost`/`link`
  * stay borderless; `focus-visible:border-focus` still wins on focus. Each hover wash is guarded
  * against the pressed state (`hover:not-data-pressed:`) so the two never fight.
+ *
+ * `default` and `adaptive` are absent from this table because neither picks a role color — they are
+ * `Exclude`d from its key type, and carry their own classes inline in the `variant` map below.
  */
 const COLOR_CLASSES: Record<
   ButtonColorScheme,
-  Record<Exclude<ButtonVariant, "default">, string>
+  Record<Exclude<ButtonVariant, "default" | "adaptive">, string>
 > = {
   primary: {
     solid:
@@ -115,7 +119,7 @@ const COLOR_CLASSES: Record<
   },
 };
 
-const COLOR_VARIANTS: Array<Exclude<ButtonVariant, "default">> = [
+const COLOR_VARIANTS: Array<Exclude<ButtonVariant, "default" | "adaptive">> = [
   "solid",
   "inverted",
   "soft",
@@ -124,7 +128,7 @@ const COLOR_VARIANTS: Array<Exclude<ButtonVariant, "default">> = [
   "link",
 ];
 
-/** variant × colorScheme → the literal fill on the `root` slot (default variant is color-independent). */
+/** variant × colorScheme → the literal fill on the `root` slot (default/adaptive are color-independent). */
 const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColorScheme[]).flatMap(
   (colorScheme) =>
     COLOR_VARIANTS.map((variant) => ({
@@ -150,6 +154,7 @@ const TEXT_PADDING_VARIANTS: Array<Exclude<ButtonVariant, "link">> = [
   "soft",
   "outline",
   "ghost",
+  "adaptive",
 ];
 const SIZE_PADDING: Record<ButtonSize, string> = {
   xs: "px-2",
@@ -299,6 +304,19 @@ export const buttonRecipe = tv({
       // `border-transparent` is explicit because the base carries no border color, and a bare `border`
       // would otherwise paint in `currentColor`.
       ghost: { root: "bg-transparent border-transparent" },
+      // Surface-adaptive: like `default`, it is color-independent and ignores `colorScheme` — but it
+      // asserts no color at all. With no `text-*` class the label inherits `currentColor` from
+      // whatever surface it sits on, and the wash is the shared `surface-adaptive-*` token, itself a
+      // finished `currentColor`-derived mix authored once in `theme.css`. So the wash is always a
+      // tint OF the label color, over whatever is behind it.
+      //
+      // That is what makes it the low-emphasis button for a container whose background you do not
+      // control. `ghost` picks a fixed shade per role, and `{role}-ghost-hovered` sits in the same
+      // tier as `{role}-soft` — so a ghost button inside a soft container washes to that container's
+      // exact background color and shows no feedback at all.
+      adaptive: {
+        root: "bg-transparent border-transparent hover:not-data-pressed:bg-surface-adaptive-hovered data-pressed:bg-surface-adaptive-pressed",
+      },
       // Layout only; the color ladder and underline live per-role in `COLOR_CLASSES.link`.
       link: {
         root: "h-auto bg-transparent border-transparent px-0.5 py-0.5",

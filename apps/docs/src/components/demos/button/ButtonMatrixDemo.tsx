@@ -6,10 +6,10 @@ import { For } from "solid-js";
 // per-role matrix that reads better as a live component than as inline MDX. Mirrors
 // the component's `VariantColorMatrix` story.
 //
-// `default` is intentionally omitted: it is color-independent (it ignores
-// `colorScheme`), so it has no row here. The `inverted` row sits on a dark strip so its
-// light fills stay visible on the page background.
-const COLORED_VARIANTS: Exclude<ButtonVariant, "default">[] = [
+// `default` and `adaptive` are intentionally omitted: both are color-independent (they
+// ignore `colorScheme`), so neither has a row here. The `inverted` row sits on a dark
+// strip so its light fills stay visible on the page background.
+const COLORED_VARIANTS: Exclude<ButtonVariant, "default" | "adaptive">[] = [
   "solid",
   "inverted",
   "soft",
