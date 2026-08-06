@@ -113,15 +113,23 @@ export function SiteHeader() {
         </nav>
 
         <div class="ms-auto flex items-center gap-1.5">
+          {/* `foreground-muted`, not `foreground-subtle`, on both the label and the shortcut hint.
+              Subtle is the ramp's quietest step and lands under WCAG's 4.5:1 on these two surfaces
+              in BOTH modes — 2.48:1 / 2.59:1 on light, 4.44:1 / 3.79:1 on dark (axe `color-contrast`).
+              Muted clears it everywhere (7.5–8.1 light, 6.9–8.1 dark) and is the same step the nav
+              tabs use, so the field still reads as secondary chrome rather than competing with them.
+              The glyph inherits it and thereby also clears the 3:1 non-text bar it was failing on
+              light. Recolouring `surface-sunken` instead was the alternative — rejected, it is a
+              shared token and would move every sunken surface on the site. */}
           <button
             type="button"
             title="Search is coming soon"
             aria-label="Search (coming soon)"
-            class="hidden w-56 items-center gap-2 rounded-lg border border-subtle bg-surface-sunken px-3 py-1.5 text-sm text-foreground-subtle transition-colors hover:border-strong sm:flex"
+            class="hidden w-56 items-center gap-2 rounded-lg border border-subtle bg-surface-sunken px-3 py-1.5 text-sm text-foreground-muted transition-colors hover:border-strong sm:flex"
           >
             <SearchIcon class="size-4 shrink-0" />
             <span>Search…</span>
-            <kbd class="ms-auto rounded border border-subtle bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-foreground-subtle">
+            <kbd class="ms-auto rounded border border-subtle bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-foreground-muted">
               ⌘&nbsp;K
             </kbd>
           </button>
