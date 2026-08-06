@@ -105,7 +105,6 @@ export function ThemeCreator() {
         {/* ── Controls ─────────────────────────────────────────────────────────── */}
         <div class="space-y-6 rounded-2xl border border-subtle bg-surface-raised p-5 shadow-sm xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:self-start xl:overflow-auto">
           <RolePicker
-            name="tc-primary"
             label={ROLE_META.primary.label}
             hint={ROLE_META.primary.hint}
             families={BRAND_FAMILIES}
@@ -114,7 +113,6 @@ export function ThemeCreator() {
           />
 
           <RolePicker
-            name="tc-neutral"
             label={ROLE_META.neutral.label}
             hint={ROLE_META.neutral.hint}
             families={NEUTRAL_FAMILIES}
@@ -132,7 +130,6 @@ export function ThemeCreator() {
               <For each={STATUS_ROLES}>
                 {(role) => (
                   <RolePicker
-                    name={`tc-${role}`}
                     label={ROLE_META[role].label}
                     hint={ROLE_META[role].hint}
                     families={BRAND_FAMILIES}

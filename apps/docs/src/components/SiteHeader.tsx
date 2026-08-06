@@ -1,10 +1,11 @@
 import { Button } from "@hope-ui/components/button";
 import type { JSX } from "@solidjs/web";
 import { Link } from "@tanstack/solid-router";
-import { createSignal, For, omit, onSettled, Show } from "solid-js";
+import { For, omit, onSettled, Show } from "solid-js";
 import { BrandLogoIcon, GitHubIcon, MoonIcon, SearchIcon, SunIcon } from "~/components/Icons";
 import { MobileNav } from "~/components/MobileNav";
 import { SITE } from "~/config";
+import { colorMode, initColorMode, toggleColorMode } from "~/lib/color-mode";
 import { PRIMARY_NAV } from "~/lib/nav";
 
 // The primary top navigation bar: brand + version badge on the left, the section
@@ -43,32 +44,16 @@ const ICON_BUTTON = {
   },
 } as const;
 
-// Client-only light/dark switch. It toggles `.dark` on <html>, which is what the
-// hope preset's `dark` variant keys on. The initial state is read after mount
-// (never during SSR/hydration render, so no mismatch); the server always emits the
-// light markup.
+// Client-only light/dark switch over the shared `~/lib/color-mode` store — shared because the Theme
+// Creator's preview carries a second switch and the two must never disagree. The initial state is
+// adopted after mount (never during SSR/hydration render, so no mismatch); the server always emits
+// the light markup.
 function ThemeToggle() {
-  const [dark, setDark] = createSignal(false);
-
-  onSettled(() => {
-    const stored = localStorage.getItem("hope-docs-theme");
-    const isDark =
-      stored === "dark" ||
-      (stored == null && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    document.documentElement.classList.toggle("dark", isDark);
-    setDark(isDark);
-  });
-
-  const toggle = () => {
-    const next = !dark();
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("hope-docs-theme", next ? "dark" : "light");
-    setDark(next);
-  };
+  onSettled(initColorMode);
 
   return (
-    <Button {...ICON_BUTTON} onClick={toggle} aria-label="Toggle dark mode">
-      <Show when={dark()} fallback={<MoonIcon />}>
+    <Button {...ICON_BUTTON} onClick={toggleColorMode} aria-label="Toggle dark mode">
+      <Show when={colorMode() === "dark"} fallback={<MoonIcon />}>
         <SunIcon />
       </Show>
     </Button>
