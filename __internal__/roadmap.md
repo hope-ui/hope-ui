@@ -112,7 +112,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
 | Tabs | Navigation | 5/5 | `createListNavigation` | roving + follow-focus |
-| Accordion | Disclosure | 5/5 | `createListExpansion` | kernel ready |
+| Accordion | Disclosure | 5/5 | `createListExpansion` (+ #23) | kernel ready **except** the #23 comparator migration, which gates this and Collapsible: `createListExpansion` is the last thing still on the retired `compareWith`/`compareByIdOrReference` vocabulary, and shipping Accordion over it makes that a public API |
 | Tooltip | Overlays | 5/5 | `createFloating`*, `createTimer`* | open/close delay |
 | Popover ✅ | Overlays | 5/5 | `createFloating`, `createDismissable`, `createAutoFocus`, `createFocusRestore`, `createFocusScope`, `createKeepVisible`, `createPresence` | the "compose, don't inherit from Dialog" proof, landed — styled API (10 compound parts + `popover` recipe). **Non-modal v1:** no focus trap, scroll lock, hide-outside or backdrop; a `modal` mode is later work. Opened **inside** a modal it is a first-class layer above it (#18/#19/#20) — spared, focusable, and it takes the first Escape alone |
 | HoverCard | Overlays | 2/5 | `createFloating`*, `createHoverIntent`* | |
@@ -122,7 +122,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Rating | Forms | 4/5 | roving + half-step | |
 | NumberInput | Forms | 4/5 | `createNumberState`*, `createTextInput`* | |
 | PinInput / OTP | Forms | 3/5 | `createPinInputState`* | multi-field focus/paste |
-| TagsInput | Forms | 2/5 | `createTagsState`*, `createTextInput` ✅ | **Promoted — it is the missing half of multi-select, not just another form control.** A `selectionMode="multiple"` Combobox has no way to show what it holds once the popup closes: its input is the query, so the field is cleared after each pick and the list's ticks are the only report. A removable chip row is what fixes that, and `createTextInput` shipping with Combobox leaves only `createTagsState` (#11) in the way. See §3 |
+| TagsInput | Forms | 2/5 | `createTextInput` ✅, `createListNavigation` ✅, `createListFocus` ✅ (#22) | **Promoted — it is the missing half of multi-select, not just another form control.** A `selectionMode="multiple"` Combobox has no way to show what it holds once the popup closes: its input is the query, so the field is cleared after each pick and the list's ticks are the only report. A removable chip row is what fixes that. **No kernel gap left:** #11 `createTagsState` was retired rather than built — the tag array is `createControllableState` in a `tags-input/` root hook, the keymap belongs to the part hooks, and the one behavior that *was* missing (focus after removal) shipped as #22. See §3 |
 | Menubar | Navigation | 3/5 | `createFloating`* + collection | application menubar |
 | ScrollArea | Utility | 3/5 | `createElementSize`* | custom scrollbars |
 | Splitter / Resizable | Utility | 3/5 | `createDragState`*, `createElementSize`* | resizable panes |
@@ -187,7 +187,7 @@ stable reference and the ordering claim holds within the original survey.
 | 8 | `createHoverIntent` | hover open/close intent + submenu safe-triangle | Menu, HoverCard, Tooltip *(port Astryx `useMenuHover`)* | T2 |
 | 9 | `createTextInput` ✅ | Controlled value + the two things a hand-rolled `onInput` gets wrong: **IME composition** (no DOM write between `compositionstart`/`compositionend`, so a half-typed CJK word survives) and **caret preservation** (captured on `input`, reapplied after the write). The DOM value is owned by a reconcile effect rather than a live `value={…}` binding — that is what makes both suppressions possible. `onBeforeInput` is left unconsumed as the one real cancel channel, since the native `input` event is not cancelable. Shipped with `Combobox.Input`; [`create-text-input.md`](primitives/internal/create-text-input.md) | Input, Textarea, Combobox ✅, TagsInput, NumberInput | T2 |
 | 10 | `createNumberState` | parse / format / clamp / step (Intl) | NumberInput, Slider | T2 |
-| 11 | `createPinInputState` · `createTagsState` | field-specific interaction state. **`createTagsState` is the last thing between here and a visible multi-select** (§3): the tag list, add/remove, `Backspace` on an empty field removing the last tag, paste-splitting, `max`/duplicate policy. Roving focus across the chips is already covered by `createListNavigation` | PinInput, TagsInput | T2 |
+| 11 | `createPinInputState` · ~~`createTagsState`~~ | field-specific interaction state. `createPinInputState` stands. **`createTagsState` is retired in place — don't build it.** Everything it was scoped to own already exists or belongs elsewhere: the controlled/uncontrolled array is `createControllableState<V[]>`; `contains`/`add`/`remove` are three one-liners in `create-list-selection.ts`; `max` is a length check; paste-splitting is a `split` plus a policy seam that **both references leave to the app**; the `Backspace`-on-empty binding is a keymap, so it belongs in a part hook the way `createComboboxInput` owns Combobox's; and this row already assigned roving focus to `createListNavigation`. Neither reference has a tags state layer either — react-aria's `useTagGroup` takes a plain `ListState` and smuggles `onRemove` to `useTag` through a module-level `WeakMap` (a shape [`CLAUDE.md`](../CLAUDE.md)'s no-module-scope rule forbids here anyway), and Base UI's chips read and write the combobox store directly. The one genuinely hard behavior in the area — **focus after removal** — is not tags-shaped, and neither reference treats it as such: react-aria's lives in `useListState`, the generic list layer. It shipped here as #22. `TagsInput` therefore owns its array in its own `tags-input/` root hook over `createControllableState`, the same way `createCalendar` replaced #16. The number is kept so cross-references stay valid | PinInput ← `createPinInputState`; TagsInput ← nothing | T2 |
 | 12 | `createDragState` | pointer drag / resize / swipe | Slider thumb, Splitter, Toast swipe, ScrollArea | T3 |
 | 13 | `createFileUploadState` | file selection, drag-drop, accept/size validation | FileUpload | T3 |
 | 14 | ~~`createOverlayStack`~~ | **Retired in place — never build this.** Nesting is shipped as **three separate registries**: #18 (dismissal order), #19 (`aria-hidden`/`inert`), #20 (focus containment). Merging them would be a bug, not a simplification: a Dialog with `dismissOnEscape: false` still participates in hide-outside *and* focus-scope ordering but must never win Escape. react-aria keeps its three apart for the same reason and centralizes nothing — [`reference-implementations.md`](reference-implementations.md) §1. The number is kept so cross-references stay valid | — see #18/#19/#20 | — |
@@ -198,9 +198,11 @@ stable reference and the ordering claim holds within the original survey.
 | 19 | `createHideOutside` — **nested `aria-hidden`/`inert`** ✅ ✳︎ | `observerStack` (only the innermost layer observes, out-of-order closes included) + a dynamic `keepVisible`/`createKeepVisible` + `TOP_LAYER_ATTRIBUTE`, the declarative always-visible marker. The two cover opposite orderings: registration reaches a layer opening *after* the modal, the marker reaches a modal opening *after* the layer — which no registration can. `Popover.Positioner` calls `createKeepVisible`; the marker ships wired to nothing, as the third-party/toast escape hatch. Now an attributed Apache-2.0 derivative | same as #18 | T2 |
 | 20 | `createFocusScope` ✅ | The third registry: a container stack answering **"did focus land in me, or in a layer opened above me?"** (`containsSelfOrAbove`). `createFocusTrap` composes it and consults it instead of `container.contains`, so a Dialog stops yanking focus out of a Popover portaled above it — which, with `closeOnFocusOutside`, used to close that Popover ~3ms after it opened. Moves no focus and cages nothing; Tab still leaves a non-modal layer freely. The *idea* is react-aria's `focusScopeTree`/`isElementInChildOfActiveScope`, but the implementation shares no expression with it: **not derivative, prose credit only** | same as #18 | T2 |
 | 21 | `primitives/src/combobox/` — the **combobox kernel** | The shared half of Select and Combobox, named after the **ARIA pattern** (APG 1.2 gives both `role="combobox"` on the focus owner, `aria-expanded`/`aria-controls` → a `role="listbox"` popup, `aria-activedescendant` on the active option). Owns: open state + `focusStrategy` (open onto first/last/selected), the trigger's `role`/`aria-*`, the keymap (ArrowDown/Up, Alt+Arrow, Enter, Escape), the `isFocused` paint-gate plumbing between focus owner and list, `allowsEmptyCollection`, `shouldCloseOnSelect`. **Input-agnostic by construction — it never owns a text value.** See § "The combobox kernel" below for why that constraint is the whole point | Select, Combobox, Autocomplete, CommandPalette | T3 |
+| 22 | `createListFocus` — **re-homing the active item** ✅ ✳︎ | `activeIndex` is a slot number, so any insert or removal renumbers every slot after it. Left alone that failed twice, silently: a row removed *before* the active one slid the highlight onto whatever moved into that slot (a valid index naming a different option, every test green), and removing the active last row left the index out of range with `aria-activedescendant` naming nothing. Reachable by any `Listbox` whose `items` come from a signal — an async load, a consumer-side filter. **Combobox is the exception that proves it:** its `items()` is the filtered set, it met this the hard way, and `combobox-root.tsx` already carries an effect that re-anchors with `navigation.first()` per keystroke. That stays and still wins (created later, and siblings run in creation order) because "highlight the top match" is a deliberate search policy — the point is that every *other* consumer was silently getting a stale slot number instead of choosing one. Now an effect reconciles the active row by identity — quietly re-indexing a survivor, or walking the *previous* ordering forward-then-backward for the nearest focusable replacement when it is gone. Adds an `itemToValue` option, `createListSelection`'s, so a widget passes one mapper to both. Ported from react-aria's `useFocusedKeyReset` (reasoning, not code); Base UI's `getIndexAfterChipRemoval` agrees on the policy by index arithmetic alone, which is why it cannot fix the first failure. [`create-list-focus.md`](primitives/internal/create-list-focus.md) | Listbox with an async collection, Combobox's filter, TagsInput's chip row | T2 |
+| 23 | `createListExpansion` — **migrate to `itemToValue`** | The last consumer of the retired `compareByIdOrReference` / `compareWith` vocabulary (`create-list-expansion.ts`), which `createListSelection` and now #22 both replaced with `itemToValue` / `isItemEqualToValue`. **A prerequisite to the disclosure pair, Collapsible & Accordion** — Accordion is the only component that will consume this primitive, and shipping it would bake the legacy comparator into a public component's API where changing it later is a breaking change. Cheap now, expensive after | Accordion (gates it), TreeView via #15 | T1 |
 
-✳︎ Extensions to a **shipped** primitive, not new ones — and deliberately three registries rather
-than one (see #14).
+✳︎ Extensions to a **shipped** primitive, not new ones — the three nesting registries (deliberately
+three rather than one, see #14) plus #22.
 
 **Covered by existing primitives (no new work):** open/close state → `createControllableState`
 (+ `createPresence`); roving focus / typeahead / arrow nav / 2D grid → the list-\* + grid kernel;
@@ -468,20 +470,34 @@ plain query input.
 
 - `createTextInput` (#9) — **shipped**, and this is now its second consumer after `Combobox.Input`.
   Not a blocker any more.
-- `createTagsState` (#11) — the remaining primitive: the tag list, add/remove, `Backspace` on an
-  empty field removing the last tag, paste-splitting, and `max`/duplicate policy.
 - Roving focus across the chips — **already in the kernel** (`createListNavigation` /
   `createListFocus`), so this is wiring, not new behaviour.
+- Focus after a chip is removed — **shipped as #22.** This was the one real gap, and it was never
+  tags-specific: `createListFocus` now re-homes the active row by identity when the collection
+  changes, which the filtered Combobox needed anyway.
+- **No `createTagsState`.** #11 was retired rather than built — see the row for the full reasoning.
+  The tag array is `createControllableState<V[]>` inside a `tags-input/` root hook; add/remove/dedupe
+  are the three one-liners `create-list-selection.ts` already spells; `max` is a length check; and
+  add-on-Enter, `Backspace`-on-empty and paste-splitting are **keymap**, so they live in the part
+  hooks the way `createComboboxInput` holds Combobox's. Neither reference has a tags state layer to
+  copy — see the row.
 - **No new combobox kernel work.** The chips are a sibling of the control, not a part of the popup;
   `createCombobox` already exposes everything the chip row needs (`state.list.value()`,
   `selection.deselect`). The integration is a *component* that composes `TagsInput` and `Combobox`,
   which is the same "compose, don't inherit" line Popover-vs-Dialog draws.
 
+**Two things left to decide when it is built**, both genuinely open because no reference settles them:
+the chip row's **ARIA role** (react-aria: `grid` with `row`/`gridcell`, which under the porting rule
+means building a `createGridList` over `createGridNavigation` rather than hand-rolling role strings;
+Base UI: `toolbar` over role-less `div`s, for a documented NVDA browse-mode reason), and **`max` /
+duplicate policy**, which has *zero* precedent in either — no `max`, no dedupe, no add-on-Enter
+anywhere upstream.
+
 **Sequencing.** `TagsInput` is worth building standalone first — it is a real form control on its own
-(email recipients, keyword entry) and it is where `createTagsState` gets its DoD. The multi-select
-Combobox integration follows, and only then is `selectionMode="multiple"` a shape worth putting in
-front of users. Until it lands, the docs should keep steering multi-select toward `Listbox` (which
-shows every row and every tick, always) rather than toward a closed Combobox that reveals nothing.
+(email recipients, keyword entry). The multi-select Combobox integration follows, and only then is
+`selectionMode="multiple"` a shape worth putting in front of users. Until it lands, the docs should
+keep steering multi-select toward `Listbox` (which shows every row and every tick, always) rather
+than toward a closed Combobox that reveals nothing.
 
 ---
 
@@ -511,12 +527,16 @@ Not prescriptive, but the natural sequence given what's now landed:
    shipped, and neither component grew a keymap of its own: `Select.Trigger` and `Combobox.Input` are
    the same ARIA pattern on a `<button>` and an `<input>`. `createTextInput` (#9) landed with the
    latter.
-6. **`createTagsState` (#11), then `TagsInput`** — the first thing Combobox left unfinished rather
-   than the next thing on the list. `selectionMode="multiple"` ships today with **no way to show what
-   it holds once the popup closes**, because a combobox's input is the query and not the value; a
-   removable chip row is what closes that, and `createTextInput` shipping means `createTagsState` is
-   the only piece missing. Full reasoning in §3. Worth building standalone first — it is a real form
-   control on its own, and it is where `createTagsState` earns its DoD — with the multi-select
+6. **`TagsInput`** — the first thing Combobox left unfinished rather than the next thing on the list.
+   `selectionMode="multiple"` ships today with **no way to show what it holds once the popup closes**,
+   because a combobox's input is the query and not the value; a removable chip row is what closes
+   that. **It is no longer gated on a primitive.** Setting out to build `createTagsState` (#11) is
+   what showed the row should not exist — its scope was already covered, and the one real gap behind
+   it, focus after removal, was a `createListFocus` bug that shipped as #22. Full reasoning in §3.
+   Worth building standalone first — it is a real form control on its own — with the multi-select
    Combobox integration following as a component that *composes* the two.
+7. **`createListExpansion` → `itemToValue` (#23), then Collapsible + Accordion.** The migration is
+   small and the ordering is the whole point: it is the last primitive on the retired `compareWith`
+   vocabulary, and Accordion is the component that would freeze it into a public API.
 
 From there the T1/T2 backlog can be parallelized.

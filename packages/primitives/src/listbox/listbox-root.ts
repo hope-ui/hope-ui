@@ -352,6 +352,9 @@ export function createListbox<V = unknown, G = V>(
     // it later, from a focus handler or a tabindex getter, never while constructing — so the forward
     // reference is safe and the dependency direction stays selection → focus everywhere else.
     entryIndex: () => selection.firstSelectedIndex(),
+    // The same mapper selection uses, so the highlight survives the option set changing under it —
+    // a Combobox narrowing on each keystroke, or an async source arriving.
+    itemToValue,
   });
 
   const selection: CreateListSelectionReturn<V> = createListSelection<V>({

@@ -98,6 +98,7 @@ function createListFocus<V = unknown>(options: {
   activeIndex?: Accessor<number | undefined>;           // controlled; -1 = none
   defaultActiveIndex?: number;                          // default -1
   onActiveChange?: (index: number) => void;
+  itemToValue?: (value: V) => unknown;                  // identity key; default identity
 }): CreateListFocusReturn<V>;
 ```
 
@@ -126,6 +127,55 @@ Returned surface: `items`, `activeIndex`, `activeItem`, `disabled`, `skipDisable
 - **`isFocusable`** is `!item.disabled() || !skipDisabled()` — with `skipDisabled` off (menus),
   disabled items stay focusable but selection/activation should still refuse them.
 - **`disabled` list** forces every `tabindex` to `-1` and suppresses `aria-activedescendant`.
+- **`itemToValue`** maps a value to the identity key used to find the active row again after the item
+  array changes — see the next section. Default identity; pass `(fruit) => fruit.id` for object values
+  rebuilt per render. It is `createListSelection`'s option, unchanged, so a widget passes one mapper to
+  both (`createListbox` does).
+
+## The active item is re-homed when the collection changes
+
+`activeIndex` is a **slot number**, and any insert or remove renumbers every slot after it. Left
+alone that fails two ways, both silent:
+
+- Remove a row *before* the active one and the highlight slides onto whatever moved into that slot.
+  The index is still valid, `activeItem()` still returns something, and every test stays green — it
+  is simply a different option than the user was on.
+- Remove the *last* row while it is active and the index falls out of range: `activeItem()` is
+  `undefined`, `aria-activedescendant` names nothing, and Enter commits nothing.
+
+Neither is hypothetical: any `Listbox` whose `items` come from a signal — an async load, a
+consumer-side filter — hits both.
+
+`Combobox` is the instructive exception. Its `items()` is the **filtered** set, so it narrows on
+every keystroke, and it had already met this the hard way: `combobox-root.tsx` carries an effect that
+re-anchors the highlight with `navigation.first()` whenever the filter changes. That stays, and it
+still wins — it is created after this one, and sibling effects run in creation order — because
+"highlight the top match" is a deliberate *search* policy, not a workaround for this bug. The
+difference is that a Combobox chose that policy, while every other consumer was silently getting a
+stale slot number.
+
+So an effect on `items()` reconciles the active row: if its key is still present the index is
+rewritten **quietly** (`setActiveIndexState`, not `setActive` — the element never moved, so scrolling
+it into view or re-arming the deferred `.focus()` would be a spurious focus move), and if the row is
+gone, focus really has to move, so the replacement goes through the full `setActive`.
+
+The replacement is the nearest surviving **focusable** row, searched forward from the old position
+and then backward. Two details carry the weight:
+
+- **The walk searches the *previous* ordering.** The removed row is gone from the new array, so only
+  the old one still knows who its neighbours were.
+- **Keys are cached from the previous run**, never re-read from the previous items. By the time this
+  effect runs those rows have unmounted, and their `value()` accessors close over props that no
+  longer have an owner.
+
+Adapted from react-aria's `useFocusedKeyReset` (in react-stately's `useListState`) — its reasoning,
+not its code. Base UI's chips reach the same landing spot with index arithmetic alone
+(`getIndexAfterChipRemoval`), which is worth knowing as independent agreement on the *policy* even
+though it cannot fix the first failure above.
+
+**Virtualization is untouched.** `createVirtualCollection`'s `items()` is the full logical set:
+scrolling changes which rows have a resolved `element()`, never the array's length or order. The
+separate focus-recovery effect above owns that case.
 
 ## SSR
 
@@ -179,3 +229,24 @@ top of it one frame later — measured at 6px of the active row clipped in the 1
 virtualizer aligning against the border box (288px) while the port excludes the 1px borders and the 4px
 padding (286px). Both automated gates stayed green through that regression; the Storybook pass is what
 caught it.
+
+### Clamping the active index on removal instead of re-homing by identity, as Base UI's chips do
+**Why not:** clamping only rescues an index that fell out of range. It cannot see that a row was
+removed *before* the active one, so the highlight slides onto whatever slid into that slot — a valid
+index naming a different option, with `activeItem()` still returning something and every assertion
+still passing. Base UI ships that limitation because its chip row is index-addressed end to end; this
+primitive already has a value per item, so the identity comparison is nearly free.
+
+### Reading the previous items back to find the active row's neighbours
+**Why not:** by the time the effect runs those rows have unmounted, and a `CollectionItem`'s `value()`
+closes over the row's props — reading a disposed one is undefined behavior at best. Keys are captured
+at the end of each run instead, while the rows are still alive, which also makes the comparison a
+plain array scan rather than N reactive reads.
+
+### Taking `isItemEqualToValue` too, mirroring `createListSelection` in full
+**Why not:** selection needs the full override because a consumer's equality can be arbitrary and it
+runs on user-visible state. Re-homing only needs to answer "is this the same row" across one array
+swap, which `itemToValue` settles; a second overlapping seam would be one more thing to keep in step
+between two primitives for no behavior neither already covers.
+**Revisit if:** a consumer turns up whose identity genuinely cannot be expressed as a key — the option
+is additive, and `createListbox` already holds an `isItemEqualToValue` to forward.

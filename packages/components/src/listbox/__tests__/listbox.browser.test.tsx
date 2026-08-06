@@ -4,7 +4,7 @@ import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { For, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Listbox } from "../index";
@@ -197,6 +197,76 @@ describe("Listbox — highlight follows focus", () => {
     // Second: once focus leaves, the highlight must not stay painted.
     (document.activeElement as HTMLElement).blur();
     await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
+    dispose();
+  });
+});
+
+describe("Listbox — the highlight survives the item set changing", () => {
+  /** A Listbox over a signal, the shape an async load or a consumer-side filter produces. */
+  function ReactiveListbox(props: { fruits: Fruit[] }): JSX.Element {
+    return (
+      <Themed>
+        <Listbox.Root
+          aria-label="fruits"
+          items={props.fruits}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          focusMode="activedescendant"
+        >
+          {(fruit) => (
+            <Listbox.Item item={fruit} data-value={fruit.name}>
+              {fruit.name}
+            </Listbox.Item>
+          )}
+        </Listbox.Root>
+      </Themed>
+    );
+  }
+
+  it("keeps naming the same option when an earlier one disappears", async () => {
+    // `aria-activedescendant` is an index into the item array underneath. Drop a row above the
+    // highlighted one and the raw index names its neighbour instead — a valid id pointing at the
+    // wrong option, which no "is it a real element" assertion can catch.
+    const [fruits, setFruits] = createSignal(FRUITS);
+    const { container, dispose } = mount(() => <ReactiveListbox fruits={fruits()} />);
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    const list = listbox(container);
+    // Focus-in already activates the entry row (Apple), so N arrows lands on index N.
+    list.focus();
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+
+    const named = () =>
+      container.querySelector(`[id="${list.getAttribute("aria-activedescendant")}"]`);
+    await vi.waitFor(() => expect(named()?.getAttribute("data-value")).toBe("Cherry"));
+
+    setFruits((current) => current.filter((fruit) => fruit.name !== "Apple"));
+
+    await vi.waitFor(() => expect(options(container)).toHaveLength(3));
+    expect(named()?.getAttribute("data-value")).toBe("Cherry");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("falls back to a neighbour when the highlighted option itself disappears", async () => {
+    const [fruits, setFruits] = createSignal(FRUITS);
+    const { container, dispose } = mount(() => <ReactiveListbox fruits={fruits()} />);
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    const list = listbox(container);
+    list.focus();
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
+
+    const named = () =>
+      container.querySelector(`[id="${list.getAttribute("aria-activedescendant")}"]`);
+    await vi.waitFor(() => expect(named()?.getAttribute("data-value")).toBe("Date"));
+
+    setFruits((current) => current.filter((fruit) => fruit.name !== "Date"));
+
+    // Not `aria-activedescendant` dangling or dropped: the last row is gone, so the highlight walks
+    // back to the one before it.
+    await vi.waitFor(() => expect(options(container)).toHaveLength(3));
+    expect(named()?.getAttribute("data-value")).toBe("Cherry");
     dispose();
   });
 });

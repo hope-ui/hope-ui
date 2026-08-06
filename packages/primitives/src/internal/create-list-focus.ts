@@ -52,6 +52,14 @@ export interface CreateListFocusOptions<V = unknown> {
   defaultActiveIndex?: number;
   /** Called whenever the active index changes. */
   onActiveChange?: (index: number) => void;
+  /**
+   * Maps a value to its **identity key**, so the active item can be recognized again after the item
+   * array changes — see "Re-homing the active item" below. Two items are the same when their keys
+   * are `===`. Borrowed unchanged from `createListSelection`, so a widget passes one mapper to both.
+   * Default: identity (`(value) => value`), which is right for primitive values; with object values
+   * that are rebuilt per render, pass e.g. `(fruit) => fruit.id`.
+   */
+  itemToValue?: (value: V) => unknown;
 }
 
 export interface CreateListFocusReturn<V = unknown> {
@@ -143,6 +151,9 @@ export function createListFocus<V = unknown>(
   const [isFocused, setFocused] = createSignal(false);
 
   const isFocusable = (item: CollectionItem<V>) => !item.disabled() || !skipDisabled();
+
+  const itemKey = (item: CollectionItem<V>) =>
+    options.itemToValue ? options.itemToValue(item.value()) : item.value();
 
   const activeItem = () => {
     const index = activeIndex();
@@ -263,6 +274,71 @@ export function createListFocus<V = unknown>(
   };
 
   const focusEntry = () => setActive(entryIndex());
+
+  // Re-homing the active item across a collection change. `activeIndex` is a slot number, and a
+  // removal renumbers every slot after it — so on its own it silently hands the highlight to
+  // whichever item slid into that slot, and names nothing at all once the list is shorter than the
+  // index. Keys are cached from the *previous* run rather than re-read from the previous items,
+  // because those rows have already unmounted by the time this runs.
+  //
+  // The walk searches the previous ordering, not the new one: the removed item is gone from the new
+  // array, so only the old one still knows who its neighbors were. Adapted from react-aria's
+  // `useFocusedKeyReset` (react-stately's `useListState`) — its reasoning, not its code.
+  /** The nearest still-present focusable row to `from`, searched forward then backward. `-1` if none. */
+  const findSurvivor = (
+    previous: unknown[],
+    currentKeys: unknown[],
+    current: ReadonlyArray<CollectionItem<V>>,
+    from: number,
+  ): number => {
+    const survivorAt = (previousIndex: number) => {
+      const index = currentKeys.indexOf(previous[previousIndex]);
+      const item = index >= 0 ? current[index] : undefined;
+      return item && isFocusable(item) ? index : -1;
+    };
+    for (let index = from + 1; index < previous.length; index++) {
+      const found = survivorAt(index);
+      if (found >= 0) {
+        return found;
+      }
+    }
+    for (let index = from - 1; index >= 0; index--) {
+      const found = survivorAt(index);
+      if (found >= 0) {
+        return found;
+      }
+    }
+    return -1;
+  };
+
+  let previousKeys: unknown[] | null = null;
+  createEffect(
+    () => items(),
+    (current) =>
+      untrack(() => {
+        const previous = previousKeys;
+        const currentKeys = current.map((item) => itemKey(item));
+        previousKeys = currentKeys;
+        const activeAt = activeIndex();
+        if (previous === null || activeAt < 0 || activeAt >= previous.length) {
+          return;
+        }
+
+        const survivedAt = currentKeys.indexOf(previous[activeAt]);
+        if (survivedAt === activeAt) {
+          return;
+        }
+        if (survivedAt >= 0) {
+          // The element never moved, only its index did. Going through `setActive` here would
+          // scroll it into view and re-arm the deferred `.focus()` for a row already focused.
+          setActiveIndexState(survivedAt);
+          return;
+        }
+
+        // The active row is gone, so focus really has to move: full `setActive`.
+        setActive(findSurvivor(previous, currentKeys, current, activeAt));
+      }),
+  );
 
   const isActive = (item: CollectionItem<V>) => activeItem() === item;
 

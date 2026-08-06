@@ -466,3 +466,123 @@ describe("createListFocus — disabled list", () => {
     dispose();
   });
 });
+
+describe("createListFocus — re-homing the active item when the collection changes", () => {
+  /** Mounts the harness over a signal-backed value list, so a test can remove rows. */
+  function renderRemovable(initial: string[], disabledValues?: string[]) {
+    const [values, setValues] = createSignal(initial);
+    let api!: HarnessApi;
+    const { container, dispose } = mount(() => (
+      <FocusHarness values={values()} disabledValues={disabledValues} onReady={(a) => (api = a)} />
+    ));
+    const activeValue = () => untrack(() => api.focus.activeItem()?.value());
+    const remove = (...removed: string[]) =>
+      setValues((current) => current.filter((value) => !removed.includes(value)));
+    return { api, container, dispose, activeValue, remove, setValues };
+  }
+
+  it("keeps the highlight on the same item when an earlier one is removed", async () => {
+    const { api, activeValue, remove, dispose } = renderRemovable(["a", "b", "c", "d"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(4));
+
+    api.focus.focusIndex(2);
+    await vi.waitFor(() => expect(activeValue()).toBe("c"));
+
+    remove("a");
+
+    // The index alone is a slot number: "c" slid from 2 to 1, so trusting the raw index would hand
+    // the highlight to "d" with nothing failing.
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+    expect(activeValue()).toBe("c");
+    dispose();
+  });
+
+  it("falls back to the previous item when the active — and last — item is removed", async () => {
+    const { api, activeValue, remove, dispose } = renderRemovable(["a", "b", "c"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    api.focus.focusIndex(2);
+    await vi.waitFor(() => expect(activeValue()).toBe("c"));
+
+    remove("c");
+
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(2));
+    expect(activeValue()).toBe("b");
+    dispose();
+  });
+
+  it("moves to the following item when an active item mid-list is removed", async () => {
+    const { api, activeValue, remove, dispose } = renderRemovable(["a", "b", "c", "d"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(4));
+
+    api.focus.focusIndex(1);
+    await vi.waitFor(() => expect(activeValue()).toBe("b"));
+
+    remove("b");
+
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+    expect(activeValue()).toBe("c");
+    dispose();
+  });
+
+  it("skips a disabled row while walking for the replacement", async () => {
+    const { api, activeValue, remove, dispose } = renderRemovable(["a", "b", "c", "d"], ["c"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(4));
+
+    api.focus.focusIndex(1);
+    await vi.waitFor(() => expect(activeValue()).toBe("b"));
+
+    remove("b");
+
+    // "c" is disabled and `skipDisabled` is on by default, so the walk carries past it to "d".
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+    expect(activeValue()).toBe("d");
+    dispose();
+  });
+
+  it("clears the active index when every item is removed", async () => {
+    const { api, remove, dispose } = renderRemovable(["a", "b"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(2));
+
+    api.focus.focusIndex(1);
+    await vi.waitFor(() => expect(untrack(() => api.focus.activeIndex())).toBe(1));
+
+    remove("a", "b");
+
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(0));
+    expect(untrack(() => api.focus.activeIndex())).toBe(-1);
+    dispose();
+  });
+
+  it("leaves the active row alone when the same list arrives as a fresh array", async () => {
+    // The virtualization-adjacent case, and the commoner one: a consumer passing
+    // `items={fruits.filter(…)}` hands a new array identity every render, so the source's items memo
+    // re-emits with every key unchanged. Re-homing must be a no-op there, not a focus move.
+    const { api, activeValue, setValues, dispose } = renderRemovable(["a", "b", "c"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    api.focus.focusIndex(1);
+    await vi.waitFor(() => expect(activeValue()).toBe("b"));
+    const focused = document.activeElement;
+
+    setValues((current) => [...current]);
+
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+    expect(untrack(() => api.focus.activeIndex())).toBe(1);
+    expect(activeValue()).toBe("b");
+    expect(document.activeElement).toBe(focused);
+    dispose();
+  });
+
+  it("has no baseline accessibility violations after a removal", async () => {
+    const { api, container, remove, dispose } = renderRemovable(["a", "b", "c"]);
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    api.focus.focusIndex(2);
+    remove("a");
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(2));
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
