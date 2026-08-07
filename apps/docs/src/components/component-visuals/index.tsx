@@ -53,12 +53,14 @@ function FallbackVisual() {
   );
 }
 
-// The preview panel rendered at the top of each overview card: a recessed surface
-// holding the page's illustration, divided from the card's text below.
+// The preview panel rendered at the top of each overview card: a tinted band holding the page's
+// illustration, divided from the card's text below. `surface-muted` (a region inside a container),
+// not `surface-sunken` (a well below the page) — the latter is black in dark mode, so the band
+// would read as a hole punched in the card.
 export function SectionVisual(props: { section: string; slug: string }) {
   const Visual = sectionVisuals[`${props.section}/${props.slug}`] ?? FallbackVisual;
   return (
-    <div class="flex h-24 items-center justify-center overflow-hidden border-b border-subtle bg-surface-sunken transition-colors group-hover:bg-primary-soft/40">
+    <div class="flex h-24 items-center justify-center overflow-hidden border-b border-subtle bg-surface-muted transition-colors group-hover:bg-primary-soft/40">
       <Visual />
     </div>
   );

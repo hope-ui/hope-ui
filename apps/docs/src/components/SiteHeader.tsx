@@ -116,16 +116,23 @@ export function SiteHeader() {
           {/* `foreground-muted`, not `foreground-subtle`, on both the label and the shortcut hint.
               Subtle is the ramp's quietest step and lands under WCAG's 4.5:1 on these two surfaces
               in BOTH modes — 2.48:1 / 2.59:1 on light, 4.44:1 / 3.79:1 on dark (axe `color-contrast`).
-              Muted clears it everywhere (7.5–8.1 light, 6.9–8.1 dark) and is the same step the nav
+              Muted clears it everywhere (7.49:1 light, 6.45:1 dark) and is the same step the nav
               tabs use, so the field still reads as secondary chrome rather than competing with them.
               The glyph inherits it and thereby also clears the 3:1 non-text bar it was failing on
-              light. Recolouring `surface-sunken` instead was the alternative — rejected, it is a
-              shared token and would move every sunken surface on the site. */}
+              light.
+
+              The fill is `surface-muted` (a region set apart from the surface it sits inside), not
+              `surface-sunken` (a well below the *page*): sunken is black in dark mode, so the field
+              painted a black pill on the near-black header and read as a hole rather than a control.
+              Recolouring the sunken *token* was the alternative — rejected, it is shared and would
+              move every sunken surface on the site; pointing this one element at the token that
+              actually describes it does not. Light is untouched by the swap (both tokens resolve to
+              the same value there), so only the dark figure above moved, from 8.13:1. */}
           <button
             type="button"
             title="Search is coming soon"
             aria-label="Search (coming soon)"
-            class="hidden w-56 items-center gap-2 rounded-lg border border-subtle bg-surface-sunken px-3 py-1.5 text-sm text-foreground-muted transition-colors hover:border-strong sm:flex"
+            class="hidden w-56 items-center gap-2 rounded-lg border border-subtle bg-surface-muted px-3 py-1.5 text-sm text-foreground-muted transition-colors hover:border-strong sm:flex"
           >
             <SearchIcon class="size-4 shrink-0" />
             <span>Search…</span>

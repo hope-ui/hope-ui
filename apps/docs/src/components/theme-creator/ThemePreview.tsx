@@ -45,7 +45,7 @@ function ModeToggle() {
   // uses one, and it satisfies biome's useSemanticElements without a suppression.
   return (
     <fieldset
-      class="inline-flex items-center rounded-lg border border-subtle bg-surface-sunken p-0.5"
+      class="inline-flex items-center rounded-lg border border-subtle bg-surface-muted p-0.5"
       aria-label="Color mode"
     >
       <button

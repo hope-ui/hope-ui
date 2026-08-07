@@ -75,9 +75,12 @@ describe("hope dialog recipe", () => {
     expect(content).toContain("data-exiting:scale-95");
   });
 
-  it("tints the footer with the sunken surface + a top hairline", () => {
+  it("tints the footer with the muted surface + a top hairline", () => {
     const footer = dialogRecipe({}).footer();
-    expect(footer).toContain("bg-surface-sunken");
+    expect(footer).toContain("bg-surface-muted");
+    // Never `surface-sunken`: that is one step below the *page*, so in a dark theme (where the page is
+    // already near-black) it painted a black hole inside the neutral-900 card.
+    expect(footer).not.toContain("bg-surface-sunken");
     expect(footer).toContain("border-t");
     expect(footer).toContain("border-subtle");
     expect(footer).toContain("rounded-b-xl");

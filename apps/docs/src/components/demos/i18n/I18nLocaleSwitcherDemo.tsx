@@ -38,7 +38,7 @@ function LocalizedSurface() {
       </div>
 
       {/* A readout of exactly what any descendant gets from useLocale() for the active locale. */}
-      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-lg bg-surface-sunken p-3 text-sm">
+      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-lg bg-surface-muted p-3 text-sm">
         <dt class="font-medium text-foreground-subtle">locale</dt>
         <dd class="font-mono text-foreground">{i18n.locale()}</dd>
         <dt class="font-medium text-foreground-subtle">direction</dt>

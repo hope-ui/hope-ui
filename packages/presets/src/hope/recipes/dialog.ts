@@ -10,7 +10,7 @@
  * ── Recipe purity ───────────────────────────────────────────────────────────────────────────────
  * shadcn-nova's own rules use alpha modifiers (`bg-black/10`, `bg-muted/50`) that a hope recipe may
  * not: every color here is a *finished* `--hope-*` design token (`bg-scrim`, `bg-surface-overlay`,
- * `bg-surface-sunken`, `border-subtle`), never one this recipe computes — no `color-mix`, no alpha
+ * `bg-surface-muted`, `border-subtle`), never one this recipe computes — no `color-mix`, no alpha
  * modifier, no magic opacity. Derived colors are authored as tokens in the preset's `theme.css`
  * instead. Enforced by `pnpm check:recipe-purity`. Enter *and* exit use `opacity-0`/`scale-95` keyed
  * on the `data-entering:`/`data-exiting:` variants (→ `[data-presence="entering"|"exiting"]`, the
@@ -73,9 +73,12 @@ export const dialogRecipe = tv({
     // a scrollbar.
     body: "min-h-0 flex-1",
     // Pulled back out into the card's own padding with negative margins, so the tinted bar reaches the
-    // card's edges.
+    // card's edges. The tint is `surface-muted`, NOT `surface-sunken`: a "sunken" surface is one step
+    // below the *page*, and a dark page is already near-black, so reusing it here painted a black hole
+    // inside a neutral-900 card. `surface-muted` is a tonal step relative to whatever surface it sits
+    // inside, so it darkens the card in a light theme and lightens it in a dark one.
     footer: [
-      "-mx-4 -mb-4 flex shrink-0 flex-col-reverse gap-2 rounded-b-xl border-t border-subtle bg-surface-sunken p-4",
+      "-mx-4 -mb-4 flex shrink-0 flex-col-reverse gap-2 rounded-b-xl border-t border-subtle bg-surface-muted p-4",
       "sm:flex-row sm:justify-end",
     ],
     title: "text-base font-medium leading-none text-foreground",

@@ -491,8 +491,9 @@ function ThemingSpotlight() {
         <div class="hope-reveal min-w-0 space-y-4">
           <UsageSnippet />
 
-          {/* Elevation surfaces demo. */}
-          <div class="rounded-2xl border border-subtle bg-surface-sunken p-4">
+          {/* Elevation surfaces demo. The frame is `surface-muted` so the `sunken` swatch it holds
+              stays visible against it — a sunken frame would swallow its own first sample. */}
+          <div class="rounded-2xl border border-subtle bg-surface-muted p-4">
             <div class="grid grid-cols-3 gap-3">
               <For
                 each={[

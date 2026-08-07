@@ -150,7 +150,7 @@ export function ThemeCreator() {
             />
           </div>
 
-          <div class="flex flex-wrap items-center gap-3 border-t border-subtle p-4 -mx-5 -mb-5 bg-surface-sunken rounded-b-xl">
+          <div class="flex flex-wrap items-center gap-3 border-t border-subtle p-4 -mx-5 -mb-5 bg-surface-muted rounded-b-xl">
             <Button fullWidth size="lg" onClick={() => update(HOPE_DEFAULT_CONFIG)}>
               Reset configuration
             </Button>

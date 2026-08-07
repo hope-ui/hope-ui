@@ -11,8 +11,8 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     expect(new Set(SEMANTIC_COLOR_TOKENS).size).toBe(SEMANTIC_COLOR_TOKENS.length);
   });
 
-  it("is the full 143-token vocabulary", () => {
-    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(143);
+  it("is the full 144-token vocabulary", () => {
+    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(144);
   });
 
   it("includes the surfaces, text ramp, on-state, role ladders, borders, collections and systemic tokens", () => {
@@ -21,6 +21,10 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("surface-raised");
     has("surface-raised-hovered");
     has("surface-raised-pressed");
+    has("surface-sunken");
+    // The tonal region-inside-a-container fill. Distinct from `-sunken` (one step below the *page*),
+    // which bottoms out at black in a dark theme and so cannot tint a region inside a dark card.
+    has("surface-muted");
     has("surface-inverse");
     has("foreground");
     has("foreground-muted");

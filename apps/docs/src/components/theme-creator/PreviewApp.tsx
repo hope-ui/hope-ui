@@ -106,7 +106,7 @@ export function PreviewApp() {
         <div class="space-y-5">
           <PreviewDeployments />
 
-          <div class="flex flex-wrap items-center gap-3 rounded-xl border border-subtle bg-surface-sunken p-4">
+          <div class="flex flex-wrap items-center gap-3 rounded-xl border border-subtle bg-surface-muted p-4">
             <span class="min-w-0 flex-1 text-sm text-foreground-muted">
               <span class="font-medium text-foreground">4 commits</span> are waiting behind the
               current release.

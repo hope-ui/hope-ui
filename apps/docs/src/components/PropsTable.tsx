@@ -29,7 +29,7 @@ export function PropsTable(props: { rows: PropRow[] }): JSX.Element {
         // Type on top (mono, emphasized), description stacked below (muted, wraps).
         type: (
           <div class="flex flex-col gap-1.5">
-            <code class="w-fit whitespace-nowrap rounded bg-surface-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground">
+            <code class="w-fit whitespace-nowrap rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground">
               {row.type}
             </code>
             {row.description ? <span>{row.description}</span> : null}

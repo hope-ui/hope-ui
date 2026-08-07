@@ -24,6 +24,7 @@
   --color-surface-raised-pressed: var(--hope-surface-raised-pressed);
   --color-surface-overlay: var(--hope-surface-overlay);
   --color-surface-sunken: var(--hope-surface-sunken);
+  --color-surface-muted: var(--hope-surface-muted);
   --color-surface-inverse: var(--hope-surface-inverse);
 
   /* Standard text ramp */

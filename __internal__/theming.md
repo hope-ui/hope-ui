@@ -296,6 +296,16 @@ maps down to each without losing MD3/Fluent nuance.
   `bg-bg`: `surface` (default page/card) · `surface-raised` (cards/menus, with its own
   `-raised-hovered`/`-raised-pressed` ladder) · `surface-overlay` (dialogs) · `surface-sunken` (wells)
   · `surface-inverse` (tooltips). → `bg-surface`.
+- **`surface-muted` is the one surface token that is *not* about depth**, and the distinction from
+  `surface-sunken` is load-bearing. `-sunken` is a well one step below the **page**; `-muted` is a
+  region set apart from the surface it sits **inside** (a dialog footer, a toolbar strip, a table
+  header). Depth only reads in one lighting direction, so a dark theme forces the split: `-sunken`
+  bottoms out (hope's is `black`, and there is nothing below an already-near-black page), which is why
+  reusing it for a region inside a `neutral-900` card painted a hole rather than a tint. `-muted` is
+  therefore direction-free by design — it darkens its container in a light theme and lightens it in a
+  dark one — and hope authors it as a `color-mix` **anchored to `surface-overlay`**, so a consumer who
+  repoints their overlay gets a footer that still tracks it. Anything asking "tint this region against
+  its own container" takes `-muted`; only a page-level well takes `-sunken`.
 - **Standard text is the `foreground*` ramp** on neutral surfaces: `foreground` → `foreground-muted` →
   `foreground-subtle`, plus `foreground-disabled`. Icons fold into these via `currentColor`; there is
   no separate `icon` family.
@@ -385,8 +395,14 @@ role with a hole in the set):
 | `surface` | `surface` | `colorBgContainer` | `colorNeutralBackground1` | `--bs-body-bg` | `background` / `card` |
 | `surface-raised` | `surface-container-high` | `colorBgElevated` | `colorNeutralCardBackground` | — | `popover` |
 | `surface-overlay` | `surface-container-highest` | `colorBgElevated` | `colorNeutralBackground1` | — | `popover` |
-| `surface-sunken` | `surface-container` / `surface-dim` | `colorBgLayout` | `colorNeutralBackground3` | `--bs-tertiary-bg` | `muted` |
+| `surface-sunken` | `surface-dim` | `colorBgLayout` | `colorNeutralBackground3` | `--bs-tertiary-bg` | — |
+| `surface-muted` | `surface-container` | `colorFillAlter` | `colorNeutralBackground2` | `--bs-secondary-bg` | `muted` |
 | `surface-inverse` | `inverse-surface` | `colorBgSpotlight` | `colorNeutralBackgroundInverted` | — | — |
+
+shadcn's `muted` sits on the `surface-muted` row, **not** `surface-sunken` — it is *lighter* than
+shadcn's `card` in dark mode, i.e. a region inside a container rather than a well below the page. This
+table claimed the opposite, and the dialog footer was built on that claim: it took `surface-sunken`
+and shipped as pure black inside a `neutral-900` card.
 
 **Foreground** · `foreground` → MD3 `on-surface` / Ant `colorText` / Fluent `colorNeutralForeground1` /
 Bootstrap `--bs-body-color` / shadcn `foreground`; `foreground-muted` → `on-surface-variant` /

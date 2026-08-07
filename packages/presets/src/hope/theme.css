@@ -25,7 +25,7 @@
  *
  * `.dark` follows `:root`: both selectors have equal specificity, so source order decides, and the
  * dark overrides win whenever the `.dark` class (see `_base/_variants.css`) is present. Conformance
- * checks only `:root`, so the two blocks are kept in lockstep by hand — 141 color tokens each.
+ * checks only `:root`, so the two blocks are kept in lockstep by hand — 142 color tokens each.
  */
 
 :root {
@@ -36,6 +36,15 @@
   --hope-surface-raised-pressed: var(--color-neutral-100);
   --hope-surface-overlay: var(--color-white);
   --hope-surface-sunken: var(--color-neutral-50);
+  /*
+   * Tonal, not an elevation step — mixed *into* the surface it sits on, so the same token darkens a
+   * light card and lightens a dark one. That direction-flip is the whole point: `surface-sunken` is
+   * one step below the *page*, which in dark mode is already near-black, so a "well" inside a
+   * neutral-900 card can only paint a hole. Anchoring the mix to `--hope-surface-overlay` (rather
+   * than to a fixed shade) means a consumer who repoints their overlay gets a footer that still
+   * tracks it.
+   */
+  --hope-surface-muted: color-mix(in oklab, var(--color-neutral-100) 50%, var(--hope-surface-overlay));
   --hope-surface-inverse: var(--color-neutral-900);
 
   /* Standard text ramp (on neutral surfaces) */
@@ -225,6 +234,7 @@
   --hope-surface-raised-pressed: var(--color-neutral-800);
   --hope-surface-overlay: var(--color-neutral-900);
   --hope-surface-sunken: var(--color-black);
+  --hope-surface-muted: color-mix(in oklab, var(--color-neutral-800) 50%, var(--hope-surface-overlay));
   --hope-surface-inverse: var(--color-neutral-50);
 
   /* Standard text ramp (on neutral surfaces) */

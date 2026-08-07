@@ -27,7 +27,7 @@ function renderCell(value: string | JSX.Element | undefined, code: boolean): JSX
   }
   if (code && typeof value === "string") {
     return (
-      <code class="whitespace-nowrap rounded bg-surface-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground">
+      <code class="whitespace-nowrap rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground">
         {value}
       </code>
     );

@@ -19,7 +19,7 @@ export function SelectPolymorphicDemo() {
         render={(props) => (
           <button
             {...props}
-            class="inline-flex min-w-44 items-center justify-between gap-3 rounded-full border border-strong bg-surface-sunken px-4 py-1.5 text-foreground text-sm"
+            class="inline-flex min-w-44 items-center justify-between gap-3 rounded-full border border-strong bg-surface-muted px-4 py-1.5 text-foreground text-sm"
           />
         )}
       >

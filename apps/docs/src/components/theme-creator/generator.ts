@@ -46,6 +46,15 @@ function mix(family: string, shade: number, pct: number): string {
   return `color-mix(in oklab, ${colorVar(family, shade)} ${pct}%, transparent)`;
 }
 
+/**
+ * A derived color mixed *into* the overlay surface rather than into transparency (`surface-muted`).
+ * Anchoring to the token rather than to a fixed shade is what lets the result follow a consumer who
+ * repoints `--hope-surface-overlay`.
+ */
+function mixIntoOverlay(family: string, shade: number, pct: number): string {
+  return `color-mix(in oklab, ${colorVar(family, shade)} ${pct}%, var(--hope-surface-overlay))`;
+}
+
 // ---------------------------------------------------------------------------
 // Role ladder — the 20 tokens of one role, in `theme.css` order.
 // ---------------------------------------------------------------------------
@@ -230,6 +239,13 @@ function buildSections(config: ThemeConfig): Section[] {
       row("surface-raised-pressed", n(100), n(800)),
       row("surface-overlay", WHITE, n(900)),
       row("surface-sunken", n(50), BLACK),
+      // Tonal, not an elevation step — it darkens a light card and lightens a dark one, which is why
+      // it cannot be `-sunken` (a well has nowhere to go once the page is already near-black).
+      {
+        name: "surface-muted",
+        light: mixIntoOverlay(N, 100, 50),
+        dark: mixIntoOverlay(N, 800, 50),
+      },
       row("surface-inverse", n(900), n(50)),
     ],
   });

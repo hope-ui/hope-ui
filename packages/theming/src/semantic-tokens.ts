@@ -28,6 +28,12 @@ export const SEMANTIC_COLOR_TOKENS = [
   "surface-raised-pressed",
   "surface-overlay",
   "surface-sunken",
+  // NOT an elevation rung, and the one surface token that says nothing about depth: a region set
+  // apart from the surface it sits *inside* (a dialog footer, a toolbar strip, a table header). It is
+  // deliberately direction-free — it darkens its container in a light theme and lightens it in a dark
+  // one. `-sunken` cannot serve this: a well is one step below the *page*, and once the page is
+  // already near-black there is no step left, so a dark theme paints a hole instead of a region.
+  "surface-muted",
   "surface-inverse",
 
   // Standard text ramp, for neutral surfaces; used as `text-*`.

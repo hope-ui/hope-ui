@@ -59,7 +59,7 @@ export function ExportThemeDialog(props: { config: ThemeConfig }) {
             </Dialog.Header>
 
             <Dialog.Body class="rounded-xl border border-subtle">
-              <div class="overflow-hidden bg-surface-sunken">
+              <div class="overflow-hidden bg-surface-muted">
                 <div class="border-b border-subtle bg-surface-raised px-4 py-2">
                   <span class="font-mono text-xs text-foreground-muted">theme.css</span>
                 </div>
