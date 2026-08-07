@@ -81,8 +81,9 @@ for one and a comparator for the other, free to disagree with no error anywhere.
 cannot be *fed* by the `itemToValue` already declared for the value model, because it answers only
 "are these equal" and never produces the key. This primitive was the last holdout — `createListSelection`
 moved first, `createListFocus` followed in roadmap #22 — and it migrated (#23) before Accordion, its
-only future consumer, could freeze the old spelling into a public component's API.
-**Consequence:** the default equality is now plain `===` rather than
+only future consumer, could freeze the old spelling into a public component's API. The helper is
+deleted, not deprecated: at `v0.0.0` a stranded util is what gets picked back up by someone who does
+not know it was retired. **Consequence:** the default equality is now plain `===` rather than
 id-matching, so object values that are rebuilt per render need an explicit `itemToValue` — the same
 trade the other two primitives already make.
 

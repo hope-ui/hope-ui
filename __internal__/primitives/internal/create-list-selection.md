@@ -8,10 +8,11 @@ anchor) is cross-checked against react-aria's `useSelectableCollection`/`useSele
 Object values are supported through the Base UI **`itemToValue`** model: each value maps to an
 identity key, and two values are equal when their keys are `===`. Pass `itemToValue: (v) => v.id` and
 a fresh `{ id, name }` object each render (or a controlled value straight from a server) still matches
-the registered item. Override the rule entirely with `isItemEqualToValue`. This replaces the retired
-Angular-idiom `compareWith` default (`compareByIdOrReference`) — `createListSelection` has no
-consumer yet, so the change carries no migration. `createListbox` threads its own `itemToValue`
-(default `String(item)`) through here.
+the registered item. Override the rule entirely with `isItemEqualToValue`. This primitive is where
+that model replaced the retired Angular-idiom `compareWith` comparator, and the rest of the kernel
+followed: [`createListFocus`](create-list-focus.md) takes the same `itemToValue`,
+[`createListExpansion`](create-list-expansion.md) takes both. `createListbox` threads its own
+`itemToValue` (default `String(item)`) through here.
 
 ## API
 
@@ -49,8 +50,7 @@ function selectionRange(fromIndex: number, toIndex: number): number[];
 
 Equality precedence: an explicit `isItemEqualToValue` wins outright; otherwise the default compares
 `itemToValue(a) === itemToValue(b)`; with neither, `itemToValue` is identity so it collapses to plain
-`===`. (The older `compareByIdOrReference` / `ValueComparator<V>` in
-[`@hope-ui/primitives/utils`](../utils/equality.md) is retained only for `createListExpansion`.)
+`===`. `createListExpansion` resolves the pair identically, so one mapper covers both.
 
 ## `setValue` — the one mutation that isn't item-wise
 
@@ -111,8 +111,10 @@ create during SSR — `value()` reports the default until the client takes over.
 *already* declared for the selection identity and for the string a form submits — `createListbox` would
 carry one rule for equality and a second for its value model, free to disagree. Base UI's
 `itemToValue` + `isItemEqualToValue` express both from one mapping, and the swap landed while this
-primitive still had no consumer, so it cost no migration. `compareByIdOrReference` survives for
-[`createListExpansion`](create-list-expansion.md), which has no value model.
+primitive still had no consumer, so it cost no migration. It ended up settling the kernel's whole
+vocabulary: [`createListFocus`](create-list-focus.md) adopted `itemToValue` for re-homing, then
+[`createListExpansion`](create-list-expansion.md) — the last holdout — took both, and the
+`compareByIdOrReference` helper was deleted with it.
 
 ### Expressing `setValue` item-wise (`deselectAll()`, then N × `select(item)`)
 **Why not:** a SolidJS 2.0 signal write is not visible to a plain read until the next flush, so every

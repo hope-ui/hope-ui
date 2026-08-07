@@ -48,7 +48,7 @@ infrastructure, deliberately *not* a growing component tracker):
   `createHideOutside`, `createScrollLock`, `createPresence`, `createFloating`, `createPress`,
   `createButton`, `createTextInput`, `createRegisteredId`, `createRegisteredElement`; utils
   `renderElement`, `withDefaults`, `composeEventHandlers`, `createKeyboardHandler`,
-  `compareByIdOrReference`. Plus the kernel's two DOM-rendering components — `ModalBackdrop` and
+  `runIfFunction`. Plus the kernel's two DOM-rendering components — `ModalBackdrop` and
   `HiddenSelect` (the clipped native `<select>` that buys Select/Listbox autofill and form reset).
 - **Adopted, not in-repo:** `createAnnounce` (`@solid-primitives/a11y`) — the polite/assertive live-region
   announcer, in use by `createCalendar`. Call it directly rather than wrapping it; it is why #2 is retired.
@@ -112,7 +112,7 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
 | Tabs | Navigation | 5/5 | `createListNavigation` | roving + follow-focus |
-| Accordion | Disclosure | 5/5 | `createListExpansion` (+ #23) | kernel ready **except** the #23 comparator migration, which gates this and Collapsible: `createListExpansion` is the last thing still on the retired `compareWith`/`compareByIdOrReference` vocabulary, and shipping Accordion over it makes that a public API |
+| Accordion | Disclosure | 5/5 | `createListExpansion` | kernel ready — #23 landed, so the primitive speaks the kernel's one equality vocabulary (`itemToValue` / `isItemEqualToValue`) and Accordion can expose it as-is |
 | Tooltip | Overlays | 5/5 | `createFloating`*, `createTimer`* | open/close delay |
 | Popover ✅ | Overlays | 5/5 | `createFloating`, `createDismissable`, `createAutoFocus`, `createFocusRestore`, `createFocusScope`, `createKeepVisible`, `createPresence` | the "compose, don't inherit from Dialog" proof, landed — styled API (10 compound parts + `popover` recipe). **Non-modal v1:** no focus trap, scroll lock, hide-outside or backdrop; a `modal` mode is later work. Opened **inside** a modal it is a first-class layer above it (#18/#19/#20) — spared, focusable, and it takes the first Escape alone |
 | HoverCard | Overlays | 2/5 | `createFloating`*, `createHoverIntent`* | |
@@ -199,15 +199,16 @@ stable reference and the ordering claim holds within the original survey.
 | 20 | `createFocusScope` ✅ | The third registry: a container stack answering **"did focus land in me, or in a layer opened above me?"** (`containsSelfOrAbove`). `createFocusTrap` composes it and consults it instead of `container.contains`, so a Dialog stops yanking focus out of a Popover portaled above it — which, with `closeOnFocusOutside`, used to close that Popover ~3ms after it opened. Moves no focus and cages nothing; Tab still leaves a non-modal layer freely. The *idea* is react-aria's `focusScopeTree`/`isElementInChildOfActiveScope`, but the implementation shares no expression with it: **not derivative, prose credit only** | same as #18 | T2 |
 | 21 | `primitives/src/combobox/` — the **combobox kernel** | The shared half of Select and Combobox, named after the **ARIA pattern** (APG 1.2 gives both `role="combobox"` on the focus owner, `aria-expanded`/`aria-controls` → a `role="listbox"` popup, `aria-activedescendant` on the active option). Owns: open state + `focusStrategy` (open onto first/last/selected), the trigger's `role`/`aria-*`, the keymap (ArrowDown/Up, Alt+Arrow, Enter, Escape), the `isFocused` paint-gate plumbing between focus owner and list, `allowsEmptyCollection`, `shouldCloseOnSelect`. **Input-agnostic by construction — it never owns a text value.** See § "The combobox kernel" below for why that constraint is the whole point | Select, Combobox, Autocomplete, CommandPalette | T3 |
 | 22 | `createListFocus` — **re-homing the active item** ✅ ✳︎ | `activeIndex` is a slot number, so any insert or removal renumbers every slot after it. Left alone that failed twice, silently: a row removed *before* the active one slid the highlight onto whatever moved into that slot (a valid index naming a different option, every test green), and removing the active last row left the index out of range with `aria-activedescendant` naming nothing. Reachable by any `Listbox` whose `items` come from a signal — an async load, a consumer-side filter. **Combobox is the exception that proves it:** its `items()` is the filtered set, it met this the hard way, and `combobox-root.tsx` already carries an effect that re-anchors with `navigation.first()` per keystroke. That stays and still wins (created later, and siblings run in creation order) because "highlight the top match" is a deliberate search policy — the point is that every *other* consumer was silently getting a stale slot number instead of choosing one. Now an effect reconciles the active row by identity — quietly re-indexing a survivor, or walking the *previous* ordering forward-then-backward for the nearest focusable replacement when it is gone. Adds an `itemToValue` option, `createListSelection`'s, so a widget passes one mapper to both. Ported from react-aria's `useFocusedKeyReset` (reasoning, not code); Base UI's `getIndexAfterChipRemoval` agrees on the policy by index arithmetic alone, which is why it cannot fix the first failure. [`create-list-focus.md`](primitives/internal/create-list-focus.md) | Listbox with an async collection, Combobox's filter, TagsInput's chip row | T2 |
-| 23 | `createListExpansion` — **migrate to `itemToValue`** | The last consumer of the retired `compareByIdOrReference` / `compareWith` vocabulary (`create-list-expansion.ts`), which `createListSelection` and now #22 both replaced with `itemToValue` / `isItemEqualToValue`. **A prerequisite to the disclosure pair, Collapsible & Accordion** — Accordion is the only component that will consume this primitive, and shipping it would bake the legacy comparator into a public component's API where changing it later is a breaking change. Cheap now, expensive after | Accordion (gates it), TreeView via #15 | T1 |
+| 23 | `createListExpansion` — **migrate to `itemToValue`** ✅ ✳︎ | It was the last consumer of the retired `compareByIdOrReference` / `compareWith` vocabulary, which `createListSelection` and then #22 had both replaced. It now takes the **pair** — `itemToValue` (identity key) + `isItemEqualToValue` (full override) — resolved exactly as selection resolves them; #22 deliberately took only the key, because re-homing just has to recognize a row across an array swap, while expansion holds consumer-supplied state where an arbitrary rule is legitimate. **The helper is gone, not deprecated:** `utils/equality.ts` (`compareByIdOrReference` / `ValueComparator`) had zero consumers left while still public via `@hope-ui/primitives/utils`, and at `v0.0.0` a stranded util is what gets picked back up by someone who does not know it was retired. One behavior change: the default equality is plain `===`, so object values rebuilt per render need an explicit `itemToValue` — the same trade the other two primitives make. **Shipped before Accordion on purpose**, since Accordion is the only component that will consume this primitive and would have frozen the legacy spelling into a public API | Accordion, TreeView via #15 | T1 |
 
 ✳︎ Extensions to a **shipped** primitive, not new ones — the three nesting registries (deliberately
-three rather than one, see #14) plus #22.
+three rather than one, see #14) plus #22 and #23.
 
 **Covered by existing primitives (no new work):** open/close state → `createControllableState`
 (+ `createPresence`); roving focus / typeahead / arrow nav / 2D grid → the list-\* + grid kernel;
 dismiss / focus-trap / scroll-lock / focus-restore / modal-hide → the overlay kernel;
-value equality → `compareByIdOrReference`; live-region announcements → `createAnnounce` (see #2).
+value equality → `itemToValue` / `isItemEqualToValue` on the list-\* primitives; live-region
+announcements → `createAnnounce` (see #2).
 
 ### The combobox kernel (#21) — three public components, one ARIA pattern
 
@@ -535,8 +536,10 @@ Not prescriptive, but the natural sequence given what's now landed:
    it, focus after removal, was a `createListFocus` bug that shipped as #22. Full reasoning in §3.
    Worth building standalone first — it is a real form control on its own — with the multi-select
    Combobox integration following as a component that *composes* the two.
-7. **`createListExpansion` → `itemToValue` (#23), then Collapsible + Accordion.** The migration is
-   small and the ordering is the whole point: it is the last primitive on the retired `compareWith`
-   vocabulary, and Accordion is the component that would freeze it into a public API.
+7. **Collapsible + Accordion.** The migration that gated them (#23) is done — `createListExpansion`
+   speaks `itemToValue` / `isItemEqualToValue` like the rest of the list kernel, and the retired
+   comparator is deleted rather than left lying around — so the disclosure pair is now plain
+   component work over a ready primitive. The ordering was the whole point: Accordion is what would
+   have frozen the old spelling into a public API.
 
 From there the T1/T2 backlog can be parallelized.

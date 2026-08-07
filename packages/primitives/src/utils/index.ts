@@ -1,6 +1,5 @@
 // Published as the subpath `@hope-ui/primitives/utils`.
 export { type WithDefaults, withDefaults } from "./defaults";
-export { compareByIdOrReference, type ValueComparator } from "./equality";
 export { composeEventHandlers, type EventHandlerEvent } from "./events";
 export {
   createKeyboardHandler,
