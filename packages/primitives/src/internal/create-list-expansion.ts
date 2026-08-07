@@ -1,5 +1,4 @@
 import type { Accessor } from "solid-js";
-import { compareByIdOrReference, type ValueComparator } from "../utils/equality";
 import type { CollectionItem } from "./create-collection";
 import { createControllableState } from "./create-controllable-state";
 
@@ -25,12 +24,21 @@ export interface CreateListExpansionOptions<V> {
    */
   collapsible?: Accessor<boolean>;
   /**
-   * How two values are compared for equality — the escape hatch for object values that aren't
-   * reference-stable. Defaults to `compareByIdOrReference` (`utils/equality`): `a.id === b.id` when
-   * both values are objects carrying an `id`, else `a === b`. Same escape hatch Angular Material
-   * spells `compareWith`.
+   * Maps a value to its **identity key**, borrowing the `itemToValue` model from Base UI (the
+   * headless React library). Two values are equal when their keys are `===` (see
+   * {@link isItemEqualToValue}), so object values need not be reference-stable: a fresh
+   * `{ id, name }` each render, or a controlled value straight from a server, still matches the
+   * registered item when it maps to the same key. Default: identity (`(value) => value`), i.e. plain
+   * `===`, which is fine for primitive values; with object values pass e.g. `(panel) => panel.id`.
+   * The same option `createListSelection` and `createListFocus` take, so a widget passes one mapper
+   * to all three.
    */
-  compareWith?: ValueComparator<V>;
+  itemToValue?: (value: V) => unknown;
+  /**
+   * Full override of the equality rule, for shapes `itemToValue` can't express. Defaults to
+   * `(a, b) => itemToValue(a) === itemToValue(b)`. When given, `itemToValue` is ignored.
+   */
+  isItemEqualToValue?: (a: V, b: V) => boolean;
 }
 
 export interface CreateListExpansionReturn<V> {
@@ -59,15 +67,20 @@ export interface CreateListExpansionReturn<V> {
  * Enter (expansion), independently. Adapted from Angular Aria's `expansion` — Angular's
  * signal-based accessibility behaviors — taking its reasoning and public surface, not its code.
  *
- * Values need not be reference-stable: they are compared with `compareWith`, which defaults to
- * matching objects on `id` and everything else with `===`.
+ * Object values need not be reference-stable: pass `itemToValue` to map each value to an identity
+ * key compared with `===`, or `isItemEqualToValue` to override equality outright.
  */
 export function createListExpansion<V>(
   options: CreateListExpansionOptions<V>,
 ): CreateListExpansionReturn<V> {
   const mode = () => options.expansionMode?.() ?? "multiple";
   const collapsible = () => options.collapsible?.() ?? true;
-  const compare = (a: V, b: V) => (options.compareWith ?? compareByIdOrReference)(a, b);
+  // An explicit `isItemEqualToValue` wins outright over `itemToValue`. Resolved once, because these
+  // are configuration rather than reactive inputs.
+  const itemToValue = options.itemToValue ?? ((value: V) => value);
+  const areEqual =
+    options.isItemEqualToValue ?? ((a: V, b: V) => itemToValue(a) === itemToValue(b));
+  const compare = (a: V, b: V) => areEqual(a, b);
   const contains = (values: V[], candidate: V) => values.some((entry) => compare(entry, candidate));
 
   const [expandedValues, setExpandedValues] = createControllableState<V[]>({

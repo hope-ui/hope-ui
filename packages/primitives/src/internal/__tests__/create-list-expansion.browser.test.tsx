@@ -234,8 +234,8 @@ describe("createListExpansion — single (accordion)", () => {
 });
 
 // ─── Object values ──────────────────────────────────────────────────────────────────────────────
-// Expansion keys need not be primitives or reference-stable: the default comparator matches on `id`,
-// and `compareWith` overrides it.
+// An expansion key need not be a primitive or a reference-stable object: `itemToValue` maps each
+// value to an identity key compared with `===`, and `isItemEqualToValue` overrides the rule entirely.
 
 interface Panel {
   id: number;
@@ -250,14 +250,16 @@ interface ObjApi {
 function ObjAccordion(props: {
   panels: Panel[];
   value?: Accessor<Panel[]>;
-  compareWith?: (a: Panel, b: Panel) => boolean;
+  itemToValue?: (panel: Panel) => unknown;
+  isItemEqualToValue?: (a: Panel, b: Panel) => boolean;
   onReady: (api: ObjApi) => void;
 }) {
   const collection = createCollection<Panel>();
   const expansion = createListExpansion<Panel>({
     items: collection.items,
     value: props.value,
-    compareWith: props.compareWith,
+    itemToValue: props.itemToValue,
+    isItemEqualToValue: props.isItemEqualToValue,
   });
   props.onReady({ collection, expansion });
   return (
@@ -309,23 +311,26 @@ describe("createListExpansion — object values", () => {
     { id: 3, name: "Three" },
   ];
 
-  it("expands the matching panel when a controlled value shares the id but not the reference", async () => {
+  const byId = (panel: Panel) => panel.id;
+
+  it("expands the matching panel when a controlled value maps to the same itemToValue key but a fresh reference", async () => {
     let api!: ObjApi;
-    // Fresh object, not the registered `Two` reference — only the id matches.
+    // Fresh object, not the registered `Two` reference — only the id key matches.
     const value = () => [{ id: 2, name: "Two (from server)" }];
     const { container, dispose } = mount(() => (
-      <ObjAccordion panels={PANELS} value={value} onReady={(a) => (api = a)} />
+      <ObjAccordion panels={PANELS} value={value} itemToValue={byId} onReady={(a) => (api = a)} />
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
 
+    // Reference equality would miss this; the id-key `itemToValue` matches it.
     await vi.waitFor(() => expect(expandedIds(container)).toEqual(["2"]));
     dispose();
   });
 
-  it("toggles object-keyed panels through the id comparator", async () => {
+  it("toggles object-keyed panels through the itemToValue key", async () => {
     let api!: ObjApi;
     const { container, dispose } = mount(() => (
-      <ObjAccordion panels={PANELS} onReady={(a) => (api = a)} />
+      <ObjAccordion panels={PANELS} itemToValue={byId} onReady={(a) => (api = a)} />
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
 
@@ -338,16 +343,31 @@ describe("createListExpansion — object values", () => {
     dispose();
   });
 
-  it("honors a custom compareWith", async () => {
+  it("defaults to reference/=== equality when no itemToValue is given", async () => {
     let api!: ObjApi;
-    // Compare by name: a value with a different id but matching name expands One.
+    // A fresh object with the same id does NOT match under the default identity `itemToValue`,
+    // because the default equality is plain `===` on the value itself.
+    const value = () => [{ id: 2, name: "Two (from server)" }];
+    const { container, dispose } = mount(() => (
+      <ObjAccordion panels={PANELS} value={value} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    // Nothing expanded: the controlled value is a different reference than any registered panel.
+    await vi.waitFor(() => expect(expandedIds(container)).toEqual([]));
+    dispose();
+  });
+
+  it("honors a custom isItemEqualToValue", async () => {
+    let api!: ObjApi;
+    // Compare by name instead of id: a value with a different id but matching name expands One.
     const value = () => [{ id: 99, name: "One" }];
-    const compareWith = (a: Panel, b: Panel) => a.name === b.name;
+    const isItemEqualToValue = (a: Panel, b: Panel) => a.name === b.name;
     const { container, dispose } = mount(() => (
       <ObjAccordion
         panels={PANELS}
         value={value}
-        compareWith={compareWith}
+        isItemEqualToValue={isItemEqualToValue}
         onReady={(a) => (api = a)}
       />
     ));
@@ -360,7 +380,7 @@ describe("createListExpansion — object values", () => {
   it("has no baseline accessibility violations", async () => {
     let api!: ObjApi;
     const { container, dispose } = mount(() => (
-      <ObjAccordion panels={PANELS} onReady={(a) => (api = a)} />
+      <ObjAccordion panels={PANELS} itemToValue={byId} onReady={(a) => (api = a)} />
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
     await expectNoA11yViolations(container);
