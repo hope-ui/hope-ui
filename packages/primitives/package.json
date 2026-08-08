@@ -20,6 +20,7 @@
       "listbox": "src/listbox/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "popover": "src/popover/index.ts",
+      "tags-input": "src/tags-input/index.ts",
       "internal": "src/internal/index.ts",
       "render": "src/render/index.ts",
       "utils": "src/utils/index.ts"
@@ -53,6 +54,10 @@
     "./popover": {
       "types": "./dist/popover/index.d.ts",
       "solid": "./dist/popover/index.jsx"
+    },
+    "./tags-input": {
+      "types": "./dist/tags-input/index.d.ts",
+      "solid": "./dist/tags-input/index.jsx"
     },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
