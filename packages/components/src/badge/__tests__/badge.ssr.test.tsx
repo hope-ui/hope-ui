@@ -1,6 +1,6 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Badge } from "../badge";
 import { Tree } from "./badge.ssr-entry";
@@ -11,8 +11,8 @@ import { Tree } from "./badge.ssr-entry";
 // construction: this file and `badge.browser.test.tsx` import the same `Tree`.
 
 describe("Badge SSR", () => {
-  it("resolves renderToStringAsync without throwing", async () => {
-    const html = await renderToStringAsync(() => (
+  it("resolves renderToStream without throwing", async () => {
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Badge>New</Badge>
       </ThemeProvider>
@@ -23,7 +23,7 @@ describe("Badge SSR", () => {
   it("paints the recipe classes into the server output", async () => {
     // Turning props into classes is a pure function of those props, so the server emits exactly what
     // the client would — which is the whole of theming's SSR requirement.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Badge variant="solid" colorScheme="danger">
           Error
@@ -36,7 +36,7 @@ describe("Badge SSR", () => {
   });
 
   it("renders the role dot on its own slot for the dot variant", async () => {
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Badge variant="dot" colorScheme="success">
           Online
@@ -50,7 +50,7 @@ describe("Badge SSR", () => {
   });
 
   it("renders the decorator slots when supplied", async () => {
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Badge startDecorator={<span>+</span>} endDecorator={<span>-</span>}>
           Label
@@ -70,7 +70,7 @@ describe("Badge SSR", () => {
     // Inline rather than a committed `.html`, so a hydration subject costs zero fixture files. The
     // bridge renders this same `<Tree />` fresh for the browser test, so the two cannot drift.
     // Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
-    const html = await renderToStringAsync(() => <Tree />);
+    const html = await renderToStream(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
       `"<span _hk=00j0 class="inline-flex items-center justify-center whitespace-nowrap align-middle font-medium select-none border h-5 gap-1 px-2 text-xs has-data-[slot=badge-start-decorator]:ps-1.5 has-data-[slot=badge-end-decorator]:pe-1.5 rounded-md bg-primary-soft text-primary-emphasis border-primary-soft" data-slot="badge" ><span _hk=00e0 data-slot="badge-label" class="inline-flex items-center">New</span></span>"`,
     );

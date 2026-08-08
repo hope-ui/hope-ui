@@ -40,8 +40,16 @@ becomes a landmine at exactly the moment nobody is looking at `pnpm-workspace.ya
 
 ## 2. The `solid-js` / `@solidjs/web` internals this codebase silently depends on
 
-`@solidjs/web` renamed runtime helpers *within* the beta line (`use` → `ref`,
-`addEventListener` → `addEvent`). Several undocumented runtime behaviors are load-bearing
+`@solidjs/web` renames things *within* the beta line — runtime helpers (`use` → `ref`,
+`addEventListener` → `addEvent`) and, at **beta.32**, a public API: **`renderToStringAsync` was
+removed.** `renderToString` is now synchronous (it does not wait for async boundaries) and the
+settled-string form is `await renderToStream(fn)`, which resolves once every boundary settles. That
+is a drop-in for the old call and is what every `*.ssr.test.tsx`, every `*.ssr-entry.tsx`, the
+hydration bridge, and `check:coverage-parity`'s `SSR_TEST_MARKER` now use. `renderToStream` is
+stubbed in the client build exactly as its predecessor was (logs, returns `undefined`), so §4's
+diagnosis below carries over unchanged under the new name.
+
+Several undocumented runtime behaviors are load-bearing
 here. **They are now pinned by characterization tests**, so stable breaking any of them shows
 up as a red test naming the code that depended on it, rather than as a mysterious component
 bug days into the migration:
@@ -62,13 +70,18 @@ What they pin:
 | A microtask queued from the first cleanup lands after every sibling cleanup | `createFocusRestore`'s deferral |
 | `Dynamic` → `ssrElement(…, true)` emits an `_hk` hydration key server-side | `renderElement`; everything it renders hydrates against that key |
 | `applyRef` does `r.flat(Infinity).forEach(f => f && f(el))`, skipping falsy entries | `renderElement`'s ref merging calls `applyRef([internalRef, consumerRef], el)` inside its single merged function ref; why no `mergeRefs` helper exists |
+| A `<Show>` `when`-gate read of a component-valued prop consumes **no** hydration id (beta.32 fix) | Button/Badge slot rendering; the assertion flipping back is the drift regressing |
 
 Still to re-check by hand at the migration, because nothing pins them:
 
-- [ ] Client `dynamic()` does `sharedConfig.hydrating ? getNextElement() : createElement(...)`,
+- [x] Client `dynamic()` does `sharedConfig.hydrating ? getNextElement() : createElement(...)`,
       i.e. `Dynamic` is hydration-aware at runtime. If that stops being true, everything
-      `renderElement` renders stops hydrating — see §3.
-- [ ] `createUniqueId()` still diverges between `solid-js`'s server and client builds. See §4.
+      `renderElement` renders stops hydrating — see §3. **Re-verified at beta.32**: beta.27 changed
+      `dynamic()`/`lazy()` to suspend into boundaries rather than gate the SSR shell flush, and
+      every component hydration round-trip still passes, so `renderElement` is unaffected.
+- [x] `createUniqueId()` still diverges between `solid-js`'s server and client builds. See §4.
+      **Re-verified at beta.32** — the whole `ssr` project would fail on its inline snapshots
+      otherwise, and none of them moved across beta.19 → beta.32.
 
 ---
 
@@ -123,8 +136,8 @@ Both are disproved. Do not resurrect either:
 
 ### What was actually going on — three layers
 
-**1. `renderToStringAsync` does not exist in the browser.** The client build defines it as
-`throwInBrowser(renderToStringAsync)`, which `console.error`s and **returns `undefined`**. The
+**1. `renderToStream` does not exist in the browser.** The client build defines it as
+`throwInBrowser(renderToStream)`, which `console.error`s and **returns `undefined`**. The
 test did `container.innerHTML = undefined`, writing the literal string `"undefined"`. No `_hk`
 nodes, hence *"Unable to find DOM nodes for hydration key: 1010"*. The test's own
 `console.error` spy was swallowing the message that said exactly this.

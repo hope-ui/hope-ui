@@ -1,4 +1,4 @@
-import { Dynamic, type JSX, renderToStringAsync } from "@solidjs/web";
+import { Dynamic, type JSX, renderToStream } from "@solidjs/web";
 import { children, createUniqueId, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
 
@@ -20,7 +20,7 @@ describe("@solidjs/web server-build contract", () => {
     // `_hk` hydration key, the positional marker Solid matches server and client nodes by. If
     // stable drops the key, every element `renderElement` renders stops hydrating. See
     // `__internal__/migration-2.0-stable.md` §3.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <Dynamic component="span" id="pinned">
         hi
       </Dynamic>
@@ -47,8 +47,8 @@ describe("solid-js server-build contract", () => {
     // `cl-${counter++}` branch, consuming nothing, and every key after the first `createUniqueId()`
     // comes out one off. So: the id must *not* look like `cl-N`, and calling it must shift the
     // hydration key of whatever renders after it.
-    const withoutId = await renderToStringAsync(() => <Dynamic component="span">hi</Dynamic>);
-    const withId = await renderToStringAsync(() => {
+    const withoutId = await renderToStream(() => <Dynamic component="span">hi</Dynamic>);
+    const withId = await renderToStream(() => {
       const id = createUniqueId();
       expect(id).not.toMatch(/^cl-/);
       return <Dynamic component="span">hi</Dynamic>;
@@ -62,25 +62,31 @@ describe("solid-js server-build contract", () => {
   });
 });
 
-describe("solid-js server-build contract: the <Show> `when`-gate read is the extra hydration key", () => {
-  // Depended on by `@hope-ui/components` Button and Badge slot rendering. The *server* half of the
-  // long-standing "component inside a <Show> breaks hydration" bug (solidjs/solid#2384,
-  // solidjs/solid-start#1089), still open in the 2.0 beta line — and an isolation of its real cause.
+describe("solid-js server-build contract: the <Show> `when`-gate read no longer burns a key", () => {
+  // Depended on by `@hope-ui/components` Button and Badge slot rendering. This pins the *server*
+  // half of the long-standing "component inside a <Show> breaks hydration" bug (solidjs/solid#2384,
+  // solidjs/solid-start#1089) — and, since 2.0.0-beta.32, its fix.
   //
   // A component passed as a prop is built lazily: `x={<Icon/>}` compiles to a getter that runs
-  // `createComponent(Icon)` wherever the prop is *read*. The trigger is not reading it inside a
-  // <Show>; it is reading it in the <Show>'s `when` gate AND again in its body — the idiomatic
+  // `createComponent(Icon)` wherever the prop is *read*. The trigger was never reading it inside a
+  // <Show>; it was reading it in the <Show>'s `when` gate AND again in its body — the idiomatic
   // `when={x != null}` + `{x}`. The `when` read builds a component only to test truthiness and
-  // throws it away, but still allocates a hydration key (`_hk`, the positional marker Solid matches
-  // server and client nodes by). The client evaluates `when` under an owner the server does not, so
-  // that discarded key lands at a different position on each side and the real body node ends up
-  // one key off.
+  // throws it away, and it used to still allocate a hydration key (`_hk`, the positional marker
+  // Solid matches server and client nodes by). The client evaluates `when` under an owner the
+  // server does not, so that discarded key landed at a different position on each side and the real
+  // body node ended up one key off.
   //
-  // The three components below are the isolation: `WhenGateAndBody` and `BodyOnly` differ only in
-  // the extra `when`-gate read, and it costs exactly one extra key. `Eager` is the fix Button and
-  // Badge use — `children()` resolves the slot once in the ambient owner, so the gate reads a
-  // memoized accessor and builds nothing. Expect these to fail the day upstream fixes the bug,
-  // which is also the day the `children()` indirection can be dropped. Full decision procedure:
+  // beta.32 fixed it upstream ("corrected hydration id drift from allocation-capable prop getters
+  // in flow controls"): the discarded gate component no longer consumes an id, so `WhenGateAndBody`
+  // and `BodyOnly` — which differ *only* in that extra gate read — now key identically. That
+  // equality is the whole assertion; it flipping back is the regression this test exists to catch.
+  //
+  // `Eager` is what Button and Badge do — `children()` resolves the slot once in the ambient owner,
+  // so the gate reads a memoized accessor and builds nothing. It is NOT a no-op even now: resolving
+  // in the ambient owner allocates ahead of the span, so it still keys differently from the raw-prop
+  // forms. So `children()` cannot simply be deleted on the strength of the upstream fix — the rule
+  // it also serves (a component-valued prop read more than once is *constructed* more than once)
+  // stands on its own, and any removal owes its own hydration round-trip. Full decision procedure:
   // `__internal__/solid-2.0-notes.md`.
 
   const Icon = (): JSX.Element => <svg data-icon="1" />;
@@ -108,10 +114,10 @@ describe("solid-js server-build contract: the <Show> `when`-gate read is the ext
     );
   };
 
-  it("keys the body <svg> one position later when the prop is also read in the `when` gate", async () => {
-    const whenGateAndBody = await renderToStringAsync(() => <WhenGateAndBody icon={<Icon />} />);
-    const bodyOnly = await renderToStringAsync(() => <BodyOnly icon={<Icon />} show={true} />);
-    const eager = await renderToStringAsync(() => <Eager icon={<Icon />} />);
+  it("keys the body <svg> identically whether or not the prop is also read in the `when` gate", async () => {
+    const whenGateAndBody = await renderToStream(() => <WhenGateAndBody icon={<Icon />} />);
+    const bodyOnly = await renderToStream(() => <BodyOnly icon={<Icon />} show={true} />);
+    const eager = await renderToStream(() => <Eager icon={<Icon />} />);
 
     for (const html of [whenGateAndBody, bodyOnly, eager]) {
       expect(html).toMatch(/<span _hk=\S+ data-slot="s"><svg _hk=\S+ data-icon="1">/);
@@ -119,16 +125,16 @@ describe("solid-js server-build contract: the <Show> `when`-gate read is the ext
 
     const svgKey = (html: string) => html.match(/<svg _hk=(\S+) /)?.[1];
 
-    // Both sit inside a <Show>, so the <Show> is not the variable: the built-then-discarded
-    // component behind the `when`-gate read burns one extra key, and the body <svg> keys one
-    // position later than the single-read control.
+    // Both sit inside a <Show> and differ only in the extra `when`-gate read, so any difference
+    // between these two keys IS the drift. Equal means the built-then-discarded gate component
+    // consumed no id — the beta.32 fix. This assertion failing means it regressed.
     expect(svgKey(whenGateAndBody)).toBeDefined();
     expect(svgKey(bodyOnly)).toBeDefined();
-    expect(svgKey(whenGateAndBody)).not.toBe(svgKey(bodyOnly));
-    expect(Number(svgKey(whenGateAndBody))).toBe(Number(svgKey(bodyOnly)) + 1);
+    expect(svgKey(whenGateAndBody)).toBe(svgKey(bodyOnly));
 
-    // The fix relocates the key: `children()` allocates the component in the ambient owner, ahead
-    // of the span — a different position from either raw-prop form, and the one that hydrates.
+    // `children()` still relocates the key — it allocates the component in the ambient owner, ahead
+    // of the span, so it keys differently from either raw-prop form. Removing it is therefore a real
+    // structural change, not a cleanup the upstream fix makes free.
     expect(svgKey(eager)).toBeDefined();
     expect(svgKey(eager)).not.toBe(svgKey(whenGateAndBody));
   });

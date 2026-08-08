@@ -1,6 +1,6 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { CloseButton } from "../close-button";
 import { Tree } from "./close-button.ssr-entry";
@@ -11,8 +11,8 @@ import { Tree } from "./close-button.ssr-entry";
 // construction: this file and `close-button.browser.test.tsx` import the same `Tree`.
 
 describe("CloseButton SSR", () => {
-  it("resolves renderToStringAsync without throwing", async () => {
-    const html = await renderToStringAsync(() => (
+  it("resolves renderToStream without throwing", async () => {
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <CloseButton />
       </ThemeProvider>
@@ -21,7 +21,7 @@ describe("CloseButton SSR", () => {
   });
 
   it("emits a native <button type=button> with the root slot marker", async () => {
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <CloseButton />
       </ThemeProvider>
@@ -31,7 +31,7 @@ describe("CloseButton SSR", () => {
   });
 
   it("renders the built-in X inside the host icon-slot span", async () => {
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <CloseButton />
       </ThemeProvider>
@@ -41,7 +41,7 @@ describe("CloseButton SSR", () => {
   });
 
   it("self-labels from the localized `common.close` (default locale = English)", async () => {
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <CloseButton />
       </ThemeProvider>
@@ -52,7 +52,7 @@ describe("CloseButton SSR", () => {
   it("paints the recipe classes (currentColor wash + focus ring) into the server output", async () => {
     // Turning props into classes is a pure function of those props, so the server emits exactly what
     // the client would — which is the whole of theming's SSR requirement.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <CloseButton size="lg" />
       </ThemeProvider>
@@ -63,7 +63,7 @@ describe("CloseButton SSR", () => {
   });
 
   it("lets a consumer aria-label override the localized default", async () => {
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <CloseButton aria-label="Dismiss" />
       </ThemeProvider>
@@ -81,7 +81,7 @@ describe("CloseButton SSR", () => {
     // Inline rather than a committed `.html`, so a hydration subject costs zero fixture files. The
     // bridge renders this same `<Tree />` fresh for the browser test, so the two cannot drift.
     // Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
-    const html = await renderToStringAsync(() => <Tree />);
+    const html = await renderToStream(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
       `"<div _hk=000><!--$--><button _hk=0050 type="button" class="relative inline-flex shrink-0 items-center justify-center select-none outline-none transition-[background-color,box-shadow] duration-150 ease-out hover:not-data-pressed:bg-surface-adaptive-hovered data-pressed:bg-surface-adaptive-pressed focus-visible:ring-3 focus-visible:ring-focus-halo data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:opacity-disabled size-6 rounded-md" aria-label="Close" data-slot="close-button" ><span _hk=002 data-slot="close-button-icon" class="pointer-events-none inline-flex items-center justify-center [&amp;_svg]:size-4"><svg _hk=0030 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span></button><!--/--><!--$--><button _hk=00a0 type="button" class="relative inline-flex shrink-0 items-center justify-center select-none outline-none transition-[background-color,box-shadow] duration-150 ease-out hover:not-data-pressed:bg-surface-adaptive-hovered data-pressed:bg-surface-adaptive-pressed focus-visible:ring-3 focus-visible:ring-focus-halo data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:opacity-disabled size-6 rounded-md" aria-label="Close" data-slot="close-button" ><span _hk=007 data-slot="close-button-icon" class="pointer-events-none inline-flex items-center justify-center [&amp;_svg]:size-4"><svg _hk=0080 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" data-custom-icon="true"><path d="M6 18 18 6M6 6l12 12"></path></svg></span></button><!--/--></div>"`,
     );

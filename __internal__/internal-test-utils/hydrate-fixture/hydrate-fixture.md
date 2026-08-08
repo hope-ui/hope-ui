@@ -51,7 +51,7 @@ dispose();
 ```
 
 Browser-project only: it needs a real DOM and the client hydrate build. There is no server
-render here — the client build's `renderToStringAsync` returns `undefined`, which is why the
+render here — the client build's `renderToStream` returns `undefined`, which is why the
 server HTML is passed in rather than produced.
 
 ## What it asserts

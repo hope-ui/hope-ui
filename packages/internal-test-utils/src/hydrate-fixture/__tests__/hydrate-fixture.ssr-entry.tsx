@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 
 // A tiny, component-free tree used only to exercise `hydrateFixture`'s own success and
 // reuse-*failure* paths against genuine server markup. Hand-writing hydration-key attributes is not
@@ -19,6 +19,6 @@ export function Tree(props: { onProbeClick?: () => void }): JSX.Element {
 }
 
 /** The server render the hydration-fixture bridge invokes for `?id=hydrate-fixture`. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

@@ -288,7 +288,7 @@ layer's `dir` goes, per the section above.
 ## SSR
 
 Host-element-free and effect-gated. `createFloating` reaches `computePosition`/`autoUpdate` from
-effect bodies alone and `createPresence` from an effect, so neither runs under `renderToStringAsync`
+effect bodies alone and `createPresence` from an effect, so neither runs under `renderToStream`
 — no `isServer` import is needed here, the same convention `createDismissable` follows. The server
 renders `floatingStyles()`'s pre-positioned branch, a constant with no client-only input, and
 `side()`/`align()` seed from the config, so `data-side` is identical on both sides of the round-trip.

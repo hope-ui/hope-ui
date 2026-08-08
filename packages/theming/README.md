@@ -33,7 +33,7 @@ Peer dependencies: `solid-js` and `@solidjs/web` (`2.0.0-beta.x`). Bundled: `tai
 - **`ThemeProvider` / `useRecipe`.** `<ThemeProvider preset={…}>` injects a preset into context;
   a component reads one recipe out with `useRecipe("<name>")` and computes its slot classes in a
   getter. Built on the isomorphic `createComponentContext`, so it is server-readable during
-  `renderToStringAsync` — that is the whole of "works in SolidStart" for theming. The provider
+  `renderToStream` — that is the whole of "works in SolidStart" for theming. The provider
   renders no DOM of its own.
 - **`RecipeRegistry`.** The single source of truth for every hope-authored component's recipe
   (variant vocabulary + slots). A component does **not** `declare module` its own recipe — both the

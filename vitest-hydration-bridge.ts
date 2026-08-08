@@ -135,7 +135,7 @@ export async function renderFixtureHtml(id: string): Promise<string> {
   if (typeof html !== "string") {
     throw new Error(
       `renderFixture() in ${entry} returned ${typeof html}, not a string — the nested server must ` +
-        "resolve the *server* builds of solid-js and @solidjs/web (renderToStringAsync returns " +
+        "resolve the *server* builds of solid-js and @solidjs/web (renderToStream returns " +
         "undefined on the client build).",
     );
   }

@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { Button } from "../button";
 
 // A second round-trip tree, this one carrying an icon *component* in the decorator slots rather than
@@ -38,7 +38,7 @@ export function Tree(): JSX.Element {
   );
 }
 
-/** Server builds only — under the client build `renderToStringAsync` returns `undefined`. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+/** Server builds only — under the client build `renderToStream` returns `undefined`. */
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

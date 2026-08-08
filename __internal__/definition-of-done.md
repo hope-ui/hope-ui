@@ -50,7 +50,7 @@ The set:
    folder). Components are what a human has to look at; pure primitives aren't. Stories (and tests)
    never reach `dist/` — tsdown only builds the `package.json` `hope.entries` files — and are excluded
    from the `build` task's turbo `inputs`.
-4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` calling `renderToStringAsync`) and a
+4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` calling `renderToStream`) and a
    hydration test (`*.browser.test.tsx` calling `hydrate`) — one of each per folder (see the SSR round
    trip below).
 
@@ -149,7 +149,7 @@ script sees every file but no DOM, the test sees the DOM but only the parts it l
 
 Every component (not pure internal primitives with no DOM output) also needs an SSR **and** a
 hydration round-trip test, and `check:coverage-parity` enforces both: a `Foo.ssr.test.tsx` that
-*calls* `renderToStringAsync`, and a `Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means
+*calls* `renderToStream`, and a `Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means
 outside a comment, outside a string, outside an `it.skip`, and not merely imported.
 
 **Component-capable slots carry an extra, conditional obligation** (author discipline —

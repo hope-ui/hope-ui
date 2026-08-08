@@ -2,7 +2,7 @@ import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate } from "@internationalized/date";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { Calendar } from "../index";
 
 // `calendar.ssr-entry.tsx`'s tree **minus the `I18nProvider`** — zero-config i18n, the shape an app
@@ -36,6 +36,6 @@ export function Tree(): JSX.Element {
 }
 
 /** The server render the hydration-fixture bridge invokes. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

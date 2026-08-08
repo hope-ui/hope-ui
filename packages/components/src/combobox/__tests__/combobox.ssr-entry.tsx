@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { type Accessor, For, Show } from "solid-js";
 import { Combobox } from "../index";
 
@@ -72,7 +72,7 @@ function FruitItem(props: { fruit: Fruit }): JSX.Element {
 
 /**
  * `defaultOpen` is optional so the ssr test can also exercise the *open* server render: the `Portal`'s
- * `isServer` guard must not crash `renderToStringAsync`, and no portaled row may reach the output. The
+ * `isServer` guard must not crash `renderToStream`, and no portaled row may reach the output. The
  * hydration path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
@@ -120,6 +120,6 @@ export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
 }
 
 /** The closed server render the hydration-fixture bridge invokes. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

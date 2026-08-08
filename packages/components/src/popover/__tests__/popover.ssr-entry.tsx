@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { Popover } from "../index";
 
 // The single source of truth for Popover's server-render → hydration round-trip, shared by
@@ -20,7 +20,7 @@ import { Popover } from "../index";
 
 /**
  * `defaultOpen` is optional so the SSR test can also exercise the *open* server render: the Portal's
- * server guard must not crash `renderToStringAsync`, and the portaled content must stay out of the
+ * server guard must not crash `renderToStream`, and the portaled content must stay out of the
  * output. The hydration path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
@@ -46,6 +46,6 @@ export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
 }
 
 /** The closed server render the hydration-fixture bridge invokes. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

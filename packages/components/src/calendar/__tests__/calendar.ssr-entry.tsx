@@ -3,7 +3,7 @@ import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate } from "@internationalized/date";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { Calendar } from "../index";
 
 // The single source of truth for Calendar's server-render → hydration round-trip, shared by
@@ -46,6 +46,6 @@ export function Tree(): JSX.Element {
 }
 
 /** The server render the hydration-fixture bridge invokes. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

@@ -274,9 +274,9 @@ describe("regex literals versus division", () => {
   });
 
   it("blanks a regex's contents in the code projection so a pattern is not read as a call", () => {
-    const source = "const re = /renderToStringAsync/;";
-    expect(blankNonCode(source)).not.toContain("renderToStringAsync");
-    expect(blankNonCode(source)).toBe("const re = /                   /;");
+    const source = "const re = /renderToStream/;";
+    expect(blankNonCode(source)).not.toContain("renderToStream");
+    expect(blankNonCode(source)).toBe("const re = /              /;");
   });
 
   it("drops the whole regex in the string projection — a pattern is not something a file emits", () => {
@@ -307,8 +307,8 @@ describe("regex literals versus division", () => {
   });
 
   it("keeps a division-heavy line intact for a code-projection match", () => {
-    const source = "const ratio = w / h / 2;\nrenderToStringAsync(<App />);";
-    expect(blankNonCode(source)).toContain("renderToStringAsync(");
+    const source = "const ratio = w / h / 2;\nrenderToStream(<App />);";
+    expect(blankNonCode(source)).toContain("renderToStream(");
   });
 });
 
@@ -437,9 +437,7 @@ describe("known limits of a tokenizer with no parser", () => {
     // therefore DO see a class fragment written inside an interpolation (useful), while a call
     // written inside one is invisible to `blankNonCode` (a hole for `check:coverage-parity`).
     expect(stringInteriors("const c = `px-${n} pr-4`;")).toContain("px-${n} pr-4");
-    expect(blankNonCode("const c = `${renderToStringAsync(x)}`;")).not.toContain(
-      "renderToStringAsync",
-    );
+    expect(blankNonCode("const c = `${renderToStream(x)}`;")).not.toContain("renderToStream");
   });
 
   it("ends an outer template at a nested template's backtick", () => {

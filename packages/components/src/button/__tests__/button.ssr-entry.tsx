@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { Button } from "../button";
 
 // One tree, three consumers — which is what keeps the server and client trees identical by
@@ -27,9 +27,9 @@ export function Tree(props?: { onClick?: (event: MouseEvent) => void }): JSX.Ele
 }
 
 /**
- * Only the bridge and the `ssr` project call this: `renderToStringAsync` returns a string only under
+ * Only the bridge and the `ssr` project call this: `renderToStream` returns a string only under
  * Solid's server builds — the client build's stub returns `undefined`.
  */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

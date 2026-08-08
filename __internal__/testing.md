@@ -64,7 +64,7 @@ green, and if the checker itself regresses nothing says so.
 - **server** — produces HTML strings, `isServer` is `true`, `Portal` throws, and
   `template`/`insert`/`spread`/`setAttribute` are stubs throwing *"Client-only API called on the
   server side"*.
-- **browser** — produces real DOM, `isServer` is `false`, `renderToStringAsync` is a stub that
+- **browser** — produces real DOM, `isServer` is `false`, `renderToStream` is a stub that
   `console.error`s and returns `undefined`.
 
 They also differ invisibly. `createUniqueId()` is three different functions:
@@ -95,16 +95,16 @@ Two fixes make it work, both commented in `vitest.config.ts`:
 
 ## Writing an SSR test
 
-Assert on the string a server would send. `dialog.ssr.test.tsx` is the model: `renderToStringAsync`
+Assert on the string a server would send. `dialog.ssr.test.tsx` is the model: `renderToStream`
 resolves, portaled content is absent, no dangling `aria-controls` IDREF is emitted.
 
 Every `@hope-ui/components` component **folder** — not every source file; a compound split across
 `<name>-<part>.tsx` files is one component — **must** have a `Foo.ssr.test.tsx` containing a real
-`renderToStringAsync()` call — not in a comment, not in a string, not merely imported, not inside an
+`renderToStream()` call — not in a comment, not in a string, not merely imported, not inside an
 `it.skip`. `check:coverage-parity` checks all four.
 
 Put the call in the wrong project and it fails loudly: in `unit` and `browser`,
-`renderToStringAsync` is a stub that logs *"renderToStringAsync is not supported in the browser,
+`renderToStream` is a stub that logs *"renderToStream is not supported in the browser,
 returning undefined"* and returns `undefined`.
 
 ## Writing a hydration test
@@ -132,7 +132,7 @@ export function Tree() {
   return <ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>;
 }
 export function renderFixture() {
-  return renderToStringAsync(() => <Tree />);
+  return renderToStream(() => <Tree />);
 }
 ```
 
@@ -176,13 +176,13 @@ scanning the container for `[_hk]`.
    `_hk` markup** — a guessed key passes against markup no server would send.
 2. Register the entry in `HYDRATION_ENTRIES` in `vitest-hydration-bridge.ts`, and (per package) add
    the `virtual:hydration-fixture?id=*` ambient type under `types/` if not present.
-3. In `<subject>.ssr.test.tsx`: `const html = await renderToStringAsync(() => <Tree />); expect(html).toMatchInlineSnapshot();`
+3. In `<subject>.ssr.test.tsx`: `const html = await renderToStream(() => <Tree />); expect(html).toMatchInlineSnapshot();`
    then `pnpm exec vitest run --project=ssr -u` to fill the snapshot. Read it, sanity-check it.
 4. In `<subject>.browser.test.tsx`: `import ssr from "virtual:hydration-fixture?id=<subject>"` and
    `hydrateFixture(ssr, () => <Tree />)`.
 
 A snapshot mismatch fails the test, and under `CI=true` fails rather than rewriting, so stale bytes
-can't pass CI. `check:coverage-parity` still requires a real `renderToStringAsync()` in the `ssr` test
+can't pass CI. `check:coverage-parity` still requires a real `renderToStream()` in the `ssr` test
 and a real `hydrate()` / `hydrateFixture()` in the `browser` test, on the same "not in a comment, not
 in an `it.skip`" terms.
 

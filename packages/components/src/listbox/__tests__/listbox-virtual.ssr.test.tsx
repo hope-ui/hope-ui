@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { Listbox } from "../index";
@@ -49,13 +49,13 @@ function VirtualTree(): JSX.Element {
 }
 
 describe("Listbox virtual SSR", () => {
-  it("resolves renderToStringAsync without throwing (the virtual path is a graceful server no-op)", async () => {
-    const html = await renderToStringAsync(() => <VirtualTree />);
+  it("resolves renderToStream without throwing (the virtual path is a graceful server no-op)", async () => {
+    const html = await renderToStream(() => <VirtualTree />);
     expect(typeof html).toBe("string");
   });
 
   it("emits a sane baseline: a role=listbox scroll container + an empty sizer, and no windowed rows", async () => {
-    const html = await renderToStringAsync(() => <VirtualTree />);
+    const html = await renderToStream(() => <VirtualTree />);
     expect(html).toMatch(/role="listbox"/);
     expect(html).toMatch(/aria-label="Ten thousand rows"/);
     expect(html).toContain('data-slot="listbox"');

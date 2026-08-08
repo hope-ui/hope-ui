@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { definePreset } from "../preset";
 import type { RecipeRegistry } from "../recipe-registry";
 import type { SlotRecipeFn } from "../slot-recipe";
@@ -43,6 +43,6 @@ export function Tree(): JSX.Element {
 }
 
 /** The server render the hydration-fixture bridge invokes. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

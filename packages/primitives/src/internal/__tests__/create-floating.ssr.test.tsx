@@ -1,4 +1,4 @@
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { createFloating, type SideOrLogical } from "../create-floating";
@@ -32,20 +32,20 @@ function Tip(props: { side?: SideOrLogical } = {}) {
 
 describe("createFloating on the server", () => {
   it("emits the pre-positioned style, with nothing measured", async () => {
-    const html = await renderToStringAsync(() => <Tip />);
+    const html = await renderToStream(() => <Tip />);
 
     expect(html).toContain("position:absolute");
     expect(html).toContain("visibility:hidden");
     expect(html).toContain('data-positioned="false"');
     // `computePosition`/`autoUpdate` are reached from effect bodies alone, and effects never run
-    // under `renderToStringAsync` — so neither the translate nor the retina `will-change` hint of
+    // under `renderToStream` — so neither the translate nor the retina `will-change` hint of
     // the post-measurement branch can appear. Same branch, same bytes as the client's first render.
     expect(html).not.toContain("translate(");
     expect(html).not.toContain("will-change");
   });
 
   it("seeds the resolved side from the option, so data-side is right on the first paint", async () => {
-    const html = await renderToStringAsync(() => <Tip />);
+    const html = await renderToStream(() => <Tip />);
     expect(html).toContain('data-side="left"');
   });
 
@@ -56,7 +56,7 @@ describe("createFloating on the server", () => {
     // replaces it with the direction-resolved side, exactly as it already does for a side that
     // `flip` overrides. Nothing is visible in between: `data-positioned` is false and the layer is
     // `visibility: hidden` until a measurement lands.
-    const html = await renderToStringAsync(() => <Tip side="inline-start" />);
+    const html = await renderToStream(() => <Tip side="inline-start" />);
     expect(html).toContain('data-side="left"');
     expect(html).toContain('data-positioned="false"');
     expect(html).toContain("visibility:hidden");

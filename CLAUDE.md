@@ -27,7 +27,7 @@ a second `solid-js` copy and `_hk` diverges. `server.deps.inline` and the bridge
 both carry `/@solid-primitives\//`. Effect-only primitives are the safe bet.
 
 **"SSR support" = "works in SolidStart"** — renders on the server, hydrates without mismatch, runs on
-the client. Nothing broader. Verified with `renderToStringAsync`/`hydrate` from `@solidjs/web`;
+the client. Nothing broader. Verified with `renderToStream`/`hydrate` from `@solidjs/web`;
 `@solidjs/start` is not on solid-js 2.0 yet, so that round-trip is the coverage. Four rules protect
 it: effect-gate DOM access; `createUniqueId` for ARIA-linking ids; gate server-side `Portal` behind
 `isServer`; keep an `aria-controls` IDREF only while its target is mounted. Details:
@@ -160,7 +160,7 @@ The set:
    `@hope-ui/theming` and `@hope-ui/components` carry no repo usage doc — their API is in
    `apps/docs/`.
 3. **`@hope-ui/components` only:** one `*.stories.tsx` per folder, colocated in `src/`.
-4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` *calling* `renderToStringAsync`) and
+4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` *calling* `renderToStream`) and
    a hydration test (`*.browser.test.tsx` *calling* `hydrate`) — one of each per folder.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces the above, plus:
@@ -487,9 +487,11 @@ Pinned via the `pnpm-workspace.yaml` catalog, in lockstep across `solid-js` / `@
 - **`children()` decision procedure.** A component arriving via a **prop/getter**
   (`startDecorator={<Icon/>}`, `loadingText`) is created on *every* read. Resolve it once with
   `children()` and read the resolved accessor everywhere — **iff it is read more than once** in a
-  render. That covers both reasons: repeated construction, and the hydration case
-  (`<Show when={x != null}>` + `{x}`, whose `when`-gate read builds and discards a component whose
-  `_hk` client and server place differently). A slot read **exactly once — `<Show>` or not — needs
+  render. The reason is repeated construction. (It used to cover a second reason — the hydration
+  case, `<Show when={x != null}>` + `{x}`, whose `when`-gate read built and discarded a component
+  whose `_hk` client and server placed differently — but **solid `2.0.0-beta.32` fixed that
+  upstream**. `children()` is still not `_hk`-neutral, so removing an existing call is a structural
+  change owing a round-trip, not a cleanup.) A slot read **exactly once — `<Show>` or not — needs
   nothing**; nor does a static child. Full procedure + non-triggers:
   `__internal__/solid-2.0-notes.md`.
 

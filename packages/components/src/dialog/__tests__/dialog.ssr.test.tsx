@@ -1,4 +1,4 @@
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Tree } from "./dialog.ssr-entry";
 
@@ -6,21 +6,21 @@ import { Tree } from "./dialog.ssr-entry";
 // position, so sharing one definition keeps the two halves structurally identical by construction.
 
 describe("Dialog SSR", () => {
-  it("resolves renderToStringAsync without throwing while closed", async () => {
-    const html = await renderToStringAsync(() => <Tree />);
+  it("resolves renderToStream without throwing while closed", async () => {
+    const html = await renderToStream(() => <Tree />);
     expect(typeof html).toBe("string");
   });
 
-  it("resolves renderToStringAsync without throwing while defaultOpen", async () => {
+  it("resolves renderToStream without throwing while defaultOpen", async () => {
     // The critical case: `@solidjs/web`'s Portal throws server-side, so an open dialog — whose
     // Backdrop and Content would otherwise portal into `document.body` — must not crash the render.
     // `Dialog.Portal`'s server guard is what makes this pass.
-    const html = await renderToStringAsync(() => <Tree defaultOpen />);
+    const html = await renderToStream(() => <Tree defaultOpen />);
     expect(typeof html).toBe("string");
   });
 
   it("renders the trigger with aria-expanded reflecting the closed state", async () => {
-    const html = await renderToStringAsync(() => <Tree />);
+    const html = await renderToStream(() => <Tree />);
     expect(html).toContain("Open dialog");
     expect(html).toMatch(/aria-expanded="false"/);
   });
@@ -28,12 +28,12 @@ describe("Dialog SSR", () => {
   it("omits aria-controls from the closed trigger, so the server HTML has no dangling IDREF", async () => {
     // `Dialog.Portal` never renders server-side, so there is no element for `aria-controls` to point
     // at — and an id reference that resolves to nothing is invalid per ARIA.
-    const html = await renderToStringAsync(() => <Tree />);
+    const html = await renderToStream(() => <Tree />);
     expect(html).not.toMatch(/aria-controls/);
   });
 
   it("omits portaled content from the SSR output even when defaultOpen", async () => {
-    const html = await renderToStringAsync(() => <Tree defaultOpen />);
+    const html = await renderToStream(() => <Tree defaultOpen />);
     expect(html).not.toContain("Dialog title");
   });
 
@@ -46,7 +46,7 @@ describe("Dialog SSR", () => {
     // Inline rather than a committed `.html`, so a hydration subject costs zero fixture files. The
     // bridge renders this same `<Tree />` fresh for the browser test, so the two cannot drift.
     // Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
-    const html = await renderToStringAsync(() => <Tree />);
+    const html = await renderToStream(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
       `"<button _hk=002010 type="button" aria-haspopup="dialog" aria-expanded="false" >Open dialog</button>"`,
     );

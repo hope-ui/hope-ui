@@ -122,7 +122,7 @@ peer dependency, same pattern as `@tanstack/virtual-core`. Positioning only — 
 Two Solid-2.0 hazards the Vue port won't flag (see `__internal__/solid-2.0-notes.md`): the watched
 reference/floating **elements** are conditionally rendered, so back them with `createSignal` and
 track them in the `compute` callback (never read a plain ref accessor there); and `autoUpdate`/
-`computePosition` are client-only — effect-gate them (nothing runs under `renderToStringAsync`).
+`computePosition` are client-only — effect-gate them (nothing runs under `renderToStream`).
 
 **As built** (`packages/primitives/src/internal/create-floating.ts`; usage doc
 `__internal__/primitives/internal/create-floating.md`). Four deliberate divergences from the map

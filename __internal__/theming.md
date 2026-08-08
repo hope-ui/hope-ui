@@ -24,7 +24,7 @@ neither knows the other.
 - **`ThemeProvider` / `useRecipe`** — `ThemeProvider` injects a **theme** (a map of recipe name → pure
   recipe function) into context; a component reads one out with `useRecipe("<name>")` and computes its
   class(es) in a getter. Built on the isomorphic `createComponentContext`, so it is server-readable
-  during `renderToStringAsync` — the whole of "works in SolidStart" for theming.
+  during `renderToStream` — the whole of "works in SolidStart" for theming.
 - **`RecipeRegistry`** (`recipe-registry.ts`) — every hope-authored component's recipe (variant
   vocabulary + slots) is declared here directly, as the single source of truth. A component does not
   `declare module` its own recipe, and a theme does not invent the shape; both import the contract

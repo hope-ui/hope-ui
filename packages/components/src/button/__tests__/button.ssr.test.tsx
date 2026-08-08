@@ -1,6 +1,6 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Button } from "../button";
 import { Tree } from "./button.ssr-entry";
@@ -11,8 +11,8 @@ import { Tree } from "./button.ssr-entry";
 // construction: this file and `button.browser.test.tsx` import the same `Tree`.
 
 describe("Button SSR", () => {
-  it("resolves renderToStringAsync without throwing", async () => {
-    const html = await renderToStringAsync(() => (
+  it("resolves renderToStream without throwing", async () => {
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Button>Click me</Button>
       </ThemeProvider>
@@ -23,7 +23,7 @@ describe("Button SSR", () => {
   it("paints the recipe classes into the server output", async () => {
     // Turning props into classes is a pure function of those props, so the server emits exactly what
     // the client would — which is the whole of theming's SSR requirement.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Button variant="solid" colorScheme="danger">
           Delete
@@ -37,7 +37,7 @@ describe("Button SSR", () => {
 
   it("renders a native disabled button with the disabled attribute and no aria-disabled", async () => {
     // No redundant `aria-disabled` — the native attribute already conveys the state.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Button disabled>Click me</Button>
       </ThemeProvider>
@@ -52,7 +52,7 @@ describe("Button SSR", () => {
   it("marks aria-busy while loading without disabling the button", async () => {
     // Loading blocks activation and dims the button, but it keeps its place in the tab order — the
     // state is conveyed by `aria-busy`, never by the native `disabled` attribute.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Button loading>Saving</Button>
       </ThemeProvider>
@@ -66,7 +66,7 @@ describe("Button SSR", () => {
     // `nativeButton={false}` switches to the `role`/`aria-disabled` model. Those derive from the
     // prop alone, never from inspecting the rendered element, which is exactly why they can appear
     // in server output at all.
-    const html = await renderToStringAsync(() => (
+    const html = await renderToStream(() => (
       <ThemeProvider preset={hope}>
         <Button nativeButton={false} disabled>
           Link
@@ -89,7 +89,7 @@ describe("Button SSR", () => {
     // Inline rather than a committed `.html`, so a hydration subject costs zero fixture files. The
     // bridge renders this same `<Tree />` fresh for the browser test, so the two cannot drift.
     // Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
-    const html = await renderToStringAsync(() => <Tree />);
+    const html = await renderToStream(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
       `"<button _hk=00p0 type="button" class="relative inline-flex items-center justify-center whitespace-nowrap font-medium select-none border outline-none transition-[color,background-color,border-color,box-shadow,translate] duration-150 ease-out focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo data-pressed:translate-y-px data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled aria-busy:cursor-progress aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading h-8 gap-1.5 text-sm rounded-lg has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5 bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed px-3" data-slot="button" ><span _hk=00f data-slot="button-label" class="inline-flex items-center">Click me</span></button>"`,
     );

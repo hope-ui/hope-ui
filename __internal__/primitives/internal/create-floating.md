@@ -383,7 +383,7 @@ The pre-positioned style is a constant with no client-only input:
 
 On the server `floating()` is `undefined` (no ref effect runs); on the client's first render
 `isPositioned()` is still `false`. Same branch, same bytes. `computePosition`/`autoUpdate` are
-reached from effect bodies alone, and effects never run under `renderToStringAsync`, so there is no
+reached from effect bodies alone, and effects never run under `renderToStream`, so there is no
 `isServer` import — the same convention as `createDismissable`. `side()`/`align()` seed from the
 config rather than from hard-coded defaults, so `data-side` is correct on the very first paint and
 identical on both sides of the round-trip.

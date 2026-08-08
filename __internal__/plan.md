@@ -212,7 +212,7 @@ Concrete rules every primitive/component must follow:
 still depends on `solid-js@^1.9.11`, so real end-to-end SolidStart integration testing is blocked on
 their migration, not on anything here. Re-check the registry periodically and add a SolidStart example
 once it supports 2.0. SSR/hydration correctness is fully testable and required *now* through
-`@solidjs/web`'s framework-agnostic `renderToStringAsync`/`hydrate`.
+`@solidjs/web`'s framework-agnostic `renderToStream`/`hydrate`.
 
 ## How to build, in order
 

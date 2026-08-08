@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { renderToStringAsync } from "@solidjs/web";
+import { renderToStream } from "@solidjs/web";
 import { Dialog } from "../index";
 
 // One tree, three consumers: `dialog.ssr.test.tsx` snapshots its server bytes,
@@ -18,7 +18,7 @@ import { Dialog } from "../index";
 
 /**
  * `defaultOpen` is optional so the SSR test can also render the open state: its portal must not
- * crash `renderToStringAsync`, and its portaled content must stay out of the output. The hydration
+ * crash `renderToStream`, and its portaled content must stay out of the output. The hydration
  * path uses the default — closed.
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
@@ -46,6 +46,6 @@ export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
 }
 
 /** The closed server render the hydration-fixture bridge invokes. */
-export function renderFixture(): Promise<string> {
-  return renderToStringAsync(() => <Tree />);
+export async function renderFixture(): Promise<string> {
+  return await renderToStream(() => <Tree />);
 }

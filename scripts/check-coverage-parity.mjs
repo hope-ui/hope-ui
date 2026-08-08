@@ -12,7 +12,7 @@
 //   • `components` — PER COMPONENT FOLDER (see PER_FOLDER_DOD): a leaf `src/<name>/` folder is one
 //     component, even when its compound parts (Alert, Dialog, …) are split across many files. The
 //     folder collectively needs a test, a colocated Storybook `*.stories.tsx`, a `*.ssr.test.tsx`
-//     that really calls `renderToStringAsync()`, and a `*.browser.test.tsx` that really calls
+//     that really calls `renderToStream()`, and a `*.browser.test.tsx` that really calls
 //     `hydrate()` (the two halves of the SSR round-trip). Requiring the whole set per part file
 //     would only manufacture boilerplate, so it is not required. Component API docs also live in
 //     the doc website, so no per-folder usage doc is required.
@@ -78,12 +78,12 @@ const REQUIRES_DOC = new Set(["primitives", "i18n"]);
 // "a doc that exists carries the section", not "a doc that was required carries the section".
 const REQUIRES_REJECTED_ALTERNATIVES = new Set(["primitives", "i18n"]);
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
-// `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
+// `renderToStream`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
 // files are the two halves of the SSR → hydrate round-trip, and neither project can do both:
 // `ssr` is the only one resolving `solid-js` *and* `@solidjs/web` to their server builds, and
 // `browser` is the only one with a DOM. See __internal__/testing.md.
 const REQUIRES_SSR_TEST = new Set(["components"]);
-const SSR_TEST_MARKER = "renderToStringAsync";
+const SSR_TEST_MARKER = "renderToStream";
 const REQUIRES_HYDRATION_TEST = new Set(["components"]);
 // A component's browser test satisfies this by calling `hydrate()` directly, or the shared
 // `hydrateFixture()` helper (`@hope-ui/internal-test-utils`), which calls `hydrate()` internally.
@@ -475,7 +475,7 @@ if (total > 0) {
 console.log(
   "check:coverage-parity passed — every primitives source file has a test and a doc under " +
     "__internal__/ (the internal-kernel src/internal/ files are doc-exempt); every theming source " +
-    "file has a test; every component FOLDER has a test, a story, an executing renderToStringAsync() " +
+    "file has a test; every component FOLDER has a test, a story, an executing renderToStream() " +
     "and an executing hydrate(); every browser test that mounts DOM also runs axe; every usage doc " +
     "under __internal__/primitives|i18n records its rejected alternatives; and no leaf source " +
     "folder has flat test/doc/fixture sprawl.",

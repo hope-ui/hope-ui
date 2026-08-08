@@ -892,7 +892,7 @@ describe("Dialog", () => {
 describe("Dialog hydration", () => {
   // `ssrFixture` is real server HTML: the bridge renders `Tree` through a nested SSR server, and
   // `dialog.ssr.test.tsx` snapshots that same render, so the two agree byte for byte. It cannot be
-  // produced here — under the client build `renderToStringAsync` returns `undefined`.
+  // produced here — under the client build `renderToStream` returns `undefined`.
   //
   // Both halves import the *same* `Tree` rather than keeping two copies in sync by hand, because
   // Solid matches server and client nodes by position: inserting anything before `Dialog.Trigger`,

@@ -18,9 +18,9 @@ catalog:
   #
   # `@solidjs/signals` is not referenced by any package.json — it arrives transitively via
   # `solid-js`. The entry is here to document the lockstep, and costs nothing.
-  solid-js: 2.0.0-beta.19
-  "@solidjs/signals": 2.0.0-beta.19
-  "@solidjs/web": 2.0.0-beta.19
+  solid-js: 2.0.0-beta.32
+  "@solidjs/signals": 2.0.0-beta.32
+  "@solidjs/web": 2.0.0-beta.32
   # The JSX compiler, pinned for the same reason the runtime is. Only two pipelines compile
   # this repo's JSX (the Vitest projects and Storybook) and they must agree with each other
   # AND with the runtime above — a mismatch surfaces as a runtime error deep inside
@@ -33,8 +33,8 @@ catalog:
   # against a beta.19 runtime. `babel-preset-solid` also needs the `overrides` entry below,
   # because a catalog only binds specifiers that say `catalog:` and vite-plugin-solid asks
   # for it by range.
-  vite-plugin-solid: 3.0.0-next.11
-  babel-preset-solid: 2.0.0-beta.19
+  vite-plugin-solid: 3.0.0-next.23
+  babel-preset-solid: 2.0.0-beta.32
   # Framework-agnostic virtualizer core. Adopted (not merely referenced) by
   # `createVirtualCollection`; an *optional* peerDependency of @hope-ui/primitives so the
   # kernel stays zero-dependency for consumers who never virtualize. See
@@ -70,9 +70,9 @@ minimumReleaseAgeExclude:
   - '@storybook/csf-plugin@10.5.0'
   - '@storybook/react-dom-shim@10.5.0'
   - storybook@10.5.0
-  - '@solidjs/signals@2.0.0-beta.19'
-  - '@solidjs/web@2.0.0-beta.19'
-  - solid-js@2.0.0-beta.19
+  - '@solidjs/signals@2.0.0-beta.32'
+  - '@solidjs/web@2.0.0-beta.32'
+  - solid-js@2.0.0-beta.32
   - '@tanstack/virtual-core@3.17.4'
   - '@floating-ui/dom@1.8.0'
   - '@internationalized/date@3.12.2'
@@ -83,7 +83,7 @@ minimumReleaseAgeExclude:
   - '@tanstack/solid-start-client@2.0.0-beta.24'
   - '@tanstack/solid-start-server@2.0.0-beta.24'
   - '@tanstack/start-static-server-functions@1.167.18'
-  - 'vite-plugin-solid@3.0.0-next.11'
-  - 'babel-preset-solid@2.0.0-beta.19'
+  - 'vite-plugin-solid@3.0.0-next.23'
+  - 'babel-preset-solid@2.0.0-beta.32'
   # Name pattern (no version): pnpm forbids a version union on a wildcard name.
   - '@dom-expressions/*'

@@ -207,11 +207,22 @@ the installed package, not read from docs.
     body node comes out one `_hk` off: `Hydration tag mismatch for key "…": expected <svg> but found
     <span>`, caught by the route error boundary, which then silently client-renders — console fills
     with errors and the SSR benefit is lost.
-    Upstream `@solidjs/web` beta asymmetry, still open through at least `2.0.0-beta.20`
-    (solidjs/solid#2384, solidjs/solid-start#1089). `children()` fixes it because the `when` gate
-    then reads the **resolved** accessor (`when={startDecorator() != null}`) — no phantom build in
-    the gate, and the single resolved component is allocated in the ambient owner like a direct
-    child, so hydration realigns.
+    Upstream `@solidjs/web` beta asymmetry (solidjs/solid#2384, solidjs/solid-start#1089), open from
+    the start of the beta line through `2.0.0-beta.31`. `children()` works around it because the
+    `when` gate then reads the **resolved** accessor (`when={startDecorator() != null}`) — no phantom
+    build in the gate, and the single resolved component is allocated in the ambient owner like a
+    direct child, so hydration realigns.
+
+    **Fixed upstream in `2.0.0-beta.32`** ("corrected hydration id drift from allocation-capable prop
+    getters in flow controls"): the discarded gate component no longer consumes an id, so the raw
+    `when`+body idiom now keys exactly like a body-only read. `solid-contract.ssr.test.tsx` was
+    flipped to assert that equality, so a regression is caught.
+
+    **This does not make the `children()` calls removable on its own.** The single-creation axis
+    above is unaffected and still applies wherever a component-valued prop is read more than once.
+    And `children()` is not key-neutral even now — resolving in the ambient owner allocates *ahead*
+    of the surrounding element, so removing a call moves `_hk` for that subtree and owes a real
+    SSR→hydrate round-trip, not a green typecheck.
 - **What does *not* need `children()` — established with isolated SSR→hydrate round-trips, not just
   reasoning:**
   - **A single read — even inside a `<Show>`.** `<Show when={someFlag()}>{x}</Show>` reading `x`
@@ -229,7 +240,7 @@ the installed package, not read from docs.
   **`children()` decision procedure:** resolve once and read the accessor **iff the component-valued
   prop is read more than once** in a render; a slot read exactly once — `<Show>` or not — needs
   neither (a reflexive `children()` only adds a memo and shifts `_hk`). Pinned in
-  `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` (the `when`-gate read is the extra
-  key; a single body read inside a `<Show>` is not) and regression-tested by `button-icons`/
+  `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` (since beta.32: the `when`-gate
+  read costs no key, and `children()` still relocates one) and regression-tested by `button-icons`/
   `badge-icons` (hydration round-trip) and `button-slot-resolution.browser.test.tsx` (counts real
   constructions).

@@ -11,7 +11,7 @@
 // to the right line in the original file and a caller can report `path:line` accurately.
 //
 // Which one a check wants follows from where its evidence lives. A rule about what the code *does*
-// (`renderToStringAsync` is actually called, an `it.skip` block is paren-balanced) reads the code
+// (`renderToStream` is actually called, an `it.skip` block is paren-balanced) reads the code
 // projection. A rule about what a recipe *emits* (a class string containing `color-mix` or a
 // physical `pr-8`) reads the string projection — and gets, for free, the guarantee that a header
 // comment discussing the forbidden pattern by name cannot trip the check.
@@ -219,10 +219,10 @@ function project(source, keep) {
 /**
  * Blanks the *contents* of comments, string/template literals and regex literals, preserving every
  * character offset. Lets a check reason about code positions only: an `it.skip("hydrates (x)")`
- * stays paren-balanced, and a `renderToStringAsync` mentioned in a comment or inside a string is no
+ * stays paren-balanced, and a `renderToStream` mentioned in a comment or inside a string is no
  * longer mistaken for a call.
  *
- * This exists because the SSR requirement used to be `source.includes("renderToStringAsync")`,
+ * This exists because the SSR requirement used to be `source.includes("renderToStream")`,
  * which `Dialog.browser.test.tsx` satisfied three ways at once — a prose comment, a bare import,
  * and a call inside an `it.skip`. None of them ran.
  *

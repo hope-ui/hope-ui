@@ -140,6 +140,18 @@ export default defineConfig(({ command }) => ({
       },
     }),
     // Tell vite-plugin-solid to also compile the JSX that MDX emits.
-    viteSolid({ ssr: true, extensions: [".mdx"] }),
+    //
+    // `compiler: "babel"` is a workaround, not a preference. Since 3.0.0-next.23 the plugin's
+    // default JSX backend is a native (Rust/oxc) compiler that picks its parser dialect from the
+    // file extension. The plugin knows custom `extensions` are unknown to it and rewrites the
+    // name — `id + ".jsx"` — for its `transformLazyAsync`/`transformRefreshAsync` passes, but the
+    // JSX pass itself is still handed the raw `id`, so every `.mdx` module dies with "Unknown file
+    // extension". Babel takes its dialect from `parserOpts.plugins` instead and doesn't care about
+    // the extension, which is how this worked before next.23.
+    //
+    // Only this app is affected: nothing under `packages/` is `.mdx`, so the library's own tests
+    // and Storybook stay on the native backend a real consumer gets by default. Drop this the day
+    // the JSX pass uses the same normalized filename as its siblings.
+    viteSolid({ ssr: true, extensions: [".mdx"], compiler: "babel" }),
   ],
 }));
