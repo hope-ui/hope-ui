@@ -1,6 +1,8 @@
 {
+  "//": "`types` is explicit because TypeScript 6.0 stopped auto-discovering `@types/node` for this package — `hope.test.ts` reads its own `theme.css` with `node:fs`, and TS 6.0.3 fails it with TS2591 where 5.9.3 (same @types/node) resolved it. A `typeRoots` pointing straight at packages/presets/node_modules/@types does NOT fix it; naming the package does. Every other package here needs no ambient types at all, so this stays local rather than moving into tsconfig.base.json.",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "types": ["node"],
     "noEmit": true,
     "declarationMap": false
   },

@@ -19,11 +19,12 @@ describe("CATALOGS registry", () => {
     );
   });
 
-  it.each(
-    Object.entries(CATALOGS),
-  )("locale '%s' has full key parity with English (complete translation)", (_code, catalog) => {
-    expect(flatKeys(catalog)).toEqual(EN_KEYS);
-  });
+  it.each(Object.entries(CATALOGS))(
+    "locale '%s' has full key parity with English (complete translation)",
+    (_code, catalog) => {
+      expect(flatKeys(catalog)).toEqual(EN_KEYS);
+    },
+  );
 });
 
 describe("resolveCatalog", () => {

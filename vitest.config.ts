@@ -1,12 +1,12 @@
 import { playwright } from "@vitest/browser-playwright";
 import solid from "vite-plugin-solid";
 import { defineConfig } from "vitest/config";
-import { solidPluginOptions } from "./solid-babel-options";
+import { solidPluginOptions } from "./solid-babel-options.ts";
 // The `@hope-ui/*` → src and server-build aliases live in their own module so the
 // hydration-fixture bridge below is a fourth consumer of the *same* arrays, not a duplicated copy
 // that could drift out of sync (CLAUDE.md's "always resolve to src" invariant).
-import { hopeUiAlias, serverBuildAlias } from "./vitest-aliases";
-import { hydrationFixtureBridge } from "./vitest-hydration-bridge";
+import { hopeUiAlias, serverBuildAlias } from "./vitest-aliases.ts";
+import { hydrationFixtureBridge } from "./vitest-hydration-bridge.ts";
 
 // Three projects, one job each. Keep them that way — the previous two-project layout put
 // pure-logic tests and SSR tests in the same "unit" project, which forced a module-resolution

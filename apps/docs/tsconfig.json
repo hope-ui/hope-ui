@@ -10,6 +10,10 @@
     "moduleResolution": "Bundler",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "isolatedModules": true,
+    // `vite.config.ts` imports `../../vitest-aliases.ts` with its extension, because Vite 8.2's
+    // native config loader warns on extensionless relative config imports and is slated to become
+    // the default. Safe with `noEmit` — nothing here is compiled to JS by tsc.
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "ES2022",

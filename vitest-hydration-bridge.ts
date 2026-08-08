@@ -1,8 +1,8 @@
 import { join } from "node:path";
 import { createServer, type Plugin, type ViteDevServer } from "vite";
 import solid from "vite-plugin-solid";
-import { solidPluginOptions } from "./solid-babel-options";
-import { hopeUiAlias, serverBuildAlias } from "./vitest-aliases";
+import { solidPluginOptions } from "./solid-babel-options.ts";
+import { hopeUiAlias, serverBuildAlias } from "./vitest-aliases.ts";
 
 // An always-fresh SSR generation bridge, so a hydration round-trip needs **zero committed fixture
 // files** at any component count. A `.html` fixture per subject is snapshot-rot waiting to happen:

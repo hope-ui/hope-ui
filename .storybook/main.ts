@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import type { StorybookConfig } from "storybook-solidjs-vite";
 import type { PluginOption } from "vite";
 import solid from "vite-plugin-solid";
-import { solidPluginOptions } from "../solid-babel-options";
+import { solidPluginOptions } from "../solid-babel-options.ts";
 
 // Same alias vitest.config.ts uses, for the same reason: `@hope-ui/components` depends
 // on `@hope-ui/primitives` as a real workspace package, which resolves to its *built*

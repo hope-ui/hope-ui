@@ -15,7 +15,7 @@ import viteSolid from "vite-plugin-solid";
 // invariant in a single place rather than a drifting copy. Vite bundles this relative
 // config dependency and injects a per-file `import.meta.dirname`, so the absolute paths
 // `hopeUiAlias` bakes in resolve against the repo root, not this config's directory.
-import { hopeUiAlias } from "../../vitest-aliases";
+import { hopeUiAlias } from "../../vitest-aliases.ts";
 
 const src = fileURLToPath(new URL("./src", import.meta.url));
 const repoRoot = fileURLToPath(new URL("../../", import.meta.url));
