@@ -188,3 +188,241 @@ keymap needs and exactly what `Select.List` must not iterate — the group bound
 concrete implementation inside a component. The consumer's own array is the only place the grouped
 shape still exists, so `Select.Root` puts it on the context and `Select.List` iterates that —
 `Listbox.Root` already iterates its own `merged.items` the same way.
+
+## TagsInput
+
+Settled **before** any TagsInput code was written, because a decision is free to change as a doc and
+expensive to change as shipped code. Two references were on the table and neither solves the
+combination: Base UI's chip row is welded to Combobox and cannot hold a value the popup never offered
+(so it cannot do email entry), and React Aria's TagGroup-plus-ComboBox is a Storybook story rather
+than a component, with no keyboard bridge between the input and the chips. Every divergence from
+either is recorded below.
+
+The decisions carry the ids `D1`–`D12`, which the part hooks, their usage docs and the build's
+validation gates all cite:
+
+| id | Decided |
+| --- | --- |
+| D1 | `TagsInput.List` is `role="toolbar"`; each chip is `role="group"` named from its own text; the ✕ is a real `<button>` with `aria-labelledby="<own id> <itemText id>"` → *"Remove Apple"* |
+| D2 | The **input is the widget's single tab stop**; chips are always `tabindex="-1"`, reached by ArrowLeft from a caret at position 0, or by pointer |
+| D3 | The tag type is a generic `V`, with `parse` **conditionally required** for any `V` other than `string` |
+| D4 | A rejected add fires `onReject({ reason, text })` with `reason: "duplicate" \| "max" \| "invalid" \| "empty"`; `parse` is the single normalization seam; equality is literal by default |
+| D5 | Enter commits when the input has text and is **unbound when it is empty**, so the enclosing form still submits; an in-progress IME composition returns before anything else |
+| D6 | Native submission is **one `<input type="hidden" name={name}>` per tag**, plus one clipped `required` text input, reusing `createHiddenSelect` unchanged |
+| D7 | Field wiring (label / description / error linking) waits for `createFormControl`; TagsInput takes `aria-describedby`, `aria-invalid`, `invalid`, `required`, `readOnly` and `disabled` as ordinary props now |
+| D8 | `TagsInput.ItemDelete` is its own part, **not** a `CloseButton` |
+| D9 | The live region is container attributes on `TagsInput.List` (`aria-live="polite"` only while focus is within, `aria-relevant="additions"`, `aria-atomic="false"`), not `createAnnounce` |
+| D10 | Keyboard removal lets `createListFocus`'s re-homing move focus to the survivor; a pointer removal clears the active index **first**, then focuses the input |
+| D11 | `ItemDelete` / `List` / `Control` — the repo's existing row and container vocabulary |
+| D12 | The three `tagsInput` i18n strings are **written** per locale, not ported from React Aria's `intl/tag/` JSON |
+
+The ARIA shape D1 lands, so the entries below read against something concrete:
+
+```html
+<div role="toolbar" aria-live="polite" aria-relevant="additions" aria-atomic="false">
+  <div role="group" aria-label="Apple" tabindex="-1" data-active>
+    <span id="t0-text">Apple</span>
+    <button id="t0-del" tabindex="-1" aria-labelledby="t0-del t0-text">✕</button>
+  </div>
+</div>
+<!-- a plain textbox, deliberately not role="combobox" -->
+<input aria-label="Add a tag" />
+```
+
+### `role="list"` / `listitem` on the chip row, or role-less `div`s (D1)
+**Why not:** NVDA and JAWS intercept arrow keys in *browse mode* and only hand them to the app in
+*focus mode*, which they enter for `grid` / `toolbar` / `listbox` / `menu` / `tree` — not for a plain
+`div`, and not for `list`/`listitem`. A role-less chip row cannot be arrowed through by a Windows
+screen-reader user, and every keyboard test still passes. That silence is why both references reach
+for an unusual role, and why the row carries `toolbar` rather than the semantically tempting `list`.
+
+### React Aria's `role="grid"` / `row` / `gridcell` for the chip row (D1)
+**Why not:** `useTagGroup` composes `useGridList` + `useGridListItem` wholesale, so the porting rule
+(*port the hooks a reference composes; never substitute a narrower hand-rolled stand-in*) makes
+`createGridList` — over the existing `create-grid-navigation.ts`, with its own test, usage doc and
+rejected-alternatives section — a prerequisite build before any TagsInput code. What that buys is a
+positional announcement and Tab-between-two-focusables-inside-one-row. The ✕'s *"Remove Apple"* label
+is **identical** in both shapes (`useTag.ts:126` spells the same `aria-labelledby` pair), the
+positional count adds nothing over the name for a row whose only action is "remove this one", and a
+chip holds exactly one focusable. The grid shape also needs `display: contents` on the row to keep the
+horizontal flex layout, which is load-bearing and historically fragile in browser accessibility trees.
+The accepted cost: a chip announces as a named group rather than "row 1 of 3". The payoff is that the
+chip row composes **only shipped primitives** — `createDataCollection` + `createListFocus` +
+`createListNavigation` + `createButton` — so TagsInput adds no kernel row.
+**Revisit if:** a chip ever needs two focusables (a clickable label plus the ✕). That is the trigger
+to build `createGridList`, not this.
+
+### Grid roles hand-rolled over `createGridNavigation` (D1)
+**Why not:** Exactly the shape the porting rule forbids — a narrower stand-in for the hooks the
+reference composes. It would ship only with a written exemption, and the semantics it buys are the
+ones already rejected above.
+
+### A roving tab stop on the chip row (D2)
+**Why not:** Tab must cross the whole field in one press. `createListFocus.getItemTabIndex()` is
+therefore deliberately **not** consulted — the hook is used for the active item, the deferred
+`.focus()` and the focus re-homing after a removal, never for the tab order. This is the rule Combobox
+already pins in its SSR test: *the input is the widget's single tab stop, server-side too — otherwise
+a page that has not hydrated yet takes three Tab presses to cross one field.*
+**Divergence from React Aria:** its TagGroup makes tags tabbable because it is standalone and has no
+input to own the tab stop. Matches Base UI.
+
+### `string`-only tags (Zag's shape) (D3)
+**Why not:** Simpler surface, but the multi-select Combobox integration would then have to stringify
+`V` and keep its own value→item map to render labels and to deselect, so the composition stops being
+plain; display-text ≠ stored-value becomes impossible, which is what email chips need. With a generic
+`V` the integration renders `state.list.value()` and the ✕ calls `selection.deselect` with no
+stringify or lookup map in between. `createTagsInput<V>` takes `itemToValue` / `itemToLabel` /
+`isItemEqualToValue` — the kernel's one equality vocabulary — plus `parse` for the text→tag direction,
+and the conditional type is what keeps a string from silently masquerading as `V`:
+
+```ts
+type ParseProp<V> = string extends V
+  ? { parse?: (text: string) => V | null }
+  : { parse: (text: string) => V | null };
+```
+
+`parse` defaults to `(text) => text.trim() as V`, correct for `V = string`; an object tag with no
+parser is a compile error. Returning `null` rejects the text as D4's `"invalid"`. The cost is that
+every part hook carries `<V>` and object tags owe one more prop. React Aria's TokenField carries
+`{ text, value? }` per token for the same reason, and its own source admits the lookup direction is
+unfinished.
+
+### A silent no-op on a rejected add (D4)
+**Why not:** The user's Enter appears to do nothing, and there is no channel to say "already added" /
+"limit reached". `onReject({ reason, text })` is that channel, with four reasons — `"duplicate"`,
+`"max"`, `"invalid"`, `"empty"`. The input text is then **kept** for `max` / `invalid` (the intent is
+unmet and the user can fix it) and **cleared** for `duplicate` (the value is already on screen as a
+chip, and the *existing* chip carries `data-duplicate` until the next input event or the next
+successful add, so the recipe can flash it).
+
+### A boolean return from the add call (D4)
+**Why not:** A boolean cannot say *why*, and a Solid component API has no natural return channel for
+what is an event.
+
+### All-or-nothing paste when the paste would exceed `max` (D4)
+**Why not:** It throws away a 20-address paste over one overflow. The accepted shape is
+**partial-accept** up to the limit, with the remainder going back into the input joined by the
+delimiter, plus one `onReject("max", remainder)` — TokenField's "the trailing empty part stays
+editable" idea, so the user sees exactly what did not fit and can act on it.
+
+### A separate `sanitize` / `sanitizeValue` prop beside `parse` (D4)
+**Why not:** Two normalization seams drift — one runs on paste but not on typing, or vice versa.
+`parse` is the **single** seam (default `text.trim()`), serving both typing and pasting, which is the
+transferable idea from TokenField's tokenizer.
+
+### Case-folding in the default duplicate check (D4)
+**Why not:** `"Apple"` and `"apple"` are two distinct keywords, and folding two distinct email
+addresses into one is a bug. The default stays literal —
+`isItemEqualToValue ?? (a, b) => itemToValue(a) === itemToValue(b)` — and the seam to change it is
+`isItemEqualToValue`, which the kernel already speaks.
+
+### Zag's `allowOverflow` — accept past `max` and mark the field invalid (D4)
+**Why not:** It makes `max` advisory and pushes the invalid state onto the consumer, who today has
+nowhere to put it (see D7: nothing in this catalog wires `aria-invalid` yet).
+**Revisit if:** `createFormControl` lands and `aria-invalid` is wired — a soft max becomes expressible
+then.
+
+### Enter mapped to a commit unconditionally, React Aria TokenField's shape (D5)
+**Why not:** TokenField can, because its whole content model is one `contentEditable`; a TagsInput
+inside a `<form>` cannot — swallowing Enter on an empty input breaks form submission. The map is
+therefore: an in-progress IME composition **returns first, before anything else**; Enter with text
+commits and calls `preventDefault()`; Enter on an empty input is **unbound with no `preventDefault()`**
+so the form submits; Enter on a focused chip returns focus to the input and commits nothing. The
+empty-input rule is the same line `createComboboxInput` already draws for a closed combobox. The IME
+guard checks **both** channels — `textInput.isComposing()` is `createTextInput`'s own truth,
+`keyCode === 229` is the legacy/Safari backstop Base UI checks in `ComboboxInput.tsx` — because
+committing on a CJK candidate confirmation turns a half-typed word into a tag.
+
+### `blurBehavior` defaulting to `"add"` (D5)
+**Why not:** Clicking a chip's ✕ blurs the input, so `"add"` would commit a half-typed draft as a side
+effect of deleting a *different* tag. `blurBehavior?: "keep" | "add" | "clear"` defaults to `"keep"`.
+
+### One delimited hidden value, `"a,b,c"` (D6)
+**Why not:** A tag containing the delimiter corrupts the submission silently, and the server re-parses
+what the client already parsed. One `<input type="hidden" name={name}>` per tag submits
+`tags=a&tags=b`, read back with `FormData.getAll("tags")` — how HTML expresses a repeated field.
+
+### `HiddenSelect` for the hidden form value (D6)
+**Why not:** It needs an `<option>` set, and a TagsInput has none — its values are authored by the
+user rather than chosen from a list. The *hook* is reused unchanged: `createHiddenSelect` is already
+element-agnostic (`HiddenFormControl = HTMLSelectElement | HTMLInputElement`) and owns exactly the two
+behaviors needed — the form-scoped `reset` listener restoring `defaultValue`, and cancelling the
+`invalid` report so focus lands somewhere visible. `required` is the clipped
+`<input type="text" required tabindex="-1">` whose value is empty exactly when the tag list is, which
+`hidden-select.tsx`'s fallback path already does. So no new primitive.
+*Follow-up, not in scope:* `createHiddenSelect` is now a misnomer; a rename to `createHiddenFormField`
+would be a pure rename plus a doc move.
+
+### No hidden form value at all, Combobox's answer (D6)
+**Why not:** Combobox's reason is that it holds the *filtered* option set, so a hidden field would drop
+options as the user typed. A TagsInput holds exactly what it will submit, so the reason does not
+transfer.
+
+### Pulling `createFormControl` forward, ahead of TagsInput (D7)
+**Why not:** It is a **gated adopt** of `@solid-primitives/a11y`, and the gate is a hydration
+round-trip on a `Field` component that does not exist yet — so pulling it forward turns a bounded
+component build into "build Field, clear the gate, and rebuild in-repo effect-only if it fails", a
+sequencing risk on TagsInput's critical path with no upside for the chip row. TagsInput's own ARIA is
+complete without it: the chip names, the ✕ labels and the live region are TagsInput's, while
+`createFormControl` adds *field* chrome (label / description / error linking) shared with Input,
+Textarea, NumberInput, Select, Combobox and Listbox — a cross-cutting retrofit, cheaper done once
+across six components than special-cased on one. Select, Combobox and Listbox wire no
+`aria-describedby` and no `aria-invalid` today; TagsInput joins that queue rather than forking it.
+The mitigation is part of the plan: `createTagsInput` takes `aria-describedby`, `aria-invalid`,
+`invalid`, `required`, `readOnly` and `disabled` as ordinary props now, resolved with the repo's
+`props.x ?? computed` fallback rule, so the retrofit is a wiring change rather than an API break.
+
+### `TagsInput.ItemDelete` rendering `@hope-ui/components/close-button` (D8)
+**Why not:** `Dialog.CloseTrigger` and `Alert.CloseTrigger` both do, and the chip ✕ cannot, because it
+needs three things CloseButton cannot express: `aria-labelledby="<own id> <itemText id>"` →
+*"Remove Apple"* (CloseButton's label is a flat `common.close` with no way to compose the row's text);
+`tabindex="-1"`, since the chip row is not in the tab order (D2) while CloseButton is a real tab stop;
+and metrics tied to `tagsInput`'s `size` rather than `closeButton`'s independent `sm`/`md`/`lg` axis,
+whose `sm` is already a 24px box with a 16px glyph — too large inside an `sm` chip. The accepted cost
+is one more slot pair on the `tagsInput` recipe (`itemDelete` + `itemDeleteIcon`), and a preset that
+restyles CloseButton app-wide does not reach chip ✕s. A deliberate divergence from the two shipped
+`CloseTrigger` parts.
+
+### `createAnnounce` for the added-tag announcement (D9)
+**Why not:** It appends its regions to `document.body` outside the tree and announces a *message you
+compose*. That is right for Calendar's "3 dates selected"; here the thing to announce is the chip
+element that just appeared, and `aria-relevant="additions"` announces it verbatim with no string to
+compose and none to localize. So `TagsInput.List` carries the container attributes directly —
+React Aria's `useTagGroup.ts:154-162`, which Base UI has no analogue for. Removals need no
+announcement: the focus move is the announcement. `aria-live` is gated on focus-within so an
+*external* value change (a server push, a `<Combobox>` pick made elsewhere) cannot talk over the user.
+
+### Letting the focus re-homing effect run during a pointer removal (D10)
+**Why not:** With a non-negative active index, the re-homing effect fires on the collection change
+and — in roving mode — sets `pendingFocus`, yanking DOM focus onto a survivor chip while the user
+expects to keep typing. So a ✕ click calls `focus.focusIndex(-1)` **before** the removal (making that
+effect return early on `activeAt < 0`), removes, then focuses the **input**; it mirrors Base UI's
+`clearActiveIndexForRemovedItem` + `inputRef.current?.focus()`. Keyboard removal is the opposite: let
+`createListFocus`'s re-homing move focus to the survivor, and **verify TagsInput inherits it rather
+than re-deriving it** — React Aria (`useListState.ts:105-148`) and Base UI
+(`getIndexAfterChipRemoval`) agree, which is why that re-homing exists as a primitive at all.
+**Divergence from React Aria** on both counts: it leaves focus on the row after a pointer removal and
+focuses the *container* when the row empties (`useTagGroup.ts:143-150`). Both are right for a
+standalone TagGroup with no input; a TagsInput has one, and it is where typing continues.
+
+### Wrapping arrow navigation at the ends of the chip row (D10)
+**Why not:** React Aria's TagGroup wraps (`shouldFocusWrap: true`) because there is nowhere else for
+focus to go. Here there is: `wrap: false`, and arrowing past either end returns to the **input** —
+implemented by peeking (`navigation.peekNext() < 0` → focus the input) rather than moving-then-reading,
+because a Solid 2.0 signal write is invisible to a plain read until the next flush. `listbox-root.ts`
+uses the same trick for shift+arrow. Base UI does not wrap either.
+
+### `ItemDeleteTrigger` (Ark) or `ChipRemove` (Base UI) for the ✕ part (D11)
+**Why not:** The `Item*` prefix is already the repo's shared row vocabulary (`ItemText`,
+`ItemIndicator`), and `Combobox.Clear` shows the `Trigger` suffix is not required on every action
+button. `List` for the chip container matches `Combobox.List` / `Select.List` as "the collection
+container", and `Control` for the bordered shell matches `Combobox.Control`.
+
+### Porting React Aria's `intl/tag/` translations for the three `tagsInput` strings (D12)
+**Why not:** It ships them for 34 locales, but copying that JSON makes `@hope-ui/i18n` an Apache-2.0
+derivative owing an `@license` header, a `NOTICE.md` row in two places and `LICENSE-APACHE-2.0.txt` in
+the package — for three short functional strings hope can write itself in the twelve locales it
+actually ships. Reproducing the *idea* of a keyboard-only remove description owes nothing. The keys are
+`tagsInput.removeLabel`, `tagsInput.removeDescription` and `tagsInput.clearLabel`; contract and
+per-locale rationale live in `__internal__/i18n/`, and `CLAUDE.md` § Third-party attribution is the
+rule this follows.
