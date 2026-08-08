@@ -6,13 +6,35 @@ allowBuilds:
   esbuild: true
 
 catalog:
-  # The solid trio moves in lockstep (CLAUDE.md requires a single solid version). Bumped
-  # beta.17 -> beta.19 because `@tanstack/solid-router` (a docs-app dep) hard-depends on
-  # `@solidjs/web@2.0.0-beta.19`; a version skew breaks context/hydration, so the whole repo
-  # moves together. See apps/docs and the PLAN handoff.
+  # The solid trio moves in lockstep (CLAUDE.md requires a single solid version). A version
+  # skew breaks context and hydration *silently*, so the whole repo moves together.
+  #
+  # `@tanstack/solid-router` (a docs-app dep) names an exact `@solidjs/web` in its own
+  # `dependencies`, but it ALSO declares `@solidjs/web`/`solid-js` as peers with a wide
+  # `>=2.0.0-0 <3.0.0` range — so the exact pin is a fallback, not a ceiling on this repo.
+  # It is still worth checking after every install that only one copy landed:
+  #   ls node_modules/.pnpm | grep -E '^(solid-js|@solidjs\+web)@'
+  # Two lines there is the skew above, and nothing fails loudly when it happens.
+  #
+  # `@solidjs/signals` is not referenced by any package.json — it arrives transitively via
+  # `solid-js`. The entry is here to document the lockstep, and costs nothing.
   solid-js: 2.0.0-beta.19
   "@solidjs/signals": 2.0.0-beta.19
   "@solidjs/web": 2.0.0-beta.19
+  # The JSX compiler, pinned for the same reason the runtime is. Only two pipelines compile
+  # this repo's JSX (the Vitest projects and Storybook) and they must agree with each other
+  # AND with the runtime above — a mismatch surfaces as a runtime error deep inside
+  # `@solidjs/web`, never as a config error. `solid-babel-options.ts` already unifies the
+  # compiler's *options*; these two entries unify its *version*.
+  #
+  # This was a live bug, not a hypothetical: the root pinned `vite-plugin-solid@3.0.0-next.5`
+  # exactly while apps/docs used `^3.0.0-next.11`, and next.5 depends on `babel-preset-solid`
+  # by open range — so every test and story compiled with `babel-preset-solid@2.0.0-beta.16`
+  # against a beta.19 runtime. `babel-preset-solid` also needs the `overrides` entry below,
+  # because a catalog only binds specifiers that say `catalog:` and vite-plugin-solid asks
+  # for it by range.
+  vite-plugin-solid: 3.0.0-next.11
+  babel-preset-solid: 2.0.0-beta.19
   # Framework-agnostic virtualizer core. Adopted (not merely referenced) by
   # `createVirtualCollection`; an *optional* peerDependency of @hope-ui/primitives so the
   # kernel stays zero-dependency for consumers who never virtualize. See
@@ -33,6 +55,13 @@ catalog:
   # solid-js/@solidjs/web ^2.0.0-beta. Adoption verdict: __internal__/solid-primitives-eval.md.
   # (`@solid-primitives/i18n` was dropped — hope-ui's i18n module now ships its own catalog+resolver.)
   "@solid-primitives/a11y": 1.0.0-next.0
+
+# `vite-plugin-solid` depends on `babel-preset-solid` by RANGE, and a range resolves to
+# whatever is newest on the registry that day — which is how the compiler drifted a version
+# behind the runtime without anyone changing a file. The catalog entry above only governs the
+# root devDependency; this is what collapses the nested range onto it.
+overrides:
+  babel-preset-solid: "catalog:"
 
 minimumReleaseAgeExclude:
   - vite@8.1.4
