@@ -232,6 +232,12 @@ export interface CreateTagsInputReturn<V = string> {
 
   /** Register the chip-row container: the collection's scroll container and the focus owner's element. */
   setListElement: (element: HTMLElement | null | undefined) => void;
+  /**
+   * The registered chip-row container. Read by the two parts that have to decide whether focus is
+   * still *inside the widget*: the row asks it about the field, and the field asks it about the row.
+   * Neither can see the other's boundary on its own — see `tags-input-input.md` § Focus-within.
+   */
+  listElement: Accessor<HTMLElement | null | undefined>;
   /** The registered text field. */
   inputElement: Accessor<HTMLElement | undefined>;
   /** Register the text field. */
@@ -515,6 +521,7 @@ export function createTagsInput<V = string>(
     isInteractive,
     direction,
     setListElement: (element) => setListElement(element),
+    listElement,
     inputElement,
     setInputElement: (element) => setInputElement(element),
     focusInput,

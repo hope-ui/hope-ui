@@ -75,8 +75,14 @@ Returned surface: `id`; `value` / `setValue`; `indexed`, `indexOfValue`; the sub
 and `navigation`; `add`, `removeAt`, `remove`, `removeLast`, `clear`; the resolved mappers
 `itemToValue`, `itemToLabel`, `isItemDisabled`, `isItemEqualToValue`; `max`, `isFull`, `delimiter`;
 `duplicateValue`, `isDuplicate`, `clearDuplicate`; `disabled`, `readOnly`, `required`, `invalid`,
-`ariaInvalid`, `ariaDescribedBy`, `isInteractive`; `direction`; `setListElement`, `inputElement`,
-`setInputElement`, `focusInput`.
+`ariaInvalid`, `ariaDescribedBy`, `isInteractive`; `direction`; `setListElement`, `listElement`,
+`inputElement`, `setInputElement`, `focusInput`.
+
+`listElement` and `inputElement` are readable, not just writable, because the widget's focus-within
+flag is decided by **two** parts that each straddle the other's boundary: the chip row asks *"is the
+active element inside me **or** is it the field?"*, and the field asks the mirror question. Neither
+element can see the other's subtree without this. See
+[`tags-input-input.md`](tags-input-input.md) § Focus-within is the widget's.
 
 `name` / `form` are deliberately absent: native submission is `D6`, and the hidden-field phase adds
 them alongside the code that reads them rather than shipping two unread options ahead of it.

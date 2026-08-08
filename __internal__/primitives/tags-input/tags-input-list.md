@@ -84,10 +84,10 @@ The decision is deferred to the next task rather than read off `event.relatedTar
 `relatedTarget` — at that instant indistinguishable from the user tabbing away — and the re-homing
 that follows lands within the same flush.
 
-**The other half of the pair is the field part's** (`createTagsInputInput`, Phase 4): this element
-only ever observes focus crossing *its own* boundary, so focus leaving the field for good is a
-transition it cannot see. Until that part lands, a widget whose field is a plain `<input>` keeps the
-flag set after focus leaves the field.
+**The other half of the pair is the field part's** ([`createTagsInputInput`](tags-input-input.md)):
+this element only ever observes focus crossing *its own* boundary, so focus leaving the field for
+good is a transition it cannot see. That hook runs the mirror check on its own deferred blur — *is the
+active element the field, or inside `state.listElement()`?* — which is what turns the region back off.
 
 ## SSR
 

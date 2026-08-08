@@ -1,6 +1,21 @@
 // The `tags-input/` barrel: the `createTagsInput` hook family, exported as the single subpath
 // `@hope-ui/primitives/tags-input`. Type-first — no namespace object (that's the component layer).
 export {
+  type CreateTagsInputClearProps,
+  type CreateTagsInputClearReturn,
+  createTagsInputClear,
+} from "./tags-input-clear";
+export {
+  type CreateTagsInputControlReturn,
+  createTagsInputControl,
+} from "./tags-input-control";
+export {
+  type CreateTagsInputInputProps,
+  type CreateTagsInputInputReturn,
+  createTagsInputInput,
+  type TagsInputBlurBehavior,
+} from "./tags-input-input";
+export {
   type CreateTagsInputItemProps,
   type CreateTagsInputItemReturn,
   createTagsInputItem,
