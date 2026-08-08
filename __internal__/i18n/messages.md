@@ -16,6 +16,7 @@ interface I18nMessageMap {
   common: { close: undefined };
   calendar: { label: undefined; /* … */ selectedDate: { date: string }; datesSelected: { count: number } };
   combobox: { triggerLabel: undefined; clearLabel: undefined; countAnnouncement: { count: number } };
+  tagsInput: { removeLabel: undefined; removeDescription: undefined; clearLabel: undefined };
 }
 ```
 
@@ -55,6 +56,15 @@ is typed as `I18nCatalog`, so it must carry every key or it fails to compile.
   MessageFormat plurals in per-locale JSON, this contract as per-locale functions, and every
   translation here is authored from scratch. No copied expression, so no `@license` header and no
   `NOTICE.md` row — see `CLAUDE.md` § Third-party attribution.
+- **The `tagsInput` strings were written, not ported.** React Aria ships the same three in
+  `react-aria/intl/tag/` for 34 locales, and copying that JSON would make this package an Apache-2.0
+  derivative owing an `@license` header, a `NOTICE.md` row in two places and
+  `LICENSE-APACHE-2.0.txt` — for three short functional strings. Reproducing the *idea* of a
+  keyboard-only `removeDescription` owes nothing, so all twelve catalogs are hand-authored.
+  `removeLabel` stays a bare verb because the chip composes it with its own text through
+  `aria-labelledby` (*"Remove Apple"*), and `ar` names the Delete key in Arabic rather than embedding
+  a Latin key name, which reorders unpredictably inside an RTL announcement. Decision `D12` in
+  `__internal__/components/decisions.md` § TagsInput.
 - **Dates are not i18n's job.** Months/weekdays/day-numbers are already locale-formatted upstream by
   `@internationalized/date` + `Intl` (keyed off the calendar's `locale`); the interpolated keys
   receive those **already-formatted strings** as params.
@@ -79,7 +89,9 @@ clears *a facet*, and several locales inflect for that object (pl `Wyczyść` vs
 vs `Zurücksetzen`). Promoting it to `common` would force one wording on all of them and make the
 later split a breaking key rename. A group per component keeps each string retranslatable in place.
 **Revisit if:** two component groups end up with a byte-identical `clearLabel` in all twelve
-catalogs — then the duplication is real and `common` earns it.
+catalogs — then the duplication is real and `common` earns it. `tagsInput.clearLabel` is the first
+second instance and it is **not** identical ("Clear all tags" vs `combobox`'s "Clear"), which is the
+argument above holding rather than failing; `locales/__tests__/en.test.ts` pins the two apart.
 
 ### One shared plural template across locales
 **Why not:** no single template spans the rules the shipped catalogs need — English is singular only

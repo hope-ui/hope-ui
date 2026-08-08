@@ -40,4 +40,12 @@ describe("MESSAGES_FR", () => {
     expect(fn({ count: 1 })).toBe("1 option disponible");
     expect(fn({ count: 2 })).toBe("2 options disponibles");
   });
+
+  it("carries the French tagsInput strings", () => {
+    expect(MESSAGES_FR.tagsInput.removeLabel).toBe("Supprimer");
+    expect(MESSAGES_FR.tagsInput.removeDescription).toBe(
+      "Appuyez sur Suppr pour supprimer l'étiquette",
+    );
+    expect(MESSAGES_FR.tagsInput.clearLabel).toBe("Effacer toutes les étiquettes");
+  });
 });

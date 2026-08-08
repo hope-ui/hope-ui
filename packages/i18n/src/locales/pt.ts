@@ -28,4 +28,9 @@ export const MESSAGES_PT: I18nCatalog = {
     countAnnouncement: ({ count }) =>
       `${count} ${count === 1 ? "opção disponível" : "opções disponíveis"}`,
   },
+  tagsInput: {
+    removeLabel: "Remover",
+    removeDescription: "Prima Delete para remover a etiqueta",
+    clearLabel: "Limpar todas as etiquetas",
+  },
 };

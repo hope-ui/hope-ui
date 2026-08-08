@@ -27,4 +27,9 @@ export const MESSAGES_DA: I18nCatalog = {
     countAnnouncement: ({ count }) =>
       `${count} ${count === 1 ? "mulighed tilgængelig" : "muligheder tilgængelige"}`,
   },
+  tagsInput: {
+    removeLabel: "Fjern",
+    removeDescription: "Tryk på Delete for at fjerne tagget",
+    clearLabel: "Ryd alle tags",
+  },
 };

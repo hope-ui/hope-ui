@@ -32,4 +32,12 @@ describe("MESSAGES_PL", () => {
     expect(fn({ count: 22 })).toBe("22 opcje dostępne"); // 22 → paucal again
     expect(fn({ count: 0 })).toBe("0 opcji dostępnych");
   });
+
+  it("carries the Polish tagsInput strings", () => {
+    expect(MESSAGES_PL.tagsInput.removeLabel).toBe("Usuń");
+    expect(MESSAGES_PL.tagsInput.removeDescription).toBe("Naciśnij Delete, aby usunąć tag");
+    // "Wyczyść" (clear the field), not a second "Usuń" — removing one tag and clearing them all
+    // must not read alike.
+    expect(MESSAGES_PL.tagsInput.clearLabel).toBe("Wyczyść wszystkie tagi");
+  });
 });

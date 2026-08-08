@@ -24,4 +24,10 @@ describe("MESSAGES_DE", () => {
     expect(fn({ count: 1 })).toBe("1 Option verfügbar");
     expect(fn({ count: 2 })).toBe("2 Optionen verfügbar");
   });
+
+  it("carries the German tagsInput strings", () => {
+    expect(MESSAGES_DE.tagsInput.removeLabel).toBe("Entfernen");
+    expect(MESSAGES_DE.tagsInput.removeDescription).toBe("Entf drücken, um das Tag zu entfernen");
+    expect(MESSAGES_DE.tagsInput.clearLabel).toBe("Alle Tags löschen");
+  });
 });

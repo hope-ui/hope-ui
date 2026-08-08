@@ -24,4 +24,10 @@ describe("MESSAGES_IT", () => {
     expect(fn({ count: 1 })).toBe("1 opzione disponibile");
     expect(fn({ count: 2 })).toBe("2 opzioni disponibili");
   });
+
+  it("carries the Italian tagsInput strings", () => {
+    expect(MESSAGES_IT.tagsInput.removeLabel).toBe("Rimuovi");
+    expect(MESSAGES_IT.tagsInput.removeDescription).toBe("Premi Canc per rimuovere il tag");
+    expect(MESSAGES_IT.tagsInput.clearLabel).toBe("Cancella tutti i tag");
+  });
 });

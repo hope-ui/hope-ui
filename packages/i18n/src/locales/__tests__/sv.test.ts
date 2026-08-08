@@ -24,4 +24,10 @@ describe("MESSAGES_SV", () => {
     expect(fn({ count: 1 })).toBe("1 alternativ tillgängligt");
     expect(fn({ count: 2 })).toBe("2 alternativ tillgängliga");
   });
+
+  it("carries the Swedish tagsInput strings", () => {
+    expect(MESSAGES_SV.tagsInput.removeLabel).toBe("Ta bort");
+    expect(MESSAGES_SV.tagsInput.removeDescription).toBe("Tryck på Delete för att ta bort taggen");
+    expect(MESSAGES_SV.tagsInput.clearLabel).toBe("Rensa alla taggar");
+  });
 });

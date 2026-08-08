@@ -32,4 +32,9 @@ export const MESSAGES_FR: I18nCatalog = {
     countAnnouncement: ({ count }) =>
       `${count} option${count <= 1 ? "" : "s"} disponible${count <= 1 ? "" : "s"}`,
   },
+  tagsInput: {
+    removeLabel: "Supprimer",
+    removeDescription: "Appuyez sur Suppr pour supprimer l'étiquette",
+    clearLabel: "Effacer toutes les étiquettes",
+  },
 };

@@ -50,4 +50,10 @@ export const MESSAGES_PL: I18nCatalog = {
       return `${count} ${phrase}`;
     },
   },
+  tagsInput: {
+    removeLabel: "Usuń",
+    removeDescription: "Naciśnij Delete, aby usunąć tag",
+    // "Wyczyść" (clear the field), not "Usuń" (remove one) — the two actions must not read alike.
+    clearLabel: "Wyczyść wszystkie tagi",
+  },
 };

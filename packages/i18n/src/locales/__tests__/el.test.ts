@@ -24,4 +24,12 @@ describe("MESSAGES_EL", () => {
     expect(fn({ count: 1 })).toBe("1 διαθέσιμη επιλογή");
     expect(fn({ count: 2 })).toBe("2 διαθέσιμες επιλογές");
   });
+
+  it("carries the Greek tagsInput strings", () => {
+    expect(MESSAGES_EL.tagsInput.removeLabel).toBe("Αφαίρεση");
+    expect(MESSAGES_EL.tagsInput.removeDescription).toBe(
+      "Πατήστε Delete για αφαίρεση της ετικέτας",
+    );
+    expect(MESSAGES_EL.tagsInput.clearLabel).toBe("Εκκαθάριση όλων των ετικετών");
+  });
 });

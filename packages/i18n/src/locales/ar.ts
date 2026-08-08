@@ -70,4 +70,11 @@ export const MESSAGES_AR: I18nCatalog = {
       return `${count} خيار متاح`;
     },
   },
+  tagsInput: {
+    removeLabel: "إزالة",
+    // The key is named rather than spelled "Delete": a Latin key name inside an RTL announcement
+    // reorders unpredictably, and "مفتاح الحذف" is how Arabic keyboard help refers to it anyway.
+    removeDescription: "اضغط مفتاح الحذف لإزالة الوسم",
+    clearLabel: "مسح كل الوسوم",
+  },
 };

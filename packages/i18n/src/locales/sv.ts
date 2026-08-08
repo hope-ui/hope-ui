@@ -27,4 +27,9 @@ export const MESSAGES_SV: I18nCatalog = {
     countAnnouncement: ({ count }) =>
       `${count} alternativ ${count === 1 ? "tillgängligt" : "tillgängliga"}`,
   },
+  tagsInput: {
+    removeLabel: "Ta bort",
+    removeDescription: "Tryck på Delete för att ta bort taggen",
+    clearLabel: "Rensa alla taggar",
+  },
 };

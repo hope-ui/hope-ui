@@ -31,4 +31,18 @@ describe("MESSAGES_EN", () => {
     expect(fn({ count: 1 })).toBe("1 option available");
     expect(fn({ count: 2 })).toBe("2 options available");
   });
+
+  it("carries the English tagsInput strings", () => {
+    // `removeLabel` is composed with the chip's own text through `aria-labelledby` ("Remove Apple"),
+    // so it must stay a bare verb with no object and no trailing punctuation.
+    expect(MESSAGES_EN.tagsInput.removeLabel).toBe("Remove");
+    expect(MESSAGES_EN.tagsInput.removeDescription).toBe("Press Delete to remove tag");
+    expect(MESSAGES_EN.tagsInput.clearLabel).toBe("Clear all tags");
+  });
+
+  it("keeps tagsInput.clearLabel distinct from combobox.clearLabel", () => {
+    // The two are separate keys precisely so each stays retranslatable in place; a byte-identical
+    // pair across every catalog is the trigger to reconsider promoting one to `common`.
+    expect(MESSAGES_EN.tagsInput.clearLabel).not.toBe(MESSAGES_EN.combobox.clearLabel);
+  });
 });

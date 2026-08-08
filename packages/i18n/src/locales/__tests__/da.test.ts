@@ -24,4 +24,10 @@ describe("MESSAGES_DA", () => {
     expect(fn({ count: 1 })).toBe("1 mulighed tilgængelig");
     expect(fn({ count: 2 })).toBe("2 muligheder tilgængelige");
   });
+
+  it("carries the Danish tagsInput strings", () => {
+    expect(MESSAGES_DA.tagsInput.removeLabel).toBe("Fjern");
+    expect(MESSAGES_DA.tagsInput.removeDescription).toBe("Tryk på Delete for at fjerne tagget");
+    expect(MESSAGES_DA.tagsInput.clearLabel).toBe("Ryd alle tags");
+  });
 });

@@ -30,4 +30,9 @@ export const MESSAGES_FI: I18nCatalog = {
     countAnnouncement: ({ count }) =>
       `${count} ${count === 1 ? "vaihtoehto" : "vaihtoehtoa"} saatavilla`,
   },
+  tagsInput: {
+    removeLabel: "Poista",
+    removeDescription: "Poista tunniste painamalla Delete-näppäintä",
+    clearLabel: "Tyhjennä kaikki tunnisteet",
+  },
 };

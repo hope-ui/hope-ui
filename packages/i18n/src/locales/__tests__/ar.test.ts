@@ -34,4 +34,15 @@ describe("MESSAGES_AR", () => {
     expect(fn({ count: 11 })).toBe("11 خيارًا متاحًا"); // many (n%100 = 11–99)
     expect(fn({ count: 100 })).toBe("100 خيار متاح"); // other (n%100 = 0/1/2 for n ≥ 100)
   });
+
+  it("carries the Arabic tagsInput strings", () => {
+    expect(MESSAGES_AR.tagsInput.removeLabel).toBe("إزالة");
+    expect(MESSAGES_AR.tagsInput.removeDescription).toBe("اضغط مفتاح الحذف لإزالة الوسم");
+    expect(MESSAGES_AR.tagsInput.clearLabel).toBe("مسح كل الوسوم");
+  });
+
+  it("names the Delete key in Arabic rather than embedding a Latin key name", () => {
+    // A Latin "Delete" inside an RTL string reorders unpredictably when announced.
+    expect(MESSAGES_AR.tagsInput.removeDescription).not.toMatch(/[A-Za-z]/);
+  });
 });

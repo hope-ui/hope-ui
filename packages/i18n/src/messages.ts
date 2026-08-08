@@ -59,6 +59,17 @@ interface I18nMessageMap {
     /** Live-region announcement of how many options the current filter left. */
     countAnnouncement: { count: number };
   };
+  tagsInput: {
+    /**
+     * The chip remove-button's own label. It is composed with the chip's text through
+     * `aria-labelledby` (*"Remove Apple"*), so it takes no params and interpolates nothing.
+     */
+    removeLabel: undefined;
+    /** Focused-chip hint on how to remove it. Keyboard-only, so it is demoted for touch. */
+    removeDescription: undefined;
+    /** The clear-all button's `aria-label`. Distinct from `combobox.clearLabel` ("Clear"). */
+    clearLabel: undefined;
+  };
 }
 
 /** Dotted, component-namespaced message keys — `"calendar.today"`, `"common.close"`, … (derived). */

@@ -30,4 +30,9 @@ export const MESSAGES_EN: I18nCatalog = {
     clearLabel: "Clear",
     countAnnouncement: ({ count }) => `${count} option${count === 1 ? "" : "s"} available`,
   },
+  tagsInput: {
+    removeLabel: "Remove",
+    removeDescription: "Press Delete to remove tag",
+    clearLabel: "Clear all tags",
+  },
 };

@@ -26,4 +26,9 @@ export const MESSAGES_DE: I18nCatalog = {
     clearLabel: "Löschen",
     countAnnouncement: ({ count }) => `${count} ${count === 1 ? "Option" : "Optionen"} verfügbar`,
   },
+  tagsInput: {
+    removeLabel: "Entfernen",
+    removeDescription: "Entf drücken, um das Tag zu entfernen",
+    clearLabel: "Alle Tags löschen",
+  },
 };

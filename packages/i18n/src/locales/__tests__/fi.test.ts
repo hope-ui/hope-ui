@@ -24,4 +24,12 @@ describe("MESSAGES_FI", () => {
     expect(fn({ count: 1 })).toBe("1 vaihtoehto saatavilla");
     expect(fn({ count: 2 })).toBe("2 vaihtoehtoa saatavilla");
   });
+
+  it("carries the Finnish tagsInput strings", () => {
+    expect(MESSAGES_FI.tagsInput.removeLabel).toBe("Poista");
+    expect(MESSAGES_FI.tagsInput.removeDescription).toBe(
+      "Poista tunniste painamalla Delete-näppäintä",
+    );
+    expect(MESSAGES_FI.tagsInput.clearLabel).toBe("Tyhjennä kaikki tunnisteet");
+  });
 });

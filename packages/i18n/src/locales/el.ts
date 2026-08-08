@@ -28,4 +28,9 @@ export const MESSAGES_EL: I18nCatalog = {
     countAnnouncement: ({ count }) =>
       `${count} ${count === 1 ? "διαθέσιμη επιλογή" : "διαθέσιμες επιλογές"}`,
   },
+  tagsInput: {
+    removeLabel: "Αφαίρεση",
+    removeDescription: "Πατήστε Delete για αφαίρεση της ετικέτας",
+    clearLabel: "Εκκαθάριση όλων των ετικετών",
+  },
 };
