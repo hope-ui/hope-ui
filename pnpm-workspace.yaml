@@ -78,11 +78,16 @@ minimumReleaseAgeExclude:
   - '@internationalized/date@3.12.2'
   - '@solid-primitives/a11y@1.0.0-next.0'
   # apps/docs (TanStack Start) deps still in cooldown — excluded so `pnpm install` isn't gated.
-  - '@tanstack/solid-router@2.0.0-beta.24'
-  - '@tanstack/solid-start@2.0.0-beta.25'
-  - '@tanstack/solid-start-client@2.0.0-beta.24'
-  - '@tanstack/solid-start-server@2.0.0-beta.24'
-  - '@tanstack/start-static-server-functions@1.167.18'
+  - '@tanstack/solid-router@2.0.0-beta.29'
+  - '@tanstack/solid-start@2.0.0-beta.30'
+  - '@tanstack/solid-start-client@2.0.0-beta.29'
+  - '@tanstack/solid-start-server@2.0.0-beta.29'
+  - '@tanstack/start-static-server-functions@1.167.24'
+  # Transitive halves of the two TanStack pins above — appended by pnpm itself, and pinned to the
+  # exact versions those releases depend on.
+  - '@tanstack/router-core@1.171.19'
+  - '@tanstack/start-client-core@1.170.19'
+  - '@tanstack/start-storage-context@1.167.21'
   - 'vite-plugin-solid@3.0.0-next.23'
   - 'babel-preset-solid@2.0.0-beta.32'
   # Name pattern (no version): pnpm forbids a version union on a wildcard name.
