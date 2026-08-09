@@ -10,7 +10,6 @@ hard parts — focus, keyboard navigation, dismissal, and accessibility — so y
 about any of it to use them.
 
 - **Documentation:** [hope-ui.dev](https://hope-ui.dev)
-- **Storybook:** [storybook.hope-ui.dev](https://storybook.hope-ui.dev)
 
 ## Status
 
